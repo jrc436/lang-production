@@ -1,0 +1,18 @@
+DO/PO priming in the ACT-UP model
+
+give-offer
+(:PRIME-PO 0.635 :TARGET-PO 0.645 :PO-TARGET-AFTER-PO-PRIME 0.511811
+ :DO-TARGET-AFTER-DO-PRIME 0.12328767)
+
+give-give
+(:PRIME-PO 0.24 :TARGET-PO 0.11 :PO-TARGET-AFTER-PO-PRIME 0.33333334
+ :DO-TARGET-AFTER-DO-PRIME 0.9605263)
+
+offer-offer
+(:PRIME-PO 0.94 :TARGET-PO 0.985 :PO-TARGET-AFTER-PO-PRIME 0.9946808
+ :DO-TARGET-AFTER-DO-PRIME 0.16666667)
+("the physician" "gave" "a flower" "to" "the cop") 
+
+
+give: ("the physician" "gave" "a flower" "to" "the cop")
+offer: ("the girl" "offered" "the seat" "to" "a friend") 

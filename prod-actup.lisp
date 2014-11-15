@@ -149,7 +149,7 @@
 
 ;; Prob distribution from  corpus
 
-(load "../split-sequence.lisp")
+(load "split-sequence.lisp")
 (import 'SPLIT-SEQUENCE::split-sequence)
 
 (DEFPARAMETER *freq-hash* (make-hash-table :test 'equal))
@@ -192,7 +192,7 @@
 ;; cat switchboard-ccg-rules.txt | awk '{if($7 == "I") { print $9, $8;}}' -  | sort | uniq -c | awk '{if($1>10) {print $1, $2, $3}}' - >~/PhD/ACT-R/swbd-lex-freq.txt
 
  
-  (with-open-file (stream "../swbd-freq.txt")
+  (with-open-file (stream "swbd-freq.txt")
     (do ((line (read-line stream nil)
                (read-line stream nil)))
         ((null line))
@@ -201,7 +201,7 @@
 	(setq *freq-sum* (+ *freq-sum* f))
 	
 	(setf (gethash   (string-downcase (car (cdr tok))) *freq-hash*) f ))))
-  (with-open-file (stream "../swbd-lex-freq.txt")
+  (with-open-file (stream "swbd-lex-freq.txt")
     (do ((line (read-line stream nil)
                (read-line stream nil)))
         ((null line))

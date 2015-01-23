@@ -1,0 +1,1746 @@
+<?xml version="1.0" encoding="UTF-8"?><rules xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../rules.xsd" name="protogrammar">
+  <application dir="forward"/>
+  <application dir="backward"/>
+  <composition harmonic="true" dir="forward"/>
+  <composition harmonic="true" dir="backward"/>
+  <composition harmonic="false" dir="backward"/>
+  <typeraising useDollar="false" dir="forward"/>
+  <typeraising useDollar="true" dir="backward"/>
+  <typeraising useDollar="true" dir="backward">
+    <arg>
+      <atomcat type="pp"/>
+    </arg>
+  </typeraising>
+  <typechanging name="n_to_np">
+    <arg>
+      <atomcat type="n">
+        <fs id="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="X"/>
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+    </arg>
+    <result>
+      <atomcat type="np">
+        <fs id="2">
+          <feat val="3rd" attr="pers"/>
+        </fs>
+        <lf>
+          <satop nomvar="X">
+            <diamond mode="det">
+              <prop name="nil"/>
+            </diamond>
+          </satop>
+        </lf>
+      </atomcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[to]\np_to_n\n">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat attr="form" val="to"/>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="n">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="n">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="X">
+            <diamond mode="Purpose">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[pss]\np_to_np\np">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat attr="form" val="pss"/>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="X">
+            <diamond mode="GenRel">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[dcl]/np_to_np\np">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat attr="form" val="dcl"/>
+          </fs>
+        </atomcat>
+        <slash dir="/" mode="&gt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="X">
+            <diamond mode="GenRel">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[pss]\np_to_s/s">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat attr="form" val="pss"/>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="s">
+          <fs id="3">
+            <feat attr="index">
+              <lf>
+                <nomvar name="E0"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="/" mode="&gt;"/>
+        <atomcat type="s">
+          <fs id="3">
+            <feat attr="index">
+              <lf>
+                <nomvar name="E0"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="E0">
+            <diamond mode="GenRel">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[ng]\np_to_np\np">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat attr="form" val="ng"/>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="X">
+            <diamond mode="GenRel">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[ng]\np_to_s\np\(s\np)">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat attr="form" val="ng"/>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="s">
+          <fs id="3">
+            <feat attr="index">
+              <lf>
+                <nomvar name="E0"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <complexcat>
+          <atomcat type="s">
+            <fs id="3">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="E0"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <slash dir="\" mode="&lt;"/>
+          <atomcat type="np">
+            <fs id="2">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="X"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+        </complexcat>
+        <lf>
+          <satop nomvar="E0">
+            <diamond mode="GenRel">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[dcl]_to_s\s">
+    <arg>
+      <atomcat type="s">
+        <fs>
+          <feat attr="index">
+            <lf>
+              <nomvar name="E"/>
+            </lf>
+          </feat>
+          <feat val="dcl" attr="form"/>
+        </fs>
+      </atomcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="s">
+          <fs id="1">
+            <feat attr="index">
+              <lf>
+                <nomvar name="E0"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash mode="*" dir="\"/>
+        <atomcat type="s">
+          <fs id="1">
+            <feat attr="index">
+              <lf>
+                <nomvar name="E0"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="E0">
+            <diamond mode="GenRel">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[adj]\np_to_np\np">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat attr="form" val="adj"/>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="X">
+            <diamond mode="GenRel">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[to]\np_to_np\np">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat attr="form" val="to"/>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="X">
+            <diamond mode="Purpose">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[to]\np_to_s\np\(s\np)">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat attr="form" val="to"/>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="s">
+          <fs id="3">
+            <feat attr="index">
+              <lf>
+                <nomvar name="E0"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <complexcat>
+          <atomcat type="s">
+            <fs id="3">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="E0"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <slash dir="\" mode="&lt;"/>
+          <atomcat type="np">
+            <fs id="2">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="X"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+        </complexcat>
+        <lf>
+          <satop nomvar="E0">
+            <diamond mode="Purpose">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[adj]\np_to_s\np\(s\np)">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat attr="form" val="adj"/>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="s">
+          <fs id="3">
+            <feat attr="index">
+              <lf>
+                <nomvar name="E0"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <complexcat>
+          <atomcat type="s">
+            <fs id="3">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="E0"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <slash dir="\" mode="&lt;"/>
+          <atomcat type="np">
+            <fs id="2">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="X"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+        </complexcat>
+        <lf>
+          <satop nomvar="E0">
+            <diamond mode="GenRel">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[ng]\np_to_np">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs id="1">
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat val="ng" attr="form"/>
+          </fs>
+        </atomcat>
+        <slash mode="&lt;" dir="\"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X2"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <atomcat type="np">
+        <fs>
+          <feat attr="index">
+            <lf>
+              <nomvar name="E"/>
+            </lf>
+          </feat>
+        </fs>
+        <lf>
+          <satop nomvar="E">
+            <diamond mode="nom">
+              <prop name="+"/>
+            </diamond>
+          </satop>
+        </lf>
+      </atomcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[to]\np_to_s\np\(s\np/(s[to]\np))">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs id="1">
+            <feat attr="form" val="to"/>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2"/>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="s">
+          <fs id="3"/>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="4"/>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <complexcat>
+          <atomcat type="s">
+            <fs id="3"/>
+          </atomcat>
+          <slash dir="\" mode="&lt;"/>
+          <atomcat type="np">
+            <fs id="4"/>
+          </atomcat>
+          <slash dir="/" mode="&gt;"/>
+          <complexcat>
+            <atomcat type="s">
+              <fs id="1">
+                <feat attr="form" val="to"/>
+              </fs>
+            </atomcat>
+            <slash dir="\" mode="&lt;"/>
+            <atomcat type="np">
+              <fs id="2"/>
+            </atomcat>
+          </complexcat>
+        </complexcat>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[pss]\np:Arg1_to_np\np">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat attr="form" val="pss"/>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="X">
+            <diamond mode="GenRel">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[ng]\np_to_s\s">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat attr="form" val="ng"/>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="s">
+          <fs id="3">
+            <feat attr="index">
+              <lf>
+                <nomvar name="E0"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="s">
+          <fs id="3">
+            <feat attr="index">
+              <lf>
+                <nomvar name="E0"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="E0">
+            <diamond mode="GenRel">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[adj]\np_to_s\np\(s\np/(s[adj]\np))">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs id="1">
+            <feat attr="form" val="adj"/>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2"/>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="s">
+          <fs id="3"/>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="4"/>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <complexcat>
+          <atomcat type="s">
+            <fs id="3"/>
+          </atomcat>
+          <slash dir="\" mode="&lt;"/>
+          <atomcat type="np">
+            <fs id="4"/>
+          </atomcat>
+          <slash dir="/" mode="&gt;"/>
+          <complexcat>
+            <atomcat type="s">
+              <fs id="1">
+                <feat attr="form" val="adj"/>
+              </fs>
+            </atomcat>
+            <slash dir="\" mode="&lt;"/>
+            <atomcat type="np">
+              <fs id="2"/>
+            </atomcat>
+          </complexcat>
+        </complexcat>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="np_to_np/(np\np)">
+    <arg>
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="X2"/>
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="np">
+          <fs id="1">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X1"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash mode="^" dir="/"/>
+        <complexcat>
+          <atomcat type="np">
+            <fs id="1">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="X1"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <slash mode="^" dir="\"/>
+          <atomcat type="np">
+            <fs id="2">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="X2"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+        </complexcat>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="np_to_s/(s/np)">
+    <arg>
+      <atomcat type="np">
+        <fs id="2">
+          <feat attr="index">
+            <lf>
+              <nomvar name="X2"/>
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="s">
+          <fs id="1">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X1"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash mode="&gt;" dir="/"/>
+        <complexcat>
+          <atomcat type="s">
+            <fs id="1">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="X1"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <slash mode="&gt;" dir="/"/>
+          <atomcat type="np">
+            <fs id="2">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="X2"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+        </complexcat>
+        <lf>
+          <satop nomvar="X2">
+            <diamond mode="top">
+              <prop name="+"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[to]\np/np_to_np\np">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs id="1">
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat val="to" attr="form"/>
+          </fs>
+        </atomcat>
+        <slash mode="&lt;" dir="\"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash mode="&gt;" dir="/"/>
+        <atomcat type="np">
+          <fs id="3">
+            <feat attr="index">
+              <lf>
+                <nomvar name="Y"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="np">
+          <fs id="3">
+            <feat attr="index">
+              <lf>
+                <nomvar name="Y"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash mode="^" dir="\"/>
+        <atomcat type="np">
+          <fs id="3">
+            <feat attr="index">
+              <lf>
+                <nomvar name="Y"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="Y">
+            <diamond mode="GenRel">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[dcl]_to_np\np">
+    <arg>
+      <atomcat type="s">
+        <fs>
+          <feat attr="index">
+            <lf>
+              <nomvar name="E"/>
+            </lf>
+          </feat>
+          <feat val="dcl" attr="form"/>
+        </fs>
+      </atomcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash mode="^" dir="\"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="X">
+            <diamond mode="GenRel">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[dcl]_to_s\np\(s\np)\(s\np\(s\np))">
+    <arg>
+      <atomcat type="s">
+        <fs>
+          <feat attr="index">
+            <lf>
+              <nomvar name="E"/>
+            </lf>
+          </feat>
+          <feat val="dcl" attr="form"/>
+        </fs>
+      </atomcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="s">
+          <fs inheritsFrom="1">
+            <feat attr="mod-index">
+              <lf>
+                <nomvar name="M"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash mode="&lt;" dir="\"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X2"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash mode="&lt;" dir="\"/>
+        <complexcat>
+          <atomcat type="s">
+            <fs id="1">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="X1"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <slash mode="&lt;" dir="\"/>
+          <atomcat type="np">
+            <fs id="2">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="X2"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+        </complexcat>
+        <slash mode="^" dir="\"/>
+        <complexcat>
+          <atomcat type="s">
+            <fs inheritsFrom="1">
+              <feat attr="mod-index">
+                <lf>
+                  <nomvar name="M"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <slash mode="&lt;" dir="\"/>
+          <atomcat type="np">
+            <fs id="2">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="X2"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <slash mode="&lt;" dir="\"/>
+          <complexcat>
+            <atomcat type="s">
+              <fs id="1">
+                <feat attr="index">
+                  <lf>
+                    <nomvar name="X1"/>
+                  </lf>
+                </feat>
+              </fs>
+            </atomcat>
+            <slash mode="&lt;" dir="\"/>
+            <atomcat type="np">
+              <fs id="2">
+                <feat attr="index">
+                  <lf>
+                    <nomvar name="X2"/>
+                  </lf>
+                </feat>
+              </fs>
+            </atomcat>
+          </complexcat>
+        </complexcat>
+        <lf>
+          <satop nomvar="M">
+            <diamond mode="GenRel">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[ng]\np_to_s/s">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat attr="form" val="ng"/>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="s">
+          <fs id="3">
+            <feat attr="index">
+              <lf>
+                <nomvar name="E0"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="/" mode="&gt;"/>
+        <atomcat type="s">
+          <fs id="3">
+            <feat attr="index">
+              <lf>
+                <nomvar name="E0"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="E0">
+            <diamond mode="GenRel">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[ng]_to_np">
+    <arg>
+      <atomcat type="s">
+        <fs id="1">
+          <feat attr="index">
+            <lf>
+              <nomvar name="E"/>
+            </lf>
+          </feat>
+          <feat val="ng" attr="form"/>
+        </fs>
+      </atomcat>
+    </arg>
+    <result>
+      <atomcat type="np">
+        <fs>
+          <feat attr="index">
+            <lf>
+              <nomvar name="E"/>
+            </lf>
+          </feat>
+        </fs>
+        <lf>
+          <satop nomvar="E">
+            <diamond mode="nom">
+              <prop name="+"/>
+            </diamond>
+          </satop>
+        </lf>
+      </atomcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[pss]\np_to_s\np\(s\np)">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat attr="form" val="pss"/>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="s">
+          <fs id="3">
+            <feat attr="index">
+              <lf>
+                <nomvar name="E0"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <complexcat>
+          <atomcat type="s">
+            <fs id="3">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="E0"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <slash dir="\" mode="&lt;"/>
+          <atomcat type="np">
+            <fs id="2">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="X"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+        </complexcat>
+        <lf>
+          <satop nomvar="E0">
+            <diamond mode="GenRel">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[dcl]_to_s/s\(s/s)">
+    <arg>
+      <atomcat type="s">
+        <fs>
+          <feat attr="index">
+            <lf>
+              <nomvar name="E"/>
+            </lf>
+          </feat>
+          <feat val="dcl" attr="form"/>
+        </fs>
+      </atomcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="s">
+          <fs inheritsFrom="1">
+            <feat attr="mod-index">
+              <lf>
+                <nomvar name="M"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash mode="&gt;" dir="/"/>
+        <atomcat type="s">
+          <fs id="1">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X1"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash mode="^" dir="\"/>
+        <complexcat>
+          <atomcat type="s">
+            <fs inheritsFrom="1">
+              <feat attr="mod-index">
+                <lf>
+                  <nomvar name="M"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <slash mode="&gt;" dir="/"/>
+          <atomcat type="s">
+            <fs id="1">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="X1"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+        </complexcat>
+        <lf>
+          <satop nomvar="M">
+            <diamond mode="Mod">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[to]\np_to_s/s">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat attr="form" val="to"/>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="s">
+          <fs id="3">
+            <feat attr="index">
+              <lf>
+                <nomvar name="E0"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="/" mode="&gt;"/>
+        <atomcat type="s">
+          <fs id="3">
+            <feat attr="index">
+              <lf>
+                <nomvar name="E0"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="E0">
+            <diamond mode="Purpose">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="s[ng]\np_to_s\np/(s\np)">
+    <arg>
+      <complexcat>
+        <atomcat type="s">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+            <feat attr="form" val="ng"/>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+      </complexcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="s">
+          <fs id="3">
+            <feat attr="index">
+              <lf>
+                <nomvar name="E0"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="\" mode="&lt;"/>
+        <atomcat type="np">
+          <fs id="2">
+            <feat attr="index">
+              <lf>
+                <nomvar name="X"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash dir="/" mode="&gt;"/>
+        <complexcat>
+          <atomcat type="s">
+            <fs id="3">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="E0"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+          <slash dir="\" mode="&lt;"/>
+          <atomcat type="np">
+            <fs id="2">
+              <feat attr="index">
+                <lf>
+                  <nomvar name="X"/>
+                </lf>
+              </feat>
+            </fs>
+          </atomcat>
+        </complexcat>
+        <lf>
+          <satop nomvar="E0">
+            <diamond mode="GenRel">
+              <nomvar name="E"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="sent_to_sents\sent">
+    <arg>
+      <atomcat type="sent">
+        <fs>
+          <feat attr="index">
+            <lf>
+              <nomvar name="E2"/>
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="sents">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash mode="&lt;" dir="\"/>
+        <atomcat type="sent">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E1"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="E">
+            <prop name="SEQ"/>
+            <diamond mode="Arg1">
+              <nomvar name="E1"/>
+            </diamond>
+            <diamond mode="Arg2">
+              <nomvar name="E2"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+  <typechanging name="sents_to_sents\sent">
+    <arg>
+      <atomcat type="sents">
+        <fs>
+          <feat attr="index">
+            <lf>
+              <nomvar name="E2"/>
+            </lf>
+          </feat>
+        </fs>
+      </atomcat>
+    </arg>
+    <result>
+      <complexcat>
+        <atomcat type="sents">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <slash mode="&lt;" dir="\"/>
+        <atomcat type="sent">
+          <fs>
+            <feat attr="index">
+              <lf>
+                <nomvar name="E1"/>
+              </lf>
+            </feat>
+          </fs>
+        </atomcat>
+        <lf>
+          <satop nomvar="E">
+            <prop name="SEQ"/>
+            <diamond mode="Arg1">
+              <nomvar name="E1"/>
+            </diamond>
+            <diamond mode="Arg2">
+              <nomvar name="E2"/>
+            </diamond>
+          </satop>
+        </lf>
+      </complexcat>
+    </result>
+  </typechanging>
+</rules>

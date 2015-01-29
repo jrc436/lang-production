@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<workbench progressCount="12" version="2.0">
+<workbenchAdvisor/>
+<window height="768" maximized="true" width="1024" x="65" y="24">
+<fastViewData fastViewLocation="1024"/>
+<perspectiveBar>
+<itemSize x="160"/>
+</perspectiveBar>
+<coolbarLayout>
+<coolItem id="group.file" itemType="typeGroupMarker"/>
+<coolItem id="org.eclipse.ui.workbench.file" itemType="typeToolBarContribution" x="144" y="30"/>
+<coolItem id="additions" itemType="typeGroupMarker"/>
+<coolItem id="org.eclipse.debug.ui.launch.toolbar" itemType="typeToolBarContribution" x="-1" y="-1"/>
+<coolItem id="org.eclipse.debug.ui.launchActionSet" itemType="typeToolBarContribution" x="156" y="30"/>
+<coolItem id="org.eclipse.debug.ui.main.toolbar" itemType="typeToolBarContribution" x="-1" y="-1"/>
+<coolItem id="org.eclipse.search.searchActionSet" itemType="typeToolBarContribution" x="88" y="30"/>
+<coolItem id="org.eclipse.ui.edit.text.actionSet.presentation" itemType="typeToolBarContribution" x="124" y="30"/>
+<coolItem id="group.nav" itemType="typeGroupMarker"/>
+<coolItem id="org.eclipse.ui.workbench.navigate" itemType="typeToolBarContribution" x="232" y="30"/>
+<coolItem id="group.editor" itemType="typeGroupMarker"/>
+<coolItem id="org.eclipse.jdt.ui.CompilationUnitEditor" itemType="typeToolBarContribution" x="-1" y="-1"/>
+<coolItem id="group.help" itemType="typeGroupMarker"/>
+<coolItem id="org.eclipse.ui.workbench.help" itemType="typeToolBarContribution" x="-1" y="-1"/>
+</coolbarLayout>
+<page aggregateWorkingSetId="Aggregate for window 1422548293809" focus="true" label="Workspace - Resource">
+<editors>
+<editorArea activeWorkbook="DefaultEditorWorkbook">
+<info part="DefaultEditorWorkbook">
+<folder appearance="1" expanded="2">
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+<part id="1"/>
+<part id="2"/>
+<part id="4"/>
+<part id="5"/>
+<part id="6"/>
+<part id="7"/>
+<part id="3"/>
+<part id="8"/>
+<part id="9"/>
+<part id="10"/>
+<part id="11"/>
+<part id="12"/>
+<part id="13"/>
+<part id="14"/>
+<part id="15"/>
+<part id="16"/>
+<part id="17"/>
+<part id="18"/>
+<part id="19"/>
+<part id="20"/>
+<part id="21"/>
+<part id="22"/>
+<part id="23"/>
+<part id="24"/>
+</presentation>
+</folder>
+</info>
+</editorArea>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Types.java" partName="Types.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/grammar/Types.java" title="Types.java" tooltip="actup-realizer/src/opennlp/ccg/grammar/Types.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/grammar/Types.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="7314" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Box.java" partName="Box.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/hylo/Box.java" title="Box.java" tooltip="actup-realizer/src/opennlp/ccg/hylo/Box.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/hylo/Box.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="7" selectionOffset="1225" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ModalOp.java" partName="ModalOp.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/hylo/ModalOp.java" title="ModalOp.java" tooltip="actup-realizer/src/opennlp/ccg/hylo/ModalOp.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/hylo/ModalOp.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1778" selectionTopPixel="102"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="HyloFormula.java" partName="HyloFormula.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/hylo/HyloFormula.java" title="HyloFormula.java" tooltip="actup-realizer/src/opennlp/ccg/hylo/HyloFormula.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/hylo/HyloFormula.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="11" selectionOffset="1512" selectionTopPixel="1254"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="LF.java" partName="LF.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/synsem/LF.java" title="LF.java" tooltip="actup-realizer/src/opennlp/ccg/synsem/LF.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/synsem/LF.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2204" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="HyloAtom.java" partName="HyloAtom.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/hylo/HyloAtom.java" title="HyloAtom.java" tooltip="actup-realizer/src/opennlp/ccg/hylo/HyloAtom.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/hylo/HyloAtom.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="1" selectionOffset="2858" selectionTopPixel="177"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="HyloHelper.java" partName="HyloHelper.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/hylo/HyloHelper.java" title="HyloHelper.java" tooltip="actup-realizer/src/opennlp/ccg/hylo/HyloHelper.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/hylo/HyloHelper.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="7133" selectionTopPixel="2550"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="HyloVar.java" partName="HyloVar.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/hylo/HyloVar.java" title="HyloVar.java" tooltip="actup-realizer/src/opennlp/ccg/hylo/HyloVar.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/hylo/HyloVar.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="6223" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Variable.java" partName="Variable.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/unify/Variable.java" title="Variable.java" tooltip="actup-realizer/src/opennlp/ccg/unify/Variable.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/unify/Variable.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1505" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Flattener.java" partName="Flattener.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/hylo/Flattener.java" title="Flattener.java" tooltip="actup-realizer/src/opennlp/ccg/hylo/Flattener.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/hylo/Flattener.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="10501" selectionTopPixel="1545"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="SatOp.java" partName="SatOp.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/hylo/SatOp.java" title="SatOp.java" tooltip="actup-realizer/src/opennlp/ccg/hylo/SatOp.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/hylo/SatOp.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1170" selectionTopPixel="209"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Op.java" partName="Op.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/hylo/Op.java" title="Op.java" tooltip="actup-realizer/src/opennlp/ccg/hylo/Op.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/hylo/Op.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="8319" selectionTopPixel="1784"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="DefaultTokenizer.java" partName="DefaultTokenizer.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/lexicon/DefaultTokenizer.java" title="DefaultTokenizer.java" tooltip="actup-realizer/src/opennlp/ccg/lexicon/DefaultTokenizer.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/lexicon/DefaultTokenizer.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2374" selectionTopPixel="209"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="MacroAdder.java" partName="MacroAdder.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/lexicon/MacroAdder.java" title="MacroAdder.java" tooltip="actup-realizer/src/opennlp/ccg/lexicon/MacroAdder.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/lexicon/MacroAdder.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="13" selectionOffset="1438" selectionTopPixel="104"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="IntHashSetMap.java" partName="IntHashSetMap.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/util/IntHashSetMap.java" title="IntHashSetMap.java" tooltip="actup-realizer/src/opennlp/ccg/util/IntHashSetMap.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/util/IntHashSetMap.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1732" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Word.java" partName="Word.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/lexicon/Word.java" title="Word.java" tooltip="actup-realizer/src/opennlp/ccg/lexicon/Word.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/lexicon/Word.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="4317" selectionTopPixel="7595"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="AAnFilter.java" partName="AAnFilter.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/ngrams/AAnFilter.java" title="AAnFilter.java" tooltip="actup-realizer/src/opennlp/ccg/ngrams/AAnFilter.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/ngrams/AAnFilter.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1940" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="NgramPrecisionModel.java" partName="NgramPrecisionModel.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/ngrams/NgramPrecisionModel.java" title="NgramPrecisionModel.java" tooltip="actup-realizer/src/opennlp/ccg/ngrams/NgramPrecisionModel.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/ngrams/NgramPrecisionModel.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2042" selectionTopPixel="2183"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="RepetitionScorer.java" partName="RepetitionScorer.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/ngrams/RepetitionScorer.java" title="RepetitionScorer.java" tooltip="actup-realizer/src/opennlp/ccg/ngrams/RepetitionScorer.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/ngrams/RepetitionScorer.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="80" selectionTopPixel="1594"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Chart.java" partName="Chart.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/parse/Chart.java" title="Chart.java" tooltip="actup-realizer/src/opennlp/ccg/parse/Chart.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/parse/Chart.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="80" selectionTopPixel="1574"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="EdgeHash.java" partName="EdgeHash.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/parse/EdgeHash.java" title="EdgeHash.java" tooltip="actup-realizer/src/opennlp/ccg/parse/EdgeHash.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/parse/EdgeHash.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1780" selectionTopPixel="13"/>
+</editor>
+<editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Chart.java" partName="Chart.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/realize/Chart.java" title="Chart.java" tooltip="actup-realizer/src/opennlp/ccg/realize/Chart.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/realize/Chart.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="20167" selectionTopPixel="6275"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="THashSet.java" partName="THashSet.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/gnu/trove/set/hash/THashSet.java" title="THashSet.java" tooltip="actup-realizer/src/gnu/trove/set/hash/THashSet.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/gnu/trove/set/hash/THashSet.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="8" selectionOffset="3125" selectionTopPixel="470"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="HashingStrategy.java" partName="HashingStrategy.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/gnu/trove/strategy/HashingStrategy.java" title="HashingStrategy.java" tooltip="actup-realizer/src/gnu/trove/strategy/HashingStrategy.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/gnu/trove/strategy/HashingStrategy.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="80" selectionTopPixel="0"/>
+</editor>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="IdentityHashingStrategy.java" partName="IdentityHashingStrategy.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/gnu/trove/strategy/IdentityHashingStrategy.java" title="IdentityHashingStrategy.java" tooltip="actup-realizer/src/gnu/trove/strategy/IdentityHashingStrategy.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/gnu/trove/strategy/IdentityHashingStrategy.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="596" selectionTopPixel="0"/>
+</editor>
+</editors>
+<views>
+<view id="org.eclipse.ui.navigator.ProjectExplorer" partName="Project Explorer">
+<viewState CommonNavigator.LINKING_ENABLED="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0"/>
+</view>
+<view id="org.eclipse.ui.views.TaskList" partName="Tasks">
+<viewState PRIMARY_SORT_FIELD="org.eclipse.ui.ide.completionField" categoryGroup="none" markerContentGenerator="org.eclipse.ui.ide.tasksGenerator" partName="Tasks">
+<columnWidths org.eclipse.ui.ide.completionField="40" org.eclipse.ui.ide.descriptionField="350" org.eclipse.ui.ide.locationField="105" org.eclipse.ui.ide.markerType="1041" org.eclipse.ui.ide.pathField="140" org.eclipse.ui.ide.priorityField="35" org.eclipse.ui.ide.resourceField="105"/>
+<visible IMemento.internal.id="org.eclipse.ui.ide.completionField"/>
+<visible IMemento.internal.id="org.eclipse.ui.ide.priorityField"/>
+<visible IMemento.internal.id="org.eclipse.ui.ide.descriptionField"/>
+<visible IMemento.internal.id="org.eclipse.ui.ide.resourceField"/>
+<visible IMemento.internal.id="org.eclipse.ui.ide.pathField"/>
+<visible IMemento.internal.id="org.eclipse.ui.ide.locationField"/>
+<visible IMemento.internal.id="org.eclipse.ui.ide.markerType"/>
+</viewState>
+</view>
+<view id="org.eclipse.ui.views.ContentOutline" partName="Outline">
+<viewState/>
+</view>
+</views>
+<perspectives activePart="org.eclipse.jdt.ui.CompilationUnitEditor" activePerspective="org.eclipse.ui.resourcePerspective">
+<perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
+<descriptor class="org.eclipse.ui.internal.ide.application.ResourcePerspective" id="org.eclipse.ui.resourcePerspective" label="Resource"/>
+<alwaysOnActionSet id="org.eclipse.ui.cheatsheets.actionSet"/>
+<alwaysOnActionSet id="org.eclipse.search.searchActionSet"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.annotationNavigation"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.navigation"/>
+<alwaysOnActionSet id="org.eclipse.ui.edit.text.actionSet.convertLineDelimitersTo"/>
+<alwaysOnActionSet id="org.eclipse.ui.externaltools.ExternalToolsSet"/>
+<alwaysOnActionSet id="org.eclipse.ui.actionSet.keyBindings"/>
+<alwaysOnActionSet id="org.eclipse.ui.actionSet.openFiles"/>
+<alwaysOnActionSet id="org.eclipse.ui.NavigateActionSet"/>
+<show_view_action id="org.eclipse.ui.navigator.ProjectExplorer"/>
+<show_view_action id="org.eclipse.ui.views.BookmarkView"/>
+<show_view_action id="org.eclipse.ui.views.ContentOutline"/>
+<show_view_action id="org.eclipse.ui.views.PropertySheet"/>
+<show_view_action id="org.eclipse.ui.views.ProblemView"/>
+<show_view_action id="org.eclipse.ui.views.ProgressView"/>
+<show_view_action id="org.eclipse.ui.views.TaskList"/>
+<show_view_action id="org.eclipse.ant.ui.views.AntView"/>
+<show_view_action id="org.eclipse.pde.runtime.LogView"/>
+<new_wizard_action id="org.eclipse.ui.wizards.new.folder"/>
+<new_wizard_action id="org.eclipse.ui.wizards.new.file"/>
+<new_wizard_action id="org.eclipse.ui.editors.wizards.UntitledTextFileWizard"/>
+<perspective_action id="org.eclipse.jdt.ui.JavaPerspective"/>
+<perspective_action id="org.eclipse.jdt.ui.JavaBrowsingPerspective"/>
+<perspective_action id="org.eclipse.team.cvs.ui.cvsPerspective"/>
+<perspective_action id="org.eclipse.team.ui.TeamSynchronizingPerspective"/>
+<hide_toolbar_item_id id="org.eclipse.debug.ui.commands.RunToLine"/>
+<hide_toolbar_item_id id="org.eclipse.jdt.ui.actions.OpenProjectWizard"/>
+<hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
+<view id="org.eclipse.ui.navigator.ProjectExplorer"/>
+<view id="org.eclipse.ui.views.ContentOutline"/>
+<view id="org.eclipse.ui.views.TaskList"/>
+<fastViewBars/>
+<layout>
+<mainWindow>
+<info folder="true" part="topLeft">
+<folder activePageID="org.eclipse.ui.navigator.ProjectExplorer" appearance="2" expanded="2">
+<page content="org.eclipse.ui.navigator.ProjectExplorer" label="Project Explorer"/>
+<page content="org.eclipse.ui.views.BookmarkView" label="LabelNotFound"/>
+<page content="org.eclipse.ui.views.ResourceNavigator" label="LabelNotFound"/>
+<page content="org.eclipse.team.ccvs.ui.RepositoriesView" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+</presentation>
+</folder>
+</info>
+<info folder="true" part="stickyFolderRight" ratio="0.7495049" ratioLeft="757" ratioRight="253" relationship="2" relative="topLeft">
+<folder appearance="2" expanded="2">
+<page content="org.eclipse.help.ui.HelpView" label="LabelNotFound"/>
+<page content="org.eclipse.ui.internal.introview" label="LabelNotFound"/>
+<page content="org.eclipse.ui.cheatsheets.views.CheatSheetView" label="LabelNotFound"/>
+</folder>
+</info>
+<info part="org.eclipse.ui.editorss" ratio="0.25940594" ratioLeft="262" ratioRight="748" relationship="2" relative="topLeft"/>
+<info folder="true" part="bottomRight" ratio="0.6596386" ratioLeft="438" ratioRight="226" relationship="4" relative="org.eclipse.ui.editorss">
+<folder activePageID="org.eclipse.ui.views.TaskList" appearance="2" expanded="2">
+<page content="org.eclipse.ui.views.TaskList" label="Tasks"/>
+<page content="org.eclipse.team.ui.GenericHistoryView" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+</presentation>
+</folder>
+</info>
+<info folder="true" part="bottomLeft" ratio="0.5" ratioLeft="332" ratioRight="332" relationship="4" relative="topLeft">
+<folder activePageID="org.eclipse.ui.views.ContentOutline" appearance="2" expanded="2">
+<page content="org.eclipse.ui.views.ContentOutline" label="Outline"/>
+<page content="org.eclipse.ant.ui.views.AntView" label="LabelNotFound"/>
+<presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
+<part id="0"/>
+</presentation>
+</folder>
+</info>
+</mainWindow>
+</layout>
+</perspective>
+</perspectives>
+<workingSets/>
+<navigationHistory>
+<editors>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/grammar/Types.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/hylo/Box.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/hylo/ModalOp.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/hylo/HyloFormula.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/synsem/LF.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/hylo/HyloAtom.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/hylo/HyloHelper.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/hylo/HyloVar.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/unify/Variable.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/hylo/Flattener.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/hylo/SatOp.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/hylo/Op.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/lexicon/DefaultTokenizer.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/lexicon/Lexicon.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/synsem/SignHash.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/lexicon/MacroAdder.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/util/IntHashSetMap.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/lexicon/Word.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/ngrams/AAnFilter.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/ngrams/NgramPrecisionModel.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/ngrams/RepetitionScorer.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/parse/Chart.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/parse/EdgeHash.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/realize/Chart.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/gnu/trove/set/hash/THashSet.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/gnu/trove/strategy/HashingStrategy.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/gnu/trove/strategy/IdentityHashingStrategy.java"/>
+</editors>
+<item historyLabel="Types.java" index="0">
+<position info="not_deleted" x="7314" y="0"/>
+</item>
+<item historyLabel="Box.java" index="1">
+<position info="not_deleted" x="1225" y="7"/>
+</item>
+<item historyLabel="ModalOp.java" index="2">
+<position info="not_deleted" x="1778" y="0"/>
+</item>
+<item historyLabel="HyloFormula.java" index="3">
+<position info="not_deleted" x="1535" y="2"/>
+</item>
+<item historyLabel="LF.java" index="4">
+<position info="not_deleted" x="2204" y="0"/>
+</item>
+<item historyLabel="HyloFormula.java" index="3">
+<position info="not_deleted" x="4947" y="0"/>
+</item>
+<item historyLabel="HyloAtom.java" index="5">
+<position info="not_deleted" x="2858" y="1"/>
+</item>
+<item historyLabel="HyloHelper.java" index="6">
+<position info="not_deleted" x="80" y="0"/>
+</item>
+<item historyLabel="HyloHelper.java" index="6">
+<position info="not_deleted" x="3531" y="13"/>
+</item>
+<item historyLabel="HyloHelper.java" index="6">
+<position info="not_deleted" x="7133" y="0"/>
+</item>
+<item historyLabel="HyloVar.java" index="7">
+<position info="not_deleted" x="1508" y="11"/>
+</item>
+<item historyLabel="HyloFormula.java" index="3">
+<position info="not_deleted" x="1512" y="11"/>
+</item>
+<item historyLabel="HyloVar.java" index="7">
+<position info="not_deleted" x="1531" y="8"/>
+</item>
+<item historyLabel="Variable.java" index="8">
+<position info="not_deleted" x="1505" y="0"/>
+</item>
+<item historyLabel="HyloVar.java" index="7">
+<position info="not_deleted" x="1508" y="11"/>
+</item>
+<item historyLabel="HyloFormula.java" index="3">
+<position info="not_deleted" x="1512" y="11"/>
+</item>
+<item historyLabel="HyloVar.java" index="7">
+<position info="not_deleted" x="1508" y="11"/>
+</item>
+<item historyLabel="HyloFormula.java" index="3">
+<position info="not_deleted" x="1512" y="11"/>
+</item>
+<item historyLabel="HyloVar.java" index="7">
+<position info="not_deleted" x="1508" y="11"/>
+</item>
+<item historyLabel="Flattener.java" index="9">
+<position info="not_deleted" x="10758" y="4"/>
+</item>
+<item historyLabel="SatOp.java" index="10">
+<position info="not_deleted" x="1170" y="0"/>
+</item>
+<item historyLabel="Flattener.java" index="9">
+<position info="not_deleted" x="10783" y="4"/>
+</item>
+<item historyLabel="SatOp.java" index="10">
+<position info="not_deleted" x="1170" y="0"/>
+</item>
+<item historyLabel="Flattener.java" index="9">
+<position info="not_deleted" x="10501" y="0"/>
+</item>
+<item historyLabel="Op.java" index="11">
+<position info="not_deleted" x="8319" y="0"/>
+</item>
+<item historyLabel="HyloVar.java" index="7">
+<position info="not_deleted" x="6223" y="0"/>
+</item>
+<item historyLabel="DefaultTokenizer.java" index="12">
+<position info="not_deleted" x="2937" y="8"/>
+</item>
+<item historyLabel="Lexicon.java" index="13">
+<position info="not_deleted" x="26106" y="8"/>
+</item>
+<item historyLabel="SignHash.java" index="14">
+<position info="not_deleted" x="1884" y="0"/>
+</item>
+<item historyLabel="MacroAdder.java" index="15">
+<position info="not_deleted" x="1438" y="13"/>
+</item>
+<item historyLabel="IntHashSetMap.java" index="16">
+<position info="not_deleted" x="1732" y="0"/>
+</item>
+<item historyLabel="Lexicon.java" index="13">
+<position info="not_deleted" x="25575" y="0"/>
+</item>
+<item historyLabel="SignHash.java" index="14">
+<position info="not_deleted" x="1884" y="0"/>
+</item>
+<item historyLabel="Lexicon.java" index="13">
+<position info="not_deleted" x="25575" y="0"/>
+</item>
+<item historyLabel="IntHashSetMap.java" index="16">
+<position info="not_deleted" x="1732" y="0"/>
+</item>
+<item historyLabel="DefaultTokenizer.java" index="12">
+<position info="not_deleted" x="2374" y="0"/>
+</item>
+<item historyLabel="Word.java" index="17">
+<position info="not_deleted" x="4317" y="0"/>
+</item>
+<item historyLabel="AAnFilter.java" index="18">
+<position info="not_deleted" x="1940" y="0"/>
+</item>
+<item historyLabel="NgramPrecisionModel.java" index="19">
+<position info="not_deleted" x="2042" y="0"/>
+</item>
+<item historyLabel="RepetitionScorer.java" index="20">
+<position info="not_deleted" x="80" y="0"/>
+</item>
+<item historyLabel="Chart.java" index="21">
+<position info="not_deleted" x="80" y="0"/>
+</item>
+<item historyLabel="EdgeHash.java" index="22">
+<position info="not_deleted" x="1780" y="0"/>
+</item>
+<item historyLabel="Chart.java" index="23">
+<position info="not_deleted" x="21364" y="8"/>
+</item>
+<item historyLabel="THashSet.java" index="24">
+<position info="not_deleted" x="3125" y="8"/>
+</item>
+<item historyLabel="HashingStrategy.java" index="25">
+<position info="not_deleted" x="80" y="0"/>
+</item>
+<item historyLabel="IdentityHashingStrategy.java" index="26">
+<position info="not_deleted" x="596" y="0"/>
+</item>
+<item active="true" historyLabel="Chart.java" index="23">
+<position info="not_deleted" x="21364" y="8"/>
+</item>
+</navigationHistory>
+<input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
+</page>
+<workbenchWindowAdvisor/>
+<actionBarAdvisor/>
+<trimLayout>
+<trimArea IMemento.internal.id="128">
+<trimItem IMemento.internal.id="org.eclipse.ui.internal.WorkbenchWindow.topBar"/>
+</trimArea>
+<trimArea IMemento.internal.id="1024">
+<trimItem IMemento.internal.id="org.eclise.ui.internal.FastViewBar"/>
+<trimItem IMemento.internal.id="org.eclipse.jface.action.StatusLineManager"/>
+<trimItem IMemento.internal.id="org.eclipse.ui.internal.progress.ProgressRegion"/>
+</trimArea>
+</trimLayout>
+</window>
+<mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="IdentityHashingStrategy.java" tooltip="actup-realizer/src/gnu/trove/strategy/IdentityHashingStrategy.java">
+<persistable path="/actup-realizer/src/gnu/trove/strategy/IdentityHashingStrategy.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="HashingStrategy.java" tooltip="actup-realizer/src/gnu/trove/strategy/HashingStrategy.java">
+<persistable path="/actup-realizer/src/gnu/trove/strategy/HashingStrategy.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="THashSet.java" tooltip="actup-realizer/src/gnu/trove/set/hash/THashSet.java">
+<persistable path="/actup-realizer/src/gnu/trove/set/hash/THashSet.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Chart.java" tooltip="actup-realizer/src/opennlp/ccg/realize/Chart.java">
+<persistable path="/actup-realizer/src/opennlp/ccg/realize/Chart.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="EdgeHash.java" tooltip="actup-realizer/src/opennlp/ccg/parse/EdgeHash.java">
+<persistable path="/actup-realizer/src/opennlp/ccg/parse/EdgeHash.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Chart.java" tooltip="actup-realizer/src/opennlp/ccg/parse/Chart.java">
+<persistable path="/actup-realizer/src/opennlp/ccg/parse/Chart.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="RepetitionScorer.java" tooltip="actup-realizer/src/opennlp/ccg/ngrams/RepetitionScorer.java">
+<persistable path="/actup-realizer/src/opennlp/ccg/ngrams/RepetitionScorer.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="NgramPrecisionModel.java" tooltip="actup-realizer/src/opennlp/ccg/ngrams/NgramPrecisionModel.java">
+<persistable path="/actup-realizer/src/opennlp/ccg/ngrams/NgramPrecisionModel.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="AAnFilter.java" tooltip="actup-realizer/src/opennlp/ccg/ngrams/AAnFilter.java">
+<persistable path="/actup-realizer/src/opennlp/ccg/ngrams/AAnFilter.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Word.java" tooltip="actup-realizer/src/opennlp/ccg/lexicon/Word.java">
+<persistable path="/actup-realizer/src/opennlp/ccg/lexicon/Word.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="IntHashSetMap.java" tooltip="actup-realizer/src/opennlp/ccg/util/IntHashSetMap.java">
+<persistable path="/actup-realizer/src/opennlp/ccg/util/IntHashSetMap.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="MacroAdder.java" tooltip="actup-realizer/src/opennlp/ccg/lexicon/MacroAdder.java">
+<persistable path="/actup-realizer/src/opennlp/ccg/lexicon/MacroAdder.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="SignHash.java" tooltip="actup-realizer/src/opennlp/ccg/synsem/SignHash.java">
+<persistable path="/actup-realizer/src/opennlp/ccg/synsem/SignHash.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Lexicon.java" tooltip="actup-realizer/src/opennlp/ccg/lexicon/Lexicon.java">
+<persistable path="/actup-realizer/src/opennlp/ccg/lexicon/Lexicon.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="DefaultTokenizer.java" tooltip="actup-realizer/src/opennlp/ccg/lexicon/DefaultTokenizer.java">
+<persistable path="/actup-realizer/src/opennlp/ccg/lexicon/DefaultTokenizer.java"/>
+</file>
+</mruList>
+</workbench>

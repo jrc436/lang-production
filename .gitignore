@@ -1,7 +1,4 @@
-candc/
-
 *.lisp~
-*.ccg
 *.com
 *.class
 *.dll

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="gnu.trove.list.array.TIntArrayList"/>
+<fullyQualifiedTypeName name="gnu.trove.map.hash.TObjectIntHashMap"/>
+<fullyQualifiedTypeName name="gnu.trove.map.hash.TIntObjectHashMap"/>
+<fullyQualifiedTypeName name="gnu.trove.set.hash.THashSet"/>
+</qualifiedTypeNameHistroy>

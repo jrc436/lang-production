@@ -19,8 +19,11 @@
 
 package opennlp.ccg.unify;
 
-import gnu.trove.*;
-import java.util.*;
+import gnu.trove.map.hash.THashMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+
+import java.util.Iterator;
 
 /**
  * Implementation of Substitution interface which ensures that all

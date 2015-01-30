@@ -18,8 +18,10 @@
 
 package opennlp.ccg.synsem;
 
-import opennlp.ccg.unify.*;
-import gnu.trove.*;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import opennlp.ccg.unify.Mutable;
+import opennlp.ccg.unify.Unifiable;
+import opennlp.ccg.unify.UnifyFailure;
 
 /**
  * An interface for objects that can be arguments in a category.

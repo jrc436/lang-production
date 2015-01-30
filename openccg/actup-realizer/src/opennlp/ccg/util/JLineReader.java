@@ -18,10 +18,17 @@
 
 package opennlp.ccg.util;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
 
-import jline.*;
+import jline.ArgumentCompletor;
+import jline.ConsoleReader;
+import jline.History;
+import jline.SimpleCompletor;
 
 /**
  * A command-line reader based on JLine.

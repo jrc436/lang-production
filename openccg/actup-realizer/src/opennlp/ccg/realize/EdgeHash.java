@@ -18,8 +18,10 @@
 
 package opennlp.ccg.realize;
 
-import gnu.trove.*;
-import java.util.*;
+import gnu.trove.set.hash.TCustomHashSet;
+import gnu.trove.strategy.HashingStrategy;
+
+import java.util.Set;
 
 /**
  * A set of edges, unique up to surface words.
@@ -28,12 +30,12 @@ import java.util.*;
  * @author      Michael White
  * @version     $Revision: 1.2 $, $Date: 2010/01/14 22:52:01 $
  */
-public class EdgeHash extends THashSet {
+public class EdgeHash extends TCustomHashSet {
 
 	private static final long serialVersionUID = 1L;
 	
 	/** Hashing strategy that uses Edge's surfaceWordHashCode and surfaceWordEquals methods. */
-    protected static TObjectHashingStrategy surfaceWordHashingStrategy = new TObjectHashingStrategy() {
+    protected static HashingStrategy surfaceWordHashingStrategy = new HashingStrategy() {
 		private static final long serialVersionUID = 1L;
 		public int computeHashCode(java.lang.Object o) {
             return ((Edge)o).surfaceWordHashCode();

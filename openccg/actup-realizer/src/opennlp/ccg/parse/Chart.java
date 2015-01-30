@@ -18,8 +18,10 @@
 
 package opennlp.ccg.parse;
 
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.set.hash.THashSet;
+import gnu.trove.map.hash.TCustomHashMap;
+import gnu.trove.set.hash.TCustomHashSet;
+import gnu.trove.strategy.HashingStrategy;
+import gnu.trove.strategy.IdentityHashingStrategy;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -64,10 +66,10 @@ public class Chart {
 	//     with a significant drop in complete parses
     @SuppressWarnings("unchecked")
     private static Map<Edge,Edge> createEdgeMap() {
-    	return new THashMap(11, representativeEdgeStrategy);
+    	return new TCustomHashMap(representativeEdgeStrategy, 11);
     }
     
-    private static TObjectHashingStrategy representativeEdgeStrategy = new TObjectHashingStrategy() {
+    private static HashingStrategy representativeEdgeStrategy = new HashingStrategy() {
 		private static final long serialVersionUID = 1L;
 		public int computeHashCode(Object o) {
             Sign sign = ((Edge)o).sign;
@@ -348,9 +350,9 @@ public class Chart {
 		Cell cell = get(x, y);
 		// recursively unpack each edge
 	    @SuppressWarnings("unchecked")
-        Set<Edge> unpacked = new THashSet(new TObjectIdentityHashingStrategy());
+        Set<Edge> unpacked = new TCustomHashSet(new IdentityHashingStrategy());
 	    @SuppressWarnings("unchecked")
-        Set<Edge> startedUnpacking = new THashSet(new TObjectIdentityHashingStrategy());
+        Set<Edge> startedUnpacking = new TCustomHashSet(new IdentityHashingStrategy());
 		for (Edge edge : cell.list) unpack(edge, unpacked, startedUnpacking); 
 		// collect and sort results
         EdgeHash merged = new EdgeHash();
@@ -490,7 +492,7 @@ public class Chart {
 		Cell cell = get(x, y);
 		// make top-level candidate list and derivs map
 		List<Candidate> topcands = new ArrayList<Candidate>(_pruneVal);
-		Map<Edge, List<Edge>> derivsmap = new THashMap(new TObjectIdentityHashingStrategy());
+		Map<Edge, List<Edge>> derivsmap = new TCustomHashMap(new IdentityHashingStrategy());
 		for (Edge edge : cell.list) {
 			List<Candidate> cands = getCandidates(edge, derivsmap);
 			topcands.addAll(cands);

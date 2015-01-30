@@ -43,8 +43,16 @@ public class LFLoader implements Iterator<LFInfo> {
 	 * @param baseDir The base directory. Paths will be interpreted relative to this directory.
 	 * @param paths The files to load the LFs from. Directories or files can be given. Directories are not searched recursively. Only files ending
 	 *  in .xml will be loaded.
+	 * @throws Exception if a list other than list<strings> is passed in
 	 */
-	public LFLoader(File grammarFile, File baseDir, List<String> paths) {
+	@SuppressWarnings("unchecked")
+	public LFLoader(File grammarFile, File baseDir, List<?> paths) throws Exception {
+		//jrc 1-29-2015 to change constructor to wildcard and allow eclipse compiler
+		//.net exception throwing style
+		if (!paths.isEmpty() && paths.get(0).getClass() == String.class) {
+				throw new Exception("paths should be a list of strings!");
+		}
+		List<String> sPaths = (List<String>) paths; //should know from earlier check, so this isn't "unchecked"
 		lfs = new LinkedList<LFInfo>();
 		URL grammarURL = null;
 		try {
@@ -60,8 +68,8 @@ public class LFLoader implements Iterator<LFInfo> {
 			e.printStackTrace();
 		}
 		lfFiles = new ArrayList<File>();
-		paths = normalize(paths);
-		for (String lfFilename : paths) {
+		sPaths = normalize(sPaths);
+		for (String lfFilename : sPaths) {
 			// if this argument is a directory, load all XML files from it
 			File f = new File(baseDir, lfFilename);
 			if(f.isDirectory()) {

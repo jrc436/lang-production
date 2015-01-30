@@ -18,7 +18,8 @@
 
 package opennlp.ccg.parse;
 
-import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TCustomHashSet;
+import gnu.trove.strategy.HashingStrategy;
 
 import java.util.Set;
 
@@ -31,12 +32,12 @@ import java.util.Set;
  * @author      Michael White
  * @version     $Revision: 1.1 $, $Date: 2007/12/20 05:51:10 $
  */
-public class EdgeHash extends THashSet {
+public class EdgeHash extends TCustomHashSet {
 
 	private static final long serialVersionUID = 1L;
 	
 	/** Hashing strategy that uses Edge's surfaceWordHashCode and surfaceWordEquals methods. */
-    protected static TObjectHashingStrategy surfaceWordHashingStrategy = new TObjectHashingStrategy() {
+    protected static HashingStrategy surfaceWordHashingStrategy = new HashingStrategy() {
 		private static final long serialVersionUID = 1L;
 		public int computeHashCode(java.lang.Object o) {
             return ((Edge)o).surfaceWordHashCode();

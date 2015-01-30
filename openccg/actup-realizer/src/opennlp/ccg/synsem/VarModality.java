@@ -17,10 +17,17 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.ccg.synsem;
 
-import java.io.Serializable;
-import gnu.trove.TObjectIntHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
-import opennlp.ccg.unify.*;
+import java.io.Serializable;
+
+import opennlp.ccg.unify.Indexed;
+import opennlp.ccg.unify.ModFcn;
+import opennlp.ccg.unify.Mutable;
+import opennlp.ccg.unify.Substitution;
+import opennlp.ccg.unify.UnifyControl;
+import opennlp.ccg.unify.UnifyFailure;
+import opennlp.ccg.unify.Variable;
 
 /**
  * A class for variables which can stand for slash modalities.

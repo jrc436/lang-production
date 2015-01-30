@@ -19,19 +19,32 @@
 
 package opennlp.ccg.grammar;
 
-import opennlp.ccg.synsem.*;
-import opennlp.ccg.hylo.*;
-import opennlp.ccg.unify.*;
-import opennlp.ccg.util.*;
+import gnu.trove.set.hash.TCustomHashSet;
+import gnu.trove.strategy.HashingStrategy;
 
-import org.jdom2.*;
-import gnu.trove.*;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.TObjectHashingStrategy;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import opennlp.ccg.hylo.HyloHelper;
+import opennlp.ccg.synsem.CatReader;
+import opennlp.ccg.synsem.Category;
+import opennlp.ccg.synsem.LF;
+import opennlp.ccg.synsem.Sign;
+import opennlp.ccg.unify.UnifyFailure;
+import opennlp.ccg.util.GroupMap;
+import opennlp.ccg.util.XmlScanner;
+
+import org.jdom2.Element;
 
 /**
  * A set of rules for combining categories.
@@ -115,15 +128,15 @@ public class RuleGroup implements Serializable {
     		sb.append(' ').append(rule);
     		return sb.toString();
     	}
-    }
+    }   
     
     // class for seen combos when determined dynamically
     // nb: for space efficiency, allows representative to be retrieved from set
-    private static class SupercatComboSet extends THashSet {
+    private static class SupercatComboSet extends TCustomHashSet {
 		private static final long serialVersionUID = 1L;
 		SupercatComboSet() {
     		super(
-    	        new TObjectHashingStrategy() {
+    	        new HashingStrategy() {
 					private static final long serialVersionUID = 1L;
 					public int computeHashCode(Object o) {
     					return (o instanceof SupercatRuleCombo) ? ((SupercatRuleCombo)o).supercatHashCode() : 0;

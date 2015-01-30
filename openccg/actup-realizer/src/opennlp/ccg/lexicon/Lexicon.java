@@ -19,20 +19,49 @@
 
 package opennlp.ccg.lexicon;
 
-import opennlp.ccg.grammar.*;
-import opennlp.ccg.synsem.*;
-import opennlp.ccg.unify.*;
-import opennlp.ccg.util.*;
-import opennlp.ccg.hylo.*;
-
-import org.jdom2.*;
-
-import java.io.*;
-import java.net.*;
-import java.util.*;
-
-import gnu.trove.*;
+import gnu.trove.map.hash.TCustomHashMap;
 import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.strategy.HashingStrategy;
+
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import opennlp.ccg.grammar.Grammar;
+import opennlp.ccg.hylo.HyloVar;
+import opennlp.ccg.hylo.NominalVar;
+import opennlp.ccg.hylo.Proposition;
+import opennlp.ccg.hylo.SatOp;
+import opennlp.ccg.synsem.AtomCat;
+import opennlp.ccg.synsem.Category;
+import opennlp.ccg.synsem.CategoryFcn;
+import opennlp.ccg.synsem.CategoryFcnAdapter;
+import opennlp.ccg.synsem.LF;
+import opennlp.ccg.synsem.Sign;
+import opennlp.ccg.synsem.SignHash;
+import opennlp.ccg.unify.FeatureStructure;
+import opennlp.ccg.unify.GFeatStruc;
+import opennlp.ccg.unify.GFeatVar;
+import opennlp.ccg.unify.ModFcn;
+import opennlp.ccg.unify.Mutable;
+import opennlp.ccg.unify.SimpleType;
+import opennlp.ccg.unify.UnifyControl;
+import opennlp.ccg.unify.UnifyFailure;
+import opennlp.ccg.util.GroupMap;
+import opennlp.ccg.util.IntHashSetMap;
+import opennlp.ccg.util.Interner;
+import opennlp.ccg.util.Pair;
+import opennlp.ccg.util.XmlScanner;
+
+import org.jdom2.Element;
 
 
 /**
@@ -951,8 +980,8 @@ public class Lexicon {
     // a map from a cat's nomvars to types, 
     // just using the var's name for equality
     @SuppressWarnings("unchecked")
-	private Map<NominalVar,SimpleType> nomvarMap = new THashMap(
-        new TObjectHashingStrategy() {
+	private Map<NominalVar,SimpleType> nomvarMap = new TCustomHashMap(
+        new HashingStrategy() {
 			private static final long serialVersionUID = 1L;
 			public int computeHashCode(Object o) {
                 return ((NominalVar)o).getName().hashCode();

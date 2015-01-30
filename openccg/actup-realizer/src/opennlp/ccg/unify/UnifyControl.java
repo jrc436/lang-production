@@ -18,9 +18,11 @@
 
 package opennlp.ccg.unify;
 
-import opennlp.ccg.synsem.*;
-
-import gnu.trove.*;
+import gnu.trove.map.hash.TIntIntHashMap;
+import opennlp.ccg.synsem.Category;
+import opennlp.ccg.synsem.CategoryFcn;
+import opennlp.ccg.synsem.CategoryFcnAdapter;
+import opennlp.ccg.synsem.LF;
 
 /**
  * Center of command for the unification process.  

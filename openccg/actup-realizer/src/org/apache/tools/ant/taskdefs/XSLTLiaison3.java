@@ -18,6 +18,7 @@
 package org.apache.tools.ant.taskdefs;
 
 import org.apache.tools.ant.types.Resource;
+import org.apache.tools.ant.taskdefs.XSLTLiaison2;
 
 /**
  * Extends Proxy interface for XSLT processors.

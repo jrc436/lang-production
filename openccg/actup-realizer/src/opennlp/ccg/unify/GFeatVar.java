@@ -17,9 +17,12 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.ccg.unify;
 
+import gnu.trove.map.hash.TObjectIntHashMap;
+
 import java.io.Serializable;
-import gnu.trove.TObjectIntHashMap;
-import opennlp.ccg.grammar.*;
+
+import opennlp.ccg.grammar.Grammar;
+import opennlp.ccg.grammar.Types;
 
 /**
  * A class for variables which can stand for any feature.

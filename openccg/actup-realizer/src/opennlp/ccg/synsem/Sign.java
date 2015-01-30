@@ -18,17 +18,37 @@
 
 package opennlp.ccg.synsem;
 
-import opennlp.ccg.parse.*;
-import opennlp.ccg.util.*;
-import opennlp.ccg.lexicon.*;
-import opennlp.ccg.grammar.*;
-import opennlp.ccg.hylo.*;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
-import org.jdom2.*;
-import gnu.trove.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
-import java.io.*;
-import java.util.*;
+import opennlp.ccg.grammar.Grammar;
+import opennlp.ccg.grammar.Rule;
+import opennlp.ccg.grammar.RuleGroup;
+import opennlp.ccg.grammar.TypeChangingRule;
+import opennlp.ccg.hylo.HyloHelper;
+import opennlp.ccg.hylo.LexDependency;
+import opennlp.ccg.hylo.Nominal;
+import opennlp.ccg.lexicon.Word;
+import opennlp.ccg.parse.DerivationHistory;
+import opennlp.ccg.util.Interner;
+import opennlp.ccg.util.Pair;
+import opennlp.ccg.util.SingletonList;
+import opennlp.ccg.util.StructureSharingList;
+
+import org.jdom2.Document;
+import org.jdom2.Element;
 
 /**
  * A CCG sign, consisting of a list of words paired with a category.

@@ -18,7 +18,8 @@
 
 package opennlp.ccg.lexicon;
 
-import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TCustomHashSet;
+import gnu.trove.strategy.IdentityHashingStrategy;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -77,7 +78,7 @@ public class DefaultTokenizer implements Tokenizer {
      * Equality is checked with identity, for use with interned strings.
      */
     @SuppressWarnings("unchecked")
-	protected Set<String> replacementSemClasses = new THashSet(new TObjectIdentityHashingStrategy());
+	protected Set<String> replacementSemClasses = new TCustomHashSet(new IdentityHashingStrategy());
 
 
     /**

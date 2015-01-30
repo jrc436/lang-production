@@ -19,10 +19,15 @@
 
 package opennlp.ccg.synsem;
 
-import gnu.trove.*;
-import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TCustomHashSet;
+import gnu.trove.strategy.HashingStrategy;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 import opennlp.ccg.lexicon.Word;
 
@@ -35,12 +40,12 @@ import opennlp.ccg.lexicon.Word;
  * @author      Michael White
  * @version     $Revision: 1.13 $, $Date: 2009/12/21 02:15:44 $
  */
-public class SignHash extends THashSet {
+public class SignHash extends TCustomHashSet {
 
 	private static final long serialVersionUID = 1L;
 	
 	/** Hashing strategy that uses Sign's surfaceWordHashCode and surfaceWordEquals methods. */
-    protected static TObjectHashingStrategy surfaceWordHashingStrategy = new TObjectHashingStrategy() {
+    protected static HashingStrategy surfaceWordHashingStrategy = new HashingStrategy() {
 		private static final long serialVersionUID = 1L;
 		public int computeHashCode(java.lang.Object o) {
             return ((Sign)o).surfaceWordHashCode();

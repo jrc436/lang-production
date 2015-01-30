@@ -18,7 +18,8 @@
 
 package opennlp.ccg.lexicon;
 
-import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TCustomHashSet;
+import gnu.trove.strategy.IdentityHashingStrategy;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -111,7 +112,7 @@ abstract public class Word implements Serializable, Comparable<Word> {
     private static Set<String> knownAttrs = initKnownAttrs(); 
     @SuppressWarnings("unchecked")
 	private static Set<String> initKnownAttrs() {
-        Set<String> knownAttrs = new THashSet(new TObjectIdentityHashingStrategy());
+        Set<String> knownAttrs = new TCustomHashSet(new IdentityHashingStrategy());
         String[] names = {
             Tokenizer.WORD_ATTR, Tokenizer.PITCH_ACCENT_ATTR, 
             Tokenizer.STEM_ATTR, Tokenizer.POS_ATTR, 

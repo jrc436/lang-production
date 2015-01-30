@@ -19,7 +19,8 @@
 package opennlp.ccg.realize;
 
 import gnu.trove.map.hash.THashMap;
-import gnu.trove.set.hash.THashSet;
+import gnu.trove.set.hash.TCustomHashSet;
+import gnu.trove.strategy.IdentityHashingStrategy;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
@@ -496,7 +497,7 @@ public class Chart
     /** Unpack complete edges, if any; otherwise unpack all. */
 	protected void doUnpacking() {
 	    @SuppressWarnings("unchecked")
-        Set<Edge> unpacked = new THashSet(new TObjectIdentityHashingStrategy());
+        Set<Edge> unpacked = new TCustomHashSet(new IdentityHashingStrategy());
 	    boolean foundComplete = bestEdge.complete();
         // unpack each relevant edge, updating best edge 
         for (Edge edge : edges) {

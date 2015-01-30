@@ -19,9 +19,11 @@
 
 package opennlp.ccg.synsem;
 
-import opennlp.ccg.unify.*;
-import opennlp.ccg.hylo.*;
-import gnu.trove.*;
+import gnu.trove.map.hash.TObjectIntHashMap;
+import opennlp.ccg.hylo.Nominal;
+import opennlp.ccg.unify.FeatureStructure;
+import opennlp.ccg.unify.Mutable;
+import opennlp.ccg.unify.Unifiable;
 
 /**
  * A CCG category.

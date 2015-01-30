@@ -18,12 +18,14 @@
 
 package opennlp.ccg.realize;
 
+import gnu.trove.set.hash.TCustomHashSet;
+import gnu.trove.strategy.IdentityHashingStrategy;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import opennlp.ccg.synsem.Sign;
-
-import java.util.*;
-
-import gnu.trove.*;
-import gnu.trove.set.hash.THashSet;
 
 /**
  * Abstract n-best edge pruning strategy that keeps edges diversified 
@@ -44,7 +46,7 @@ abstract public class DiversityPruningStrategy extends NBestPruningStrategy
     public boolean singleBestPerGroup = false;
     
     /** Reusable set of edges to keep. */
-    protected THashSet keepers = new THashSet(new TObjectIdentityHashingStrategy());
+    protected TCustomHashSet keepers = new TCustomHashSet(new IdentityHashingStrategy());
     
     /** Returns true iff the given signs are not compellingly different. */
     abstract public boolean notCompellinglyDifferent(Sign sign1, Sign sign2);

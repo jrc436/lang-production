@@ -34,9 +34,8 @@ import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 
 import opennlp.ccgbank.convert.InfoHelper;
-import opennlp.ccgbank.convert.XSLTTrueCaser;
 import opennlp.ccgbank.convert.MorphLookup;
-import opennlp.ccgbank.parse.CCGbankDerivation;
+import opennlp.ccgbank.convert.XSLTTrueCaser;
 import opennlp.ccgbank.parse.SimpleNode;
 
 import org.apache.tools.ant.BuildException;

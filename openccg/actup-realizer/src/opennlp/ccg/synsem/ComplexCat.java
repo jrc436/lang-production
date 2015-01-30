@@ -18,13 +18,20 @@
 
 package opennlp.ccg.synsem;
 
-import opennlp.ccg.unify.*;
-import opennlp.ccg.util.DisplayPrefs;
-import opennlp.ccg.grammar.Grammar;
-import gnu.trove.*;
-import org.jdom2.*;
+import gnu.trove.map.hash.TObjectIntHashMap;
 
-import java.util.*;
+import java.util.List;
+
+import opennlp.ccg.grammar.Grammar;
+import opennlp.ccg.unify.FeatureStructure;
+import opennlp.ccg.unify.GUnifier;
+import opennlp.ccg.unify.ModFcn;
+import opennlp.ccg.unify.Substitution;
+import opennlp.ccg.unify.UnifyFailure;
+import opennlp.ccg.unify.Variable;
+import opennlp.ccg.util.DisplayPrefs;
+
+import org.jdom2.Element;
 
 /**
  * A non-recursive representation of complex categories.

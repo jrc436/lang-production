@@ -1,0 +1,10 @@
+package ar.xmlparser;
+
+import java.util.Stack;
+
+
+//this keeps track of child relationships
+public class NodeStack extends Stack<XmlNode> {
+	private static final long serialVersionUID = 1L;
+
+}

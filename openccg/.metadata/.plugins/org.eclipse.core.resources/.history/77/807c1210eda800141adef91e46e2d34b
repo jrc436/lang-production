@@ -1,0 +1,8 @@
+package ar.xmlparser;
+
+import java.util.Stack;
+
+//this keeps track of child relationships
+public class NodeHandler {
+	Stack<XmlNode> activeNodes;
+}

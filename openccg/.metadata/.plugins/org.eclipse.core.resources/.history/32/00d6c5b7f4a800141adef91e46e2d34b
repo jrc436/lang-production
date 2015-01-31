@@ -1,0 +1,54 @@
+package ar.xmlparser;
+
+import java.util.Scanner;
+
+public class LineParser {
+	private String nodeType;
+	private String nodeValue;
+	private boolean nodeClosed;
+	public void parse(String line) throws Exception {
+		line.trim();
+		Scanner s = new Scanner(line);
+		String iter = "start";
+		
+		this.nodeType = "";
+		this.nodeValue = "";
+		
+		while (s.hasNext()) {
+			String cur = s.next();
+			switch(iter) {
+				case "start":
+					if (cur.charAt(0) != '<') {
+						throw new Exception("Format error. Line without leading '<'");
+					}
+					//should be able to grab the node "type" right away
+					if (cur.charAt(cur.length() - 1) == '>') {
+						nodeClosed = true;
+						this.nodeType = cur.substring(1, cur.length()-1);
+						
+						//the while loop should end naturally now, but as an error check
+						if (s.hasNext()) {
+							throw new Exception("Format error. '>' does not end the line");
+						}
+					}
+					else {
+						this.nodeType = cur.substring(1, cur.length());
+						iter = "attrs";
+					}
+				default:
+			}
+		}
+		
+		
+		s.close();
+	}
+	public boolean getNodeClosed() {
+		return nodeClosed;
+	}
+	public String getNodeType() {
+		return nodeType;
+	}
+	public String getNodeValue() {
+		return nodeValue;
+	}
+}

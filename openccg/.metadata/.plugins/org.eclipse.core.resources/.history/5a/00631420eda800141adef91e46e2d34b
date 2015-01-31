@@ -1,0 +1,12 @@
+package ar.xmlparser;
+
+import java.util.Stack;
+
+//this keeps track of child relationships
+public class NodeHandler {
+	//the node on top will always be the most recent to add children to
+	Stack<XmlNode> activeNodes;
+	public void AddNode(XmlNode newNode) {
+		
+	}
+}

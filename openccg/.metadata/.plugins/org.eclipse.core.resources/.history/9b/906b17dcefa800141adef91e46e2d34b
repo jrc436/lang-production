@@ -1,0 +1,16 @@
+package ar.xmlparser;
+
+import java.util.Scanner;
+
+public class LineParser {
+	public void parse(String line) {
+		line.trim();
+		Scanner s = new Scanner(line);
+		while (s.hasNext()) {
+			s.next();
+		}
+		
+		
+		s.close();
+	}
+}

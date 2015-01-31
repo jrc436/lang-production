@@ -1,0 +1,18 @@
+package ar.xmlparser;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+
+public class XmlNode {
+	String label;
+	String value;
+	ArrayList<XmlNode> children;
+	HashMap<String, String> attributes;
+	public XmlNode(String label, String value) {
+		this.label = label;
+		this.value = value;
+	}
+	public void addAttribute(String attrName, String attrValue) {
+		
+	}
+}

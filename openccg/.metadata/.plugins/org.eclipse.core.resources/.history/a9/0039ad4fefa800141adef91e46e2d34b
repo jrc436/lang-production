@@ -1,0 +1,9 @@
+package ar.xmlparser;
+
+public class LineParser {
+	
+	
+	public static void parse(String line) {
+		
+	}
+}

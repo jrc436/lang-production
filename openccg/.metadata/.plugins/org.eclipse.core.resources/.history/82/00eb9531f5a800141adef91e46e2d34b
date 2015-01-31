@@ -1,0 +1,16 @@
+package ar.xmlparser;
+
+public class Client {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		String regex = "^<[a-z]+(?<attrs> [a-z]+=\"[a-z]+\")*>(?<value>[a-z])?(?<closetag>+</[a-z]+>)?$";
+		String input = "<tag type=\"tok\">first</tag>";
+		input.split(regex);
+		
+	}
+
+}

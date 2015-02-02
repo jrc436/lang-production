@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<workbench progressCount="12" version="2.0">
+<workbench progressCount="17" version="2.0">
 <workbenchAdvisor/>
-<window height="711" maximized="true" width="1018" x="439" y="195">
+<window height="654" maximized="true" width="1012" x="572" y="168">
 <fastViewData fastViewLocation="1024"/>
 <perspectiveBar>
 <itemSize x="160"/>
@@ -32,167 +32,25 @@
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
 <part id="0"/>
 <part id="1"/>
-<part id="2"/>
-<part id="3"/>
-<part id="4"/>
-<part id="5"/>
-<part id="6"/>
-<part id="7"/>
-<part id="8"/>
-<part id="9"/>
-<part id="10"/>
-<part id="11"/>
-<part id="12"/>
-<part id="13"/>
-<part id="14"/>
-<part id="15"/>
-<part id="16"/>
-<part id="17"/>
-<part id="18"/>
-<part id="19"/>
-<part id="20"/>
-<part id="21"/>
-<part id="22"/>
-<part id="23"/>
-<part id="24"/>
-<part id="25"/>
-<part id="26"/>
-<part id="27"/>
-<part id="28"/>
-<part id="29"/>
-<part id="30"/>
 </presentation>
 </folder>
 </info>
 </editorArea>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Realize.java" partName="Realize.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/Realize.java" title="Realize.java" tooltip="actup-realizer/src/opennlp/ccg/Realize.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/Realize.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2331" selectionTopPixel="0"/>
+<editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Client.java" partName="Client.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/ar/xmlparser/Client.java" title="Client.java" tooltip="actup-realizer/src/ar/xmlparser/Client.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/ar/xmlparser/Client.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="873" selectionTopPixel="0"/>
 </editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="CommonsLoggingListener.java" partName="CommonsLoggingListener.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/listener/CommonsLoggingListener.java" title="CommonsLoggingListener.java" tooltip="actup-realizer/src/org/apache/tools/ant/listener/CommonsLoggingListener.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/listener/CommonsLoggingListener.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="851" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Log4jListener.java" partName="Log4jListener.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/listener/Log4jListener.java" title="Log4jListener.java" tooltip="actup-realizer/src/org/apache/tools/ant/listener/Log4jListener.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/listener/Log4jListener.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1183" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="JavaClassHelper.java" partName="JavaClassHelper.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/filters/util/JavaClassHelper.java" title="JavaClassHelper.java" tooltip="actup-realizer/src/org/apache/tools/ant/filters/util/JavaClassHelper.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/filters/util/JavaClassHelper.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1220" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="CCGBankConvert.java" partName="CCGBankConvert.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccgbank/CCGBankConvert.java" title="CCGBankConvert.java" tooltip="actup-realizer/src/opennlp/ccgbank/CCGBankConvert.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccgbank/CCGBankConvert.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="80" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="MimeMailer.java" partName="MimeMailer.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/taskdefs/email/MimeMailer.java" title="MimeMailer.java" tooltip="actup-realizer/src/org/apache/tools/ant/taskdefs/email/MimeMailer.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/taskdefs/email/MimeMailer.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2100" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ApacheCatalog.java" partName="ApacheCatalog.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/types/resolver/ApacheCatalog.java" title="ApacheCatalog.java" tooltip="actup-realizer/src/org/apache/tools/ant/types/resolver/ApacheCatalog.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/types/resolver/ApacheCatalog.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1047" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ApacheCatalogResolver.java" partName="ApacheCatalogResolver.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/types/resolver/ApacheCatalogResolver.java" title="ApacheCatalogResolver.java" tooltip="actup-realizer/src/org/apache/tools/ant/types/resolver/ApacheCatalogResolver.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/types/resolver/ApacheCatalogResolver.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1308" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="XSLTProcess.java" partName="XSLTProcess.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTProcess.java" title="XSLTProcess.java" tooltip="actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTProcess.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTProcess.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="11" selectionOffset="21518" selectionTopPixel="11747"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="XSLTLiaison2.java" partName="XSLTLiaison2.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTLiaison2.java" title="XSLTLiaison2.java" tooltip="actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTLiaison2.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTLiaison2.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="809" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="TraXLiaison.java" partName="TraXLiaison.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/taskdefs/optional/TraXLiaison.java" title="TraXLiaison.java" tooltip="actup-realizer/src/org/apache/tools/ant/taskdefs/optional/TraXLiaison.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/taskdefs/optional/TraXLiaison.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="12" selectionOffset="2782" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.ClassFileEditorNoSource" name="ErrorListener.class" partName="ErrorListener.class" path="/tmp/ErrorListener.class2519010829974300025.class" title="ErrorListener.class" tooltip="javax.xml.transform.ErrorListener" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.jdt.ui.ClassFileEditorInputFactory" org.eclipse.jdt.ui.ClassFileIdentifier="=actup-realizer/\/usr\/lib\/jvm\/java-7-openjdk-amd64\/jre\/lib\/rt.jar&lt;javax.xml.transform(ErrorListener.class"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="0" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="XSLTLiaison4.java" partName="XSLTLiaison4.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTLiaison4.java" title="XSLTLiaison4.java" tooltip="actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTLiaison4.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTLiaison4.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1005" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="XSLTLiaison3.java" partName="XSLTLiaison3.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTLiaison3.java" title="XSLTLiaison3.java" tooltip="actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTLiaison3.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTLiaison3.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1045" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="XSLTLiaison.java" partName="XSLTLiaison.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTLiaison.java" title="XSLTLiaison.java" tooltip="actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTLiaison.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTLiaison.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="999" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ScriptRunner.java" partName="ScriptRunner.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/util/ScriptRunner.java" title="ScriptRunner.java" tooltip="actup-realizer/src/org/apache/tools/ant/util/ScriptRunner.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/util/ScriptRunner.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1195" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ContainsRegexpSelector.java" partName="ContainsRegexpSelector.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/types/selectors/ContainsRegexpSelector.java" title="ContainsRegexpSelector.java" tooltip="actup-realizer/src/org/apache/tools/ant/types/selectors/ContainsRegexpSelector.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/types/selectors/ContainsRegexpSelector.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="3" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="JakartaOroMatcher.java" partName="JakartaOroMatcher.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/util/regexp/JakartaOroMatcher.java" title="JakartaOroMatcher.java" tooltip="actup-realizer/src/org/apache/tools/ant/util/regexp/JakartaOroMatcher.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/util/regexp/JakartaOroMatcher.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="851" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="JakartaOroRegexp.java" partName="JakartaOroRegexp.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/util/regexp/JakartaOroRegexp.java" title="JakartaOroRegexp.java" tooltip="actup-realizer/src/org/apache/tools/ant/util/regexp/JakartaOroRegexp.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/util/regexp/JakartaOroRegexp.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1088" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="JakartaRegexpMatcher.java" partName="JakartaRegexpMatcher.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/util/regexp/JakartaRegexpMatcher.java" title="JakartaRegexpMatcher.java" tooltip="actup-realizer/src/org/apache/tools/ant/util/regexp/JakartaRegexpMatcher.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/util/regexp/JakartaRegexpMatcher.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="851" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="JakartaRegexpRegexp.java" partName="JakartaRegexpRegexp.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/util/regexp/JakartaRegexpRegexp.java" title="JakartaRegexpRegexp.java" tooltip="actup-realizer/src/org/apache/tools/ant/util/regexp/JakartaRegexpRegexp.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/util/regexp/JakartaRegexpRegexp.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="851" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="FTP.java" partName="FTP.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/taskdefs/optional/net/FTP.java" title="FTP.java" tooltip="actup-realizer/src/org/apache/tools/ant/taskdefs/optional/net/FTP.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/taskdefs/optional/net/FTP.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2368" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="FTPConfigurator.java" partName="FTPConfigurator.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/taskdefs/optional/net/FTPConfigurator.java" title="FTPConfigurator.java" tooltip="actup-realizer/src/org/apache/tools/ant/taskdefs/optional/net/FTPConfigurator.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/taskdefs/optional/net/FTPConfigurator.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="851" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="FTPTaskMirrorImpl.java" partName="FTPTaskMirrorImpl.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/taskdefs/optional/net/FTPTaskMirrorImpl.java" title="FTPTaskMirrorImpl.java" tooltip="actup-realizer/src/org/apache/tools/ant/taskdefs/optional/net/FTPTaskMirrorImpl.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/taskdefs/optional/net/FTPTaskMirrorImpl.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="851" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="RExecTask.java" partName="RExecTask.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/taskdefs/optional/net/RExecTask.java" title="RExecTask.java" tooltip="actup-realizer/src/org/apache/tools/ant/taskdefs/optional/net/RExecTask.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/taskdefs/optional/net/RExecTask.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="851" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="TelnetTask.java" partName="TelnetTask.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/tools/ant/taskdefs/optional/net/TelnetTask.java" title="TelnetTask.java" tooltip="actup-realizer/src/org/apache/tools/ant/taskdefs/optional/net/TelnetTask.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/tools/ant/taskdefs/optional/net/TelnetTask.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="1264" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="AbsoluteLocationPath.java" partName="AbsoluteLocationPath.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/org/apache/xalan/xsltc/compiler/AbsoluteLocationPath.java" title="AbsoluteLocationPath.java" tooltip="actup-realizer/src/org/apache/xalan/xsltc/compiler/AbsoluteLocationPath.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/org/apache/xalan/xsltc/compiler/AbsoluteLocationPath.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="2153" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Realizer.java" partName="Realizer.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/realize/Realizer.java" title="Realizer.java" tooltip="actup-realizer/src/opennlp/ccg/realize/Realizer.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/realize/Realizer.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="8" selectionOffset="1807" selectionTopPixel="0"/>
-</editor>
-<editor activePart="true" focus="true" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="TextCCG.java" partName="TextCCG.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/TextCCG.java" title="TextCCG.java" tooltip="actup-realizer/src/opennlp/ccg/TextCCG.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/TextCCG.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="3078" selectionTopPixel="511"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="WebCCG.java" partName="WebCCG.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/WebCCG.java" title="WebCCG.java" tooltip="actup-realizer/src/opennlp/ccg/WebCCG.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/WebCCG.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="81" selectionTopPixel="0"/>
-</editor>
-<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Parse.java" partName="Parse.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/opennlp/ccg/Parse.java" title="Parse.java" tooltip="actup-realizer/src/opennlp/ccg/Parse.java" workbook="DefaultEditorWorkbook">
-<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/opennlp/ccg/Parse.java"/>
-<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="81" selectionTopPixel="0"/>
+<editor id="org.eclipse.jdt.ui.CompilationUnitEditor" name="LineParser.java" partName="LineParser.java" path="/home/jrc/actup-production/openccg/actup-realizer/src/ar/xmlparser/LineParser.java" title="LineParser.java" tooltip="actup-realizer/src/ar/xmlparser/LineParser.java" workbook="DefaultEditorWorkbook">
+<input factoryID="org.eclipse.ui.part.FileEditorInputFactory" path="/actup-realizer/src/ar/xmlparser/LineParser.java"/>
+<editorState selectionHorizontalPixel="0" selectionLength="0" selectionOffset="995" selectionTopPixel="959"/>
 </editor>
 </editors>
 <views>
-<view id="org.eclipse.ui.navigator.ProjectExplorer" partName="Project Explorer">
-<viewState CommonNavigator.LINKING_ENABLED="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0"/>
+<view id="org.eclipse.jdt.callhierarchy.view" partName="Call Hierarchy">
+<viewState search_scope_type="1"/>
+</view>
+<view id="org.eclipse.ui.console.ConsoleView" partName="Console">
+<viewState/>
 </view>
 <view id="org.eclipse.search.ui.views.SearchView" partName="Search">
 <viewState isPinned="false">
@@ -200,8 +58,8 @@
 <view IMemento.internal.id="org.eclipse.jdt.ui.JavaSearchResultPage" org.eclipse.jdt.search.resultpage.grouping="3" org.eclipse.jdt.search.resultpage.limit="1000" org.eclipse.jdt.search.resultpage.limit_enabled="TRUE" org.eclipse.jdt.search.resultpage.sorting="1" org.eclipse.search.lastActivation="1" org.eclipse.search.resultpage.layout="2"/>
 </viewState>
 </view>
-<view id="org.eclipse.jdt.callhierarchy.view" partName="Call Hierarchy">
-<viewState search_scope_type="1"/>
+<view id="org.eclipse.ui.views.ContentOutline" partName="Outline">
+<viewState/>
 </view>
 <view id="org.eclipse.ui.views.TaskList" partName="Tasks">
 <viewState PRIMARY_SORT_FIELD="org.eclipse.ui.ide.completionField" categoryGroup="none" markerContentGenerator="org.eclipse.ui.ide.tasksGenerator" partName="Tasks">
@@ -215,11 +73,11 @@
 <visible IMemento.internal.id="org.eclipse.ui.ide.markerType"/>
 </viewState>
 </view>
-<view id="org.eclipse.ui.views.ContentOutline" partName="Outline">
-<viewState/>
+<view id="org.eclipse.ui.navigator.ProjectExplorer" partName="Project Explorer">
+<viewState CommonNavigator.LINKING_ENABLED="0" org.eclipse.ui.navigator.resources.workingSets.showTopLevelWorkingSets="0"/>
 </view>
 </views>
-<perspectives activePart="org.eclipse.jdt.ui.CompilationUnitEditor" activePerspective="org.eclipse.ui.resourcePerspective">
+<perspectives activePart="org.eclipse.ui.console.ConsoleView" activePerspective="org.eclipse.ui.resourcePerspective">
 <perspective editorAreaTrimState="2" editorAreaVisible="1" fixed="0" version="0.016">
 <descriptor class="org.eclipse.ui.internal.ide.application.ResourcePerspective" id="org.eclipse.ui.resourcePerspective" label="Resource"/>
 <alwaysOnActionSet id="org.eclipse.ui.cheatsheets.actionSet"/>
@@ -247,13 +105,14 @@
 <perspective_action id="org.eclipse.jdt.ui.JavaBrowsingPerspective"/>
 <perspective_action id="org.eclipse.team.cvs.ui.cvsPerspective"/>
 <perspective_action id="org.eclipse.team.ui.TeamSynchronizingPerspective"/>
+<hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
 <hide_toolbar_item_id id="org.eclipse.debug.ui.commands.RunToLine"/>
 <hide_toolbar_item_id id="org.eclipse.jdt.ui.actions.OpenProjectWizard"/>
-<hide_toolbar_item_id id="org.eclipse.ui.edit.text.toggleShowSelectedElementOnly"/>
 <view id="org.eclipse.ui.navigator.ProjectExplorer"/>
 <view id="org.eclipse.ui.views.TaskList"/>
 <view id="org.eclipse.search.ui.views.SearchView"/>
 <view id="org.eclipse.jdt.callhierarchy.view"/>
+<view id="org.eclipse.ui.console.ConsoleView"/>
 <fastViewBars>
 <fastViewBar fastViewLocation="16384" id="bottomLeft" orientation="512" selectedTabId="org.eclipse.ui.views.ContentOutline" style="0">
 <fastViews>
@@ -283,20 +142,22 @@
 </info>
 <info part="org.eclipse.ui.editorss" ratio="0.23149171" ratioLeft="419" ratioRight="1391" relationship="2" relative="topLeft"/>
 <info folder="true" part="bottomRight" ratio="0.6596386" ratioLeft="438" ratioRight="226" relationship="4" relative="org.eclipse.ui.editorss">
-<folder activePageID="org.eclipse.jdt.callhierarchy.view" appearance="2" expanded="2">
+<folder activePageID="org.eclipse.ui.console.ConsoleView" appearance="2" expanded="2">
 <page content="org.eclipse.ui.views.TaskList" label="Tasks"/>
 <page content="org.eclipse.search.ui.views.SearchView" label="Search"/>
 <page content="org.eclipse.jdt.callhierarchy.view" label="Call Hierarchy"/>
+<page content="org.eclipse.ui.console.ConsoleView" label="Console"/>
 <page content="org.eclipse.team.ui.GenericHistoryView" label="LabelNotFound"/>
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory">
 <part id="0"/>
 <part id="1"/>
 <part id="2"/>
+<part id="3"/>
 </presentation>
 </folder>
 </info>
 <info folder="true" part="bottomLeft" ratio="0.5" ratioLeft="332" ratioRight="332" relationship="4" relative="topLeft">
-<folder appearance="2" expanded="0">
+<folder appearance="2" expanded="2">
 <page content="org.eclipse.ui.views.ContentOutline" label="LabelNotFound"/>
 <page content="org.eclipse.ant.ui.views.AntView" label="LabelNotFound"/>
 <presentation id="org.eclipse.ui.presentations.WorkbenchPresentationFactory"/>
@@ -309,10 +170,8 @@
 <workingSets/>
 <navigationHistory>
 <editors>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTLiaison2.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTLiaison4.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTLiaison3.java"/>
-<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/org/apache/tools/ant/taskdefs/XSLTLiaison.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/org/apache/tools/ant/types/optional/image/Arc.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/org/apache/tools/ant/util/depend/bcel/AncestorAnalyzer.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/org/apache/tools/ant/util/optional/ScriptRunner.java"/>
@@ -335,156 +194,158 @@
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/TextCCG.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/WebCCG.java"/>
 <editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/opennlp/ccg/Parse.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/ar/xmlparser/Client.java"/>
+<editor factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" path="/actup-realizer/src/ar/xmlparser/LineParser.java"/>
 </editors>
-<item historyLabel="XSLTLiaison4.java" index="1">
-<position info="not_deleted" x="1106" y="12"/>
-</item>
-<item historyLabel="XSLTLiaison3.java" index="2">
-<position info="not_deleted" x="1088" y="12"/>
-</item>
-<item historyLabel="XSLTLiaison2.java" index="0">
-<position info="not_deleted" x="994" y="11"/>
-</item>
-<item historyLabel="XSLTLiaison.java" index="3">
-<position info="not_deleted" x="999" y="0"/>
-</item>
-<item historyLabel="XSLTLiaison3.java" index="2">
-<position info="not_deleted" x="1045" y="0"/>
-</item>
-<item historyLabel="XSLTLiaison2.java" index="0">
-<position info="not_deleted" x="809" y="0"/>
-</item>
-<item historyLabel="XSLTLiaison3.java" index="2">
-<position info="not_deleted" x="1045" y="0"/>
-</item>
-<item historyLabel="XSLTLiaison4.java" index="1">
+<item historyLabel="XSLTLiaison4.java" index="0">
 <position info="not_deleted" x="1005" y="0"/>
 </item>
-<item historyLabel="XSLTLiaison3.java" index="2">
+<item historyLabel="XSLTLiaison3.java" index="1">
 <position info="not_deleted" x="1045" y="0"/>
 </item>
-<item historyLabel="Arc.java" index="4">
+<item historyLabel="Arc.java" index="2">
 <position/>
 </item>
-<item historyLabel="XSLTLiaison3.java" index="2">
+<item historyLabel="XSLTLiaison3.java" index="1">
 <position info="not_deleted" x="1045" y="0"/>
 </item>
-<item historyLabel="AncestorAnalyzer.java" index="5">
+<item historyLabel="AncestorAnalyzer.java" index="3">
 <position info="not_deleted" x="3" y="0"/>
 </item>
-<item historyLabel="XSLTLiaison3.java" index="2">
+<item historyLabel="XSLTLiaison3.java" index="1">
 <position info="not_deleted" x="1045" y="0"/>
 </item>
-<item historyLabel="ScriptRunner.java" index="6">
+<item historyLabel="ScriptRunner.java" index="4">
 <position info="not_deleted" x="3" y="0"/>
 </item>
-<item historyLabel="XSLTLiaison3.java" index="2">
+<item historyLabel="XSLTLiaison3.java" index="1">
 <position info="not_deleted" x="1045" y="0"/>
 </item>
-<item historyLabel="ScriptRunner.java" index="7">
+<item historyLabel="ScriptRunner.java" index="5">
 <position info="not_deleted" x="1195" y="0"/>
 </item>
-<item historyLabel="JakartaOroMatcher.java" index="8">
+<item historyLabel="JakartaOroMatcher.java" index="6">
 <position info="not_deleted" x="3" y="0"/>
 </item>
-<item historyLabel="ScriptRunner.java" index="7">
+<item historyLabel="ScriptRunner.java" index="5">
 <position info="not_deleted" x="1195" y="0"/>
 </item>
-<item historyLabel="ContainsRegexpSelector.java" index="9">
+<item historyLabel="ContainsRegexpSelector.java" index="7">
 <position info="not_deleted" x="3" y="0"/>
 </item>
-<item historyLabel="JakartaOroMatcher.java" index="8">
+<item historyLabel="JakartaOroMatcher.java" index="6">
 <position info="not_deleted" x="851" y="0"/>
 </item>
-<item historyLabel="JakartaOroRegexp.java" index="10">
+<item historyLabel="JakartaOroRegexp.java" index="8">
 <position info="not_deleted" x="1088" y="0"/>
 </item>
-<item historyLabel="JakartaRegexpMatcher.java" index="11">
+<item historyLabel="JakartaRegexpMatcher.java" index="9">
 <position info="not_deleted" x="851" y="0"/>
 </item>
-<item historyLabel="JakartaRegexpRegexp.java" index="12">
+<item historyLabel="JakartaRegexpRegexp.java" index="10">
 <position info="not_deleted" x="851" y="0"/>
 </item>
-<item historyLabel="Arc.java" index="4">
+<item historyLabel="Arc.java" index="2">
 <position info="not_deleted" x="3" y="0"/>
 </item>
-<item historyLabel="Draw.java" index="13">
+<item historyLabel="Draw.java" index="11">
 <position info="not_deleted" x="3" y="0"/>
 </item>
-<item historyLabel="DrawOperation.java" index="14">
+<item historyLabel="DrawOperation.java" index="12">
 <position info="not_deleted" x="851" y="0"/>
 </item>
-<item historyLabel="JakartaRegexpRegexp.java" index="12">
+<item historyLabel="JakartaRegexpRegexp.java" index="10">
 <position info="not_deleted" x="851" y="0"/>
 </item>
-<item historyLabel="FTP.java" index="15">
+<item historyLabel="FTP.java" index="13">
 <position info="not_deleted" x="3299" y="3"/>
 </item>
-<item historyLabel="JakartaRegexpRegexp.java" index="12">
+<item historyLabel="JakartaRegexpRegexp.java" index="10">
 <position info="not_deleted" x="851" y="0"/>
 </item>
-<item historyLabel="FTP.java" index="15">
+<item historyLabel="FTP.java" index="13">
 <position info="not_deleted" x="5" y="107638"/>
 </item>
-<item historyLabel="FTPConfigurator.java" index="16">
+<item historyLabel="FTPConfigurator.java" index="14">
 <position info="not_deleted" x="851" y="0"/>
 </item>
-<item historyLabel="FTPTaskMirrorImpl.java" index="17">
+<item historyLabel="FTPTaskMirrorImpl.java" index="15">
 <position info="not_deleted" x="851" y="0"/>
 </item>
-<item historyLabel="RExecTask.java" index="18">
+<item historyLabel="RExecTask.java" index="16">
 <position info="not_deleted" x="851" y="0"/>
 </item>
-<item historyLabel="TelnetTask.java" index="19">
+<item historyLabel="TelnetTask.java" index="17">
 <position info="not_deleted" x="1264" y="0"/>
 </item>
-<item historyLabel="AbsoluteLocationPath.java" index="20">
+<item historyLabel="AbsoluteLocationPath.java" index="18">
 <position info="not_deleted" x="2153" y="0"/>
 </item>
-<item historyLabel="Realizer.java" index="21">
+<item historyLabel="Realizer.java" index="19">
 <position info="not_deleted" x="81" y="0"/>
 </item>
-<item historyLabel="Realizer.java" index="21">
+<item historyLabel="Realizer.java" index="19">
 <position info="not_deleted" x="1453" y="8"/>
 </item>
-<item historyLabel="Realizer.java" index="21">
+<item historyLabel="Realizer.java" index="19">
 <position info="not_deleted" x="1807" y="8"/>
 </item>
-<item historyLabel="Realize.java" index="22">
+<item historyLabel="Realize.java" index="20">
 <position info="not_deleted" x="2331" y="0"/>
 </item>
-<item historyLabel="TextCCG.java" index="23">
+<item historyLabel="TextCCG.java" index="21">
 <position info="not_deleted" x="80" y="0"/>
 </item>
-<item historyLabel="Realize.java" index="22">
+<item historyLabel="Realize.java" index="20">
 <position info="not_deleted" x="2331" y="0"/>
 </item>
-<item historyLabel="TextCCG.java" index="23">
+<item historyLabel="TextCCG.java" index="21">
 <position info="not_deleted" x="80" y="0"/>
 </item>
-<item historyLabel="WebCCG.java" index="24">
+<item historyLabel="WebCCG.java" index="22">
 <position info="not_deleted" x="81" y="0"/>
 </item>
-<item historyLabel="Realize.java" index="22">
+<item historyLabel="Realize.java" index="20">
 <position info="not_deleted" x="2331" y="0"/>
 </item>
-<item historyLabel="Parse.java" index="25">
+<item historyLabel="Parse.java" index="23">
 <position info="not_deleted" x="81" y="0"/>
 </item>
-<item historyLabel="TextCCG.java" index="23">
+<item historyLabel="TextCCG.java" index="21">
 <position info="not_deleted" x="1768" y="23"/>
 </item>
-<item historyLabel="WebCCG.java" index="24">
+<item historyLabel="WebCCG.java" index="22">
 <position info="not_deleted" x="81" y="0"/>
 </item>
-<item historyLabel="Realize.java" index="22">
+<item historyLabel="Realize.java" index="20">
 <position info="not_deleted" x="2331" y="0"/>
 </item>
-<item historyLabel="Parse.java" index="25">
+<item historyLabel="Parse.java" index="23">
 <position info="not_deleted" x="81" y="0"/>
 </item>
-<item active="true" historyLabel="TextCCG.java" index="23">
-<position info="not_deleted" x="1768" y="23"/>
+<item historyLabel="TextCCG.java" index="21">
+<position info="not_deleted" x="3078" y="0"/>
+</item>
+<item historyLabel="Client.java" index="24">
+<position info="not_deleted" x="0" y="0"/>
+</item>
+<item historyLabel="Client.java" index="24">
+<position info="not_deleted" x="529" y="0"/>
+</item>
+<item historyLabel="Client.java" index="24">
+<position info="not_deleted" x="741" y="0"/>
+</item>
+<item historyLabel="Client.java" index="24">
+<position info="not_deleted" x="741" y="0"/>
+</item>
+<item historyLabel="LineParser.java" index="25">
+<position info="not_deleted" x="995" y="0"/>
+</item>
+<item historyLabel="Client.java" index="24">
+<position info="not_deleted" x="741" y="0"/>
+</item>
+<item active="true" historyLabel="Client.java" index="24">
+<position info="not_deleted" x="310" y="0"/>
 </item>
 </navigationHistory>
 <input factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/" type="8"/>
@@ -506,6 +367,12 @@
 </trimLayout>
 </window>
 <mruList>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="LineParser.java" tooltip="actup-realizer/src/ar/xmlparser/LineParser.java">
+<persistable path="/actup-realizer/src/ar/xmlparser/LineParser.java"/>
+</file>
+<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Client.java" tooltip="actup-realizer/src/ar/xmlparser/Client.java">
+<persistable path="/actup-realizer/src/ar/xmlparser/Client.java"/>
+</file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="Parse.java" tooltip="actup-realizer/src/opennlp/ccg/Parse.java">
 <persistable path="/actup-realizer/src/opennlp/ccg/Parse.java"/>
 </file>
@@ -544,12 +411,6 @@
 </file>
 <file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="JakartaOroRegexp.java" tooltip="actup-realizer/src/org/apache/tools/ant/util/regexp/JakartaOroRegexp.java">
 <persistable path="/actup-realizer/src/org/apache/tools/ant/util/regexp/JakartaOroRegexp.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="JakartaOroMatcher.java" tooltip="actup-realizer/src/org/apache/tools/ant/util/regexp/JakartaOroMatcher.java">
-<persistable path="/actup-realizer/src/org/apache/tools/ant/util/regexp/JakartaOroMatcher.java"/>
-</file>
-<file factoryID="org.eclipse.ui.part.FileEditorInputFactory" id="org.eclipse.jdt.ui.CompilationUnitEditor" name="ContainsRegexpSelector.java" tooltip="actup-realizer/src/org/apache/tools/ant/types/selectors/ContainsRegexpSelector.java">
-<persistable path="/actup-realizer/src/org/apache/tools/ant/types/selectors/ContainsRegexpSelector.java"/>
 </file>
 </mruList>
 </workbench>

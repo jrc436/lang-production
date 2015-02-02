@@ -8,4 +8,5 @@
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="ar.xmlparser.Client"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="actup-realizer"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Xmx8g"/>
 </launchConfiguration>

@@ -1,0 +1,40 @@
+package ar.xmlparser;
+
+import java.util.ArrayList;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+public class LineParser {
+	private final String regex;
+	private final Pattern p;
+	private final NodeHandler nh;
+	
+	//these two form the output of the primary method, "parse"
+	private XmlNode readingNode;
+	private boolean nodeClosed;
+	
+	public LineParser(String regex) {
+		this.regex = regex;
+		this.p = Pattern.compile(regex);
+		nh = new NodeHandler();
+	}
+	//XML 
+	public LineParser() {
+		this.regex = "^(?<start><[a-z]+(?<attrs> [a-zA-z:0-9]+=\"[a-zA-Z0-9.'_:\\-\\[\\]]+\")*>)?(?<value>[a-zA-Z0-9?':!+`\\$\\-.,]+)?(?<close></[a-z\\-]+>)?$";
+		this.p = Pattern.compile(regex);
+		nh = new NodeHandler();
+	}
+	public void parse(String input) throws Exception {
+		input.trim();				
+		Matcher m = p.matcher(input);
+		while (m.find()) {
+			String start = m.group("start"); //
+			String attr = m.group("attrs");
+			String value = m.group("value");
+			String close = m.group("close");
+		}
+	}
+	public boolean getNodeClosed() {
+		return nodeClosed;
+	}
+}

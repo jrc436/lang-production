@@ -1,6 +1,5 @@
 #call this with SOURCE instead of just running it i.e. "source bin/source-env"
 
-export JAVA_HOME="/usr/lib/jvm/java-1.7.0-openjdk-amd64"
 export OPENCCG_HOME="/home/jrc/actup-production/openccg"
 export PATH="$PATH:$OPENCCG_HOME/bin"
 

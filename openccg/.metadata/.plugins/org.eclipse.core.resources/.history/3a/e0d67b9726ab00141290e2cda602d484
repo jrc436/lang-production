@@ -1,0 +1,15 @@
+package ar.grammarcreator;
+
+import java.util.ArrayList;
+
+
+//for use with morph.xml, mostly just a struct
+public class Entry {
+	public String word;
+	public String pos;
+	String stem;
+	ArrayList<String> macros;
+	public Entry() {
+		macros = new ArrayList<String>();
+	}
+}

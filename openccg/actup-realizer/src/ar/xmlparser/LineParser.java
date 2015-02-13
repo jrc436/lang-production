@@ -7,7 +7,7 @@ public class LineParser {
 	private final String regex;
 	private final Pattern p;
 	private final NodeHandler nh;
-	int lineNumber;
+	public int lineNumber;
 	
 	public LineParser(String regex) {
 		this.regex = regex;
@@ -97,5 +97,15 @@ public class LineParser {
 			return true;
 		}
 		return false;
+	}
+	public XmlNode getTopLevelNode() throws Exception {
+		if (nh.getTopLevelNodes().size() != 1) {
+			String errmsg = "";
+			for (XmlNode x : nh.getTopLevelNodes()) {
+				errmsg += x.getLabel() + "::";
+			}
+			throw new Exception(errmsg);
+		}
+		return nh.getTopLevelNodes().get(0);
 	}
 }

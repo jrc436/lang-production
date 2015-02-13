@@ -36,4 +36,10 @@ public class XmlNode {
 	public int getLineNumber() {
 		return lineNumber;
 	}
+	public String getAttribute(String name) {
+		return attributes.get(name);
+	}
+	public ArrayList<XmlNode> getChildren() {
+		return children;
+	}
 }

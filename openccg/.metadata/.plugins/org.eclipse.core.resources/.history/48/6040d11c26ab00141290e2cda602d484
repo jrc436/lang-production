@@ -1,0 +1,11 @@
+package ar.grammarcreator;
+
+import java.util.ArrayList;
+
+public class MorphBuild {
+	public final ArrayList<String> header;
+	public MorphBuild() {
+		header = new ArrayList<String>() { "<?xml version=\"1.0\" encoding=\"UTF-8\"?>", "<morph xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:noNamespaceSchemaLocation=\"../morph.xsd\" name=\"English\">" }
+	}
+
+}

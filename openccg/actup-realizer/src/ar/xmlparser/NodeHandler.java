@@ -37,5 +37,8 @@ public class NodeHandler {
 			throw new Exception("labelOpen("+top.getLineNumber()+"):"+top.getLabel() + "; labelClosed("+lineNumber+"):"+confirmTag);
 		}
 	}
+	public ArrayList<XmlNode> getTopLevelNodes() {
+		return this.topLevelNodes;
+	}
 	
 }

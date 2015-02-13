@@ -1,0 +1,7 @@
+package ar.grammarcreator;
+
+
+//for use with morph.xml, mostly just a struct
+public class Entry {
+	
+}

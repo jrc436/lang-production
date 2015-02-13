@@ -1,0 +1,18 @@
+Disfluency Removal in Switchboard
+remove-disfluencies.perl
+
+
+
+EDITED   (disfluencies - edited part (i.e. reparandum))
+PRN  (interjections, "you know", "I guess")
+RM/IP/RS / -DFL -   (disfluency markup)
+
+... are removed completely. 
+
+INTJ: Hesitations ("uh") are removed. So are any predecing or following commas
+
+
+TYPO: Only the TYPO mark is removed, so the wrongly spelled word including the possibly wrong tag is inserted.
+
+-UNF: Utterances containing unfinished constituents are dropped from the analysis. 
+

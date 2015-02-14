@@ -18,20 +18,11 @@
 
 package opennlp.ccg.unify;
 
-import gnu.trove.map.hash.TObjectIntHashMap;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import opennlp.ccg.grammar.Grammar;
-import opennlp.ccg.hylo.HyloHelper;
-
-import org.jdom2.Element;
+import opennlp.ccg.hylo.*;
+import opennlp.ccg.grammar.*;
+import gnu.trove.*;
+import org.jdom.*;
+import java.util.*;
 
 
 /**

@@ -102,6 +102,7 @@ public class POSPriorModel extends ConditionalProbabilityTable {
                 post = post.trim().split("-")[1];
             }
         }
+        br.close();
 
         // initialize the arrays to this size.
         posVocab = new String[cnt];

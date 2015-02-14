@@ -20,7 +20,7 @@ package opennlp.ccg.test;
 import opennlp.ccg.grammar.*;
 import opennlp.ccg.lexicon.*;
 
-import org.jdom2.*;
+import org.jdom.*;
 
 import java.io.*;
 import java.net.*;

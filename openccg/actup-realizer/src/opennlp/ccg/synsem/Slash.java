@@ -18,18 +18,11 @@
 
 package opennlp.ccg.synsem;
 
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import java.io.Serializable;
+import gnu.trove.*;
+import org.jdom.Element;
 
-import opennlp.ccg.unify.ModFcn;
-import opennlp.ccg.unify.Mutable;
-import opennlp.ccg.unify.Substitution;
-import opennlp.ccg.unify.Unifiable;
-import opennlp.ccg.unify.UnifyFailure;
-import opennlp.ccg.unify.Variable;
-
-import org.jdom2.Element;
+import opennlp.ccg.unify.*;
 
 /**
  * A categorial slash which has an optional mode associated with it.

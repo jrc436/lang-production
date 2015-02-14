@@ -22,12 +22,11 @@ import opennlp.ccg.synsem.*;
 import opennlp.ccg.unify.*;
 import opennlp.ccg.grammar.*;
 import opennlp.ccg.lexicon.Lexicon;
-import org.jdom2.*;
+import org.jdom.*;
 
 import java.util.*;
 
 import gnu.trove.*;
-import gnu.trove.list.array.TIntArrayList;
 
 /**
  * A utility class to help with certain global operations over hybrid logic

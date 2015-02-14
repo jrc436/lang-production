@@ -34,17 +34,18 @@ import javax.xml.transform.Source;
 import javax.xml.transform.sax.SAXSource;
 
 import opennlp.ccgbank.convert.InfoHelper;
-import opennlp.ccgbank.convert.MorphLookup;
 import opennlp.ccgbank.convert.XSLTTrueCaser;
+import opennlp.ccgbank.convert.MorphLookup;
+import opennlp.ccgbank.parse.CCGbankDerivation;
 import opennlp.ccgbank.parse.SimpleNode;
 
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.DefaultLogger;
 import org.apache.tools.ant.Project;
 import org.apache.tools.ant.ProjectHelper;
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.transform.JDOMSource;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.transform.JDOMSource;
 import org.xml.sax.InputSource;
 
 

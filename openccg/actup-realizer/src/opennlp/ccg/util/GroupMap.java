@@ -19,14 +19,10 @@
 
 package opennlp.ccg.util;
 
-import gnu.trove.map.hash.TCustomHashMap;
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.strategy.IdentityHashingStrategy;
+import gnu.trove.*;
 
 import java.io.Serializable;
-import java.util.Collection;
-import java.util.Set;
+import java.util.*;
 
 /**
  * A map where putting a value does not replace an old value but is rather
@@ -43,15 +39,15 @@ public class GroupMap<KeyType,ValType> implements Serializable {
 	private static final long serialVersionUID = -2995356057195571222L;
 	
 	// the underlying map
-	private TCustomHashMap map;
+	private THashMap map;
 	
 	/** Default constructor. */
 	public GroupMap() { this(false); }
 	
 	/** Constructor with flag for whether to use identity instead of <code>equals</code> on keys. */
 	public GroupMap(boolean useIdentityEquals) {
-		if (useIdentityEquals) map = new TCustomHashMap(new IdentityHashingStrategy());
-		else map = new TCustomHashMap();
+		if (useIdentityEquals) map = new THashMap(new TObjectIdentityHashingStrategy());
+		else map = new THashMap();
 	}
 	
     /** Adds the given key-value pair to the map, and returns null. */

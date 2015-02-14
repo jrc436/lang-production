@@ -18,33 +18,18 @@
 
 package opennlp.ccg.realize;
 
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.set.hash.TCustomHashSet;
-import gnu.trove.strategy.IdentityHashingStrategy;
-
-import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.prefs.Preferences;
-
-import opennlp.ccg.TextCCG;
-import opennlp.ccg.hylo.Alt;
-import opennlp.ccg.hylo.SatOp;
+import opennlp.ccg.*;
+import opennlp.ccg.synsem.*;
+import opennlp.ccg.util.Pair;
 import opennlp.ccg.ngrams.NgramPrecisionModel;
 import opennlp.ccg.parse.DerivationHistory;
-import opennlp.ccg.synsem.Category;
-import opennlp.ccg.synsem.Sign;
-import opennlp.ccg.util.Pair;
+import opennlp.ccg.hylo.*;
+
+import java.io.*;
+import java.util.*;
+import java.util.prefs.*;
+
+import gnu.trove.*;
 
 /**
  * The chart manages the creation of edges.  Newly added edges are kept on an 
@@ -167,7 +152,7 @@ public class Chart
     // coverage vectors and their cats, sans LFs
     @SuppressWarnings("unchecked")
     private Map<Edge, Edge> catMap = new THashMap(
-        /*new TObjectHashingStrategy() {
+        new TObjectHashingStrategy() {
 			private static final long serialVersionUID = 1L;
 			public int computeHashCode(Object o) {
                 Edge edge = (Edge) o;
@@ -178,7 +163,7 @@ public class Chart
                 return edge1.bitset.equals(edge2.bitset) &&
                     edge1.sign.getCategory().equalsNoLF(edge2.sign.getCategory());
             }
-        }*/
+        }
     );
     
     // cell map: based on input coverage vectors
@@ -497,7 +482,7 @@ public class Chart
     /** Unpack complete edges, if any; otherwise unpack all. */
 	protected void doUnpacking() {
 	    @SuppressWarnings("unchecked")
-        Set<Edge> unpacked = new TCustomHashSet(new IdentityHashingStrategy());
+        Set<Edge> unpacked = new THashSet(new TObjectIdentityHashingStrategy());
 	    boolean foundComplete = bestEdge.complete();
         // unpack each relevant edge, updating best edge 
         for (Edge edge : edges) {

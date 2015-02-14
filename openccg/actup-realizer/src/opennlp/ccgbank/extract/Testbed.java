@@ -36,12 +36,12 @@ import opennlp.ccg.synsem.*;
 import opennlp.ccg.test.*;
 import opennlp.ccg.unify.*;
 
-import org.jdom2.Document;
-import org.jdom2.Element;
-import org.jdom2.JDOMException;
-import org.jdom2.input.SAXBuilder;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 /**
  * Creates test files under in 'test' dir under extracted grammar.
@@ -232,6 +232,7 @@ public class Testbed {
                              textsc=tokenizer.getOrthography((List<Word>)sign.getWords(),true);
                              textscPW.println(textsc);
                              textscPW.flush();
+                             textscPW.close();
 						 }
 
 						

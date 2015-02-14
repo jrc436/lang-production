@@ -29,10 +29,8 @@ public class MorphLookup {
 		
 		stemMap = new HashMap<String,String>();
 		
-		BufferedReader wordsReader = new BufferedReader(
-				new FileReader(words));
-		BufferedReader stemsReader = new BufferedReader(
-				new FileReader(stems));
+		BufferedReader wordsReader = new BufferedReader(new FileReader(words));
+		BufferedReader stemsReader = new BufferedReader(new FileReader(stems));
 		String wordsLine, stemsLine;
 		// read lines in parallel
 		while ( (wordsLine = wordsReader.readLine()) != null ) {
@@ -49,6 +47,8 @@ public class MorphLookup {
 			stemMap.put(key, stem);
 			stemMap.put(key2, stem);
 		}
+		wordsReader.close();
+		stemsReader.close();
 	}
 	
 	/** Returns the stem for the given word and pos, or the empty string if none. */

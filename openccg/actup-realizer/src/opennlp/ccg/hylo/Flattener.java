@@ -25,7 +25,6 @@ import opennlp.ccg.util.*;
 import java.util.*;
 
 import gnu.trove.*;
-import gnu.trove.list.array.TIntArrayList;
 
 /**
  * A class for performing flattening operations on LFs.
@@ -237,7 +236,7 @@ public class Flattener {
         }
         // set alts, opts, chunks
         if (!alts.empty()) satOp.alts = new ArrayList<Alt>(alts);
-        if (opts.size() > 0) satOp.opts = new TIntArrayList(opts.toArray());
+        if (opts.size() > 0) satOp.opts = new TIntArrayList(opts.toNativeArray());
         satOp.setChunks(lf.getChunks());
     }
     

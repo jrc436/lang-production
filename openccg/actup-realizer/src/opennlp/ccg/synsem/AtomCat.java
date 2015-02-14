@@ -19,17 +19,11 @@
 
 package opennlp.ccg.synsem;
 
-import gnu.trove.map.hash.TObjectIntHashMap;
-import opennlp.ccg.grammar.Grammar;
-import opennlp.ccg.unify.FeatureStructure;
-import opennlp.ccg.unify.GFeatStruc;
-import opennlp.ccg.unify.ModFcn;
-import opennlp.ccg.unify.Substitution;
-import opennlp.ccg.unify.UnifyFailure;
-import opennlp.ccg.unify.Variable;
+import opennlp.ccg.unify.*;
 import opennlp.ccg.util.DisplayPrefs;
-
-import org.jdom2.Element;
+import opennlp.ccg.grammar.Grammar;
+import org.jdom.*;
+import gnu.trove.*;
 
 /**
  * The most basic CG category.  This corresponds to a category like 'np[acc]',

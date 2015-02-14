@@ -19,10 +19,8 @@
 package opennlp.ccg.synsem;
 
 import opennlp.ccg.unify.*;
-import org.jdom2.*;
+import org.jdom.*;
 import gnu.trove.*;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * An interface for objects which represent Logical Forms.

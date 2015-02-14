@@ -81,13 +81,14 @@ public class InfoHelper{
 					bbnData=bbnData.replaceAll(":","|");
 					bbnInfo.put(key,bbnData);
 					ArrayList<String> spanList=new ArrayList<String>();
-					if(!bbnSpans.containsKey(sentId))
+					if(!bbnSpans.containsKey(sentId)) {
 						bbnSpans.put(sentId,spanList);
+					}
 					spanList=bbnSpans.get(sentId);
 					spanList.add(span);
 					bbnSpans.put(sentId,spanList);
-					
 				}
+				inp.close();
 			}
 		}
 		catch(IOException e){
@@ -120,7 +121,7 @@ public class InfoHelper{
 					quotedText=quotedText.trim();
 					quoteInfo.put(key,quotedText);
 				}
-				
+				inp.close();
 			}
 		}
 		catch(IOException e){
@@ -164,6 +165,7 @@ public class InfoHelper{
 						}
 					}
 				}
+				inp.close();
 			}
 		}
 		catch(IOException e){
@@ -178,7 +180,7 @@ public class InfoHelper{
 		
 		try{
 			
-			if(new File(treeAuxFile).exists()){
+			if(new File(treeAuxFile).exists()) {
 				System.out.println("Reading in Tree aux file: "+treeAuxFile);
 				BufferedReader inp= new BufferedReader(new FileReader(treeAuxFile));
 				String line="";
@@ -191,7 +193,7 @@ public class InfoHelper{
 					String catId=treeParts[2];
 					treeInfo.put(key,catId);
 				}
-				
+				inp.close();
 			}
 
 		}
@@ -602,6 +604,8 @@ public class InfoHelper{
 					print_writer.print("\"/>");
 				print_writer.flush();
 			}
+			
+			print_writer.close();
 			
 		}
 		catch (Exception e){

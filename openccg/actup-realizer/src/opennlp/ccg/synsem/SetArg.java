@@ -18,20 +18,11 @@
 
 package opennlp.ccg.synsem;
 
-import gnu.trove.map.hash.TObjectIntHashMap;
-
+import opennlp.ccg.unify.*;
+import org.jdom.*;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import opennlp.ccg.unify.GUnifier;
-import opennlp.ccg.unify.ModFcn;
-import opennlp.ccg.unify.Substitution;
-import opennlp.ccg.unify.UnifyFailure;
-import opennlp.ccg.unify.Variable;
-
-import org.jdom2.Element;
+import java.util.*;
+import gnu.trove.*;
 
 /**
  * A category which contains an unordered set of categories.

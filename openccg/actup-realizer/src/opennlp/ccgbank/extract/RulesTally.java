@@ -112,7 +112,7 @@ public class RulesTally {
 		
 		//Freq Output file
 		File freqFile = new File(directory, "RuleFreq.html");
-		PrintWriter output=new PrintWriter(new FileOutputStream(freqFile));
+		PrintWriter output = new PrintWriter(new FileOutputStream(freqFile));
 		
 		List<String> ruleList = FreqTally.sortTally(ruleFreq);
 		
@@ -191,6 +191,7 @@ public class RulesTally {
 		output.println("</body>");
 		output.println("</html>");
 		output.flush();
+		output.close();
 	}
 	
 	

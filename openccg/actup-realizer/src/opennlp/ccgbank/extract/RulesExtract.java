@@ -41,7 +41,7 @@ import opennlp.ccgbank.extract.ExtractGrammar.ExtractionProperties;
 import org.apache.xml.serializer.OutputPropertiesFactory;
 import org.apache.xml.serializer.Serializer;
 import org.apache.xml.serializer.SerializerFactory;
-import org.jdom2.JDOMException;
+import org.jdom.JDOMException;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 import org.xml.sax.XMLFilter;

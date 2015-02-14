@@ -17,7 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.ccg.lexicon;
 
-import org.jdom2.*;
+import org.jdom.*;
 
 /**
  * Data structure for storing information about a lexical entry.  Specifically

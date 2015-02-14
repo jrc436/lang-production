@@ -42,7 +42,7 @@ public class Client {
 		}
 		
 		XmlNode root = lp.getTopLevelNode();
-		LexiconBuild lb = new LexiconBuild();
+		//LexiconBuild lb = new LexiconBuild();
 		MorphBuild mb = new MorphBuild(dirPath, root);
 		mb.output();
 	

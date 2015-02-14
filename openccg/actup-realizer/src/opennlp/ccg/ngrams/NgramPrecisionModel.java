@@ -18,20 +18,14 @@
 
 package opennlp.ccg.ngrams;
 
-import gnu.trove.set.hash.THashSet;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import opennlp.ccg.grammar.Grammar;
-import opennlp.ccg.lexicon.Word;
+import opennlp.ccg.grammar.*;
+import opennlp.ccg.lexicon.*;
 import opennlp.ccg.perceptron.FeatureVector;
 import opennlp.ccg.synsem.Sign;
-import opennlp.ccg.util.ArrayListWithIdentityEquals;
-import opennlp.ccg.util.Interner;
-import opennlp.ccg.util.SingletonList;
-import opennlp.ccg.util.StructureSharingList;
+import opennlp.ccg.util.*;
+
+import gnu.trove.*;
+import java.util.*;
 
 /**
  * N-gram precision scoring model, using a linear combination of 

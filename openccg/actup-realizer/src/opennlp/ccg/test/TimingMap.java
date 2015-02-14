@@ -19,7 +19,7 @@ package opennlp.ccg.test;
 
 import java.util.*;
 
-import org.jdom2.*;
+import org.jdom.*;
 
 /**
  * Utility class for managing average times per number of nodes.

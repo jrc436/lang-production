@@ -26,10 +26,10 @@ import opennlp.ccg.parse.Parser;
 import opennlp.ccg.parse.ParseException;
 import opennlp.ccg.realize.Realizer;
 
-import org.jdom2.*;
-import org.jdom2.input.*;
-import org.jdom2.output.*;
-import org.jdom2.transform.*;
+import org.jdom.*;
+import org.jdom.input.*;
+import org.jdom.output.*;
+import org.jdom.transform.*;
 import org.xml.sax.*;
 import javax.xml.parsers.*;
 import javax.xml.transform.*;

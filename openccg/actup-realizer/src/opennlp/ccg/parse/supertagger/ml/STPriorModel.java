@@ -125,7 +125,7 @@ public class STPriorModel extends ConditionalProbabilityTable {
                 st = st.trim().split("-")[1];
             }
         }
-
+        br.close();
         // initialize the arrays to this size.
         stagVocab = new String[cnt];
         stagPointers = new ProbIndexPair[cnt];

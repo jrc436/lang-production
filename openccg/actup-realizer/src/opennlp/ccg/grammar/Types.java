@@ -21,15 +21,14 @@ package opennlp.ccg.grammar;
 import opennlp.ccg.util.*;
 import opennlp.ccg.unify.*;
 
-import org.jdom2.*;
-import org.jdom2.input.*;
+import org.jdom.*;
+import org.jdom.input.*;
 
 import java.io.*;
 import java.net.*;
 import java.util.*;
 
 import gnu.trove.*;
-import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * Class for constructing and holding the hierarchical simple type maps.
@@ -193,7 +192,7 @@ public class Types {
         
         // find max depth
         int maxDepth = 0;
-        int[] depths = depthMap.values();
+        int[] depths = depthMap.getValues();
         for (int i = 0; i < depths.length; i++) {
             maxDepth = Math.max(maxDepth, depths[i]);
         }

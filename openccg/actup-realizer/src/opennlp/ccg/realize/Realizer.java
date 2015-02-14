@@ -22,7 +22,7 @@ import opennlp.ccg.grammar.*;
 import opennlp.ccg.synsem.*;
 import opennlp.ccg.hylo.*;
 import opennlp.ccg.*;
-import org.jdom2.*;
+import org.jdom.*;
 import java.util.*;
 import java.util.prefs.*;
 

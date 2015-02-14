@@ -39,7 +39,7 @@ import opennlp.ccgbank.extract.ExtractGrammar.ExtractionProperties;
 //import javax.xml.transform.TransformerConfigurationException;
 //import javax.xml.transform.TransformerException;
 
-//import org.jdom2.JDOMException;
+//import org.jdom.JDOMException;
 //import org.xml.sax.SAXException;
 
 

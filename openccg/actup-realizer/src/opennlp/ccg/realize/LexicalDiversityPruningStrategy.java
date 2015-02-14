@@ -18,13 +18,13 @@
 
 package opennlp.ccg.realize;
 
-import gnu.trove.set.hash.TCustomHashSet;
-import gnu.trove.strategy.IdentityHashingStrategy;
-
-import java.util.Set;
-
 import opennlp.ccg.lexicon.Word;
 import opennlp.ccg.synsem.Sign;
+
+import gnu.trove.THashSet;
+import gnu.trove.TObjectIdentityHashingStrategy;
+
+import java.util.*;
 
 /**
  * A diversity pruning strategy that defines signs to be 
@@ -39,11 +39,11 @@ public class LexicalDiversityPruningStrategy extends DiversityPruningStrategy
 {
     /** The interned POS values to use for relevant open class stems. */
     @SuppressWarnings("unchecked")
-	protected Set<String> posValsToUse = new TCustomHashSet(new IdentityHashingStrategy());
+	protected Set<String> posValsToUse = new THashSet(new TObjectIdentityHashingStrategy());
     
     /** Reusable set of observed interned stems for comparison purposes. */
     @SuppressWarnings("unchecked")
-	protected Set<String> stemsSeen = new TCustomHashSet(new IdentityHashingStrategy());
+	protected Set<String> stemsSeen = new THashSet(new TObjectIdentityHashingStrategy());
     
     /** Constructor, which sets POS classes of interest. */
     public LexicalDiversityPruningStrategy() {

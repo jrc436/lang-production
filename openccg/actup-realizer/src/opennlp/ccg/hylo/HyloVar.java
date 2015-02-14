@@ -21,9 +21,8 @@ package opennlp.ccg.hylo;
 import opennlp.ccg.grammar.*;
 import opennlp.ccg.synsem.*;
 import opennlp.ccg.unify.*;
-import org.jdom2.*;
+import org.jdom.*;
 import gnu.trove.*;
-import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * A class for objects which can stand for any HyloFormula object.

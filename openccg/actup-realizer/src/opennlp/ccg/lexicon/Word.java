@@ -18,24 +18,11 @@
 
 package opennlp.ccg.lexicon;
 
-import gnu.trove.set.hash.TCustomHashSet;
-import gnu.trove.strategy.IdentityHashingStrategy;
+import opennlp.ccg.util.*;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.ObjectStreamException;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import opennlp.ccg.util.Pair;
+import java.io.*;
+import java.util.*;
+import gnu.trove.*;
 
 /**
  * A Word object may either be a surface word or a full word.
@@ -112,7 +99,7 @@ abstract public class Word implements Serializable, Comparable<Word> {
     private static Set<String> knownAttrs = initKnownAttrs(); 
     @SuppressWarnings("unchecked")
 	private static Set<String> initKnownAttrs() {
-        Set<String> knownAttrs = new TCustomHashSet(new IdentityHashingStrategy());
+        Set<String> knownAttrs = new THashSet(new TObjectIdentityHashingStrategy());
         String[] names = {
             Tokenizer.WORD_ATTR, Tokenizer.PITCH_ACCENT_ATTR, 
             Tokenizer.STEM_ATTR, Tokenizer.POS_ATTR, 

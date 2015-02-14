@@ -40,8 +40,8 @@ import opennlp.ccg.util.Pair;
 import opennlp.ccg.util.SingletonList;
 import opennlp.ccg.perceptron.*;
 
-import org.jdom2.*;
-import org.jdom2.output.XMLOutputter;
+import org.jdom.*;
+import org.jdom.output.XMLOutputter;
 
 /**
  * Automates the testing of CCG grammars.

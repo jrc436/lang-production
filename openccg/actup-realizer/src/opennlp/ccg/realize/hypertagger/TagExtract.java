@@ -49,7 +49,7 @@ public class TagExtract {
 		this.tex = t;
 	}
 	/* TODO: this method should probably be rewritten to use LFLoader and a config file */
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws IOException {
 		TagExtract t = null;
 		//PrintStream output = System.out;
 		BufferedWriter output;

@@ -18,25 +18,13 @@
 
 package opennlp.ccg.ngrams;
 
-import gnu.trove.set.hash.THashSet;
+import opennlp.ccg.lexicon.*;
+import opennlp.ccg.util.*;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.Reader;
-import java.io.StreamTokenizer;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.io.*;
 
-import opennlp.ccg.lexicon.DefaultTokenizer;
-import opennlp.ccg.lexicon.Tokenizer;
-import opennlp.ccg.lexicon.Word;
-import opennlp.ccg.util.ArrayListWithIdentityEquals;
-import opennlp.ccg.util.Interner;
-import opennlp.ccg.util.SingletonList;
-import opennlp.ccg.util.StructureSharingList;
+import gnu.trove.*;
 
 /**
  * AN n-gram filter that detects "a" followed by a word beginning with a vowel, 

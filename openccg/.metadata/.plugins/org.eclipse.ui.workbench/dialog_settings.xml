@@ -4,6 +4,23 @@
 		<item value="575" key="DIALOG_X_ORIGIN"/>
 		<item value="132" key="DIALOG_Y_ORIGIN"/>
 	</section>
+	<section name="org.eclipse.ui.preferences.keysPreferencePage">
+		<item value="true" key="actionSetFilter"/>
+		<item value="true" key="uncategorizedFilter"/>
+		<item value="true" key="internalFilter"/>
+	</section>
+	<section name="org.eclipse.ui.internal.QuickAccess">
+		<item value="894" key="dialogHeight"/>
+		<item value="1344" key="dialogWidth"/>
+		<list key="textEntries">
+		</list>
+		<list key="orderedElements">
+		</list>
+		<list key="orderedProviders">
+		</list>
+		<list key="textArray">
+		</list>
+	</section>
 	<section name="InstallationDialogSettings">
 		<item value="798" key="DIALOG_WIDTH"/>
 		<item value="1|Ubuntu|11.0|0|GTK|1|" key="DIALOG_FONT_NAME"/>
@@ -21,9 +38,11 @@
 		<item value="false" key="WizardFileSystemResourceImportPage1.STORE_CREATE_CONTAINER_STRUCTURE_ID"/>
 		<item value="false" key="WizardFileSystemResourceImportPage1.STORE_OVERWRITE_EXISTING_RESOURCES_ID"/>
 		<list key="WizardFileSystemResourceImportPage1.STORE_SOURCE_NAMES_ID">
+			<item value="/home/jrc/actup-production/openccg/src/opennlp/src/ccg"/>
+			<item value="/home/jrc/actup-production/openccg/src/opennlp/src/ccgbank"/>
+			<item value="/home/jrc/actup-production/openccg/src/opennlp/src"/>
+			<item value="/home/jrc/actup-production/openccg/lib"/>
 			<item value="/home/jrc/opensrc/jline/src/main/java/jline"/>
-			<item value="/home/jrc/opensrc/jline/src/main"/>
-			<item value="/home/jrc/opensrc/jline2/src/main/java"/>
 		</list>
 	</section>
 </section>

@@ -32,7 +32,7 @@ import opennlp.ccg.ngrams.*;
 import opennlp.ccg.test.*;
 import opennlp.ccg.realize.Edge; // only realization edges referenced (for preferences)
 
-import org.jdom2.*;
+import org.jdom.*;
 
 import java.io.*;
 import java.net.*;

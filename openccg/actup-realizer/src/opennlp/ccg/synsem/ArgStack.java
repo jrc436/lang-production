@@ -18,19 +18,12 @@
 
 package opennlp.ccg.synsem;
 
-import gnu.trove.map.hash.TObjectIntHashMap;
+import opennlp.ccg.unify.*;
+import gnu.trove.*;
+import org.jdom.*;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import opennlp.ccg.unify.ModFcn;
-import opennlp.ccg.unify.Substitution;
-import opennlp.ccg.unify.UnifyFailure;
-import opennlp.ccg.unify.Variable;
-
-import org.jdom2.Element;
+import java.util.*;
 
 /**
  * A stack of arguments with their associated slashes.

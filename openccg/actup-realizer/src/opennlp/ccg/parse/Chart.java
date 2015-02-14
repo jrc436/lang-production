@@ -18,34 +18,12 @@
 
 package opennlp.ccg.parse;
 
-import gnu.trove.map.hash.TCustomHashMap;
-import gnu.trove.set.hash.TCustomHashSet;
-import gnu.trove.strategy.HashingStrategy;
-import gnu.trove.strategy.IdentityHashingStrategy;
+import opennlp.ccg.grammar.*;
+import opennlp.ccg.synsem.*;
+import gnu.trove.*;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import opennlp.ccg.grammar.AbstractRule;
-import opennlp.ccg.grammar.Rule;
-import opennlp.ccg.grammar.RuleGroup;
-import opennlp.ccg.synsem.ReRankingScorer;
-import opennlp.ccg.synsem.Sign;
-import opennlp.ccg.synsem.SignHash;
-import opennlp.ccg.synsem.SignScorer;
+import java.io.*;
+import java.util.*;
 
 /**
  * An implementation of the table (or chart) used for chart parsers like CKY.
@@ -66,10 +44,10 @@ public class Chart {
 	//     with a significant drop in complete parses
     @SuppressWarnings("unchecked")
     private static Map<Edge,Edge> createEdgeMap() {
-    	return new TCustomHashMap(representativeEdgeStrategy, 11);
+    	return new THashMap(11, representativeEdgeStrategy);
     }
     
-    private static HashingStrategy representativeEdgeStrategy = new HashingStrategy() {
+    private static TObjectHashingStrategy representativeEdgeStrategy = new TObjectHashingStrategy() {
 		private static final long serialVersionUID = 1L;
 		public int computeHashCode(Object o) {
             Sign sign = ((Edge)o).sign;
@@ -350,9 +328,9 @@ public class Chart {
 		Cell cell = get(x, y);
 		// recursively unpack each edge
 	    @SuppressWarnings("unchecked")
-        Set<Edge> unpacked = new TCustomHashSet(new IdentityHashingStrategy());
+        Set<Edge> unpacked = new THashSet(new TObjectIdentityHashingStrategy());
 	    @SuppressWarnings("unchecked")
-        Set<Edge> startedUnpacking = new TCustomHashSet(new IdentityHashingStrategy());
+        Set<Edge> startedUnpacking = new THashSet(new TObjectIdentityHashingStrategy());
 		for (Edge edge : cell.list) unpack(edge, unpacked, startedUnpacking); 
 		// collect and sort results
         EdgeHash merged = new EdgeHash();
@@ -492,7 +470,7 @@ public class Chart {
 		Cell cell = get(x, y);
 		// make top-level candidate list and derivs map
 		List<Candidate> topcands = new ArrayList<Candidate>(_pruneVal);
-		Map<Edge, List<Edge>> derivsmap = new TCustomHashMap(new IdentityHashingStrategy());
+		Map<Edge, List<Edge>> derivsmap = new THashMap(new TObjectIdentityHashingStrategy());
 		for (Edge edge : cell.list) {
 			List<Candidate> cands = getCandidates(edge, derivsmap);
 			topcands.addAll(cands);
@@ -690,8 +668,10 @@ public class Chart {
 			_size = _table.length;
 			_numUnpackingEdges = 0;
 		} catch (ClassNotFoundException e) {
+			in.close();
             throw (RuntimeException) new RuntimeException().initCause(e);
 		}
+		in.close();
 	}
 	
 	

@@ -74,6 +74,7 @@ public class SRILM_FactoredScorerMaker extends SRILM_ScorerMaker {
                 out.println(line);
             }
         }
+        br.close();
         out.close();
     }
     

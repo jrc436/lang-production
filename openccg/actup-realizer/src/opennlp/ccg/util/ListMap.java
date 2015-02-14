@@ -18,14 +18,8 @@
 
 package opennlp.ccg.util;
 
-import gnu.trove.map.hash.TCustomHashMap;
-import gnu.trove.map.hash.THashMap;
-import gnu.trove.strategy.IdentityHashingStrategy;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import gnu.trove.*;
+import java.util.*;
 
 /**
  * A map where putting a value does not replace an old value 
@@ -39,15 +33,15 @@ import java.util.Set;
 public class ListMap<KeyType,ValType> {
     
 	// the underlying map
-	private TCustomHashMap map;
+	private THashMap map;
 	
 	/** Default constructor. */
 	public ListMap() { this(false); }
 	
 	/** Constructor with flag for whether to use identity instead of <code>equals</code> on keys. */
 	public ListMap(boolean useIdentityEquals) {
-		if (useIdentityEquals) map = new TCustomHashMap(new IdentityHashingStrategy());
-		else map = new TCustomHashMap();
+		if (useIdentityEquals) map = new THashMap(new TObjectIdentityHashingStrategy());
+		else map = new THashMap();
 	}
 	
     /** Adds the given key-value pair to the map, and returns null. */

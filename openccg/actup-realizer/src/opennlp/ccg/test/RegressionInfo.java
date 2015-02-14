@@ -20,8 +20,8 @@ package opennlp.ccg.test;
 import opennlp.ccg.grammar.Grammar;
 import opennlp.ccg.synsem.*;
 
-import org.jdom2.*;
-import org.jdom2.input.*;
+import org.jdom.*;
+import org.jdom.input.*;
 import java.io.*;
 import java.util.*;
 

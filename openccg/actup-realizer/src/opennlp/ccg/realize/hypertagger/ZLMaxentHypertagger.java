@@ -844,7 +844,7 @@ public class ZLMaxentHypertagger extends TagExtractor implements Hypertagger {
 	}
 
 	@SuppressWarnings("boxing")
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws IOException {
 		String usage = "\nhypertagger (-i <input>) (-o <output> [defaults to <stdout>]) (-c <config file>)\n";
 		if (args.length > 0 && args[0].equals("-h")) {
 			System.out.println(usage);

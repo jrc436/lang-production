@@ -18,17 +18,12 @@
 
 package opennlp.ccg.ngrams;
 
-import gnu.trove.set.hash.TCustomHashSet;
-import gnu.trove.set.hash.THashSet;
-import gnu.trove.strategy.IdentityHashingStrategy;
-
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-
-import opennlp.ccg.lexicon.Word;
 import opennlp.ccg.synsem.Sign;
 import opennlp.ccg.synsem.SignScorer;
+import opennlp.ccg.lexicon.Word;
+
+import java.util.*;
+import gnu.trove.*;
 
 /**
  * Scores a sign according to how repetitive its words are given the 
@@ -57,25 +52,25 @@ public class RepetitionScorer implements SignScorer
     public double oldestCount = 0.125;
     
     /** The interned POS values to use for repetition scoring purposes. */
-    protected Set posValsToUse = new TCustomHashSet(new IdentityHashingStrategy());
+    protected Set posValsToUse = new THashSet(new TObjectIdentityHashingStrategy());
     
     /** The interned stems to ignore for repetition scoring purposes. */
-    protected Set stemsToIgnore = new TCustomHashSet(new IdentityHashingStrategy());
+    protected Set stemsToIgnore = new THashSet(new TObjectIdentityHashingStrategy());
     
     /** The interned items (eg stems) seen in the previous words. */
-    protected Set previousItems = new TCustomHashSet(new IdentityHashingStrategy());
+    protected Set previousItems = new THashSet(new TObjectIdentityHashingStrategy());
     
     /** The interned items (eg stems) seen in the recent context. */
-    protected Set contextItems = new TCustomHashSet(new IdentityHashingStrategy());
+    protected Set contextItems = new THashSet(new TObjectIdentityHashingStrategy());
     
     /** The interned items (eg stems) seen in the older context. */
-    protected Set olderContextItems = new TCustomHashSet(new IdentityHashingStrategy());
+    protected Set olderContextItems = new THashSet(new TObjectIdentityHashingStrategy());
     
     /** The interned items (eg stems) seen in the even older context. */
-    protected Set evenOlderContextItems = new TCustomHashSet(new IdentityHashingStrategy());
+    protected Set evenOlderContextItems = new THashSet(new TObjectIdentityHashingStrategy());
     
     /** The interned items (eg stems) seen in the oldest context. */
-    protected Set oldestContextItems = new TCustomHashSet(new IdentityHashingStrategy());
+    protected Set oldestContextItems = new THashSet(new TObjectIdentityHashingStrategy());
     
     /**
      * Default constructor.

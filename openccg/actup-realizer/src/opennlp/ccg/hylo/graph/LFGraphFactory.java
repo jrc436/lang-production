@@ -35,8 +35,8 @@ import opennlp.ccg.hylo.SatOp;
 import opennlp.ccg.realize.Realizer;
 import opennlp.ccg.synsem.LF;
 
-import org.jdom2.Element;
-import org.jdom2.input.DOMBuilder;
+import org.jdom.Element;
+import org.jdom.input.DOMBuilder;
 
 /**
  * Factory class for creating LF graphs based on {@link LF}s and XML elements 

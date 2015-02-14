@@ -21,10 +21,9 @@ package opennlp.ccg.hylo;
 import opennlp.ccg.synsem.*;
 import opennlp.ccg.unify.*;
 import opennlp.ccg.grammar.Grammar;
-import org.jdom2.*;
+import org.jdom.*;
 import java.util.*;
 import gnu.trove.*;
-import gnu.trove.map.hash.TObjectIntHashMap;
 
 /**
  * A generic operator, such as conjunction, disjunction, exclusive-or, 

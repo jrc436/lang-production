@@ -19,20 +19,12 @@
 
 package opennlp.ccg.synsem;
 
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import java.io.IOException;
 import java.io.Serializable;
-
-import opennlp.ccg.hylo.HyloHelper;
-import opennlp.ccg.hylo.Nominal;
-import opennlp.ccg.unify.FeatureStructure;
-import opennlp.ccg.unify.ModFcn;
-import opennlp.ccg.unify.Substitution;
-import opennlp.ccg.unify.UnifyFailure;
-import opennlp.ccg.unify.Variable;
-
-import org.jdom2.Element;
+import gnu.trove.*;
+import org.jdom.*;
+import opennlp.ccg.hylo.*;
+import opennlp.ccg.unify.*;
 
 /**
  * Abstract category adapter for CCG categories.

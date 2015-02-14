@@ -18,31 +18,13 @@
 
 package opennlp.ccg.lexicon;
 
-import gnu.trove.set.hash.TCustomHashSet;
-import gnu.trove.strategy.IdentityHashingStrategy;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.ParsePosition;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Currency;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
-
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.Duration;
-
 import opennlp.ccg.grammar.Grammar;
-import opennlp.ccg.util.Pair;
+import opennlp.ccg.util.*;
+
+import java.text.*;
+import java.util.*;
+import javax.xml.datatype.*;
+import gnu.trove.*;
 
 /**
  * DefaultTokenizer provides a default implementation of the 
@@ -78,7 +60,7 @@ public class DefaultTokenizer implements Tokenizer {
      * Equality is checked with identity, for use with interned strings.
      */
     @SuppressWarnings("unchecked")
-	protected Set<String> replacementSemClasses = new TCustomHashSet(new IdentityHashingStrategy());
+	protected Set<String> replacementSemClasses = new THashSet(new TObjectIdentityHashingStrategy());
 
 
     /**

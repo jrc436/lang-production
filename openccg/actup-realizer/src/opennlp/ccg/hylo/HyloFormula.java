@@ -19,10 +19,8 @@
 package opennlp.ccg.hylo;
 
 import java.io.Serializable;
-import org.jdom2.*;
+import org.jdom.*;
 import gnu.trove.*;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TObjectIntHashMap;
 
 import opennlp.ccg.synsem.*;
 import opennlp.ccg.unify.*;

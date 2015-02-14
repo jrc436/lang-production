@@ -28,8 +28,8 @@ import java.util.*;
 //import java.util.prefs.*;
 //import java.text.NumberFormat;
 
-import org.jdom2.*;
-import org.jdom2.input.*;
+import org.jdom.*;
+import org.jdom.input.*;
 
 /**
  * Runs cross-validation tests with the realizer.

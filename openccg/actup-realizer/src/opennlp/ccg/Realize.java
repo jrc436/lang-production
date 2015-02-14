@@ -18,19 +18,32 @@
 
 package opennlp.ccg;
 
-import opennlp.ccg.realize.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.net.URL;
+import java.util.List;
+import java.util.prefs.Preferences;
+
+import opennlp.ccg.grammar.Grammar;
+import opennlp.ccg.lexicon.Word;
+import opennlp.ccg.ngrams.FactoredNgramModelFamily;
+import opennlp.ccg.ngrams.NgramPrecisionModel;
+import opennlp.ccg.ngrams.NgramScorer;
+import opennlp.ccg.ngrams.StandardNgramModel;
+import opennlp.ccg.realize.Chart;
+import opennlp.ccg.realize.Edge;
+import opennlp.ccg.realize.Hypertagger;
+import opennlp.ccg.realize.PruningStrategy;
+import opennlp.ccg.realize.Realizer;
 import opennlp.ccg.realize.hypertagger.ZLMaxentHypertagger;
-import opennlp.ccg.grammar.*;
-import opennlp.ccg.synsem.*;
-import opennlp.ccg.ngrams.*;
+import opennlp.ccg.synsem.LF;
+import opennlp.ccg.synsem.SignScorer;
 
-import org.jdom2.*;
-import org.jdom2.output.*;
-
-import java.io.*;
-import java.net.*;
-import java.util.*;
-import java.util.prefs.*;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.output.Format;
 
 /**
  * Sample front-end to the realizer, showing the intermediate steps of realization.
@@ -103,7 +116,7 @@ public class Realize
         out.println("Request:");
         out.println();
         Document doc = grammar.loadFromXml(inputfile);
-        org.jdom2.output.XMLOutputter outputter = new org.jdom2.output.XMLOutputter(Format.getPrettyFormat()); 
+        org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter(Format.getPrettyFormat()); 
         out.flush();
         outputter.output(doc, out);
         out.flush();
@@ -207,10 +220,13 @@ public class Realize
         }
 
         // run request
-        realizer.realize(lf, ngramScorer);
+        Edge e = realizer.realize(lf, ngramScorer);
         Chart chart = realizer.getChart();
         chart.out = out;
-
+        for (Word w : e.getSign().getWords()) {
+        	System.out.print(w.getForm());
+        }
+/*
         out.println();
         out.println("Preds:");
         chart.printEPs();
@@ -278,8 +294,7 @@ public class Realize
             out.println(chart.bestJoinedEdge.getSign().getDerivationHistory());
             out.flush();
         }
-
-
+*/
         // reset prefs
         prefs.putBoolean(Edge.SHOW_COMPLETENESS, oldShowCompleteness);
         prefs.putBoolean(Edge.SHOW_BITSET, oldShowBitset);

@@ -18,20 +18,11 @@
 
 package opennlp.ccg.hylo;
 
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TObjectIntHashMap;
-
-import java.util.List;
-
-import opennlp.ccg.synsem.LF;
-import opennlp.ccg.synsem.LexSemOrigin;
-import opennlp.ccg.unify.ModFcn;
-import opennlp.ccg.unify.Substitution;
-import opennlp.ccg.unify.Unifier;
-import opennlp.ccg.unify.UnifyFailure;
-import opennlp.ccg.unify.Variable;
-
-import org.jdom2.Element;
+import opennlp.ccg.synsem.*;
+import opennlp.ccg.unify.*;
+import org.jdom.*;
+import java.util.*;
+import gnu.trove.*;
 
 /**
  * A hybrid logic satifaction operator, which tests whether a formula is true

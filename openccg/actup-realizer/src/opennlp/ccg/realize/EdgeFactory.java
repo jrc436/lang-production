@@ -27,8 +27,6 @@ import opennlp.ccg.hylo.*;
 import opennlp.ccg.util.*;
 
 import gnu.trove.*;
-import gnu.trove.list.array.TIntArrayList;
-import gnu.trove.map.hash.TObjectIntHashMap;
 
 import java.util.*;
 import java.util.prefs.*;

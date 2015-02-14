@@ -18,14 +18,10 @@
 
 package opennlp.ccg.synsem;
 
-import gnu.trove.map.hash.TObjectIntHashMap;
-
 import java.io.Serializable;
+import gnu.trove.*;
 
-import opennlp.ccg.unify.ModFcn;
-import opennlp.ccg.unify.Substitution;
-import opennlp.ccg.unify.UnifyFailure;
-import opennlp.ccg.unify.Variable;
+import opennlp.ccg.unify.*;
 
 /**
  * A basic argument that contains a slash and a category.

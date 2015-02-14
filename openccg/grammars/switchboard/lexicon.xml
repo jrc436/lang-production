@@ -57510,7 +57510,6 @@
             <feat val="," attr="lex"/>
           </fs>
         </atomcat>
-        <slash mode="*" dir="/"/>
         <lf>
           <satop nomvar="X1">
             <diamond mode="Mod">

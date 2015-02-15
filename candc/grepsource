@@ -1,3 +1,0 @@
-#!/bin/bash
-
-find src \( -name "*.h" -or -name "*.cc" \) -exec egrep -H -n --color "${@}" {} \;

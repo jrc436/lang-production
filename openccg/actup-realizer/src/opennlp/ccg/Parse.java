@@ -71,7 +71,7 @@ public class Parse {
         }
         
         // args
-        String grammarfile = "grammar.xml";
+        String grammarfile = null;
         String inputfile = null;
         String outputfile = null;
         String parseScorerClass = null;

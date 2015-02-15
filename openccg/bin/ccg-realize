@@ -1,5 +1,0 @@
-#!/bin/sh
-# Usage: ccg-realize (-g <grammarfile>) <inputfile> (<outputfile>)
-. ccg-env
-"$JAVA" $JAVA_ARGS opennlp.ccg.Realize $@
-

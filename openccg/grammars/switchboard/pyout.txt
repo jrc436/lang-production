@@ -1,3 +1,0 @@
-2061:    <member stem="slow" pred="slow.01"/>
-6230:    <member stem="split" pred="split.01"/>
-57512:        <lf>

@@ -1,4 +1,0 @@
-#!/bin/sh
-. ccg-env
-"$JAVA" $JAVA_ARGS opennlp.ccg.parse.postagger.BasicPOSTagger $@
-

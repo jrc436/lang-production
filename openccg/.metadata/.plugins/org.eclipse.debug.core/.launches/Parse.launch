@@ -7,6 +7,6 @@
 <listEntry value="1"/>
 </listAttribute>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="opennlp.ccg.Parse"/>
-<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-g &quot;/home/jrc/actup-production/openccg/grammars/switchboard/grammar.xml&quot; -parsescorer &quot;opennlp.ccg.ngrams.NgramPrecisionModel&quot; &quot;/home/jrc/ap-largefiles/switchboard-input.txt&quot; &quot;/home/jrc/ap-largefiles/switchboard-parsed.txt&quot;"/>
+<stringAttribute key="org.eclipse.jdt.launching.PROGRAM_ARGUMENTS" value="-g &quot;../config/grammar/grammar.xml&quot; -parsescorer &quot;opennlp.ccg.ngrams.NgramPrecisionModel&quot; -stconfig &quot;../config/tagger/stconfig&quot; &quot;../../../ap-largefiles/switchboard-input.txt&quot; &quot;../../../ap-largefiles/switchboard-parsed.txt&quot;"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="actup-realizer"/>
 </launchConfiguration>

@@ -27,15 +27,10 @@ import java.util.List;
 import java.util.prefs.Preferences;
 
 import opennlp.ccg.grammar.Grammar;
-import opennlp.ccg.lexicon.Word;
-import opennlp.ccg.ngrams.FactoredNgramModelFamily;
 import opennlp.ccg.ngrams.NgramPrecisionModel;
-import opennlp.ccg.ngrams.NgramScorer;
-import opennlp.ccg.ngrams.StandardNgramModel;
 import opennlp.ccg.realize.Chart;
 import opennlp.ccg.realize.Edge;
 import opennlp.ccg.realize.Hypertagger;
-import opennlp.ccg.realize.PruningStrategy;
 import opennlp.ccg.realize.Realizer;
 import opennlp.ccg.realize.hypertagger.ZLMaxentHypertagger;
 import opennlp.ccg.synsem.LF;
@@ -53,48 +48,20 @@ import org.jdom.output.Format;
  */
 public class Realize
 {
-    private static PrintWriter out;
+	
+	
+    private PrintWriter out;
     
-    @SuppressWarnings("unchecked")
-	public static void main(String[] args) throws Exception {
-        
-        String usage = "Usage: java opennlp.ccg.Realize (-g <grammarfile>) (-exactmatches) (-ngramorder N) <inputfile> (<outputfile>)";
-        
-        if (args.length > 0 && args[0].equals("-h")) {
-            System.out.println(usage);
-            System.exit(0);
-        }
-        
-        // args
-        String grammarfile = "grammar.xml";
-        String inputfile = null;
-        String outputfile = null;
-        boolean exactMatches = false;
-        int ngramOrder = 0;
-        for (int i = 0; i < args.length; i++) {
-        	if (args[i].startsWith("-D")) {
-        		String prop = args[i].substring(2); int equalpos = prop.indexOf("=");
-        		String key = prop.substring(0, equalpos); String val = prop.substring(equalpos+1);
-        		System.setProperty(key, val); continue;
-        	}
-            if (args[i].equals("-g")) { grammarfile = args[++i]; continue; }
-            if (args[i].equals("-exactmatches")) { exactMatches = true; continue; }
-            if (args[i].equals("-ngramorder")) { ngramOrder = Integer.parseInt(args[++i]); continue; }
-            if (inputfile == null) { inputfile = args[i]; continue; }
-            outputfile = args[i];
-        }
-        if (inputfile == null) {
-            System.out.println(usage);
-            System.exit(0);
-        }
-        
-        // set out accordingly
-        if (outputfile != null) {
-            out = new PrintWriter(new BufferedWriter(new FileWriter(outputfile)));
-        }
-        else {
-            out = new PrintWriter(System.out); 
-        }
+    public void realizeMain(String grammarfile, String inputfile, String outputfile) throws Exception {
+    	realizeMain(grammarfile, inputfile, outputfile, false);
+    }
+    
+    public void realizeMain(String grammarfile, String inputfile, String outputfile, boolean exactMatches) throws Exception {
+    	realizeMain(grammarfile, inputfile, outputfile, exactMatches, 0);
+    }   
+
+	public void realizeMain(String grammarfile, String inputfile, String outputfile, boolean exactMatches, int ngramOrder) throws Exception {
+        out = new PrintWriter(new BufferedWriter(new FileWriter(outputfile)));
         
         // remember, modify prefs
         Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
@@ -105,27 +72,28 @@ public class Realize
         
         // load grammar
         URL grammarURL = new File(grammarfile).toURI().toURL();
-        out.println("Loading grammar from URL: " + grammarURL);
+        System.out.println("Loading grammar from URL: " + grammarURL);
         Grammar grammar = new Grammar(grammarURL);
 
         // instantiate realizer        
         Realizer realizer = new Realizer(grammar);
         
         // get request
-        out.println();
-        out.println("Request:");
-        out.println();
+        //out.println();
+        //out.println("Request:");
+        //out.println();
         Document doc = grammar.loadFromXml(inputfile);
         org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter(Format.getPrettyFormat()); 
         out.flush();
-        outputter.output(doc, out);
-        out.flush();
+      //  outputter.output(doc, out);
+      //  out.flush();
         
         //this is for a single run. Setting it up for multiple runs.
         
         
         Element root = doc.getRootElement();
-        List<Element> items = root.getChildren("item");
+        @SuppressWarnings("unchecked")
+		List<Element> items = root.getChildren("item");
         
         
         for (Element item : items) {
@@ -136,9 +104,9 @@ public class Realize
         	//System.out.println(parseAttr);
         	Element lfelt = item.getChild("lf");
 	        LF lf = Realizer.getLfFromElt(lfelt);
-	        out.println();
-	        out.println("** Initial run");
-	        out.println();
+	        //out.println();
+	        //out.println("** Initial run");
+	        //out.println();
 	        out.println("Input LF: " + lf);
 	        
 	        // set up n-gram scorer
@@ -147,11 +115,11 @@ public class Realize
 	        //Element ngramModelElt = root.getChild("ngram-model");
 	            // just use targets
 	        String[] targets = new String[] { item.getAttribute("string").getValue() }; //not sure how it could be more than one
-	        out.println();
-	        out.println("Targets:");
-	        for (int i=0; i < targets.length; i++) {;
+	        //out.println();
+	        out.println("Target: " + targets[0]);
+	       /* for (int i=0; i < targets.length; i++) {;
 	            out.println(targets[i]);
-	        }
+	        }*/
 	        ngramScorer = new NgramPrecisionModel(targets);
 	        
 	        // set hypertagger (if any)
@@ -171,79 +139,13 @@ public class Realize
 	            }
 	        }
 	
-	        // run request
-	        Edge e = realizer.realize(lf, ngramScorer);
+	        realizer.realize(lf, ngramScorer);
 	        Chart chart = realizer.getChart();
 	        chart.out = out;
-	/*
-	        out.println();
-	        out.println("Preds:");
-	        chart.printEPs();
-	        
-	        out.println();
-	        out.println("LF chunks:");
-	        chart.printLfChunks();
-	
-	        out.println();
-	        out.println("LF alts:");
-	        chart.printLfAlts();
-	
-	        out.println();
-	        out.println("LF optional parts:");
-	        chart.printLfOpts();
-	
-	        out.println();
-	        out.println("Initial Edges:");
-	        chart.printInitialEdges();
-	
-	        out.println();
-	        out.println("Marked Edges:");
-	        chart.printMarkedEdges(); 
-	        
-	        out.println();
-	        out.println("Instantiated Semantically Null Edges:");
-	        chart.printInstantiatedNoSemEdges();
-	
-	        out.println();
-	        out.println("Uninstantiated Semantically Null Edges:");
-	        chart.printNoSemEdges();
-	
-	        out.println();
-	        out.println("Rule Instances:");
-	        chart.printRuleInstances();
-	
-	        out.println();
-	        out.println("All Edges:");
-	        chart.printEdges();
-	
-	        out.println();
-	        out.println("Complete Edges (unsorted):");
-	        chart.printEdges(true);
-	
-	        out.println();
-	        out.println("Complete Edges (sorted):");
-	        chart.printEdges(true, true);
-	*/
-	        out.println();
-	        out.println("Best Edge:");
+
 	        chart.printBestEdge();
-	        
 	        out.println();
-	        out.println("Best Edge Derivation:");
-	        out.println(chart.bestEdge.getSign().getDerivationHistory());
-	        out.flush();
 	        
-	        if (chart.bestJoinedEdge != null) {
-	            out.println();
-	            out.println("Best Joined Edge:");
-	            chart.printBestJoinedEdge();
-	        
-	            out.println();
-	            out.println("Best Joined Edge Derivation:");
-	            out.println(chart.bestJoinedEdge.getSign().getDerivationHistory());
-	            out.flush();
-	        }
-	
 	        // reset prefs
 	        prefs.putBoolean(Edge.SHOW_COMPLETENESS, oldShowCompleteness);
 	        prefs.putBoolean(Edge.SHOW_BITSET, oldShowBitset);

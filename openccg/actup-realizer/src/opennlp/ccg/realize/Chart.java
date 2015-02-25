@@ -670,7 +670,7 @@ public class Chart
                 throw (RuntimeException) new RuntimeException().initCause(exc);
             }
         }
-        out.println(bestEdge.sign.getBracketedString());
+        out.println("Best Edge:" + bestEdge.sign.getBracketedString());
         out.flush();
     }
     

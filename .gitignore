@@ -15,6 +15,7 @@
 *.tar
 *.zip
 
+*.swp
 *.log
 *.sql
 *.sqlite

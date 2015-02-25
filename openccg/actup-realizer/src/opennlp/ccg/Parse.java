@@ -55,46 +55,20 @@ import org.jdom.output.XMLOutputter;
  * @version     $Revision: 1.2 $, $Date: 2010/10/28 02:46:32 $
  */
 public class Parse {
-
-	public static void main(String[] args) throws IOException {
-		
-        String usage = "Usage: java opennlp.ccg.Parse \n" + 
-        	"  (-g <grammarfile>) \n" + 
-        	"  -parsescorer <scorerclass> \n" +
-        	"  (-supertagger <supertaggerclass> | -stconfig <configfile>) \n" +
-	        "  (-nbestListSize <nbestListSize>) \n" +
-        	"  <inputfile> <outputfile>";
-        
-        if (args.length == 0 && args[0].equals("-h")) {
-            System.out.println(usage);
-            System.exit(0);
-        }
-        
-        // args
-        String grammarfile = null;
-        String inputfile = null;
-        String outputfile = null;
-        String parseScorerClass = null;
-        String supertaggerClass = null, stconfig = null;
-	int nbestListSize = 1;
-        for (int i = 0; i < args.length; i++) {
-            if (args[i].equals("-g")) { grammarfile = args[++i]; continue; }
-            if (args[i].equals("-parsescorer")) { parseScorerClass = args[++i]; continue; }
-            if (args[i].equals("-supertagger")) { supertaggerClass = args[++i]; continue; }
-            if (args[i].equals("-stconfig")) { stconfig = args[++i]; continue; }
-            if (args[i].equals("-nbestListSize")) { nbestListSize = Integer.parseInt(args[++i]); continue; }
-            if (inputfile == null) { inputfile = args[i]; continue; }
-            else outputfile = args[i];
-        }
-	if (nbestListSize < 1) nbestListSize = 1;
-
-        if (inputfile == null || outputfile == null || 
-        	parseScorerClass == null || (supertaggerClass == null && stconfig == null)) 
-        {
-            System.out.println(usage);
-            System.exit(0);
-        }
-        
+	
+	private static final String defaultScorer = "opennlp.ccg.ngrams.NgramPrecisionModel";
+	private static final String defaultConfig = "../config/tagger/stconfig";
+	
+	public void parseMain(String grammarfile, String inputfile, String outputfile) throws IOException {
+		parseMain(grammarfile, inputfile, outputfile, defaultScorer, defaultConfig, 1);
+	}
+	
+	public void parseMain(String grammarfile, String inputfile, String outputfile, String parseScorerClass, String stconfig) throws IOException {
+		parseMain(grammarfile, inputfile, outputfile, parseScorerClass, stconfig, 1);
+	}
+	
+	public void parseMain(String grammarfile, String inputfile, String outputfile, String parseScorerClass, String stconfig, int nBestListSize) throws IOException {
+              
 		// make test doc, sign map
 		Document outDoc = new Document();
 		Element outRoot = new Element("regression");
@@ -116,23 +90,19 @@ public class Parse {
             SignScorer parseScorer = (SignScorer) Class.forName(parseScorerClass).newInstance();
             parser.setSignScorer(parseScorer);
             System.out.println();
-        } catch (Exception exc) {
+        } 
+        catch (Exception exc) {
             throw (RuntimeException) new RuntimeException().initCause(exc);
         }
         // instantiate supertagger
         try {
         	Supertagger supertagger;
-        	if (supertaggerClass != null) {
-                System.out.println("Instantiating supertagger from class: " + supertaggerClass);
-                supertagger = (Supertagger) Class.forName(supertaggerClass).newInstance();
-        	}
-        	else {
-        		System.out.println("Instantiating supertagger from config file: " + stconfig);
-        		supertagger = WordAndPOSDictionaryLabellingStrategy.supertaggerFactory(stconfig);
-        	}
+    		System.out.println("Instantiating supertagger from config file: " + stconfig);
+    		supertagger = WordAndPOSDictionaryLabellingStrategy.supertaggerFactory(stconfig);
             parser.setSupertagger(supertagger);
             System.out.println();
-        } catch (Exception exc) {
+        } 
+        catch (Exception exc) {
             throw (RuntimeException) new RuntimeException().initCause(exc);
         }
         
@@ -148,49 +118,50 @@ public class Parse {
         	try {
         		// parse it
         		System.out.println(line);
-			parser.parse(line);
-			int numParses = Math.min(nbestListSize, parser.getResult().size());
-			for (int i=0; i < numParses; i++) {
-			    Sign thisParse = parser.getResult().get(i);
-			    // convert lf
-			    Category cat = thisParse.getCategory();
-			    LF convertedLF = null;
-			    String predInfo = null;
-			    if (cat.getLF() != null) {
-				// convert LF
-				LF flatLF = cat.getLF();
-				cat = cat.copy();
-				Nominal index = cat.getIndexNominal(); 
-				convertedLF = HyloHelper.compactAndConvertNominals(flatLF, index, thisParse);
-				// get pred info
-				predInfoMap.clear();
-				Testbed.extractPredInfo(flatLF, predInfoMap);
-				predInfo = Testbed.getPredInfo(predInfoMap);
-			    }
-			    // add test item, sign
-			    Element item = RegressionInfo.makeTestItem(grammar, line, 1, convertedLF);
-			    String actualID = (nbestListSize == 1) ? id : id + "-" + (i+1);
-			    item.setAttribute("info", actualID);
+				parser.parse(line);
+				int numParses = Math.min(nBestListSize, parser.getResult().size());
+				for (int i=0; i < numParses; i++) {
+				    Sign thisParse = parser.getResult().get(i);
+				    // convert lf
+				    Category cat = thisParse.getCategory();
+				    LF convertedLF = null;
+				    String predInfo = null;
+				    if (cat.getLF() != null) {
+					// convert LF
+					LF flatLF = cat.getLF();
+					cat = cat.copy();
+					Nominal index = cat.getIndexNominal(); 
+					convertedLF = HyloHelper.compactAndConvertNominals(flatLF, index, thisParse);
+					// get pred info
+					predInfoMap.clear();
+					Testbed.extractPredInfo(flatLF, predInfoMap);
+					predInfo = Testbed.getPredInfo(predInfoMap);
+				    }
+				    // add test item, sign
+				    Element item = RegressionInfo.makeTestItem(grammar, line, 1, convertedLF);
+				    String actualID = (nBestListSize == 1) ? id : id + "-" + (i+1);
+				    item.setAttribute("info", actualID);
+				    outRoot.addContent(item);
+				    signMap.put(actualID, thisParse);
+				    // Add parsed words as a separate LF element
+				    Element fullWordsElt = new Element("full-words");
+				    fullWordsElt.addContent(tokenizer.format(thisParse.getWords()));
+				    item.addContent(fullWordsElt);
+				    if (predInfo != null) {
+						Element predInfoElt = new Element("pred-info");
+						predInfoElt.setAttribute("data", predInfo);
+						item.addContent(predInfoElt);
+				    }
+				}
+			} 
+        	catch (ParseException e) {
+			    System.out.println("Unable to parse!");
+			    // add test item with zero parses
+			    Element item = RegressionInfo.makeTestItem(grammar, line, 0, null);
+			    item.setAttribute("info", id);
 			    outRoot.addContent(item);
-			    signMap.put(actualID, thisParse);
-			    // Add parsed words as a separate LF element
-			    Element fullWordsElt = new Element("full-words");
-			    fullWordsElt.addContent(tokenizer.format(thisParse.getWords()));
-			    item.addContent(fullWordsElt);
-			    if (predInfo != null) {
-				Element predInfoElt = new Element("pred-info");
-				predInfoElt.setAttribute("data", predInfo);
-				item.addContent(predInfoElt);
-			    }
-			}
-		} catch (ParseException e) {
-		    System.out.println("Unable to parse!");
-		    // add test item with zero parses
-		    Element item = RegressionInfo.makeTestItem(grammar, line, 0, null);
-		    item.setAttribute("info", id);
-		    outRoot.addContent(item);
-		}
-		count++;
+        	}
+        	count++;
         }
         System.out.println();
         

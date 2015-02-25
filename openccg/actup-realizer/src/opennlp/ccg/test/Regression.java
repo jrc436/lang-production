@@ -17,30 +17,67 @@
 //////////////////////////////////////////////////////////////////////////////
 package opennlp.ccg.test;
 
-import java.io.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
 import java.net.URL;
-import java.text.*;
-import java.util.*;
-import java.util.prefs.Preferences;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
-import opennlp.ccg.TextCCG;
 import opennlp.ccg.grammar.Grammar;
-import opennlp.ccg.hylo.*;
+import opennlp.ccg.hylo.EPsScorer;
+import opennlp.ccg.hylo.HyloHelper;
+import opennlp.ccg.hylo.Nominal;
 import opennlp.ccg.lexicon.Tokenizer;
 import opennlp.ccg.lexicon.Word;
-import opennlp.ccg.ngrams.*;
+import opennlp.ccg.ngrams.AAnFilter;
+import opennlp.ccg.ngrams.FactoredNgramModelFamily;
+import opennlp.ccg.ngrams.NgramDiversityPruningStrategy;
+import opennlp.ccg.ngrams.NgramPrecisionModel;
+import opennlp.ccg.ngrams.NgramScorer;
+import opennlp.ccg.ngrams.SRILMNgramModel;
+import opennlp.ccg.ngrams.SRILMNgramModelType;
+import opennlp.ccg.ngrams.SelfParaphraseBiaser;
+import opennlp.ccg.ngrams.StandardNgramModel;
 import opennlp.ccg.parse.ParseException;
 import opennlp.ccg.parse.Parser;
 import opennlp.ccg.parse.Supertagger;
 import opennlp.ccg.parse.supertagger.WordAndPOSDictionaryLabellingStrategy;
-import opennlp.ccg.realize.*;
+import opennlp.ccg.perceptron.Alphabet;
+import opennlp.ccg.perceptron.ComposedFeatureExtractor;
+import opennlp.ccg.perceptron.EventFile;
+import opennlp.ccg.perceptron.FeatureExtractor;
+import opennlp.ccg.realize.Chart;
+import opennlp.ccg.realize.Edge;
+import opennlp.ccg.realize.EdgeFactory;
+import opennlp.ccg.realize.Hypertagger;
+import opennlp.ccg.realize.PruningStrategy;
+import opennlp.ccg.realize.Realizer;
 import opennlp.ccg.realize.hypertagger.ZLMaxentHypertagger;
-import opennlp.ccg.synsem.*;
+import opennlp.ccg.synsem.Category;
+import opennlp.ccg.synsem.GenerativeSyntacticModel;
+import opennlp.ccg.synsem.LF;
+import opennlp.ccg.synsem.Sign;
+import opennlp.ccg.synsem.SignScorer;
 import opennlp.ccg.util.Pair;
 import opennlp.ccg.util.SingletonList;
-import opennlp.ccg.perceptron.*;
 
-import org.jdom.*;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
 
 /**
@@ -1207,16 +1244,15 @@ public class Regression {
     /** Shows realizer settings for current test. */
     static void showRealizerSettings() {
         // get, show prefs
-        Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
-        boolean useIndexing = prefs.getBoolean(EdgeFactory.USE_INDEXING, true);
-        boolean useChunks = prefs.getBoolean(EdgeFactory.USE_CHUNKS, true);
-        boolean useLicensing = prefs.getBoolean(EdgeFactory.USE_FEATURE_LICENSING, true);
-        boolean useCombos = prefs.getBoolean(opennlp.ccg.realize.Chart.USE_COMBOS, true);
-        boolean usePacking = prefs.getBoolean(opennlp.ccg.realize.Chart.USE_PACKING, false);
-        int timeLimit = prefs.getInt(opennlp.ccg.realize.Chart.TIME_LIMIT, opennlp.ccg.realize.Chart.NO_TIME_LIMIT);
-        double nbTimeLimit = prefs.getDouble(opennlp.ccg.realize.Chart.NEW_BEST_TIME_LIMIT, opennlp.ccg.realize.Chart.NO_TIME_LIMIT);
-        int pruningVal = prefs.getInt(opennlp.ccg.realize.Chart.PRUNING_VALUE, opennlp.ccg.realize.Chart.NO_PRUNING);
-        int cellPruningVal = prefs.getInt(opennlp.ccg.realize.Chart.CELL_PRUNING_VALUE, opennlp.ccg.realize.Chart.NO_PRUNING);
+        boolean useIndexing = EdgeFactory.USE_INDEXING;
+        boolean useChunks = EdgeFactory.USE_CHUNKS;
+        boolean useLicensing = EdgeFactory.USE_FEATURE_LICENSING;
+        boolean useCombos = Chart.USE_COMBOS;
+        boolean usePacking = Chart.USE_PACKING;
+        int timeLimit = Chart.TIME_LIMIT;
+        double nbTimeLimit = opennlp.ccg.realize.Chart.NEW_BEST_TIME_LIMIT;
+        int pruningVal = opennlp.ccg.realize.Chart.PRUNING_VALUE;
+        int cellPruningVal = Chart.CELL_PRUNING_VALUE;
         String msg = "Timing realization with index filtering " + ((useIndexing) ? "on" : "off") + ", "; 
         msg += "chunks " + ((useChunks) ? "on" : "off") + ", "; 
         msg += "licensing " + ((useLicensing) ? "on" : "off") + ", ";

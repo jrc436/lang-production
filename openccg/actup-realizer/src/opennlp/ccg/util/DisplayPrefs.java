@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+/*///////////////////////////////////////////////////////////////////////////////
 // Copyright (C) 2006 Ben Wing
 // 
 // This library is free software; you can redistribute it and/or
@@ -21,27 +21,27 @@ import java.util.prefs.Preferences;
 
 import opennlp.ccg.TextCCG;
 
-/**
+*//**
  * Simple class for holding preferences for converting an object to a
  * string or other displayable representation.
  *
  * @author  Ben Wing
  * @version $Revision: 1.5 $, $Date: 2007/06/22 01:52:21 $
- */
+ *//*
 public class DisplayPrefs {
 
-    /* Whether to show feature info along with each nonterminal */
+     Whether to show feature info along with each nonterminal 
     public boolean showFeats = false; 
-    /* Whether to show semantic info (logical forms) */
+     Whether to show semantic info (logical forms) 
     public boolean showSem = false;
-    /* Which features to show. */
+     Which features to show. 
     public String featsToShow = "";
     
-    /** Constructor sets initial prefs from current user prefs. */
+    *//** Constructor sets initial prefs from current user prefs. *//*
     public DisplayPrefs() {
     	Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
     	showFeats = prefs.getBoolean(TextCCG.SHOW_FEATURES, false);
     	showSem = prefs.getBoolean(TextCCG.SHOW_SEMANTICS, false);
     	featsToShow = prefs.get(TextCCG.FEATURES_TO_SHOW, "");
     }
-}
+}*/

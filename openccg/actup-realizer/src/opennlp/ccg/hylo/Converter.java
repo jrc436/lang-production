@@ -18,10 +18,16 @@
 
 package opennlp.ccg.hylo;
 
-import opennlp.ccg.TextCCG;
-import opennlp.ccg.synsem.*;
-import java.util.*;
-import java.util.prefs.Preferences;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
+
+import opennlp.ccg.synsem.Category;
+import opennlp.ccg.synsem.LF;
+import opennlp.ccg.synsem.LexSemOrigin;
+import opennlp.ccg.synsem.Sign;
 
 /**
  * A class implementing conversion of nominal variables to nominal atoms.
@@ -32,8 +38,10 @@ import java.util.prefs.Preferences;
 public class Converter {
     
     /** Preference key for using word positions to name atoms. */
-    public static final String USE_WORD_POSITIONS_FOR_ATOM_CONVERSION = "Use Word Positions To Convert Atoms";
-
+    //public static final String USE_WORD_POSITIONS_FOR_ATOM_CONVERSION = "Use Word Positions To Convert Atoms";
+	public static final Boolean USE_WORD_POSITIONS_FOR_ATOM_CONVERSION = true;
+	
+	
 	// map to already converted nominals 
     private Map<Nominal,Nominal> nominalMap = new HashMap<Nominal,Nominal>();
     
@@ -55,8 +63,7 @@ public class Converter {
 	 */
 	static Nominal convertNominals(LF lf, Sign root, Nominal nominalRoot) {
 		// check preference for naming with word positions; set root to null if false
-        Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
-        boolean useWordPositions = prefs.getBoolean(USE_WORD_POSITIONS_FOR_ATOM_CONVERSION, true);
+        boolean useWordPositions = USE_WORD_POSITIONS_FOR_ATOM_CONVERSION;
 		if (!useWordPositions) root = null;
         // traverse twice, skipping absent props the first time
     	Converter converter = new Converter();

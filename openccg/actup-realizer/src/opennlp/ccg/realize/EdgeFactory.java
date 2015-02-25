@@ -18,18 +18,49 @@
 
 package opennlp.ccg.realize;
 
-import opennlp.ccg.*;
-import opennlp.ccg.lexicon.*;
-import opennlp.ccg.grammar.*;
-import opennlp.ccg.unify.*;
-import opennlp.ccg.synsem.*;
-import opennlp.ccg.hylo.*;
-import opennlp.ccg.util.*;
+import gnu.trove.TIntArrayList;
+import gnu.trove.TObjectIntHashMap;
 
-import gnu.trove.*;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import java.util.*;
-import java.util.prefs.*;
+import opennlp.ccg.grammar.FragmentJoining;
+import opennlp.ccg.grammar.Grammar;
+import opennlp.ccg.grammar.Rule;
+import opennlp.ccg.grammar.RuleGroup;
+import opennlp.ccg.grammar.TypeChangingRule;
+import opennlp.ccg.hylo.Alt;
+import opennlp.ccg.hylo.HyloHelper;
+import opennlp.ccg.hylo.Nominal;
+import opennlp.ccg.hylo.NominalAtom;
+import opennlp.ccg.hylo.SatOp;
+import opennlp.ccg.lexicon.Lexicon;
+import opennlp.ccg.lexicon.LicensingFeature;
+import opennlp.ccg.lexicon.Word;
+import opennlp.ccg.synsem.Arg;
+import opennlp.ccg.synsem.AtomCat;
+import opennlp.ccg.synsem.Category;
+import opennlp.ccg.synsem.CategoryFcn;
+import opennlp.ccg.synsem.CategoryFcnAdapter;
+import opennlp.ccg.synsem.ComplexCat;
+import opennlp.ccg.synsem.LF;
+import opennlp.ccg.synsem.Sign;
+import opennlp.ccg.synsem.SignScorer;
+import opennlp.ccg.unify.FeatureStructure;
+import opennlp.ccg.unify.SimpleSubstitution;
+import opennlp.ccg.unify.Substitution;
+import opennlp.ccg.unify.Unifier;
+import opennlp.ccg.unify.UnifyControl;
+import opennlp.ccg.unify.UnifyFailure;
+import opennlp.ccg.util.Pair;
 
 /**
  * The EdgeFactory is responsible for creating edges. 
@@ -42,14 +73,14 @@ public class EdgeFactory
 {
 
     /** Preference key for whether to use indexing to filter edges to combine. */
-    public static final String USE_INDEXING = "Use Indexing";
+    public static final Boolean USE_INDEXING = true;
     
     /** Preference key for whether to use LF chunks to filter edges to combine. */
-    public static final String USE_CHUNKS = "Use Chunks";
+    public static final Boolean USE_CHUNKS = true;
     
     /** Preference key for whether to use feature licensing; if false, 
         the simple lex feature is used for comparison purposes. */
-    public static final String USE_FEATURE_LICENSING = "Use Feature Licensing";
+    public static final Boolean USE_FEATURE_LICENSING = true;
     
 
     /** The grammar used to create edges. */    
@@ -202,10 +233,9 @@ public class EdgeFactory
         allPreds = new BitSet(preds.size());
         allPreds.set(0, preds.size());
         
-        Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
-        useIndexing = prefs.getBoolean(USE_INDEXING, true);
-        useChunks = prefs.getBoolean(USE_CHUNKS, true);
-        useFeatureLicensing = prefs.getBoolean(USE_FEATURE_LICENSING, true);
+        useIndexing = USE_INDEXING;
+        useChunks = USE_CHUNKS;
+        useFeatureLicensing = USE_FEATURE_LICENSING;
 
         if (useFeatureLicensing) {
             featureLicenser = new FeatureLicenser(this);

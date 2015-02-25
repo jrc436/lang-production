@@ -18,18 +18,32 @@
 
 package opennlp.ccg.realize;
 
-import opennlp.ccg.*;
-import opennlp.ccg.synsem.*;
-import opennlp.ccg.util.Pair;
+import gnu.trove.THashMap;
+import gnu.trove.THashSet;
+import gnu.trove.TObjectHashingStrategy;
+import gnu.trove.TObjectIdentityHashingStrategy;
+
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import opennlp.ccg.hylo.Alt;
+import opennlp.ccg.hylo.SatOp;
 import opennlp.ccg.ngrams.NgramPrecisionModel;
 import opennlp.ccg.parse.DerivationHistory;
-import opennlp.ccg.hylo.*;
-
-import java.io.*;
-import java.util.*;
-import java.util.prefs.*;
-
-import gnu.trove.*;
+import opennlp.ccg.synsem.Category;
+import opennlp.ccg.synsem.Sign;
+import opennlp.ccg.util.Pair;
 
 /**
  * The chart manages the creation of edges.  Newly added edges are kept on an 
@@ -46,86 +60,42 @@ import gnu.trove.*;
  */
 public class Chart
 {
-    
-    /** Preference key for time limit on edge combination. */
-    public static final String TIME_LIMIT = "Time Limit";
-    
-    /** Preference key for time limit on finding a new best complete realization. 
-        If between o-1, the time limit is interpreted as a percentage of the 
-        time until the first realization is found. */
-    public static final String NEW_BEST_TIME_LIMIT = "New Best Time Limit";
-    
-    /** A constant indicating no time limit on edge combination. */
+    //CONSTANTS
     public static final int NO_TIME_LIMIT = 0;
-
-    /** Preference key for edge limit on edge combination. */
-    public static final String EDGE_LIMIT = "Edge Limit";
-    
-    /** A constant indicating no edge limit on edge combination. */
     public static final int NO_EDGE_LIMIT = 0;
+    public static final int NO_PRUNING = 0; 
+    
+    //PREFERENCES
+    public static final int EDGE_LIMIT = NO_EDGE_LIMIT;
+    public static final int TIME_LIMIT = NO_TIME_LIMIT;
+    public static final double NEW_BEST_TIME_LIMIT = NO_TIME_LIMIT;
+    public static final int CELL_PRUNING_VALUE = NO_PRUNING;
+    public static final int PRUNING_VALUE = NO_PRUNING;  
+    public static final boolean DO_UNPACKING = true;    
+    public static final boolean USE_COMBOS = true;   
+    public static final boolean USE_PACKING = false;
+    
+    public int edgeLimit;    
+    public int pruningValue;
+    public int cellPruningValue;
+    public boolean collectCombos;
+    public boolean usePacking;
+    public boolean doUnpacking;
+    public int newBestTimeLimit;
+    public double newBestTimeLimitPct;
 
-    /** Preference key for pruning the number of signs kept per equivalence class. */
-    public static final String PRUNING_VALUE = "Pruning Value";
-
-    /** Preference key for pruning the number of signs kept per cell. */
-    public static final String CELL_PRUNING_VALUE = "Cell Pruning Value";
-
-    /** A constant indicating no pruning of signs per equivalence class. */
-    public static final int NO_PRUNING = 0;
-
-    /** Preference key for whether to collect category combinations. */
-    public static final String USE_COMBOS = "Use Combos";
-    
-    /** Preference key for whether to create a packed generation forest in the first of 
-        two realization stages (deferring unpacking to the later stage). 
-        This option pre-empts the use of collected combos in a single, anytime realization stage. */
-    public static final String USE_PACKING = "Use Packing";
-    
-    /** Preference key for whether to unpack a generation forest in the second of 
-        two realization stages.  This option is only relevant if packing is 
-        used in the first stage. */
-    public static final String DO_UNPACKING = "Do Unpacking";
-
-    
-    /** The edge factory for the realization request. */
-    public final EdgeFactory edgeFactory;
-
-    /** The pruning strategy. */
-    public final PruningStrategy pruningStrategy;
-    
-    /** Flag for whether to use depth-first search.  Defaults to false. */
-    public boolean depthFirst = false; 
-    
-    /** New best time limit, in ms.  Set from prefs in constructor. */
-    public int newBestTimeLimit = NO_TIME_LIMIT;
-    
-    /** New best time limit, as a percentage of time from the first complete realization.  Set from prefs in constructor. */
-    public double newBestTimeLimitPct = NO_TIME_LIMIT;
-    
-    /** Edge limit.  Set from prefs in constructor. */
-    public int edgeLimit = NO_EDGE_LIMIT;
-    
-    /** Pruning value.  Set from prefs in constructor. */
-    public int pruningValue = NO_PRUNING;
-    
-    /** Cell pruning value.  Set from prefs in constructor. */
-    public int cellPruningValue = NO_PRUNING;
-    
-    /** Flag for whether to collect category combos.  Set from prefs in constructor. */
-    public boolean collectCombos = true;
-
-    /** Flag for whether to use packing.  Set from prefs in constructor. */
-    public boolean usePacking = false;
-
-    /** Flag for whether to do unpacking.  Set from prefs in constructor. */
-    public boolean doUnpacking = true;
-    
+    public boolean depthFirst = false;              
     /** Flag for whether to join best fragments if no complete realization found.  Defaults to false. */
     public boolean joinFragments = false;
 
     /** Flag for whether to glue fragments currently. Defaults to false. */
     public boolean gluingFragments = false;
 
+    
+    /** The edge factory for the realization request. */
+    public final EdgeFactory edgeFactory;
+    /** The pruning strategy. */
+    public final PruningStrategy pruningStrategy;
     
     // the agenda of edges that have yet to be added to the chart
     private List<Edge> agenda = new ArrayList<Edge>();
@@ -234,18 +204,17 @@ public class Chart
     public Chart(EdgeFactory edgeFactory, PruningStrategy pruningStrategy) {
         this.edgeFactory = edgeFactory;
         this.pruningStrategy = pruningStrategy;
-        Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
-        newBestTimeLimitPct = prefs.getDouble(NEW_BEST_TIME_LIMIT, NO_TIME_LIMIT);
+        newBestTimeLimitPct = NO_TIME_LIMIT;
         if (newBestTimeLimitPct >= 1) {
             newBestTimeLimit = (int) newBestTimeLimitPct;
             newBestTimeLimitPct = NO_TIME_LIMIT; 
         }
-        edgeLimit = prefs.getInt(EDGE_LIMIT, NO_EDGE_LIMIT);
-        pruningValue = prefs.getInt(PRUNING_VALUE, NO_PRUNING);
-        cellPruningValue = prefs.getInt(CELL_PRUNING_VALUE, NO_PRUNING);
-        usePacking = prefs.getBoolean(USE_PACKING, false); 
-        collectCombos = !usePacking && prefs.getBoolean(USE_COMBOS, true);
-        doUnpacking = usePacking && prefs.getBoolean(DO_UNPACKING, true);
+        edgeLimit = NO_EDGE_LIMIT;
+        pruningValue = NO_PRUNING;
+        cellPruningValue = NO_PRUNING;
+        usePacking = USE_PACKING; 
+        collectCombos = !usePacking && USE_COMBOS;
+        doUnpacking = usePacking && DO_UNPACKING;
     }
         
     

@@ -18,12 +18,24 @@
 
 package opennlp.ccg.grammar;
 
-import opennlp.ccg.TextCCG;
-import opennlp.ccg.unify.*;
-import opennlp.ccg.synsem.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.*;
-import java.util.prefs.Preferences;
+import opennlp.ccg.synsem.Arg;
+import opennlp.ccg.synsem.ArgStack;
+import opennlp.ccg.synsem.AtomCat;
+import opennlp.ccg.synsem.BasicArg;
+import opennlp.ccg.synsem.Category;
+import opennlp.ccg.synsem.ComplexCat;
+import opennlp.ccg.synsem.SetArg;
+import opennlp.ccg.synsem.Slash;
+import opennlp.ccg.synsem.TargetCat;
+import opennlp.ccg.unify.GSubstitution;
+import opennlp.ccg.unify.GUnifier;
+import opennlp.ccg.unify.ModFcn;
+import opennlp.ccg.unify.Mutable;
+import opennlp.ccg.unify.Substitution;
+import opennlp.ccg.unify.UnifyFailure;
 
 /**
  * Super class for composition rules.
@@ -37,7 +49,7 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 	private static final long serialVersionUID = 1L;
 
 	/** Preference key for Eisner constraints. */
-    public static final String EISNER_CONSTRAINTS = "Use Eisner Constraints";
+    public static final Boolean EISNER_CONSTRAINTS = true;
     
 	/** 
 	 * Flag for whether to impose Eisner's normal form constraints.
@@ -47,8 +59,9 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 	public static boolean useEisnerConstraints = initEisnerConstraints();
 	
 	private static boolean initEisnerConstraints() {
-        Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
-        return prefs.getBoolean(EISNER_CONSTRAINTS, true);
+        /*Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
+        return prefs.getBoolean(EISNER_CONSTRAINTS, true);*/
+		return EISNER_CONSTRAINTS;
 	}
 	
 	protected boolean _isHarmonic;

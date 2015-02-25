@@ -24,12 +24,10 @@ import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.List;
-import java.util.prefs.Preferences;
 
 import opennlp.ccg.grammar.Grammar;
 import opennlp.ccg.ngrams.NgramPrecisionModel;
 import opennlp.ccg.realize.Chart;
-import opennlp.ccg.realize.Edge;
 import opennlp.ccg.realize.Hypertagger;
 import opennlp.ccg.realize.Realizer;
 import opennlp.ccg.realize.hypertagger.ZLMaxentHypertagger;
@@ -38,7 +36,6 @@ import opennlp.ccg.synsem.SignScorer;
 
 import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.output.Format;
 
 /**
  * Sample front-end to the realizer, showing the intermediate steps of realization.
@@ -64,11 +61,12 @@ public class Realize
         out = new PrintWriter(new BufferedWriter(new FileWriter(outputfile)));
         
         // remember, modify prefs
-        Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
+        /*Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
         boolean oldShowCompleteness = prefs.getBoolean(Edge.SHOW_COMPLETENESS, false);
         boolean oldShowBitset = prefs.getBoolean(Edge.SHOW_BITSET, false);
         prefs.putBoolean(Edge.SHOW_COMPLETENESS, true);
-        prefs.putBoolean(Edge.SHOW_BITSET, true);
+        prefs.putBoolean(Edge.SHOW_BITSET, true);*/
+        
         
         // load grammar
         URL grammarURL = new File(grammarfile).toURI().toURL();
@@ -83,7 +81,7 @@ public class Realize
         //out.println("Request:");
         //out.println();
         Document doc = grammar.loadFromXml(inputfile);
-        org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter(Format.getPrettyFormat()); 
+       // org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter(Format.getPrettyFormat()); 
         out.flush();
       //  outputter.output(doc, out);
       //  out.flush();
@@ -147,8 +145,8 @@ public class Realize
 	        out.println();
 	        
 	        // reset prefs
-	        prefs.putBoolean(Edge.SHOW_COMPLETENESS, oldShowCompleteness);
-	        prefs.putBoolean(Edge.SHOW_BITSET, oldShowBitset);
+	      /*  prefs.putBoolean(Edge.SHOW_COMPLETENESS, oldShowCompleteness);
+	        prefs.putBoolean(Edge.SHOW_BITSET, oldShowBitset);*/
 	    }
     }
 }

@@ -18,18 +18,26 @@
 
 package opennlp.ccg.parse;
 
-import opennlp.ccg.TextCCG;
-import opennlp.ccg.lexicon.*;
-import opennlp.ccg.synsem.*;
-import opennlp.ccg.grammar.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import opennlp.ccg.grammar.Grammar;
+import opennlp.ccg.grammar.RuleGroup;
 import opennlp.ccg.hylo.EPsScorer;
 import opennlp.ccg.hylo.HyloHelper;
 import opennlp.ccg.hylo.Nominal;
-import opennlp.ccg.unify.*;
+import opennlp.ccg.lexicon.LexException;
+import opennlp.ccg.lexicon.Lexicon;
+import opennlp.ccg.lexicon.SupertaggerAdapter;
+import opennlp.ccg.lexicon.Word;
+import opennlp.ccg.synsem.Category;
+import opennlp.ccg.synsem.LF;
+import opennlp.ccg.synsem.Sign;
+import opennlp.ccg.synsem.SignHash;
+import opennlp.ccg.synsem.SignScorer;
+import opennlp.ccg.unify.UnifyControl;
 import opennlp.ccg.util.Pair;
-
-import java.util.*;
-import java.util.prefs.Preferences;
 
 /**
  * The parser is a CKY chart parser for CCG, optionally  
@@ -42,29 +50,17 @@ import java.util.prefs.Preferences;
  */
 public class Parser 
 {
-    /** Preference key for time limit on parsing. */
-    public static final String PARSE_TIME_LIMIT = "Parse Time Limit";
-    
-    /** A constant indicating no time limit on parsing. */
+    //constants
     public static final int NO_TIME_LIMIT = 0;
-
-    /** Preference key for edge limit on parsing. */
-    public static final String PARSE_EDGE_LIMIT = "Parse Edge Limit";
-    
-    /** A constant indicating no edge limit on parsing. */
     public static final int NO_EDGE_LIMIT = 0;
-
-    /** Preference key for pruning the number of signs kept per equivalence class. */
-    public static final String PARSE_PRUNING_VALUE = "Parse Pruning Value";
-
-    /** Preference key for pruning the number of edges kept per cell. */
-    public static final String PARSE_CELL_PRUNING_VALUE = "Parse Cell Pruning Value";
-
-    /** A constant indicating no pruning of signs per equivalence class. */
     public static final int NO_PRUNING = 0;
-
-    /** Preference key for whether to use lazy unpacking. */
-    public static final String PARSE_LAZY_UNPACKING = "Parse Lazy Unpacking";
+    
+    //preferences
+    public static final int PARSE_TIME_LIMIT = NO_TIME_LIMIT;
+    public static final int PARSE_EDGE_LIMIT = 100000;
+    public static final int PARSE_PRUNING_VALUE = 7;
+    public static final int PARSE_CELL_PRUNING_VALUE = 25;
+    public static final Boolean PARSE_LAZY_UNPACKING = false;
     
 	/** The grammar. */
 	public final Grammar grammar;
@@ -81,59 +77,37 @@ public class Parser
 	/** The sign scorer (or null if none). */
 	protected SignScorer signScorer = null;
 	
-	/** The "n" for n-best pruning. (Default is none.) */
-	protected int pruneVal = -1;
+	protected int pruneVal = PARSE_PRUNING_VALUE;
+	protected int cellPruneVal = PARSE_CELL_PRUNING_VALUE;
+	protected Boolean lazyUnpacking = PARSE_LAZY_UNPACKING;	
+	protected int timeLimit = PARSE_TIME_LIMIT; 
+	protected int edgeLimit = PARSE_EDGE_LIMIT;
 	
-	/** The cell pruning value. (Default is none.) */
-	protected int cellPruneVal = -1;
-	
-	/** The lazy unpacking flag. (Default is none.) */
-	protected Boolean lazyUnpacking = null;
-	
-    /** Supertagger to use. (Default is none.) */
-    protected Supertagger supertagger = null;
-    
-    /** Flag for whether to use the supertagger in the most-to-least restrictive direction. */
+    protected Supertagger supertagger = null;    
     protected boolean stMostToLeastDir = true;
+
     
-    /** Time limit in milliseconds. (Default is none.) */
-    protected int timeLimit = -1; 
-    
-    /** Edge limit. (Default is none.) */
-    protected int edgeLimit = -1; 
-    
+
     // start time for chart construction
-    private long startTime = 0;
-    
+    private long startTime = 0;    
     // lex lookup time
-    private int lexTime = 0;
-    
+    private int lexTime = 0; 
     // parse time
-    private int parseTime = 0;
-    
+    private int parseTime = 0;   
     // chart construction time
     private int chartTime = 0;
     
     // unpacking time
     private int unpackingTime = 0;
-    
-    // time limit to use
-    private int timeLimitToUse = NO_TIME_LIMIT;
-    
-    // edge limit to use
-    private int edgeLimitToUse = NO_EDGE_LIMIT;
-    
-    // pruning value to use
-    private int pruneValToUse = NO_PRUNING;
-    
-    // pruning value to use
-    private int cellPruneValToUse = NO_PRUNING;
-    
-    // lazy unpacking flag to use
+
+    private int timeLimitToUse;
+    private int edgeLimitToUse;
+    private int pruneValToUse;
+    private int cellPruneValToUse ;
     private boolean lazyUnpackingToUse = true;
     
     // current chart
-    private Chart chart = null;
+    private Chart chart;
     
     // parse results
     private ArrayList<Sign> result;
@@ -146,6 +120,11 @@ public class Parser
     	this.grammar = grammar;
         this.lexicon = grammar.lexicon;
         this.rules = grammar.rules;
+        this.pruneVal = PARSE_PRUNING_VALUE;
+    	this.cellPruneVal = PARSE_CELL_PRUNING_VALUE;
+    	this.lazyUnpacking = PARSE_LAZY_UNPACKING;	
+    	this. timeLimit = PARSE_TIME_LIMIT; 
+    	this.edgeLimit = PARSE_EDGE_LIMIT;
     }
     
 	/** Sets the sign scorer. */
@@ -192,18 +171,11 @@ public class Parser
      * Parses a list of words.
      */
     public void parse(List<Word> words) throws ParseException {
-    	// set up timing: use limit from prefs unless explicitly set
-		Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
-    	if (timeLimit >= 0) timeLimitToUse = timeLimit;
-    	else timeLimitToUse = prefs.getInt(PARSE_TIME_LIMIT, NO_TIME_LIMIT);
-    	if (edgeLimit >= 0) edgeLimitToUse = edgeLimit;
-    	else edgeLimitToUse = prefs.getInt(PARSE_EDGE_LIMIT, NO_EDGE_LIMIT);
-    	if (pruneVal >= 0) pruneValToUse = pruneVal; 
-    	else pruneValToUse = prefs.getInt(PARSE_PRUNING_VALUE, NO_PRUNING);
-    	if (cellPruneVal >= 0) cellPruneValToUse = cellPruneVal; 
-    	else cellPruneValToUse = prefs.getInt(PARSE_CELL_PRUNING_VALUE, NO_PRUNING);
-    	if (lazyUnpacking != null) lazyUnpackingToUse = lazyUnpacking;
-    	else lazyUnpackingToUse = prefs.getBoolean(PARSE_LAZY_UNPACKING, true);
+    	timeLimitToUse = this.timeLimit;
+    	edgeLimitToUse = this.edgeLimit;
+    	pruneValToUse = this.pruneVal;
+    	cellPruneValToUse = this.cellPruneVal;
+    	lazyUnpackingToUse = this.lazyUnpacking;
     	// supertagger case: iterative beta-best
     	if (supertagger != null) {
     		parseWithSupertagger(words);

@@ -18,12 +18,15 @@
 
 package opennlp.ccg.realize;
 
-import opennlp.ccg.synsem.*;
-import opennlp.ccg.hylo.*;
-import opennlp.ccg.*;
-import java.util.*;
-import java.util.prefs.*;
-import java.text.*;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collections;
+import java.util.List;
+
+import opennlp.ccg.hylo.Alt;
+import opennlp.ccg.synsem.Sign;
 
 /**
  * <p>
@@ -54,12 +57,9 @@ import java.text.*;
  */
 public class Edge extends Tracker
 {
-
-    /** Preference key for showing completeness. */
-    public static final String SHOW_COMPLETENESS = "Show Completeness";
-
-    /** Preference key for showing coverage bitset. */
-    public static final String SHOW_BITSET = "Show Bitset";
+	//preferences
+	public static final Boolean SHOW_COMPLETENESS = true;
+	public static final Boolean SHOW_BITSET = true;
 
     
     /** The sign. */
@@ -196,9 +196,9 @@ public class Edge extends Tracker
      * {completeness} [score] orthography :- category {bitset}. 
      */
     public String toString() {
-        Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
-        boolean showCompleteness = prefs.getBoolean(SHOW_COMPLETENESS, false);
-        boolean showBitset = prefs.getBoolean(SHOW_BITSET, false);
+       // Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
+        boolean showCompleteness = SHOW_COMPLETENESS;//prefs.getBoolean(SHOW_COMPLETENESS, false);
+        boolean showBitset = SHOW_BITSET;//prefs.getBoolean(SHOW_BITSET, false);
         StringBuffer sbuf = new StringBuffer();
         //sbuf.append(indices + " ");
         if (showCompleteness) { sbuf.append("{" + nf2.format(completeness) + "} "); }

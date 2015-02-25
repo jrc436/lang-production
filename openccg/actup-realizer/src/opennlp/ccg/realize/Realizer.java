@@ -18,13 +18,16 @@
 
 package opennlp.ccg.realize;
 
-import opennlp.ccg.grammar.*;
-import opennlp.ccg.synsem.*;
-import opennlp.ccg.hylo.*;
-import opennlp.ccg.*;
-import org.jdom.*;
-import java.util.*;
-import java.util.prefs.*;
+import java.util.List;
+
+import opennlp.ccg.grammar.Grammar;
+import opennlp.ccg.hylo.HyloHelper;
+import opennlp.ccg.hylo.SatOp;
+import opennlp.ccg.synsem.LF;
+import opennlp.ccg.synsem.SignScorer;
+
+import org.jdom.Document;
+import org.jdom.Element;
 
 /**
  * The realizer manages the realization process.
@@ -36,49 +39,38 @@ import java.util.prefs.*;
  */
 public class Realizer
 {
-    
+    public static final int REALIZER_TIME_LIMIT = 15000;
+	
+	
     /** The grammar used for realization. */
     public final Grammar grammar; 
-    
-    /** Flag for whether to use depth-first search.  Defaults to false. */
-    public boolean depthFirst = false; 
-    
+    public boolean depthFirst;   
     // the chart used to realize a request
-    private Chart chart = null;
-    
+    private Chart chart;
+    /** Sign scorer to use.  (Default is none.) */
+    public SignScorer signScorer;
+    public int timeLimitMS;
+    /** Flag for whether to wait for a complete edge. (Default is false.) */
+    public boolean waitForCompleteEdge;
+    /** Pruning strategy to use. (Default is none.) */
+    public PruningStrategy pruningStrategy;
+    /** Hypertagger to use. (Default is none.) */
+    public Hypertagger hypertagger;
    
     /** Constructor. */
     public Realizer(Grammar grammar) { 
         this.grammar = grammar;
+        this.timeLimitMS = REALIZER_TIME_LIMIT;
+        this.depthFirst = false;
+        this.waitForCompleteEdge = false;
+        this.pruningStrategy = null;
+        this.signScorer = null;
+        this.hypertagger = null;
     }
     
     /** Returns the chart used in the latest request, or null if none. */
     public Chart getChart() { return chart; }
     
-    
-    //-----------------------------------------------------------------
-    // default options, for use when not given in realization request
-    // nb: as the usual practice is to set these options once 
-    //     for reuse across calls to the realizer, only a subset of 
-    //     the options may be overridden in different calls to the 
-    //     realize method
-        
-    /** Time limit in ms.  (Default is -1, or none.) */
-    public int timeLimitMS = -1;
-    
-    /** Flag for whether to wait for a complete edge. (Default is false.) */
-    public boolean waitForCompleteEdge = false;
-
-    /** Sign scorer to use.  (Default is none.) */
-    public SignScorer signScorer = null;
-    
-    /** Pruning strategy to use. (Default is none.) */
-    public PruningStrategy pruningStrategy = null;
-    
-    /** Hypertagger to use. (Default is none.) */
-    public Hypertagger hypertagger = null;
-    
-
     //-----------------------------------------------------------------
     // get LF from doc    
     
@@ -119,10 +111,7 @@ public class Realizer
      * returning the best edge found (or null if none).
      */
     public Edge realize(LF lf, SignScorer signScorer) {
-        Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
-        int timeLimitToUse = (timeLimitMS != -1) 
-            ? timeLimitMS
-            : prefs.getInt(Chart.TIME_LIMIT, Chart.NO_TIME_LIMIT);
+    	int timeLimitToUse = this.timeLimitMS;
         return realize(lf, signScorer, timeLimitToUse, waitForCompleteEdge);
     }
     
@@ -174,8 +163,7 @@ public class Realizer
         // get start time
         long startTime = System.currentTimeMillis();
         // get edge limit
-        Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
-        int edgeLimit = prefs.getInt(Chart.EDGE_LIMIT, Chart.NO_EDGE_LIMIT);
+        int edgeLimit = Chart.EDGE_LIMIT;
     	// set supertagger in lexicon
     	grammar.lexicon.setSupertagger(hypertagger);
     	// reset beta

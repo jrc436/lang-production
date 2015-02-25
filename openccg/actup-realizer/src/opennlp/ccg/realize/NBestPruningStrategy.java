@@ -18,10 +18,8 @@
 
 package opennlp.ccg.realize;
 
-import opennlp.ccg.TextCCG;
-
-import java.util.*;
-import java.util.prefs.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Default, n-best edge pruning strategy.
@@ -44,8 +42,8 @@ public class NBestPruningStrategy implements PruningStrategy
     
     /** Default constructor retrieves pruning val from preferences. */
     public NBestPruningStrategy() {
-        Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
-        CAT_PRUNE_VAL = prefs.getInt(Chart.PRUNING_VALUE, Chart.NO_PRUNING);
+      //  Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
+        CAT_PRUNE_VAL = Chart.PRUNING_VALUE;
     }
     
     /**

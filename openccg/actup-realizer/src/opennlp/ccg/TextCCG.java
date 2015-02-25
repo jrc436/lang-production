@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+/*///////////////////////////////////////////////////////////////////////////////
 // Copyright (C) 2003-4 Jason Baldridge, Gann Bierner, 
 //                      University of Edinburgh (Michael White), 
 //                      Alexandros Triantafyllidis and David Reitter
@@ -39,7 +39,7 @@ import java.net.*;
 import java.util.*;
 import java.util.prefs.*;
 
-/**
+*//**
  * A text interface for testing grammars.
  *
  * @author  Jason Baldridge
@@ -48,38 +48,38 @@ import java.util.prefs.*;
  * @author  Alexandros Triantafyllidis
  * @author  David Reitter
  * @version $Revision: 1.67 $, $Date: 2011/12/13 04:00:54 $
- */
+ *//*
 public class TextCCG {
     
-    /** Preference key for showing all results. */
+    *//** Preference key for showing all results. *//*
     public static final String SHOW_ALL_RESULTS = "Show All Results";
     
-    /** Preference key for showing derivations. */
+    *//** Preference key for showing derivations. *//*
     public static final String SHOW_DERIVATIONS = "Show Derivations";
     
-    /** Preference key for showing features. */
+    *//** Preference key for showing features. *//*
     public static final String SHOW_FEATURES = "Show Features";
     
-    /** Preference key for showing semantics. */
+    *//** Preference key for showing semantics. *//*
     public static final String SHOW_SEMANTICS = "Show Semantics";
     
-    /** Preference key for showing features. */
+    *//** Preference key for showing features. *//*
     public static final String FEATURES_TO_SHOW = "Features to Show";
     
-    /** Preference key for showing realizer timing. */
+    *//** Preference key for showing realizer timing. *//*
     public static final String SHOW_TIMING = "Show Timing";
     
-    /** Preference key for showing incomplete edges during realization. */
+    *//** Preference key for showing incomplete edges during realization. *//*
     public static final String SHOW_INCOMPLETE_EDGES = "Show Incomplete Edges";
     
-    /** Preference key for visualizing a derivation. */
+    *//** Preference key for visualizing a derivation. *//*
     public static final String VISUALIZE = "Visualize";
 
-    /** Preference key for command line history. */
+    *//** Preference key for command line history. *//*
     public static final String HISTORY = "Command Line History";	
 	
 	
-    /** Main method for tccg. */
+    *//** Main method for tccg. *//*
     @SuppressWarnings("unchecked")
 	public static void main(String[] args) throws IOException, LexException { 
 
@@ -614,7 +614,7 @@ public class TextCCG {
     }
     
     
-    /** Shows help for the command-line tool. */
+    *//** Shows help for the command-line tool. *//*
     public static void showHelp() {
         System.out.println();
         System.out.println("Commands for tccg (otherwise input is parsed):");
@@ -688,7 +688,7 @@ public class TextCCG {
         System.out.println();
     }
 
-    /** Shows current settings. */
+    *//** Shows current settings. *//*
     public static void showSettings(Preferences prefs) {
         System.out.println();
         System.out.println("Current preference settings:"); 
@@ -758,3 +758,4 @@ public class TextCCG {
         System.out.println();
     }
 }
+*/

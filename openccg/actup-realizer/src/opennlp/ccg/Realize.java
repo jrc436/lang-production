@@ -121,182 +121,132 @@ public class Realize
         outputter.output(doc, out);
         out.flush();
         
-        LF lf = Realizer.getLfFromDoc(doc);
-        out.println();
-        out.println("** Initial run");
-        out.println();
-        out.println("Input LF: " + lf);
+        //this is for a single run. Setting it up for multiple runs.
         
-        // set up n-gram scorer
-        SignScorer ngramScorer;
+        
         Element root = doc.getRootElement();
-        Element ngramModelElt = root.getChild("ngram-model");
-        if (ngramModelElt == null) {
-            // just use targets
-            List<Element> targetElts = root.getChildren("target");
-            String[] targets = new String[targetElts.size()];
-            out.println();
-            out.println("Targets:");
-            for (int i=0; i < targetElts.size(); i++) {
-                Element ex = (Element) targetElts.get(i);
-                String target = ex.getText();
-                out.println(target);
-                targets[i] = target;
-            }
-            if (ngramOrder > 0) {
-                out.println();
-                out.println("Using order " + ngramOrder + " in n-gram precision.");
-            	ngramScorer = new NgramPrecisionModel(targets, ngramOrder); 
-            }
-            else ngramScorer = new NgramPrecisionModel(targets);
-            if (exactMatches) {
-                out.println();
-                out.println("Only counting exact matches in n-gram precision.");
-                ((NgramPrecisionModel)ngramScorer).setExactMatches(exactMatches);
-            }
-        }
-        else if (ngramModelElt.getAttributeValue("class") != null) {
-            // load scorer from class
-            String scorerClass = ngramModelElt.getAttributeValue("class");
-            out.println();
-            out.println("Instantiating scorer from class: " + scorerClass);
-            ngramScorer = (SignScorer) Class.forName(scorerClass).newInstance();
-        }
-        else {
-            // load n-gram model
-            String filename = ngramModelElt.getAttributeValue("file");
-            String reverseStr = ngramModelElt.getAttributeValue("reverse");
-            boolean reverse = (reverseStr != null) ? reverseStr.equals("true") : false; 
-            String factoredStr = ngramModelElt.getAttributeValue("factored");
-            boolean factored = (factoredStr != null) ? factoredStr.equals("true") : false; 
-            String semClassesStr = ngramModelElt.getAttributeValue("sem-classes");
-            boolean useSemClasses = (semClassesStr != null) ? semClassesStr.equals("true") : true;
-            int order = 3; // order can only be changed for standard n-gram models
-            String orderStr = ngramModelElt.getAttributeValue("order"); 
-            if (orderStr != null) { order = Integer.parseInt(orderStr); }
-            if (ngramOrder > 0) order = ngramOrder; // preference given to command-line value
-            out.println();
-            String msg = "Loading ";
-            if (reverse) msg += "reversed ";
-            if (factored) msg += "factored ";
-            msg += "n-gram model ";
-            if (!factored) msg += "of order " + order + " ";
-            if (useSemClasses) msg += "with semantic class replacement ";
-            msg += "from: " + filename;
-            out.println(msg);
-            if (factored)
-                ngramScorer = new FactoredNgramModelFamily(filename, useSemClasses);
-            else
-                ngramScorer = new StandardNgramModel(order, filename, useSemClasses);
-            if (reverse) ((NgramScorer)ngramScorer).setReverse(true);
-        }
+        List<Element> items = root.getChildren("item");
         
-        // set pruning strategy (if any)
-        Element pruningStrategyElt = root.getChild("pruning-strategy");
-        if (pruningStrategyElt != null) {
-            // load pruning strategy from class
-            String pruningStrategyClass = pruningStrategyElt.getAttributeValue("class");
-            out.println();
-            out.println("Instantiating pruning strategy from class: " + pruningStrategyClass);
-            realizer.pruningStrategy = (PruningStrategy) 
-                Class.forName(pruningStrategyClass).newInstance();
-        }
         
-        // set hypertagger (if any)
-        Element htModelElt = root.getChild("ht-model");
-        if (htModelElt != null) {
-            String htconfig = htModelElt.getAttributeValue("config");
-            if (htconfig != null) {
-                out.println();
-                out.println("Instantiating hypertagger from: " + htconfig);
-            	realizer.hypertagger = ZLMaxentHypertagger.ZLMaxentHypertaggerFactory(htconfig);
-            }
-            else {
-	            String htModelClass = htModelElt.getAttributeValue("class");
+        for (Element item : items) {
+        	String parseAttr = item.getAttribute("numOfParses").getValue();
+        	if (parseAttr.equals("0")) {
+        		continue;
+        	}
+        	//System.out.println(parseAttr);
+        	Element lfelt = item.getChild("lf");
+	        LF lf = Realizer.getLfFromElt(lfelt);
+	        out.println();
+	        out.println("** Initial run");
+	        out.println();
+	        out.println("Input LF: " + lf);
+	        
+	        // set up n-gram scorer
+	        SignScorer ngramScorer;
+	        //Element root = doc.getRootElement();
+	        //Element ngramModelElt = root.getChild("ngram-model");
+	            // just use targets
+	        String[] targets = new String[] { item.getAttribute("string").getValue() }; //not sure how it could be more than one
+	        out.println();
+	        out.println("Targets:");
+	        for (int i=0; i < targets.length; i++) {;
+	            out.println(targets[i]);
+	        }
+	        ngramScorer = new NgramPrecisionModel(targets);
+	        
+	        // set hypertagger (if any)
+	        Element htModelElt = root.getChild("ht-model");
+	        if (htModelElt != null) {
+	            String htconfig = htModelElt.getAttributeValue("config");
+	            if (htconfig != null) {
+	                out.println();
+	                out.println("Instantiating hypertagger from: " + htconfig);
+	            	realizer.hypertagger = ZLMaxentHypertagger.ZLMaxentHypertaggerFactory(htconfig);
+	            }
+	            else {
+		            String htModelClass = htModelElt.getAttributeValue("class");
+		            out.println();
+		            out.println("Instantiating hypertagger from class: " + htModelClass);
+		            realizer.hypertagger = (Hypertagger) Class.forName(htModelClass).newInstance();
+	            }
+	        }
+	
+	        // run request
+	        Edge e = realizer.realize(lf, ngramScorer);
+	        Chart chart = realizer.getChart();
+	        chart.out = out;
+	/*
+	        out.println();
+	        out.println("Preds:");
+	        chart.printEPs();
+	        
+	        out.println();
+	        out.println("LF chunks:");
+	        chart.printLfChunks();
+	
+	        out.println();
+	        out.println("LF alts:");
+	        chart.printLfAlts();
+	
+	        out.println();
+	        out.println("LF optional parts:");
+	        chart.printLfOpts();
+	
+	        out.println();
+	        out.println("Initial Edges:");
+	        chart.printInitialEdges();
+	
+	        out.println();
+	        out.println("Marked Edges:");
+	        chart.printMarkedEdges(); 
+	        
+	        out.println();
+	        out.println("Instantiated Semantically Null Edges:");
+	        chart.printInstantiatedNoSemEdges();
+	
+	        out.println();
+	        out.println("Uninstantiated Semantically Null Edges:");
+	        chart.printNoSemEdges();
+	
+	        out.println();
+	        out.println("Rule Instances:");
+	        chart.printRuleInstances();
+	
+	        out.println();
+	        out.println("All Edges:");
+	        chart.printEdges();
+	
+	        out.println();
+	        out.println("Complete Edges (unsorted):");
+	        chart.printEdges(true);
+	
+	        out.println();
+	        out.println("Complete Edges (sorted):");
+	        chart.printEdges(true, true);
+	*/
+	        out.println();
+	        out.println("Best Edge:");
+	        chart.printBestEdge();
+	        
+	        out.println();
+	        out.println("Best Edge Derivation:");
+	        out.println(chart.bestEdge.getSign().getDerivationHistory());
+	        out.flush();
+	        
+	        if (chart.bestJoinedEdge != null) {
 	            out.println();
-	            out.println("Instantiating hypertagger from class: " + htModelClass);
-	            realizer.hypertagger = (Hypertagger) Class.forName(htModelClass).newInstance();
-            }
-        }
-
-        // run request
-        Edge e = realizer.realize(lf, ngramScorer);
-        Chart chart = realizer.getChart();
-        chart.out = out;
-        for (Word w : e.getSign().getWords()) {
-        	System.out.print(w.getForm());
-        }
-/*
-        out.println();
-        out.println("Preds:");
-        chart.printEPs();
-        
-        out.println();
-        out.println("LF chunks:");
-        chart.printLfChunks();
-
-        out.println();
-        out.println("LF alts:");
-        chart.printLfAlts();
-
-        out.println();
-        out.println("LF optional parts:");
-        chart.printLfOpts();
-
-        out.println();
-        out.println("Initial Edges:");
-        chart.printInitialEdges();
-
-        out.println();
-        out.println("Marked Edges:");
-        chart.printMarkedEdges(); 
-        
-        out.println();
-        out.println("Instantiated Semantically Null Edges:");
-        chart.printInstantiatedNoSemEdges();
-
-        out.println();
-        out.println("Uninstantiated Semantically Null Edges:");
-        chart.printNoSemEdges();
-
-        out.println();
-        out.println("Rule Instances:");
-        chart.printRuleInstances();
-
-        out.println();
-        out.println("All Edges:");
-        chart.printEdges();
-
-        out.println();
-        out.println("Complete Edges (unsorted):");
-        chart.printEdges(true);
-
-        out.println();
-        out.println("Complete Edges (sorted):");
-        chart.printEdges(true, true);
-
-        out.println();
-        out.println("Best Edge:");
-        chart.printBestEdge();
-        
-        out.println();
-        out.println("Best Edge Derivation:");
-        out.println(chart.bestEdge.getSign().getDerivationHistory());
-        out.flush();
-        
-        if (chart.bestJoinedEdge != null) {
-            out.println();
-            out.println("Best Joined Edge:");
-            chart.printBestJoinedEdge();
-        
-            out.println();
-            out.println("Best Joined Edge Derivation:");
-            out.println(chart.bestJoinedEdge.getSign().getDerivationHistory());
-            out.flush();
-        }
-*/
-        // reset prefs
-        prefs.putBoolean(Edge.SHOW_COMPLETENESS, oldShowCompleteness);
-        prefs.putBoolean(Edge.SHOW_BITSET, oldShowBitset);
+	            out.println("Best Joined Edge:");
+	            chart.printBestJoinedEdge();
+	        
+	            out.println();
+	            out.println("Best Joined Edge Derivation:");
+	            out.println(chart.bestJoinedEdge.getSign().getDerivationHistory());
+	            out.flush();
+	        }
+	
+	        // reset prefs
+	        prefs.putBoolean(Edge.SHOW_COMPLETENESS, oldShowCompleteness);
+	        prefs.putBoolean(Edge.SHOW_BITSET, oldShowBitset);
+	    }
     }
 }

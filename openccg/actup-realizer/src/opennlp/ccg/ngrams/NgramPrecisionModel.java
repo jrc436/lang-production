@@ -265,27 +265,32 @@ public class NgramPrecisionModel extends NgramScorer implements SelfParaphraseBi
     // initializes the n-grams from the target phrases
     private void initTargetNgrams(String[] targets) {
         for (int j = 0; j < targets.length; j++) {
-        	if (targets[j].length() == 0) continue;
-            // parse or tokenize target phrase into words
-            List<Word> words;
-            if (useSemClasses) // use parsed words to get sem classes
-                words = Grammar.theGrammar.getParsedWords(targets[j]);
-            else
-                words = Grammar.theGrammar.lexicon.tokenizer.tokenize(targets[j]);
-            // add sentence delimiters, if not already present
-            setWordsToScore(words, true);
-            // reduce each word to a surface word, using the sem class if apropos
-            int numWords = wordsToScore.size();
-            for (int i = 0; i < numWords; i++) {
-                Word w = wordsToScore.get(i);
-                wordsToScore.set(i, reduceWord(w));
-            }
-            // make and store target n-grams
-            for (int k=0; k < order; k++) {
-                for (int i=0; i < numWords - k; i++) {
-                    targetNgrams.add(makeNgram(wordsToScore, i, k+1));
-                }
-            }
+        	try {
+	        	if (targets[j].length() == 0) continue;
+	            // parse or tokenize target phrase into words
+	            List<Word> words;
+	            if (useSemClasses) // use parsed words to get sem classes
+	                words = Grammar.theGrammar.getParsedWords(targets[j]);
+	            else
+	                words = Grammar.theGrammar.lexicon.tokenizer.tokenize(targets[j]);
+	            // add sentence delimiters, if not already present
+	            setWordsToScore(words, true);
+	            // reduce each word to a surface word, using the sem class if apropos
+	            int numWords = wordsToScore.size();
+	            for (int i = 0; i < numWords; i++) {
+	                Word w = wordsToScore.get(i);
+	                wordsToScore.set(i, reduceWord(w));
+	            }
+	            // make and store target n-grams
+	            for (int k=0; k < order; k++) {
+	                for (int i=0; i < numWords - k; i++) {
+	                    targetNgrams.add(makeNgram(wordsToScore, i, k+1));
+	                }
+	            }
+        	}
+        	catch (java.lang.StringIndexOutOfBoundsException e) {
+        		System.err.println(targets[j]);
+        	}
         }
     }
     

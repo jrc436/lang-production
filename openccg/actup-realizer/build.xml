@@ -33,7 +33,6 @@
         <mkdir dir="bin"/>
         <copy includeemptydirs="false" todir="bin">
             <fileset dir="src">
-                <exclude name="**/*.launch"/>
                 <exclude name="**/*.java"/>
             </fileset>
         </copy>
@@ -94,9 +93,30 @@
             <classpath refid="actup-realizer.classpath"/>
         </java>
     </target>
+<<<<<<< HEAD
     <target name="Client">
         <java classname="opennlp.ccg.Client" failonerror="true" fork="yes">
             <jvmarg line="-Xmx12g"/>
+=======
+    <target name="Client2">
+        <java classname="opennlp.ccg.Client2" failonerror="true" fork="yes">
+            <classpath refid="actup-realizer.classpath"/>
+        </java>
+    </target>
+    <target name="WordAndPOSDictionaryLabellingStrategy">
+        <java classname="opennlp.ccg.parse.supertagger.WordAndPOSDictionaryLabellingStrategy" failonerror="true" fork="yes">
+            <classpath refid="actup-realizer.classpath"/>
+        </java>
+    </target>
+    <target name="JavaSupertaggingApp">
+        <java classname="opennlp.ccg.parse.supertagger.JavaSupertaggingApp" failonerror="true" fork="yes">
+>>>>>>> d64d6c6e7aff3f8619b5951ca05b7e32b0674c6e
+            <classpath refid="actup-realizer.classpath"/>
+        </java>
+    </target>
+    <target name="TextCCG">
+        <java classname="opennlp.ccg.TextCCG" failonerror="true" fork="yes">
+            <arg line="&quot;../config/grammar/grammar.xml&quot;"/>
             <classpath refid="actup-realizer.classpath"/>
         </java>
     </target>

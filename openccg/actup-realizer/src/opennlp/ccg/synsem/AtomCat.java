@@ -19,11 +19,16 @@
 
 package opennlp.ccg.synsem;
 
-import opennlp.ccg.unify.*;
-import opennlp.ccg.util.DisplayPrefs;
+import gnu.trove.TObjectIntHashMap;
 import opennlp.ccg.grammar.Grammar;
-import org.jdom.*;
-import gnu.trove.*;
+import opennlp.ccg.unify.FeatureStructure;
+import opennlp.ccg.unify.GFeatStruc;
+import opennlp.ccg.unify.ModFcn;
+import opennlp.ccg.unify.Substitution;
+import opennlp.ccg.unify.UnifyFailure;
+import opennlp.ccg.unify.Variable;
+
+import org.jdom.Element;
 
 /**
  * The most basic CG category.  This corresponds to a category like 'np[acc]',
@@ -159,16 +164,16 @@ public final class AtomCat extends AbstractCat implements TargetCat {
     }
     
     public String toString() {
-        DisplayPrefs prefs = Grammar.theGrammar.prefs;
+        //DisplayPrefs prefs = Grammar.theGrammar.prefs;
 
         StringBuffer sb = new StringBuffer();
         sb.append(type);
         if (fragCompletion) sb.append("_c");
         
-        if(_featStruc != null && prefs.showFeats)
+        if(_featStruc != null && Grammar.theGrammar.showFeats)
             sb.append(_featStruc.toString());
 
-        if (_lf != null && prefs.showSem) {
+        if (_lf != null && Grammar.theGrammar.showSem) {
             sb.append(" : ").append(_lf.toString());
         }
 
@@ -190,10 +195,9 @@ public final class AtomCat extends AbstractCat implements TargetCat {
     }
     
     public String toTeX() {
-        DisplayPrefs prefs = Grammar.theGrammar.prefs;
         StringBuffer sb = new StringBuffer();
         sb.append(type);
-        if(_featStruc != null && prefs.showFeats)
+        if(_featStruc != null && Grammar.theGrammar.showFeats)
             sb.append(_featStruc.toTeX());
         if (sb.length() == 0) return "UnknownCat";
         return sb.toString();

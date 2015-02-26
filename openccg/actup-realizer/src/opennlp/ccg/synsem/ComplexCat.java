@@ -18,13 +18,19 @@
 
 package opennlp.ccg.synsem;
 
-import opennlp.ccg.unify.*;
-import opennlp.ccg.util.DisplayPrefs;
-import opennlp.ccg.grammar.Grammar;
-import gnu.trove.*;
-import org.jdom.*;
+import gnu.trove.TObjectIntHashMap;
 
-import java.util.*;
+import java.util.List;
+
+import opennlp.ccg.grammar.Grammar;
+import opennlp.ccg.unify.FeatureStructure;
+import opennlp.ccg.unify.GUnifier;
+import opennlp.ccg.unify.ModFcn;
+import opennlp.ccg.unify.Substitution;
+import opennlp.ccg.unify.UnifyFailure;
+import opennlp.ccg.unify.Variable;
+
+import org.jdom.Element;
 
 /**
  * A non-recursive representation of complex categories.
@@ -268,10 +274,9 @@ public final class ComplexCat extends AbstractCat {
 	}
 
 	public String toString() {
-	    DisplayPrefs prefs = Grammar.theGrammar.prefs;
 	    StringBuffer sb = new StringBuffer();
 	    sb.append(_target.toString()).append(_args.toString());
-	    if (_lf != null && prefs.showSem) {
+	    if (_lf != null && Grammar.theGrammar.showSem) {
 	    	sb.append(" : ").append(_lf.toString());
 	    }
 	    return sb.toString();

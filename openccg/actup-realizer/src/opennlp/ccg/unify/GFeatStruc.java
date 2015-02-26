@@ -18,11 +18,20 @@
 
 package opennlp.ccg.unify;
 
-import opennlp.ccg.hylo.*;
-import opennlp.ccg.grammar.*;
-import gnu.trove.*;
-import org.jdom.*;
-import java.util.*;
+import gnu.trove.TObjectIntHashMap;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import opennlp.ccg.grammar.Grammar;
+import opennlp.ccg.hylo.HyloHelper;
+
+import org.jdom.Element;
 
 
 /**
@@ -329,7 +338,7 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
         
         if (_empty) return sb.toString();
 
-        String featsToShow = Grammar.theGrammar.prefs.featsToShow;
+        String featsToShow = Grammar.theGrammar.featsToShow;
 
         sb.append('{');
 
@@ -418,7 +427,7 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
             sb.append(" \\subsf{ < "); sb.append(_index); sb.append(" > } ");
         }
         if (_empty) return sb.toString();
-        String featsToShow = Grammar.theGrammar.prefs.featsToShow;
+        String featsToShow = Grammar.theGrammar.featsToShow;
         sb.append(" \\subsf{ ");
         if ((_index > 0)) {
             sb.append("  < "); sb.append(_index); sb.append(" > ");

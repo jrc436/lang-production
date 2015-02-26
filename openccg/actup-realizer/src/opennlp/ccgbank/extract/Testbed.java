@@ -108,8 +108,8 @@ public class Testbed {
 		ccgBankTaskTestbed.log("Loading grammar from URL: " + grammarURL);
 		Grammar grammar = new Grammar(grammarURL);
 		Tokenizer tokenizer = grammar.lexicon.tokenizer;
-		grammar.prefs.showFeats = true;
-		grammar.prefs.showSem = ccgBankTaskTestbed.isShowsSem();
+		grammar.showFeats = true;
+		grammar.showSem = ccgBankTaskTestbed.isShowsSem();
 
 		this.lexicon = grammar.lexicon;
 		this.rules = grammar.rules;

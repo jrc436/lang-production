@@ -216,7 +216,7 @@ public class Op extends HyloFormula {
     
     // filters out semantic features if apropos
     private List<LF> filteredArgs() {
-        String featsToShow = Grammar.theGrammar.prefs.featsToShow;
+        String featsToShow = Grammar.theGrammar.featsToShow;
         if (featsToShow.length() == 0) return _args;
         List<LF> retval = new ArrayList<LF>(_args.size());
         for (Iterator<LF> it = _args.iterator(); it.hasNext(); ) {

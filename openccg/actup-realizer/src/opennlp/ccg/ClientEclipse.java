@@ -25,7 +25,7 @@ public class ClientEclipse {
 		for (String in : filePaths) {
 			String out1 = in.split(".txt")[0] + "-parsed.txt";
 			String out2 = in.split(".txt")[0] + "-out.txt";
-			p.parseMain(grammar, in, out1, defaultScorer, defaultConfig, nBestListSize);
+			//p.parseMain(grammar, in, out1, defaultScorer, defaultConfig, nBestListSize);
 			r.realizeMain(trainingPath, grammar, out1, out2);
 		}
 	}

@@ -57,7 +57,9 @@ public class NBestPruningStrategy implements PruningStrategy
         // clear reusable return list
         retval.clear();
         // ensure pruning enabled
-        if (CAT_PRUNE_VAL == Chart.NO_PRUNING) return retval;
+        if (CAT_PRUNE_VAL == Chart.NO_PRUNING) {
+        	return retval;
+        }
         // nb: could add an option to prune all egdes with zero score
         /*
         for (Iterator it = catEdges.iterator(); it.hasNext(); ) {

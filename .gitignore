@@ -9,6 +9,7 @@
 *.metadata
 
 openccg/actup-realizer/bin/*
+openccg/.recommenders/*
 
 *.7z
 *.dmg

@@ -23,14 +23,16 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.PrintWriter;
 import java.net.URL;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 import opennlp.ccg.grammar.Grammar;
 import opennlp.ccg.ngrams.NgramPrecisionModel;
 import opennlp.ccg.realize.Chart;
-import opennlp.ccg.realize.Hypertagger;
 import opennlp.ccg.realize.Realizer;
-import opennlp.ccg.realize.hypertagger.ZLMaxentHypertagger;
 import opennlp.ccg.synsem.LF;
 import opennlp.ccg.synsem.SignScorer;
 
@@ -49,24 +51,16 @@ public class Realize
 	
     private PrintWriter out;
     
-    public void realizeMain(String grammarfile, String inputfile, String outputfile) throws Exception {
-    	realizeMain(grammarfile, inputfile, outputfile, false);
+    public void realizeMain(String modelFile, String grammarfile, String inputfile, String outputfile) throws Exception {
+    	realizeMain(modelFile, grammarfile, inputfile, outputfile, false);
     }
     
-    public void realizeMain(String grammarfile, String inputfile, String outputfile, boolean exactMatches) throws Exception {
-    	realizeMain(grammarfile, inputfile, outputfile, exactMatches, 0);
+    public void realizeMain(String modelFile, String grammarfile, String inputfile, String outputfile, boolean exactMatches) throws Exception {
+    	realizeMain(modelFile, grammarfile, inputfile, outputfile, exactMatches, 0);
     }   
 
-	public void realizeMain(String grammarfile, String inputfile, String outputfile, boolean exactMatches, int ngramOrder) throws Exception {
+	public void realizeMain(String modelFile, String grammarfile, String inputfile, String outputfile, boolean exactMatches, int ngramOrder) throws Exception {
         out = new PrintWriter(new BufferedWriter(new FileWriter(outputfile)));
-        
-        // remember, modify prefs
-        /*Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
-        boolean oldShowCompleteness = prefs.getBoolean(Edge.SHOW_COMPLETENESS, false);
-        boolean oldShowBitset = prefs.getBoolean(Edge.SHOW_BITSET, false);
-        prefs.putBoolean(Edge.SHOW_COMPLETENESS, true);
-        prefs.putBoolean(Edge.SHOW_BITSET, true);*/
-        
         
         // load grammar
         URL grammarURL = new File(grammarfile).toURI().toURL();
@@ -77,76 +71,59 @@ public class Realize
         Realizer realizer = new Realizer(grammar);
         
         // get request
-        //out.println();
-        //out.println("Request:");
-        //out.println();
         Document doc = grammar.loadFromXml(inputfile);
-       // org.jdom.output.XMLOutputter outputter = new org.jdom.output.XMLOutputter(Format.getPrettyFormat()); 
         out.flush();
-      //  outputter.output(doc, out);
-      //  out.flush();
-        
-        //this is for a single run. Setting it up for multiple runs.
-        
         
         Element root = doc.getRootElement();
         @SuppressWarnings("unchecked")
 		List<Element> items = root.getChildren("item");
         
-        
+        //remove unparsed nodes
+        List<Element> toRemove = new ArrayList<Element>();
         for (Element item : items) {
         	String parseAttr = item.getAttribute("numOfParses").getValue();
         	if (parseAttr.equals("0")) {
-        		continue;
+        		toRemove.add(item);
         	}
-        	//System.out.println(parseAttr);
+        }
+        for (Element remove : toRemove) {
+        	items.remove(remove);
+        }
+        toRemove = null; 
+        
+        //build LM
+        List<String> targetList = Files.readAllLines(Paths.get(modelFile), Charset.defaultCharset());
+        String[] targets = new String[targetList.size()];
+        for (int i = 0; i < targets.length; i++) {
+        	targets[i] = targetList.get(i);
+        }
+        targetList = null;
+        
+        //this uses the inputfile 
+        String[] goals = new String[items.size()];
+        for (int i = 0; i < items.size(); i++) {
+        	goals[i] = items.get(i).getAttribute("string").getValue();
+        }
+        
+        SignScorer ngramScorer = new NgramPrecisionModel(targets);
+        
+        //realize strings
+        for (int i = 0; i < items.size(); i++) {
+        	Element item = items.get(i);
+        	
         	Element lfelt = item.getChild("lf");
 	        LF lf = Realizer.getLfFromElt(lfelt);
-	        //out.println();
-	        //out.println("** Initial run");
-	        //out.println();
+	        
 	        out.println("Input LF: " + lf);
-	        
-	        // set up n-gram scorer
-	        SignScorer ngramScorer;
-	        //Element root = doc.getRootElement();
-	        //Element ngramModelElt = root.getChild("ngram-model");
-	            // just use targets
-	        String[] targets = new String[] { item.getAttribute("string").getValue() }; //not sure how it could be more than one
-	        //out.println();
-	        out.println("Target: " + targets[0]);
-	       /* for (int i=0; i < targets.length; i++) {;
-	            out.println(targets[i]);
-	        }*/
-	        ngramScorer = new NgramPrecisionModel(targets);
-	        
-	        // set hypertagger (if any)
-	        Element htModelElt = root.getChild("ht-model");
-	        if (htModelElt != null) {
-	            String htconfig = htModelElt.getAttributeValue("config");
-	            if (htconfig != null) {
-	                out.println();
-	                out.println("Instantiating hypertagger from: " + htconfig);
-	            	realizer.hypertagger = ZLMaxentHypertagger.ZLMaxentHypertaggerFactory(htconfig);
-	            }
-	            else {
-		            String htModelClass = htModelElt.getAttributeValue("class");
-		            out.println();
-		            out.println("Instantiating hypertagger from class: " + htModelClass);
-		            realizer.hypertagger = (Hypertagger) Class.forName(htModelClass).newInstance();
-	            }
-	        }
-	
+	        out.println("Goal: " + goals[i]);
+
 	        realizer.realize(lf, ngramScorer);
+	        
 	        Chart chart = realizer.getChart();
 	        chart.out = out;
 
 	        chart.printBestEdge();
 	        out.println();
-	        
-	        // reset prefs
-	      /*  prefs.putBoolean(Edge.SHOW_COMPLETENESS, oldShowCompleteness);
-	        prefs.putBoolean(Edge.SHOW_BITSET, oldShowBitset);*/
 	    }
     }
 }

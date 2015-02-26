@@ -1,0 +1,24 @@
+package opennlp.ccg;
+
+import java.io.IOException;
+
+//forgot to commit a simple file and don't want to cause git collisions
+
+public class Client2 {
+	private static final String[] filePaths = new String[] {
+		"",
+		"",
+	};
+	
+	private static final String grammar = "../config/grammar/grammar.xml";
+	public static void main(String[] args) throws IOException {
+		Realize r = new Realize();
+		Parse p = new Parse();
+		
+		for (String in : filePaths) {
+			String out1 = in.split(".txt")[0] + "-parsed.txt";
+			p.parseMain(grammar, in, out1);
+		}
+	}
+	
+}

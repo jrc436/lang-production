@@ -1,0 +1,7 @@
+package opennlp.ccg;
+
+//forgot to commit a simple file and don't want to cause git collisions
+
+public class Client2 {
+
+}

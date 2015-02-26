@@ -1,0 +1,13 @@
+package opennlp.ccg;
+
+//forgot to commit a simple file and don't want to cause git collisions
+
+public class Client2 {
+	private static final String grammar = "../config/grammar/grammar.xml";
+	
+	
+	public static void main(String[] args) {
+		
+	}
+	
+}

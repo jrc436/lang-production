@@ -54,19 +54,7 @@ import org.jdom.output.XMLOutputter;
  * @author      Michael White
  * @version     $Revision: 1.2 $, $Date: 2010/10/28 02:46:32 $
  */
-public class Parse {
-	
-	private static final String defaultScorer = "opennlp.ccg.ngrams.NgramPrecisionModel";
-	private static final String defaultConfig = "../config/tagger/stconfig";
-	
-	public void parseMain(String grammarfile, String inputfile, String outputfile) throws IOException {
-		parseMain(grammarfile, inputfile, outputfile, defaultScorer, defaultConfig, 1);
-	}
-	
-	public void parseMain(String grammarfile, String inputfile, String outputfile, String parseScorerClass, String stconfig) throws IOException {
-		parseMain(grammarfile, inputfile, outputfile, parseScorerClass, stconfig, 1);
-	}
-	
+public class Parse {		
 	public void parseMain(String grammarfile, String inputfile, String outputfile, String parseScorerClass, String stconfig, int nBestListSize) throws IOException {
               
 		// make test doc, sign map

@@ -5,6 +5,10 @@
 *.exe
 *.o
 *.so
+*.settings
+*.metadata
+
+openccg/actup-realizer/bin/*
 
 *.7z
 *.dmg

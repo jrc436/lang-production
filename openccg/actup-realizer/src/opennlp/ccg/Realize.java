@@ -47,19 +47,10 @@ import org.jdom.Element;
  */
 public class Realize
 {
-	
-	
     private PrintWriter out;
-    
-    public void realizeMain(String modelFile, String grammarfile, String inputfile, String outputfile) throws Exception {
-    	realizeMain(modelFile, grammarfile, inputfile, outputfile, false);
-    }
-    
-    public void realizeMain(String modelFile, String grammarfile, String inputfile, String outputfile, boolean exactMatches) throws Exception {
-    	realizeMain(modelFile, grammarfile, inputfile, outputfile, exactMatches, 0);
-    }   
 
-	public void realizeMain(String modelFile, String grammarfile, String inputfile, String outputfile, boolean exactMatches, int ngramOrder) throws Exception {
+
+	public void realizeMain(String modelFile, String grammarfile, String inputfile, String outputfile) throws Exception {
         out = new PrintWriter(new BufferedWriter(new FileWriter(outputfile)));
         
         // load grammar

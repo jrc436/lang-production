@@ -65,9 +65,25 @@
         <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
         <antcall target="build"/>
     </target>
+    <target name="TextCCG">
+        <java classname="opennlp.ccg.TextCCG" failonerror="true" fork="yes">
+            <arg line="&quot;../config/grammar/grammar.xml&quot;"/>
+            <classpath refid="actup-realizer.classpath"/>
+        </java>
+    </target>
+    <target name="WordAndPOSDictionaryLabellingStrategy">
+        <java classname="opennlp.ccg.parse.supertagger.WordAndPOSDictionaryLabellingStrategy" failonerror="true" fork="yes">
+            <classpath refid="actup-realizer.classpath"/>
+        </java>
+    </target>
     <target name="Realizer">
         <java classname="opennlp.ccg.Realize" failonerror="true" fork="yes">
             <arg line="-g &quot;../config/grammar/grammar.xml&quot; &quot;../../../ap-largefiles/switchboard-parsed.xml&quot; &quot;../../../ap-largefiles/switchboard-out.txt&quot;"/>
+            <classpath refid="actup-realizer.classpath"/>
+        </java>
+    </target>
+    <target name="JavaSupertaggingApp">
+        <java classname="opennlp.ccg.parse.supertagger.JavaSupertaggingApp" failonerror="true" fork="yes">
             <classpath refid="actup-realizer.classpath"/>
         </java>
     </target>
@@ -78,13 +94,9 @@
             <classpath refid="actup-realizer.classpath"/>
         </java>
     </target>
-    <target name="WordAndPOSDictionaryLabellingStrategy">
-        <java classname="opennlp.ccg.parse.supertagger.WordAndPOSDictionaryLabellingStrategy" failonerror="true" fork="yes">
-            <classpath refid="actup-realizer.classpath"/>
-        </java>
-    </target>
-    <target name="JavaSupertaggingApp">
-        <java classname="opennlp.ccg.parse.supertagger.JavaSupertaggingApp" failonerror="true" fork="yes">
+    <target name="Client">
+        <java classname="opennlp.ccg.Client" failonerror="true" fork="yes">
+            <jvmarg line="-Xmx12g"/>
             <classpath refid="actup-realizer.classpath"/>
         </java>
     </target>

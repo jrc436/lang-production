@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////////
+/*///////////////////////////////////////////////////////////////////////////////
 // Copyright (C) 2006 Ben Wing.
 // 
 // This library is free software; you can redistribute it and/or
@@ -34,7 +34,7 @@ import java.io.*;
 import java.net.*;
 import java.util.*;
 
-/**
+*//**
  * An interface for use with a higher-level web interface.  This should
  * provide as simple an interface onto parsing as possible, with its output
  * in a format that can be easily handled by a CGI program or similar.
@@ -49,9 +49,9 @@ import java.util.*;
  *
  * @author  Ben Wing
  * @version $Revision: 1.4 $, $Date: 2009/12/21 03:27:18 $
- */
+ *//*
 public class WebCCG {
-    /** Main method for tccg. */
+    *//** Main method for tccg. *//*
     public static void main(String[] args) throws IOException, LexException { 
 	String usage = "java opennlp.ccg.WebCCG " + 
 "[-showall] [-showderivs] [-showsem] [-showfeats] [-visualize FILE] GRAMMARDIR\n" +
@@ -175,3 +175,4 @@ public class WebCCG {
 	}
     }
 }
+*/

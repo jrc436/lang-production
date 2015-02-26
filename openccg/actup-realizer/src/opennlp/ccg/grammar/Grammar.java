@@ -18,26 +18,61 @@
 
 package opennlp.ccg.grammar;
 
-import opennlp.ccg.lexicon.*;
-import opennlp.ccg.util.*;
-import opennlp.ccg.synsem.*;
-import opennlp.ccg.hylo.*;
-import opennlp.ccg.parse.Parser;
-import opennlp.ccg.parse.ParseException;
-import opennlp.ccg.realize.Realizer;
-
-import org.jdom.*;
-import org.jdom.input.*;
-import org.jdom.output.*;
-import org.jdom.transform.*;
-import org.xml.sax.*;
-import javax.xml.parsers.*;
-import javax.xml.transform.*;
-import javax.xml.transform.stream.*;
-import javax.xml.transform.sax.*;
-import java.io.*;
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Source;
+import javax.xml.transform.Templates;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.sax.SAXTransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
+import opennlp.ccg.hylo.HyloHelper;
+import opennlp.ccg.lexicon.DefaultTokenizer;
+import opennlp.ccg.lexicon.Lexicon;
+import opennlp.ccg.lexicon.Tokenizer;
+import opennlp.ccg.lexicon.Word;
+import opennlp.ccg.parse.ParseException;
+import opennlp.ccg.parse.Parser;
+import opennlp.ccg.realize.Realizer;
+import opennlp.ccg.synsem.LF;
+import opennlp.ccg.synsem.Sign;
+
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.XMLOutputter;
+import org.jdom.transform.JDOMResult;
+import org.jdom.transform.JDOMSource;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.XMLFilter;
+import org.xml.sax.XMLReader;
 
 /**
  * A CCG grammar is essentially a lexicon plus a rule group.
@@ -69,7 +104,7 @@ public class Grammar {
     public final URL[] toXmlTransforms;
 
     /** Preferences for displaying elements in this grammar. */
-    public DisplayPrefs prefs = new DisplayPrefs();
+    //public DisplayPrefs prefs = new DisplayPrefs();
    
     /** For access to the current grammar; should be generalized eventually. */
     public static Grammar theGrammar;

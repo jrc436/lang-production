@@ -1,15 +1,16 @@
 package opennlp.ccg;
 
 
+
 //forgot to commit a simple file and don't want to cause git collisions
 
 public class ClientEclipse {
 	private static final String[] filePaths = new String[] {
-		"../../../ap-largefiles/data/swbd/swbd-rawtext-sample.txt",
+		"../../../ap-largefiles/data/swbd/swbd-rawtext-full.txt",
 	};
 	public static final String trainingPath = "../../../ap-largefiles/data/wsj/wsj-rawtext.txt";
 	
-	public static final String defaultScorer = "opennlp.ccg.ngrams.NgramPrecisionModel";
+	public static final String defaultScorer = "opennlp.ccg.ngrams.NgramScorer";
 	public static final String defaultConfig = "../config/tagger/stconfig";
 	
 	//parser config
@@ -20,7 +21,7 @@ public class ClientEclipse {
 	private static final String grammar = "../config/grammar/grammar.xml";
 	public static void main(String[] args) throws Exception {
 		Realize r = new Realize();
-		Parse p = new Parse();
+		//Parse p = new Parse();
 		
 		for (String in : filePaths) {
 			String out1 = in.split(".txt")[0] + "-parsed.txt";

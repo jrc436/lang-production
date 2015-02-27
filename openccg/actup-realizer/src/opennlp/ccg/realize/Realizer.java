@@ -126,14 +126,9 @@ public class Realizer
      */
     public Edge realize(LF lf, SignScorer signScorer, int timeLimitMS, boolean waitForCompleteEdge) {
         List<SatOp> preds = HyloHelper.flatten(lf);
-        SignScorer scorerToUse = (signScorer != null) 
-            ? signScorer : SignScorer.nullScorer;
-        PruningStrategy strategyToUse = (pruningStrategy != null) 
-            ? pruningStrategy : new NBestPruningStrategy();
+        SignScorer scorerToUse = signScorer;
+        PruningStrategy strategyToUse = new NBestPruningStrategy();
         // realize iteratively with hypertagger, if present
-        if (hypertagger != null) { 
-        	return realizeWithHypertagger(preds, scorerToUse, strategyToUse, timeLimitMS);
-        }
         // otherwise make chart, set start time
         long startTime = System.currentTimeMillis(); 
         chart = new Chart(new EdgeFactory(grammar, preds, scorerToUse), strategyToUse);
@@ -142,6 +137,8 @@ public class Realizer
         // run request
         chart.initialize();
         chart.combine(timeLimitMS, waitForCompleteEdge);
+        int numEdges = chart.numEdgesInChart();
+        chart.printEdges(true, true);
         // XXX tmp
     	// if no complete edge, try again gluing fragments
 //        if (!chart.bestEdge.complete()) {
@@ -151,120 +148,5 @@ public class Realizer
 //        }
         // return best edge
         return chart.bestEdge;
-    }
-    
-    // XXX tmp switch for gluing
-    private boolean useGluing = Boolean.getBoolean("useGluing");
-    
-    // iterate through beta-best values until a complete realization is found; 
-    // otherwise return the best fragment using the glue rule, or if all else 
-    // fails (or not using gluing), greedy fragment joining
-    private Edge realizeWithHypertagger(List<SatOp> preds, SignScorer signScorer, PruningStrategy pruningStrategy, int timeLimitMS) {
-        // get start time
-        long startTime = System.currentTimeMillis();
-        // get edge limit
-        int edgeLimit = Chart.EDGE_LIMIT;
-    	// set supertagger in lexicon
-    	grammar.lexicon.setSupertagger(hypertagger);
-    	// reset beta
-    	hypertagger.resetBeta();
-        // loop until retval set or need to give up
-        Edge retval = null;
-        chart = null;
-        boolean outOfBetas = false;
-        boolean pastTimeLimit = false;
-        boolean exceededEdgeLimit = false;
-        long iterStartTime = 0, currentTime = 0;
-        int iterTime = 0;
-        while (retval == null && !outOfBetas && !pastTimeLimit && !exceededEdgeLimit) {
-        	// instantiate chart and set start time for this iteration
-            chart = new Chart(new EdgeFactory(grammar, preds, signScorer, hypertagger), pruningStrategy);
-            iterStartTime = System.currentTimeMillis();
-        	// do realization in packing mode to see if a complete realization 
-        	// can be found with this hypertagger setting
-            chart.usePacking = true; chart.collectCombos = false;
-            chart.doUnpacking = false; chart.joinFragments = false;
-            // run request
-            chart.initialize();
-            if (chart.noUncoveredPreds()) 
-            	chart.combine(timeLimitMS, false);
-            // check time limit
-            currentTime = System.currentTimeMillis();
-            iterTime = (int) (currentTime - iterStartTime);
-            if (timeLimitMS != Chart.NO_TIME_LIMIT && iterTime >= timeLimitMS) {
-            	pastTimeLimit = true;
-//            	System.out.println("Went past time limit with ht beta: " + hypertagger.getCurrentBetaValue());
-            }
-            // check edge limit
-            if (edgeLimit != Chart.NO_EDGE_LIMIT && chart.numEdges >= edgeLimit) {
-            	exceededEdgeLimit = true;
-//            	System.out.println("Exceeded edge limit with ht beta: " + hypertagger.getCurrentBetaValue());
-            }
-            // if complete, unpack and return best edge
-            if (chart.bestEdge.complete()) {
-            	chart.doUnpacking = true; chart.doUnpacking();
-            	retval = chart.bestEdge;
-            }
-            // otherwise check beta level if still within limits
-            else if (!pastTimeLimit && !exceededEdgeLimit) {
-            	// progress to next beta setting, if any
-            	if (hypertagger.hasMoreBetas()) {
-            		hypertagger.nextBeta();
-            	}
-            	else {
-	            	// otherwise out of betas
-            		outOfBetas = true;
-//	            	System.out.println("Ran out of betas with ht beta: " + hypertagger.getCurrentBetaValue());
-            	}
-            }
-        }
-        // if no result, take desperate measures with fragments
-        if (retval == null) {
-        	// try realization with gluing
-            if (useGluing) {
-//	            System.out.println("Num edges for final iteration: " + chart.numEdges);
-//	            System.out.println("Trying gluing option after iterTime: " + iterTime);
-	        	chart.reInitForGluing();
-	        	// double time and space limits, to give gluing option some room
-	        	chart.edgeLimit = edgeLimit * 2;
-	        	chart.combine(timeLimitMS * 2, waitForCompleteEdge);
-//	            System.out.println("Num edges after gluing: " + chart.numEdges);
-	            currentTime = System.currentTimeMillis();
-	            iterTime = (int) (currentTime - iterStartTime);
-	            // if complete, unpack and return best edge
-	            if (chart.bestEdge.complete()) {
-//	                System.out.println("Unpacking in final iteration after iterTime: " + iterTime);
-	            	chart.doUnpacking = true; chart.doUnpacking();
-	            	retval = chart.bestEdge;
-	            }
-            }
-            // otherwise try a final iteration in an iteration in anytime mode, possibly resorting to joining fragments 
-            if (retval == null) {
-//                System.out.println("Trying a final iteration in anytime mode after iterTime: " + iterTime);
-            	// instantiate chart and set start time for this iteration
-                chart = new Chart(new EdgeFactory(grammar, preds, signScorer, hypertagger), pruningStrategy);
-                iterStartTime = System.currentTimeMillis();
-                // run request
-        		chart.usePacking = false; chart.joinFragments = true;
-                chart.initialize();
-                chart.combine(timeLimitMS, waitForCompleteEdge);
-//	            System.out.println("Num edges after anytime iteration: " + chart.numEdges);
-	            currentTime = System.currentTimeMillis();
-	            iterTime = (int) (currentTime - iterStartTime);
-//	            if (chart.bestEdge.complete()) 
-//	                System.out.println("Found complete edge after iterTime: " + iterTime);
-//	            else
-//	                System.out.println("Resorting to joined fragments after iterTime: " + iterTime);
-                // return best edge
-                retval = chart.bestEdge;
-            }
-        }
-    	// update end time
-        long endTime = System.currentTimeMillis();
-        chart.timeTilDone = (int) (endTime - startTime);
-    	// reset supertagger in lexicon
-    	grammar.lexicon.setSupertagger(null);
-        // return
-    	return retval;
     }
 }

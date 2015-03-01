@@ -12,6 +12,7 @@ else
 	client="Terminal"
 	size="full"
 	bp="/Users/jrc/Public/jrc-research/"
+fi
 java -Xmx$mem opennlp.ccg.Client${client}.java -actr
 java -Xmx$mem opennlp.ccg.Client${client}.java -notactr
 #now we have output in ap-largefiles/data/swbd/SOMETHING-out-SOMETHING

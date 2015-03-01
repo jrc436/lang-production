@@ -1,0 +1,8 @@
+---------------------------------------------
+ACTR ROUGE-L Average_R: 0.53710 (95%-conf.int. 0.53710 - 0.53710)
+ACTR ROUGE-L Average_P: 0.90000 (95%-conf.int. 0.90000 - 0.90000)
+ACTR ROUGE-L Average_F: 0.67273 (95%-conf.int. 0.67273 - 0.67273)
+---------------------------------------------
+STD ROUGE-L Average_R: 0.54677 (95%-conf.int. 0.54677 - 0.54677)
+STD ROUGE-L Average_P: 0.86923 (95%-conf.int. 0.86923 - 0.86923)
+STD ROUGE-L Average_F: 0.67128 (95%-conf.int. 0.67128 - 0.67128)

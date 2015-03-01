@@ -1,0 +1,20 @@
+<ROUGE-EVAL version="1.0">
+<EVAL ID="SWBD-SAMPLE">
+<PEER-ROOT>
+actup/realizations
+</PEER-ROOT>
+<MODEL-ROOT>
+actup/gold
+</MODEL-ROOT>
+<INPUT-FORMAT TYPE="SPL">
+</INPUT-FORMAT>
+<PEERS>
+<P ID="ACTR">actr-out.spl</P>
+<P ID="STD">std-out.spl</P>
+</PEERS>
+<MODELS>
+<M ID="ACTR">actr-goals.spl</M>
+<M ID="STD">std-goals.spl</M>
+</MODELS>
+</EVAL>
+</ROUGE-EVAL>

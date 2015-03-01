@@ -1,0 +1,636 @@
+../obj/i686-m64$(OBJ_OPTION)/FDiscount.o: FDiscount.cc hexdec.h FDiscount.h \
+ /work/research/actup-production/srilm//include/Discount.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/zio.h \
+ /work/research/actup-production/srilm//include/zlib.h \
+ /work/research/actup-production/srilm//include/zconf.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/Debug.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/NgramStats.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Map.h \
+ /work/research/actup-production/srilm//include/SArray.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/tls.h \
+ /work/research/actup-production/srilm//include/TextStats.h \
+ /work/research/actup-production/srilm//include/Prob.h \
+ /work/research/actup-production/srilm//include/Counts.h \
+ /work/research/actup-production/srilm//include/Trie.h FNgramStats.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ FactoredVocab.h /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/Debug.h FNgramSpecs.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/BlockMalloc.h \
+ /work/research/actup-production/srilm//include/Trie.cc \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/Array.cc wmatrix.h \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/NgramStats.h
+../obj/i686-m64$(OBJ_OPTION)/FNgramStats.o: FNgramStats.cc FNgramStats.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/tls.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/zio.h \
+ /work/research/actup-production/srilm//include/zlib.h \
+ /work/research/actup-production/srilm//include/zconf.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Map.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/SArray.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/TextStats.h \
+ /work/research/actup-production/srilm//include/Prob.h \
+ /work/research/actup-production/srilm//include/Counts.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/Debug.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ FactoredVocab.h /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/Debug.h FNgramSpecs.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/BlockMalloc.h \
+ /work/research/actup-production/srilm//include/Trie.cc \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/Array.cc wmatrix.h \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/NgramStats.h \
+ /work/research/actup-production/srilm//include/LMStats.h
+../obj/i686-m64$(OBJ_OPTION)/FNgramStatsInt.o: FNgramStatsInt.cc FNgramStats.cc FNgramStats.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/tls.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/zio.h \
+ /work/research/actup-production/srilm//include/zlib.h \
+ /work/research/actup-production/srilm//include/zconf.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Map.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/SArray.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/TextStats.h \
+ /work/research/actup-production/srilm//include/Prob.h \
+ /work/research/actup-production/srilm//include/Counts.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/Debug.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ FactoredVocab.h /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/Debug.h FNgramSpecs.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/BlockMalloc.h \
+ /work/research/actup-production/srilm//include/Trie.cc \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/Array.cc wmatrix.h \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/NgramStats.h \
+ /work/research/actup-production/srilm//include/LMStats.h
+../obj/i686-m64$(OBJ_OPTION)/FNgramSpecs.o: FNgramSpecs.cc FNgram.h \
+ /work/research/actup-production/srilm//include/LM.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/Prob.h \
+ /work/research/actup-production/srilm//include/Counts.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/zio.h \
+ /work/research/actup-production/srilm//include/zlib.h \
+ /work/research/actup-production/srilm//include/zconf.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Map.h \
+ /work/research/actup-production/srilm//include/SArray.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/tls.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ /work/research/actup-production/srilm//include/TextStats.h \
+ /work/research/actup-production/srilm//include/Debug.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/NgramStats.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/Trie.h FNgramStats.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ FactoredVocab.h /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/Debug.h FNgramSpecs.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/BlockMalloc.h \
+ /work/research/actup-production/srilm//include/Trie.cc \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/Array.cc wmatrix.h \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/NgramStats.h FDiscount.h \
+ /work/research/actup-production/srilm//include/Discount.h hexdec.h
+../obj/i686-m64$(OBJ_OPTION)/FNgramSpecsInt.o: FNgramSpecsInt.cc FNgramSpecs.cc FNgram.h \
+ /work/research/actup-production/srilm//include/LM.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/Prob.h \
+ /work/research/actup-production/srilm//include/Counts.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/zio.h \
+ /work/research/actup-production/srilm//include/zlib.h \
+ /work/research/actup-production/srilm//include/zconf.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Map.h \
+ /work/research/actup-production/srilm//include/SArray.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/tls.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ /work/research/actup-production/srilm//include/TextStats.h \
+ /work/research/actup-production/srilm//include/Debug.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/NgramStats.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/Trie.h FNgramStats.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ FactoredVocab.h /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/Debug.h FNgramSpecs.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/BlockMalloc.h \
+ /work/research/actup-production/srilm//include/Trie.cc \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/Array.cc wmatrix.h \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/NgramStats.h FDiscount.h \
+ /work/research/actup-production/srilm//include/Discount.h hexdec.h
+../obj/i686-m64$(OBJ_OPTION)/FactoredVocab.o: FactoredVocab.cc \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/zio.h \
+ /work/research/actup-production/srilm//include/zlib.h \
+ /work/research/actup-production/srilm//include/zconf.h \
+ /work/research/actup-production/srilm//include/Boolean.h FNgramStats.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/tls.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Map.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/SArray.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/TextStats.h \
+ /work/research/actup-production/srilm//include/Prob.h \
+ /work/research/actup-production/srilm//include/Counts.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/Debug.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ FactoredVocab.h /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/Debug.h FNgramSpecs.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/BlockMalloc.h \
+ /work/research/actup-production/srilm//include/Trie.cc \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/Array.cc wmatrix.h \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/NgramStats.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/MStringTokUtil.h
+../obj/i686-m64$(OBJ_OPTION)/FNgramLM.o: FNgramLM.cc FNgram.h \
+ /work/research/actup-production/srilm//include/LM.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/Prob.h \
+ /work/research/actup-production/srilm//include/Counts.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/zio.h \
+ /work/research/actup-production/srilm//include/zlib.h \
+ /work/research/actup-production/srilm//include/zconf.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Map.h \
+ /work/research/actup-production/srilm//include/SArray.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/tls.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ /work/research/actup-production/srilm//include/TextStats.h \
+ /work/research/actup-production/srilm//include/Debug.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/NgramStats.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/Trie.h FNgramStats.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ FactoredVocab.h /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/Debug.h FNgramSpecs.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/BlockMalloc.h \
+ /work/research/actup-production/srilm//include/Trie.cc \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/Array.cc wmatrix.h \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/NgramStats.h FDiscount.h \
+ /work/research/actup-production/srilm//include/Discount.h hexdec.h
+../obj/i686-m64$(OBJ_OPTION)/ProductVocab.o: ProductVocab.cc FNgramStats.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/tls.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/zio.h \
+ /work/research/actup-production/srilm//include/zlib.h \
+ /work/research/actup-production/srilm//include/zconf.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Map.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/SArray.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/TextStats.h \
+ /work/research/actup-production/srilm//include/Prob.h \
+ /work/research/actup-production/srilm//include/Counts.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/Debug.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ FactoredVocab.h /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/Debug.h FNgramSpecs.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/BlockMalloc.h \
+ /work/research/actup-production/srilm//include/Trie.cc \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/Array.cc wmatrix.h \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/NgramStats.h \
+ /work/research/actup-production/srilm//include/LMStats.h ProductVocab.h
+../obj/i686-m64$(OBJ_OPTION)/ProductNgram.o: ProductNgram.cc ProductNgram.h \
+ /work/research/actup-production/srilm//include/Ngram.h \
+ /work/research/actup-production/srilm//include/LM.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/Prob.h \
+ /work/research/actup-production/srilm//include/Counts.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/zio.h \
+ /work/research/actup-production/srilm//include/zlib.h \
+ /work/research/actup-production/srilm//include/zconf.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Map.h \
+ /work/research/actup-production/srilm//include/SArray.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/tls.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ /work/research/actup-production/srilm//include/TextStats.h \
+ /work/research/actup-production/srilm//include/Debug.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/NgramStats.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/Discount.h ProductVocab.h \
+ /work/research/actup-production/srilm//include/Vocab.h FactoredVocab.h \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ /work/research/actup-production/srilm//include/Debug.h FNgramStats.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/LMStats.h FNgramSpecs.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/BlockMalloc.h \
+ /work/research/actup-production/srilm//include/Trie.cc \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/Array.cc wmatrix.h \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/NgramStats.h FNgram.h \
+ /work/research/actup-production/srilm//include/LM.h
+../obj/i686-m64$(OBJ_OPTION)/FLMThreads.o: FLMThreads.cc FLMThreads.h \
+ /work/research/actup-production/srilm//include/LMThreads.h FNgramStats.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/tls.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/zio.h \
+ /work/research/actup-production/srilm//include/zlib.h \
+ /work/research/actup-production/srilm//include/zconf.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Map.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/SArray.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/TextStats.h \
+ /work/research/actup-production/srilm//include/Prob.h \
+ /work/research/actup-production/srilm//include/Counts.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/Debug.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ FactoredVocab.h /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/Debug.h FNgramSpecs.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/BlockMalloc.h \
+ /work/research/actup-production/srilm//include/Trie.cc \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/Array.cc wmatrix.h \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/NgramStats.h \
+ /work/research/actup-production/srilm//include/LMStats.h ProductNgram.h \
+ /work/research/actup-production/srilm//include/Ngram.h \
+ /work/research/actup-production/srilm//include/LM.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ /work/research/actup-production/srilm//include/NgramStats.h \
+ /work/research/actup-production/srilm//include/Discount.h ProductVocab.h \
+ FNgram.h /work/research/actup-production/srilm//include/LM.h
+../obj/i686-m64$(OBJ_OPTION)/strtolplusb.o: strtolplusb.cc
+../obj/i686-m64$(OBJ_OPTION)/wmatrix.o: wmatrix.cc \
+ /work/research/actup-production/srilm//include/Trie.cc \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Map.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/BlockMalloc.h \
+ /work/research/actup-production/srilm//include/Array.cc \
+ /work/research/actup-production/srilm//include/Array.h FDiscount.h \
+ /work/research/actup-production/srilm//include/Discount.h \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/zio.h \
+ /work/research/actup-production/srilm//include/zlib.h \
+ /work/research/actup-production/srilm//include/zconf.h \
+ /work/research/actup-production/srilm//include/Debug.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/NgramStats.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/SArray.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/tls.h \
+ /work/research/actup-production/srilm//include/TextStats.h \
+ /work/research/actup-production/srilm//include/Prob.h \
+ /work/research/actup-production/srilm//include/Counts.h FNgramStats.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ FactoredVocab.h /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/Debug.h FNgramSpecs.h \
+ /work/research/actup-production/srilm//include/LHash.cc wmatrix.h \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/NgramStats.h hexdec.h
+../obj/i686-m64$(OBJ_OPTION)/pngram.o: pngram.cc ../../lm/src/ngram.cc \
+ /work/research/actup-production/srilm//include/option.h \
+ /work/research/actup-production/srilm//include/cfuncproto.h \
+ /work/research/actup-production/srilm//include/version.h \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/zio.h \
+ /work/research/actup-production/srilm//include/zlib.h \
+ /work/research/actup-production/srilm//include/zconf.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ ../../lm/src/Vocab.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Map.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/SArray.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/tls.h \
+ ../../lm/src/SubVocab.h ../../lm/src/MultiwordVocab.h \
+ ../../lm/src/MultiwordLM.h ../../lm/src/LM.h ../../lm/src/Prob.h \
+ ../../lm/src/Counts.h ../../lm/src/XCount.h ../../lm/src/TextStats.h \
+ /work/research/actup-production/srilm//include/Debug.h \
+ ../../lm/src/NgramStats.h ../../lm/src/LMStats.h \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ ../../lm/src/NonzeroLM.h ../../lm/src/NBest.h \
+ /work/research/actup-production/srilm//include/Map.h ../../lm/src/Bleu.h \
+ ../../lm/src/TaggedVocab.h ../../lm/src/Ngram.h ../../lm/src/Discount.h \
+ ../../lm/src/TaggedNgram.h ../../lm/src/StopNgram.h \
+ ../../lm/src/ClassNgram.h ../../lm/src/Trellis.h \
+ /work/research/actup-production/srilm//include/Map2.h \
+ ../../lm/src/SimpleClassNgram.h ../../lm/src/DFNgram.h \
+ ../../lm/src/SkipNgram.h ../../lm/src/HiddenNgram.h \
+ ../../lm/src/HiddenSNgram.h ../../lm/src/NullLM.h \
+ ../../lm/src/LMClient.h ../../lm/src/BayesMix.h \
+ ../../lm/src/NgramProbArrayTrie.h \
+ /work/research/actup-production/srilm//include/Array.cc \
+ /work/research/actup-production/srilm//include/Array.h \
+ ../../lm/src/LoglinearMix.h ../../lm/src/AdaptiveMix.h \
+ ../../lm/src/AdaptiveMarginals.h ../../lm/src/NgramCountLM.h \
+ ../../lm/src/MSWebNgramLM.h ../../lm/src/CacheLM.h \
+ ../../lm/src/DynamicLM.h ../../lm/src/DecipherNgram.h \
+ ../../lm/src/HMMofNgrams.h ../../lm/src/RefList.h ProductNgram.h \
+ /work/research/actup-production/srilm//include/Ngram.h ProductVocab.h \
+ /work/research/actup-production/srilm//include/Vocab.h FactoredVocab.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/SubVocab.h FNgramStats.h \
+ /work/research/actup-production/srilm//include/LMStats.h FNgramSpecs.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/BlockMalloc.h \
+ /work/research/actup-production/srilm//include/Trie.cc \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/LHash.cc wmatrix.h \
+ /work/research/actup-production/srilm//include/NgramStats.h FNgram.h \
+ /work/research/actup-production/srilm//include/LM.h \
+ ../../lm/src/MEModel.h ../../lm/src/hmaxent.h \
+ /work/research/actup-production/srilm//include/MStringTokUtil.h \
+ /work/research/actup-production/srilm//include/BlockMalloc.h
+../obj/i686-m64$(OBJ_OPTION)/fngram-count.o: fngram-count.cc \
+ /work/research/actup-production/srilm//include/option.h \
+ /work/research/actup-production/srilm//include/cfuncproto.h \
+ /work/research/actup-production/srilm//include/version.h \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/zio.h \
+ /work/research/actup-production/srilm//include/zlib.h \
+ /work/research/actup-production/srilm//include/zconf.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Map.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/SArray.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/tls.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/Ngram.h \
+ /work/research/actup-production/srilm//include/LM.h \
+ /work/research/actup-production/srilm//include/Prob.h \
+ /work/research/actup-production/srilm//include/Counts.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ /work/research/actup-production/srilm//include/TextStats.h \
+ /work/research/actup-production/srilm//include/Debug.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/NgramStats.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/Discount.h \
+ /work/research/actup-production/srilm//include/VarNgram.h \
+ /work/research/actup-production/srilm//include/Ngram.h \
+ /work/research/actup-production/srilm//include/TaggedNgram.h \
+ /work/research/actup-production/srilm//include/TaggedVocab.h \
+ /work/research/actup-production/srilm//include/SkipNgram.h \
+ /work/research/actup-production/srilm//include/StopNgram.h \
+ /work/research/actup-production/srilm//include/NgramStats.h \
+ /work/research/actup-production/srilm//include/TaggedNgramStats.h \
+ /work/research/actup-production/srilm//include/StopNgramStats.h \
+ FNgramStats.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/XCount.h FactoredVocab.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/Debug.h FNgramSpecs.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/BlockMalloc.h \
+ /work/research/actup-production/srilm//include/Trie.cc \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/Array.cc wmatrix.h \
+ /work/research/actup-production/srilm//include/Trie.h FNgram.h \
+ /work/research/actup-production/srilm//include/LM.h FDiscount.h \
+ /work/research/actup-production/srilm//include/Discount.h hexdec.h
+../obj/i686-m64$(OBJ_OPTION)/fngram.o: fngram.cc \
+ /work/research/actup-production/srilm//include/option.h \
+ /work/research/actup-production/srilm//include/cfuncproto.h \
+ /work/research/actup-production/srilm//include/version.h \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/zio.h \
+ /work/research/actup-production/srilm//include/zlib.h \
+ /work/research/actup-production/srilm//include/zconf.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/File.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Map.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/SArray.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/tls.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ /work/research/actup-production/srilm//include/Vocab.h \
+ /work/research/actup-production/srilm//include/NBest.h \
+ /work/research/actup-production/srilm//include/Prob.h \
+ /work/research/actup-production/srilm//include/Counts.h \
+ /work/research/actup-production/srilm//include/XCount.h \
+ /work/research/actup-production/srilm//include/LM.h \
+ /work/research/actup-production/srilm//include/SubVocab.h \
+ /work/research/actup-production/srilm//include/TextStats.h \
+ /work/research/actup-production/srilm//include/Debug.h \
+ /work/research/actup-production/srilm//include/Boolean.h \
+ /work/research/actup-production/srilm//include/NgramStats.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/Bleu.h \
+ /work/research/actup-production/srilm//include/Ngram.h \
+ /work/research/actup-production/srilm//include/Discount.h FNgram.h \
+ /work/research/actup-production/srilm//include/LM.h FNgramStats.h \
+ /work/research/actup-production/srilm//include/TLSWrapper.h \
+ /work/research/actup-production/srilm//include/LMStats.h \
+ /work/research/actup-production/srilm//include/XCount.h FactoredVocab.h \
+ /work/research/actup-production/srilm//include/LHash.h \
+ /work/research/actup-production/srilm//include/Array.h \
+ /work/research/actup-production/srilm//include/MemStats.h \
+ /work/research/actup-production/srilm//include/Debug.h FNgramSpecs.h \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/BlockMalloc.h \
+ /work/research/actup-production/srilm//include/Trie.cc \
+ /work/research/actup-production/srilm//include/LHash.cc \
+ /work/research/actup-production/srilm//include/Array.cc wmatrix.h \
+ /work/research/actup-production/srilm//include/Trie.h \
+ /work/research/actup-production/srilm//include/NgramStats.h \
+ /work/research/actup-production/srilm//include/NullLM.h \
+ /work/research/actup-production/srilm//include/DecipherNgram.h \
+ /work/research/actup-production/srilm//include/Ngram.h hexdec.h
+../bin/i686-m64$(OPTION)/pngram:	../obj/i686-m64$(OPTION)/pngram.o
+pngram:	../bin/i686-m64$(OPTION)/pngram
+../bin/i686-m64$(OPTION)/fngram-count:	../obj/i686-m64$(OPTION)/fngram-count.o
+fngram-count:	../bin/i686-m64$(OPTION)/fngram-count
+../bin/i686-m64$(OPTION)/fngram:	../obj/i686-m64$(OPTION)/fngram.o
+fngram:	../bin/i686-m64$(OPTION)/fngram

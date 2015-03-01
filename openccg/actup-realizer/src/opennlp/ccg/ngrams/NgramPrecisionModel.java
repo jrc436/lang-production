@@ -196,8 +196,7 @@ public class NgramPrecisionModel extends NgramScorer implements SelfParaphraseBi
 	public FeatureVector extractFeatures(Sign sign, boolean complete) {
 		return extractFeatureMap(sign, complete);
 	}
-	
-    
+	 
     /** Not supported; throws an UnsupportedOperationException. */
     protected float logProbFromNgram(int i, int order) {
         throw new UnsupportedOperationException();

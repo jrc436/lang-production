@@ -173,16 +173,16 @@ public class StandardNgramModel extends AbstractStandardNgramModel
     //     <s> and </s> tags are used.
     public static void main(String[] args) throws IOException {
         
-        String usage = "Usage: java opennlp.ccg.ngrams.StandardNgramModel <order> <lmfile> <tokens> (-reverse)";
-        
-        if (args.length > 0 && args[0].equals("-h")) {
-            System.out.println(usage);
-            System.exit(0);
-        }
+//        String usage = "Usage: java opennlp.ccg.ngrams.StandardNgramModel <order> <lmfile> <tokens> (-reverse)";
+//        
+//        if (args.length > 0 && args[0].equals("-h")) {
+//            System.out.println(usage);
+//            System.exit(0);
+//        }
         
         long start = System.currentTimeMillis();
-        String order = args[0]; String lmfile = args[1]; String tokens = args[2];
-        String reversed = (args.length >= 4 && args[3].equals("-reverse")) ? "reversed " : "";
+        String order = "3"; String lmfile = "../../../ap-largefiles/data/wsj/wsj-lm"; String tokens = "the markets are good";
+        String reversed = "";
         System.out.println("Loading " + reversed + "n-gram model with order " + order + " from: " + lmfile);
         StandardNgramModel lm = new StandardNgramModel(Integer.parseInt(order), lmfile);
         if (reversed.length() > 0) lm.setReverse(true);

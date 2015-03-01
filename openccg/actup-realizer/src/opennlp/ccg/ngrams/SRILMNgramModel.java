@@ -5,6 +5,9 @@ package opennlp.ccg.ngrams;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -164,19 +167,19 @@ public class SRILMNgramModel extends AbstractStandardNgramModel {
 	protected native void finalize() throws Throwable;
 	
 	public static void main(String[] args) throws Exception {
-		String usage = "Usage: java opennlp.ccg.ngrams.SRILMNgramModel"
-			+ " <order> <lmfile> <lmtype> <tokens> (-reverse)";
-        
-        if (args.length > 0 && args[0].equals("-h")) {
-            System.out.println(usage);
-            return;
-        }
-        
+//		String usage = "Usage: java opennlp.ccg.ngrams.SRILMNgramModel"
+//			+ " <order> <lmfile> <lmtype> <tokens> (-reverse)";
+//        
+//        if (args.length > 0 && args[0].equals("-h")) {
+//            System.out.println(usage);
+//            return;
+//        }
+//        
         long start = System.currentTimeMillis();
-        String order = args[0];
-        String lmfile = args[1];
-        String lmType = args[2];
-        String tokens = args[3];
+        String order = 4+"";//args[0];
+        String lmfile = "../../../ap-largefiles/data/wsj/wsj-rawtext.txt";//args[1];
+        String lmType = SRILMNgramModelType.STANDARD.toString();//args[2];
+       // String tokens = args[3];
         String reversed = (args.length >= 5 && args[4].equals("-reverse"))
         	? "reversed " : "";
         System.out.println("Loading " + reversed
@@ -188,22 +191,25 @@ public class SRILMNgramModel extends AbstractStandardNgramModel {
         int secs = (int) (System.currentTimeMillis() - start) / 1000;
         System.out.println("secs: " + secs);
         System.out.println();
+       // File input = new File("../../../ap-largefiles/data/swbd/swbd-rawtext-sample.txt");
+        List<String> tokensList = Files.readAllLines(Paths.get("../../../ap-largefiles/data/swbd/swbd-rawtext-sample.txt"), Charset.defaultCharset());
         // System.out.println("trie map: ");
         // System.out.println(lm.trieMapRoot.toString());
         // System.out.println();
-        
-        Tokenizer tokenizer = new DefaultTokenizer();
-        List<Word> words = tokenizer.tokenize(tokens);
-        System.out.println("scoring: " + tokens);
-        System.out.println();
-        lm.debugScore = true;
-        lm.setWordsToScore(words, true);
-        lm.prepareToScoreWords();
-        double logprob = lm.logprob();
-        double score = convertToProb(logprob);
-        System.out.println();
-        System.out.println("score: " + score);
-        System.out.println("logprob: " + logprob);
-        System.out.println("ppl: " + NgramScorer.convertToPPL(logprob / (words.size()-1)));
+        for (String tokens : tokensList) {
+	        Tokenizer tokenizer = new DefaultTokenizer();
+	        List<Word> words = tokenizer.tokenize(tokens);
+	        System.out.println("scoring: " + tokens);
+	        System.out.println();
+	        lm.debugScore = true;
+	        lm.setWordsToScore(words, true);
+	        lm.prepareToScoreWords();
+	        double logprob = lm.logprob();
+	        double score = convertToProb(logprob);
+	        System.out.println();
+	        System.out.println("score: " + score);
+	        System.out.println("logprob: " + logprob);
+	        System.out.println("ppl: " + NgramScorer.convertToPPL(logprob / (words.size()-1)));
+        }
 	}
 }

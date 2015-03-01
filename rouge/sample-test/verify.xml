@@ -1,10 +1,10 @@
 <ROUGE-EVAL version="1.0">
 <EVAL ID="1">
 <PEER-ROOT>
-Verify
+sample-test/Verify
 </PEER-ROOT>
 <MODEL-ROOT>
-Verify
+sample-test/Verify
 </MODEL-ROOT>
 <INPUT-FORMAT TYPE="SEE">
 </INPUT-FORMAT>

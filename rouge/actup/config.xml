@@ -9,11 +9,11 @@ actup/gold
 <INPUT-FORMAT TYPE="SPL">
 </INPUT-FORMAT>
 <PEERS>
-<P ID="ACTR">actr-out.spl</P>
-<P ID="STD">std-out.spl</P>
+<P ID="ACTR">ctr-realize.spl</P>
+<P ID="STD">std-realize.spl</P>
 </PEERS>
 <MODELS>
-<M ID="ACTR">actr-goals.spl</M>
+<M ID="ACTR">ctr-goals.spl</M>
 <M ID="STD">std-goals.spl</M>
 </MODELS>
 </EVAL>

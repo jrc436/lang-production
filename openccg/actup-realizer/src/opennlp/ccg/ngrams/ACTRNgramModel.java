@@ -31,10 +31,10 @@ public class ACTRNgramModel extends StandardNgramModel {
 		}
 		double prior = super.score(sign, complete);
 		double activation = Math.exp(getActivation(sf));
-		double actPrior = Math.exp(-250.0); //I think this is in the act-up. Should be based on language expertise?
+		double actPrior = Math.exp(-60.0); //we'll use about 1 hour for the base rate
     	//updateActivationTable(sf);
     	if (activation == 1.0) {
-    		//no activation occurred
+    		//no activation occurred, should not just be 1 - activation
     		return prior * (1.0 - activation) / (1.0 - actPrior);
     	}
     	else {

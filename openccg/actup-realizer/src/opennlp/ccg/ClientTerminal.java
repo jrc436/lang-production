@@ -17,7 +17,7 @@ public class ClientTerminal {
 	public static final int nBestListSize = 1;
 	
 	private static final String grammar = "../../config/grammar/grammar.xml";
-	public static final boolean USEACTR = false;
+	public static final boolean USEACTR = true;
 	
 	public static void main(String[] args) throws Exception {
 		Realize r = new Realize();
@@ -35,7 +35,7 @@ public class ClientTerminal {
 		
 		String addendum = useACTR ? "-actr" : "-std";
 		for (String in : filePaths) {
-			String out1 = in.split(".txt")[0] + "-parsed"+addendum+".txt";
+			String out1 = in.split(".txt")[0] + "-parsed.txt";
 			String out2 = in.split(".txt")[0] + "-out"+addendum+".txt";
 			//p.parseMain(grammar, in, out1, defaultScorer, defaultConfig, nBestListSize);
 			r.realizeMain(useACTR, trainingPath, grammar, out1, out2);

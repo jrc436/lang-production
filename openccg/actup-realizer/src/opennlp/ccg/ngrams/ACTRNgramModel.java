@@ -32,14 +32,13 @@ public class ACTRNgramModel extends StandardNgramModel {
 		double prior = super.score(sign, complete);
 		double activation = Math.exp(getActivation(sf));
 		double actPrior = Math.exp(-60.0); //we'll use about 1 hour for the base rate
-    	//updateActivationTable(sf);
-    	if (activation == 1.0) {
-    		//no activation occurred, should not just be 1 - activation
-    		return prior * (1.0 - activation) / (1.0 - actPrior);
-    	}
-    	else {
-    		return prior * activation / actPrior;
-    	}
+    		if (activation == 1.0) {
+    			//no activation occurred, so activation and actprior cancel
+    			return prior;
+    		}
+    		else {
+    			return prior * activation / actPrior;
+    		}
     	//we want to return the probability of the ngram happening given activation
     	//P(ngram | activation)
     	//so the probability of the ngram happening is prior

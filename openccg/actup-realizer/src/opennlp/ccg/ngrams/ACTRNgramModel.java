@@ -29,35 +29,19 @@ public class ACTRNgramModel extends StandardNgramModel {
 		for (Word w : s) {
 			sf += w.getForm();
 		}
-		double prior = super.score(sign, complete);
-		double activation = Math.exp(getActivation(sf));
-		double actPrior = Math.exp(-60.0); //we'll use about 1 hour for the base rate
+		//This is a Baye's Law argument
+		double prior = super.score(sign, complete); //P(ngram)
+		double activation = Math.exp(getActivation(sf)); //P(activation | ngram)
+		double actPrior = Math.exp(-60.0); //P(activation): we'll use about 1 hour for the base rate since an ngram last appeared
     		if (activation == 1.0) {
-    			//no activation occurred, so activation and actprior cancel
+    			//since the ngram hasn't appeared yet, P(activation | ngram) = P(activation) and the terms cancel 
+			//thought: since "the base rate" should take into account ngrams that have occurred, is it lower? This line of reasoning might require a lot of 
+			//unknown probabilistic information for a probably mostly irrelevant gain compared to tuning the prior
     			return prior;
     		}
     		else {
     			return prior * activation / actPrior;
     		}
-    	//we want to return the probability of the ngram happening given activation
-    	//P(ngram | activation)
-    	//so the probability of the ngram happening is prior
-    	
-    	//the base-rate probability of activation happening is ???? 
-    	
-    	//what's the probability of activation happening given the prior, that's basically activation
-    	
-    	//P(ngram | NOT-activation)
-    	
-    	//probability of the ngram happening is still prior
-    	
-    	//the base-rate probability of activation happening is still ???? which makes this (1-???)
-    	
-    	//well if P(ngram | activation) = P(n) P(a | n) / P(a)
-    	//        P(ngram | NOT-activation) = P(n) P(not-a | n) / (1 - P(a))
-    	//        P(n | a) = P(n AND a) / P(
-    	
-    	//alternatively, what's 
 	}
 
 	private HashSet<Integer> getNgramsFromSentence(String sentence) {

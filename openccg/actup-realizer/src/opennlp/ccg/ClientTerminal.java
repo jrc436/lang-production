@@ -39,12 +39,12 @@ public class ClientTerminal {
 			
 			p.parseMain(grammar, in, out1, defaultScorer, defaultConfig, nBestListSize);
 			r.realizeMain(useACTR, trainingPath1, grammar, out1, out2+".wsj");
-			r.realizeMain(useACTR, trainingPathDir+fp.split(".")[0]+".train", grammar, out1, out2+".swm1");
+			r.realizeMain(useACTR, trainingPathDir+fp.split(".")[0]+".lm", grammar, out1, out2+".swm1");
 			
 			useACTR = !useACTR;
 			out2 = in.split(".txt")[0] + addendum;
 			r.realizeMain(useACTR, trainingPath1, grammar, out1, out2+".wsj");
-			r.realizeMain(useACTR, trainingPathDir+fp.split(".")[0]+".train", grammar, out1, out2+".swm1");
+			r.realizeMain(useACTR, trainingPathDir+fp.split(".")[0]+".lm", grammar, out1, out2+".swm1");
 		}
 	}
 }

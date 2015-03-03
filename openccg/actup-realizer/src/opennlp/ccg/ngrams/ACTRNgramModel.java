@@ -11,9 +11,7 @@ import opennlp.ccg.lexicon.Word;
 import opennlp.ccg.synsem.Sign;
 
 public class ACTRNgramModel extends StandardNgramModel {
-	private static final double negD = -0.5;
-	
-	//private static final double epsilon = 0.001;
+	private static final double negD = -0.16; //hindi paper acl
 	
 	//the integers in the list represent the number of intervening words since that presentation
 	//the initial integers are the hashcodes of the string, because java.
@@ -29,19 +27,15 @@ public class ACTRNgramModel extends StandardNgramModel {
 		for (Word w : s) {
 			sf += w.getForm();
 		}
-		//This is a Baye's Law argument
-		double prior = super.score(sign, complete); //P(ngram)
-		double activation = Math.exp(getActivation(sf)); //P(activation | ngram)
-		double actPrior = Math.exp(-60.0); //P(activation): we'll use about 1 hour for the base rate since an ngram last appeared
-    		if (activation == 1.0) {
-    			//since the ngram hasn't appeared yet, P(activation | ngram) = P(activation) and the terms cancel 
-			//thought: since "the base rate" should take into account ngrams that have occurred, is it lower? This line of reasoning might require a lot of 
-			//unknown probabilistic information for a probably mostly irrelevant gain compared to tuning the prior
-    			return prior;
-    		}
-    		else {
-    			return prior * activation / actPrior;
-    		}
+		//This is exactly the formula for the ACT-R n-gram formula
+		double prior = super.score(sign, complete); 
+		double activation = getActivation(sf);
+		if (activation == -1) {
+			//E[t] = log(0.5) / log(1 - prior)
+			activation = Math.pow(Math.log(0.5) / Math.log(1 - prior), negD);
+		}
+		activation = Math.exp(activation);
+    	return prior * activation;
 	}
 
 	private HashSet<Integer> getNgramsFromSentence(String sentence) {
@@ -62,7 +56,7 @@ public class ACTRNgramModel extends StandardNgramModel {
 	public synchronized void updateActivationTable(String sentence) {
 		// first need to parse the sentence into n-grams
 		HashSet<Integer> ngrams = getNgramsFromSentence(sentence);
-		double time_approximate = ((double) sentence.split(" ").length) / 120.0;//120 wpm
+		double time_approximate = ((double) sentence.split(" ").length) / 2.0;//120 wpm
 		for (Integer hash : ngrams) {
 			if (!nGramPresentations.containsKey(hash)) {
 				//this is the first presentation of this ngram
@@ -86,12 +80,9 @@ public class ACTRNgramModel extends StandardNgramModel {
 //	}
 	public synchronized double getActivation(String sf) {
 		double sum = 0.0;
-//		if (sf.split(" ").length <= 3) {
-//			System.out.println("###########"+sf+"##########");
-//		}
 		List<Double> presentations = nGramPresentations.get(sf.hashCode());
 		if (presentations == null) {
-			return 0.0;
+			return -1; //we'll have to calculate a prior
 		}
 		for (Double t : presentations) {
 			sum += Math.pow(t, negD);

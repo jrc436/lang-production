@@ -89,7 +89,7 @@ public class Realize
 //        targetList = null;
 //        SignScorer ngramScorer = new NgramPrecisionModel(targets);
         //SignScorer ngramScorer = ;
-        SignScorer ngramScorer = useACTR ? new ACTRNgramModel(3, modelFile) : new StandardNgramModel(3, modelFile);
+        SignScorer ngramScorer = useACTR ? new ACTRNgramModel(4, modelFile) : new StandardNgramModel(4, modelFile);
         
         //this uses the inputfile 
         String[] goals = new String[items.size()];

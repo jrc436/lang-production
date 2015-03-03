@@ -16,6 +16,7 @@
 *.rar
 *.tar
 *.zip
+*-old
 
 *.swp
 *.log

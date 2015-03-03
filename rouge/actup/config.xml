@@ -13,8 +13,8 @@ actup/gold
 <P ID="STD">std-realize.spl</P>
 </PEERS>
 <MODELS>
-<M ID="ACTR">ctr-goals.spl</M>
-<M ID="STD">std-goals.spl</M>
+<M ID="ACTR">goals.spl</M>
+<M ID="STD">goals.spl</M>
 </MODELS>
 </EVAL>
 </ROUGE-EVAL>

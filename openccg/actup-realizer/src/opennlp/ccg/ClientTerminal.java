@@ -14,7 +14,7 @@ public class ClientTerminal {
 	public static final String trainingPath1 = "../../../../ap-largefiles/lm/wsj.lm";
 	public static final String trainingPathDir = "../../../../ap-largefiles/lm/swbd/";
 	
-	public static final String defaultScorer = "opennlp.ccg.ngrams.NgramScorer";
+	public static final String defaultScorer = "opennlp.ccg.ngrams.NgramPrecisionModel";
 	public static final String defaultConfig = "../../config/tagger/stconfig";
 	
 	//parser config

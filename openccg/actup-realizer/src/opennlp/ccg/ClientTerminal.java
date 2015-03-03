@@ -10,10 +10,9 @@ import java.util.List;
 public class ClientTerminal {
 	private static final String pathToLoadAll = "../../../../ap-largefiles/data/run-list";
 	private static final String prefix = "../../../../ap-largefiles/data/swbd/";
-	//private static final String[] filePaths = new String[] {
-	//	"../../../../ap-largefiles/data/swbd/swbd-rawtext-full.txt",
-	//};
-	public static final String trainingPath = "../../../../ap-largefiles/data/wsj/wsj-lm";
+
+	public static final String trainingPath1 = "../../../../ap-largefiles/lm/wsj.lm";
+	public static final String trainingPathDir = "../../../../ap-largefiles/lm/swbd/";
 	
 	public static final String defaultScorer = "opennlp.ccg.ngrams.NgramScorer";
 	public static final String defaultConfig = "../../config/tagger/stconfig";
@@ -29,24 +28,23 @@ public class ClientTerminal {
 		Parse p = new Parse();
 		
 		boolean useACTR = USEACTR;
-		if (args.length > 0) {
-			if (args[1].equals("-actr")) {
-				useACTR = true;
-			}
-			else {
-				useACTR = false;
-			}
-		}	
-		
+
 		String addendum = useACTR ? "-actr" : "-std";
 		
 		List<String> filePaths = Files.readAllLines(Paths.get(pathToLoadAll), Charset.defaultCharset());
 		for (String fp : filePaths) {
 			String in = prefix + fp;
 			String out1 = in.split(".txt")[0] + "-parsed.xml";
-			String out2 = in.split(".txt")[0] + "-out"+addendum+".txt";
+			String out2 = in.split(".txt")[0] + addendum;
+			
 			p.parseMain(grammar, in, out1, defaultScorer, defaultConfig, nBestListSize);
-			r.realizeMain(useACTR, trainingPath, grammar, out1, out2);
+			r.realizeMain(useACTR, trainingPath1, grammar, out1, out2+".wsj");
+			r.realizeMain(useACTR, trainingPathDir+fp.split(".")[0]+".train", grammar, out1, out2+".swm1");
+			
+			useACTR = !useACTR;
+			out2 = in.split(".txt")[0] + addendum;
+			r.realizeMain(useACTR, trainingPath1, grammar, out1, out2+".wsj");
+			r.realizeMain(useACTR, trainingPathDir+fp.split(".")[0]+".train", grammar, out1, out2+".swm1");
 		}
 	}
 }

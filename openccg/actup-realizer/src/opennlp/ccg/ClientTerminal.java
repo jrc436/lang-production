@@ -21,11 +21,11 @@ public class ClientTerminal {
 	public static final int nBestListSize = 1;
 	
 	private static final String grammar = "../../config/grammar/grammar.xml";
-	public static final boolean USEACTR = false;
+	public static final boolean USEACTR = true;
 	
 	public static void main(String[] args) throws Exception {
 		Realize r = new Realize();
-		Parse p = new Parse();
+		//Parse p = new Parse();
 		
 		boolean useACTR = USEACTR;
 
@@ -36,15 +36,22 @@ public class ClientTerminal {
 			String in = prefix + fp;
 			String out1 = in.split(".txt")[0] + "-parsed.xml";
 			String out2 = in.split(".txt")[0] + addendum;
+		
+			String trainingPathFile = trainingPathDir+fp.split(".txt")[0]+".lm";	
 			
-			p.parseMain(grammar, in, out1, defaultScorer, defaultConfig, nBestListSize);
-			r.realizeMain(useACTR, trainingPath1, grammar, out1, out2+".wsj");
-			r.realizeMain(useACTR, trainingPathDir+fp.split(".")[0]+".lm", grammar, out1, out2+".swm1");
+			//p.parseMain(grammar, in, out1, defaultScorer, defaultConfig, nBestListSize);
+			r.realizeMain(useACTR, trainingPath1, grammar, out1, out2+"-corrected.wsj");
+			r.realizeMain(useACTR, trainingPathFile, grammar, out1, out2+"-.swm1");
+		
+			//useACTR = !useACTR;
 			
-			useACTR = !useACTR;
-			out2 = in.split(".txt")[0] + addendum;
-			r.realizeMain(useACTR, trainingPath1, grammar, out1, out2+".wsj");
-			r.realizeMain(useACTR, trainingPathDir+fp.split(".")[0]+".lm", grammar, out1, out2+".swm1");
+			//addendum = useACTR ? "-actr" : "-std";	
+
+			//useACTR = !useACTR;
+			//out2 = in.split(".txt")[0] + addendum;
+			//r.realizeMain(useACTR, trainingPath1, grammar, out1, out2+"-final.wsj");
+			//r.realizeMain(useACTR, trainingPathFile, grammar, out1, out2+"-final.swm1");
+			//break;
 		}
 	}
 }

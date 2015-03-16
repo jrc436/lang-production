@@ -90,7 +90,8 @@ public class Realize
 //        SignScorer ngramScorer = new NgramPrecisionModel(targets);
         //SignScorer ngramScorer = ;
         SignScorer ngramScorer = useACTR ? new ACTRNgramModel(4, modelFile) : new StandardNgramModel(4, modelFile);
-        
+	System.out.println(ngramScorer.getClass());       
+ 
         //this uses the inputfile 
         String[] goals = new String[items.size()];
         for (int i = 0; i < items.size(); i++) {

@@ -1,0 +1,492 @@
+../obj/macosx$(OBJ_OPTION)/FDiscount.o: FDiscount.cc hexdec.h FDiscount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Discount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Boolean.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/File.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zio.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zlib.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zconf.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/MemStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Debug.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/NgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/XCount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LMStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Vocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Map.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SArray.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TLSWrapper.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/tls.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TextStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Prob.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Counts.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.h \
+  FNgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SubVocab.h \
+  FactoredVocab.h FNgramSpecs.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/BlockMalloc.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.cc \
+  wmatrix.h
+../obj/macosx$(OBJ_OPTION)/FNgramStats.o: FNgramStats.cc FNgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TLSWrapper.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/tls.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Boolean.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LMStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Vocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/File.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zio.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zlib.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zconf.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Map.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/MemStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SArray.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TextStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Prob.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Counts.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/XCount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Debug.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SubVocab.h \
+  FactoredVocab.h FNgramSpecs.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/BlockMalloc.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.cc \
+  wmatrix.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/NgramStats.h
+../obj/macosx$(OBJ_OPTION)/FNgramStatsInt.o: FNgramStatsInt.cc FNgramStats.cc FNgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TLSWrapper.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/tls.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Boolean.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LMStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Vocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/File.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zio.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zlib.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zconf.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Map.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/MemStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SArray.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TextStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Prob.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Counts.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/XCount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Debug.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SubVocab.h \
+  FactoredVocab.h FNgramSpecs.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/BlockMalloc.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.cc \
+  wmatrix.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/NgramStats.h
+../obj/macosx$(OBJ_OPTION)/FNgramSpecs.o: FNgramSpecs.cc FNgram.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LM.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Boolean.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Prob.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Counts.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/XCount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/File.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zio.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zlib.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zconf.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/MemStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Vocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Map.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SArray.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TLSWrapper.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/tls.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SubVocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TextStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Debug.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/NgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LMStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.h \
+  FNgramStats.h FactoredVocab.h FNgramSpecs.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/BlockMalloc.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.cc \
+  wmatrix.h FDiscount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Discount.h \
+  hexdec.h
+../obj/macosx$(OBJ_OPTION)/FNgramSpecsInt.o: FNgramSpecsInt.cc FNgramSpecs.cc FNgram.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LM.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Boolean.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Prob.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Counts.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/XCount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/File.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zio.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zlib.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zconf.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/MemStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Vocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Map.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SArray.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TLSWrapper.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/tls.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SubVocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TextStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Debug.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/NgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LMStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.h \
+  FNgramStats.h FactoredVocab.h FNgramSpecs.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/BlockMalloc.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.cc \
+  wmatrix.h FDiscount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Discount.h \
+  hexdec.h
+../obj/macosx$(OBJ_OPTION)/FactoredVocab.o: FactoredVocab.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/File.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zio.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zlib.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zconf.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Boolean.h \
+  FNgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TLSWrapper.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/tls.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LMStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Vocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Map.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/MemStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SArray.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TextStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Prob.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Counts.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/XCount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Debug.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SubVocab.h \
+  FactoredVocab.h FNgramSpecs.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/BlockMalloc.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.cc \
+  wmatrix.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/NgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/MStringTokUtil.h
+../obj/macosx$(OBJ_OPTION)/FNgramLM.o: FNgramLM.cc FNgram.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LM.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Boolean.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Prob.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Counts.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/XCount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/File.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zio.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zlib.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zconf.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/MemStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Vocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Map.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SArray.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TLSWrapper.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/tls.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SubVocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TextStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Debug.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/NgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LMStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.h \
+  FNgramStats.h FactoredVocab.h FNgramSpecs.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/BlockMalloc.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.cc \
+  wmatrix.h FDiscount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Discount.h \
+  hexdec.h
+../obj/macosx$(OBJ_OPTION)/ProductVocab.o: ProductVocab.cc FNgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TLSWrapper.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/tls.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Boolean.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LMStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Vocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/File.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zio.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zlib.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zconf.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Map.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/MemStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SArray.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TextStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Prob.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Counts.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/XCount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Debug.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SubVocab.h \
+  FactoredVocab.h FNgramSpecs.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/BlockMalloc.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.cc \
+  wmatrix.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/NgramStats.h \
+  ProductVocab.h
+../obj/macosx$(OBJ_OPTION)/ProductNgram.o: ProductNgram.cc ProductNgram.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Ngram.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LM.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Boolean.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Prob.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Counts.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/XCount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/File.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zio.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zlib.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zconf.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/MemStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Vocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Map.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SArray.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TLSWrapper.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/tls.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SubVocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TextStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Debug.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/NgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LMStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Discount.h \
+  ProductVocab.h FactoredVocab.h FNgramStats.h FNgramSpecs.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/BlockMalloc.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.cc \
+  wmatrix.h FNgram.h
+../obj/macosx$(OBJ_OPTION)/FLMThreads.o: FLMThreads.cc FLMThreads.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LMThreads.h \
+  FNgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TLSWrapper.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/tls.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Boolean.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LMStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Vocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/File.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zio.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zlib.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zconf.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Map.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/MemStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SArray.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TextStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Prob.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Counts.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/XCount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Debug.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SubVocab.h \
+  FactoredVocab.h FNgramSpecs.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/BlockMalloc.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.cc \
+  wmatrix.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/NgramStats.h \
+  ProductNgram.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Ngram.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LM.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Discount.h \
+  ProductVocab.h FNgram.h
+../obj/macosx$(OBJ_OPTION)/strtolplusb.o: strtolplusb.cc
+../obj/macosx$(OBJ_OPTION)/wmatrix.o: wmatrix.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/MemStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Map.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Boolean.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/BlockMalloc.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.h \
+  FDiscount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Discount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/File.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zio.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zlib.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zconf.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Debug.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/NgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/XCount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LMStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Vocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SArray.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TLSWrapper.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/tls.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TextStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Prob.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Counts.h \
+  FNgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SubVocab.h \
+  FactoredVocab.h FNgramSpecs.h wmatrix.h hexdec.h
+../obj/macosx$(OBJ_OPTION)/pngram.o: pngram.cc ../../lm/src/ngram.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/option.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/cfuncproto.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/version.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/File.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zio.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zlib.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zconf.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Boolean.h \
+  ../../lm/src/Vocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Map.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/MemStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SArray.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TLSWrapper.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/tls.h \
+  ../../lm/src/SubVocab.h ../../lm/src/MultiwordVocab.h \
+  ../../lm/src/MultiwordLM.h ../../lm/src/LM.h ../../lm/src/Prob.h \
+  ../../lm/src/Counts.h ../../lm/src/XCount.h ../../lm/src/TextStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Debug.h \
+  ../../lm/src/NgramStats.h ../../lm/src/LMStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.h \
+  ../../lm/src/NonzeroLM.h ../../lm/src/NBest.h ../../lm/src/Bleu.h \
+  ../../lm/src/TaggedVocab.h ../../lm/src/Ngram.h \
+  ../../lm/src/Discount.h ../../lm/src/TaggedNgram.h \
+  ../../lm/src/StopNgram.h ../../lm/src/ClassNgram.h \
+  ../../lm/src/Trellis.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Map2.h \
+  ../../lm/src/SimpleClassNgram.h ../../lm/src/DFNgram.h \
+  ../../lm/src/SkipNgram.h ../../lm/src/HiddenNgram.h \
+  ../../lm/src/HiddenSNgram.h ../../lm/src/NullLM.h \
+  ../../lm/src/LMClient.h ../../lm/src/BayesMix.h \
+  ../../lm/src/NgramProbArrayTrie.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.cc \
+  ../../lm/src/LoglinearMix.h ../../lm/src/AdaptiveMix.h \
+  ../../lm/src/AdaptiveMarginals.h ../../lm/src/NgramCountLM.h \
+  ../../lm/src/MSWebNgramLM.h ../../lm/src/CacheLM.h \
+  ../../lm/src/DynamicLM.h ../../lm/src/DecipherNgram.h \
+  ../../lm/src/HMMofNgrams.h ../../lm/src/RefList.h ProductNgram.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Ngram.h \
+  ProductVocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Vocab.h \
+  FactoredVocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/XCount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SubVocab.h \
+  FNgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LMStats.h \
+  FNgramSpecs.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/BlockMalloc.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.cc \
+  wmatrix.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/NgramStats.h \
+  FNgram.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LM.h \
+  ../../lm/src/MEModel.h ../../lm/src/hmaxent.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/MStringTokUtil.h
+../obj/macosx$(OBJ_OPTION)/fngram-count.o: fngram-count.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/option.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/cfuncproto.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/version.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/File.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zio.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zlib.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zconf.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Boolean.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Vocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Map.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/MemStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SArray.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TLSWrapper.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/tls.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SubVocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Ngram.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LM.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Prob.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Counts.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/XCount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TextStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Debug.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/NgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LMStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Discount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/VarNgram.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TaggedNgram.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TaggedVocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SkipNgram.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/StopNgram.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TaggedNgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/StopNgramStats.h \
+  FNgramStats.h FactoredVocab.h FNgramSpecs.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/BlockMalloc.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.cc \
+  wmatrix.h FNgram.h FDiscount.h hexdec.h
+../obj/macosx$(OBJ_OPTION)/fngram.o: fngram.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/option.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/cfuncproto.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/version.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/File.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zio.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zlib.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/zconf.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Boolean.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Vocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Map.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/MemStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SArray.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TLSWrapper.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/tls.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/SubVocab.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/NBest.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Prob.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Counts.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/XCount.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LM.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/TextStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Debug.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/NgramStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LMStats.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Bleu.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Ngram.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Discount.h \
+  FNgram.h FNgramStats.h FactoredVocab.h FNgramSpecs.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/LHash.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/BlockMalloc.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Trie.cc \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/Array.cc \
+  wmatrix.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/NullLM.h \
+  /Users/jrc/Public/jrc-research/actup-production/srilm//include/DecipherNgram.h \
+  hexdec.h
+../bin/macosx$(OPTION)/pngram:	../obj/macosx$(OPTION)/pngram.o
+pngram:	../bin/macosx$(OPTION)/pngram
+../bin/macosx$(OPTION)/fngram-count:	../obj/macosx$(OPTION)/fngram-count.o
+fngram-count:	../bin/macosx$(OPTION)/fngram-count
+../bin/macosx$(OPTION)/fngram:	../obj/macosx$(OPTION)/fngram.o
+fngram:	../bin/macosx$(OPTION)/fngram

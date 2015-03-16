@@ -4,7 +4,7 @@
 # $Header: /home/srilm/CVS/srilm/Makefile,v 1.70 2014-05-26 03:30:23 stolcke Exp $
 #
 
-SRILM = /work/research/actup-production/srilm/
+SRILM = /Users/jrc/Public/jrc-research/actup-production/srilm/
 MACHINE_TYPE := $(shell $(SRILM)/sbin/machine-type)
 
 RELEASE := $(shell cat RELEASE)

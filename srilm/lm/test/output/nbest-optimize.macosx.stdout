@@ -1,0 +1,12 @@
+   weights = 0.125 1 0 1 0
+   normed = 1 8 0 8 0
+   scale = 8
+original errors = 0 (0/word)
+best errors = 0 (0/word)
+   weights = 0.125 1 0 1 0
+   normed = 1 8 0 8 0
+   scale = 8
+*** nbest-rover control file ***
+../nbest-rover/nbest-pron-scores	8 +
+../nbest-rover/nbest-dur-scores	0 +
+.	8 0 1.0 0 8

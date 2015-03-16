@@ -6,16 +6,20 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
+import java.io.FileWriter;
+import java.io.File;
 
 import opennlp.ccg.lexicon.Word;
 import opennlp.ccg.synsem.Sign;
 
+
+
 public class ACTRNgramModel extends StandardNgramModel {
-	private static final double negD = -0.16; //hindi paper acl
-	
+	private static final double negD = -0.5; //hindi paper acl
 	//the integers in the list represent the number of intervening words since that presentation
 	//the initial integers are the hashcodes of the string, because java.
 	private HashMap<Integer, List<Double>> nGramPresentations;
+
 	
 	public ACTRNgramModel(int order, String modelFile) throws IOException {
 		super(order, modelFile);
@@ -31,11 +35,11 @@ public class ACTRNgramModel extends StandardNgramModel {
 		double prior = super.score(sign, complete); 
 		double activation = getActivation(sf);
 		if (activation == -1) {
-			//E[t] = log(0.5) / log(1 - prior)
-			activation = Math.pow(Math.log(0.5) / Math.log(1 - prior), negD);
+			//E[t] = 5 * log(0.5) / log(1 - prior)
+			activation = Math.pow(5.0 * Math.log(0.5) / Math.log(1.0 - prior), negD);
 		}
-		activation = Math.exp(activation);
-    	return prior * activation;
+		activation = Math.exp(activation) - 1;
+    		return prior * activation;
 	}
 
 	private HashSet<Integer> getNgramsFromSentence(String sentence) {
@@ -56,7 +60,7 @@ public class ACTRNgramModel extends StandardNgramModel {
 	public synchronized void updateActivationTable(String sentence) {
 		// first need to parse the sentence into n-grams
 		HashSet<Integer> ngrams = getNgramsFromSentence(sentence);
-		double time_approximate = ((double) sentence.split(" ").length) / 2.0;//120 wpm
+		double time_approximate = ((double) sentence.split(" ").length) / (196.0 / 60.0);//196 wpm
 		for (Integer hash : ngrams) {
 			if (!nGramPresentations.containsKey(hash)) {
 				//this is the first presentation of this ngram

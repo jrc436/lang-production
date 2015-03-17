@@ -36,8 +36,6 @@ Thumbs.db
 /build
 /bin
 
-build.xml
-
 *.pydevproject
 .metadata
 .gradle

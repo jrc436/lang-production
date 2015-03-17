@@ -643,6 +643,24 @@ public class Chart
         out.flush();
     }
     
+    public String getBestEdgeAsText() {
+    	printEdge(bestEdge);
+        if (!edgeFactory.labeledNominals.isEmpty()) {
+            try {
+                ByteArrayOutputStream bstr = new ByteArrayOutputStream();
+                edgeFactory.grammar.serializeXml(
+                    bestEdge.sign.getWordsInXml(edgeFactory.labeledNominals), bstr
+                );
+                out.println(bstr.toString());
+            }
+            catch (java.io.IOException exc) { 
+                throw (RuntimeException) new RuntimeException().initCause(exc);
+            }
+        }
+        String bracketedEdge = bestEdge.sign.getBracketedString();
+        return bracketedEdge.replace(")", "").replace("(", "");
+    }
+    
     /** Prints the best joined edge. */
     public void printBestJoinedEdge() {
     	if (bestJoinedEdge == null) return;

@@ -137,7 +137,7 @@ public class Realizer
         // run request
         chart.initialize();
         chart.combine(timeLimitMS, waitForCompleteEdge);
-        int numEdges = chart.numEdgesInChart();
+        //int numEdges = chart.numEdgesInChart();
         chart.printEdges(true, true);
         // XXX tmp
     	// if no complete edge, try again gluing fragments

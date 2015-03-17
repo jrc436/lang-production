@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
-import java.io.FileWriter;
-import java.io.File;
 
 import opennlp.ccg.lexicon.Word;
 import opennlp.ccg.synsem.Sign;
@@ -39,7 +37,7 @@ public class ACTRNgramModel extends StandardNgramModel {
 			activation = Math.pow(5.0 * Math.log(0.5) / Math.log(1.0 - prior), negD);
 		}
 		activation = Math.exp(activation) - 1;
-    		return prior * activation;
+    	return prior * activation;
 	}
 
 	private HashSet<Integer> getNgramsFromSentence(String sentence) {
@@ -56,8 +54,10 @@ public class ACTRNgramModel extends StandardNgramModel {
 		}
 		return ngrams;
 	}
-	
-	public synchronized void updateActivationTable(String sentence) {
+	/**
+	 * update the activation table
+	 */
+	public synchronized void updateAfterRealization(String sentence) {
 		// first need to parse the sentence into n-grams
 		HashSet<Integer> ngrams = getNgramsFromSentence(sentence);
 		double time_approximate = ((double) sentence.split(" ").length) / (196.0 / 60.0);//196 wpm

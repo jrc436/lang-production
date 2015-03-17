@@ -19,7 +19,7 @@ import opennlp.ccg.util.Pair;
  * @version $Revision: 1.3 $
  * @since 0.9.2
  */
-abstract class AbstractStandardNgramModel extends NgramScorer {
+public abstract class AbstractStandardNgramModel extends NgramScorer {
 
 	/** Reusable list of strings to score. */
     protected List<String> stringsToScore = new ArrayList<String>();
@@ -34,6 +34,13 @@ abstract class AbstractStandardNgramModel extends NgramScorer {
 		super(order, useSemClasses);
 		numNgrams = new int[order];
 	}
+    /**
+     * This allows an ngram model to update its scoring methodology after each realization. Primarily
+     * implemented for the ACTR language model
+     */
+    public void updateAfterRealization(String realized) {
+    	
+    }
 
     /**
      * Creates a new ngram model with the specified order.

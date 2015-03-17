@@ -1,6 +1,8 @@
-i = 650
+import sys
 
-conf = file("config.xml", 'w')
+i = int(sys.argv[1])
+fw = sys.argv[2]+"config.xml"
+conf = file(fw, 'w')
 conf.write('<ROUGE-EVAL version="1.0">\n')
 
 asID = "actr-swm1"
@@ -14,10 +16,10 @@ for line in range(i):
 	
 	conf.write('<EVAL ID="SWBD-'+lineF+'">\n')
         conf.write("<PEER-ROOT>\n")
-        conf.write("actup/realizations\n")
+        conf.write(sys.argv[2]+"realizations\n")
         conf.write("</PEER-ROOT>\n")
         conf.write("<MODEL-ROOT>\n")
-	conf.write("actup/gold\n")
+	conf.write(sys.argv[2]+"gold\n")
         conf.write("</MODEL-ROOT>\n")
         conf.write('<INPUT-FORMAT TYPE="SPL">\n')
         conf.write("</INPUT-FORMAT>\n")

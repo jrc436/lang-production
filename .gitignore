@@ -23,6 +23,9 @@
 *.sql
 *.sqlite
 
+config.xml
+rouge/realizations/*
+
 .DS_Store
 .DS_Store?
 ._*

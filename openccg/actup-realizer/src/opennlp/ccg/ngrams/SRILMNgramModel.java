@@ -33,7 +33,7 @@ public class SRILMNgramModel extends AbstractStandardNgramModel {
 	 * @throws UnsatisfiedLinkError If Java can't find the srilmbridge library.
 	 */
 	static {
-		System.loadLibrary("srilmbridge");
+		//System.loadLibrary("srilmbridge");
 	}
 	
 	/**

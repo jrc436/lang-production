@@ -10,9 +10,9 @@ import java.nio.file.Paths;
 //forgot to commit a simple file and don't want to cause git collisions
 
 public class Client {
-	//private static final String basePath = "/Users/jrc/Public/jrc-research/";
-	private static final String basePath = "/work/research/";
-	private static final String trialName = "trial-18";
+	private static final String basePath = "/Users/jrc/Public/jrc-research/";
+	//private static final String basePath = "/work/research/";
+	private static final String trialName = "full-eval";
 	
 	private static final String experimentPath = basePath+"ap-largefiles/experiment/";
 	private static final String outPath = experimentPath+"output/"+trialName+".txt";
@@ -44,11 +44,16 @@ public class Client {
 		File[] input = new File(parsedPath).listFiles();
 		int fileCount = input.length; //this is just to make the config at the end.
 		
-		Files.createDirectory(Paths.get(trialPath));
-		
-		//WSJ time
+		try {
+			Files.createDirectory(Paths.get(trialPath));
+		}
+		catch (Exception e) {
+			System.err.print("YOU ARE OVERWRITING A RUN!!!!!");
+		}
+		String type = "";
+//		//WSJ time
 		r.setLM(ACTRTrial, wsj_lm_dir+"wsj.lm");
-		String type = runType + "wsj-";
+		type = runType + "wsj-";
 		for (File in : input) {
 			String num = in.getName().split("-")[1];
 			System.out.println("Beginning to realize: "+num);

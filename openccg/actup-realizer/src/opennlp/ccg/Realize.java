@@ -106,9 +106,10 @@ public class Realize
 
 	        realizer.realize(lf, ngramScorer);	        
 	        Chart chart = realizer.getChart();
+	     
+	        out.println(chart.getBestEdgeAsText());
 	        ngramScorer.updateAfterRealization(goals[i]);
 	        
-	        out.println(chart.getBestEdgeAsText());
 	        out.flush();
 	    }
     }

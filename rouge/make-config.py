@@ -28,14 +28,14 @@ for line in range(i):
 	#actr-swbd, actr-wsj, std-swbd, std-wsj
 	conf.write('<P ID="'+asID+'">'+asID+'-'+lineF+".spl"+'</P>\n')
         conf.write('<P ID="'+awID+'">'+awID+'-'+lineF+".spl"+'</P>\n')
-	#conf.write('<P ID="'+ssID+'">'+ssID+'-'+lineF+".spl"+'</P>\n')
-	#conf.write('<P ID="'+swID+'">'+swID+'-'+lineF+".spl"+'</P>\n')
+	conf.write('<P ID="'+ssID+'">'+ssID+'-'+lineF+".spl"+'</P>\n')
+	conf.write('<P ID="'+swID+'">'+swID+'-'+lineF+".spl"+'</P>\n')
 	conf.write("</PEERS>\n")
         conf.write("<MODELS>\n")
         conf.write('<M ID="'+asID+'">'+goals+'-'+lineF+'.spl</M>\n')
 	conf.write('<M ID="'+awID+'">'+goals+'-'+lineF+'.spl</M>\n')
-	#conf.write('<M ID="'+ssID+'">'+goals+'-'+lineF+'.spl</M>\n')
-	#conf.write('<M ID="'+swID+'">'+goals+'-'+lineF+'.spl</M>\n')
+	conf.write('<M ID="'+ssID+'">'+goals+'-'+lineF+'.spl</M>\n')
+	conf.write('<M ID="'+swID+'">'+goals+'-'+lineF+'.spl</M>\n')
 	conf.write("</MODELS>\n")
         conf.write("</EVAL>\n")
 

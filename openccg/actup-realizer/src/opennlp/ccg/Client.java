@@ -60,6 +60,7 @@ public class Client {
 			System.out.println("This realization is a: " + type);
 			String outPath = trialPath+type+num+".spl";
 			r.realize(in.getPath(), outPath);
+			r.cleanLM();
 		}
 		
 		//SWM1 time

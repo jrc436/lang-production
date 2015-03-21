@@ -51,6 +51,9 @@ public class ACTRNgramModel extends StandardNgramModel {
 		//activation = Math.exp(activation) - 1;
     	return actProb;//activation;
 	}
+	public void clean() {
+		nGramPresentations = new Presentations(k);
+	}
 	private HashSet<String> getNgramsFromSentence(String sentence) {
 		HashSet<String> ngrams = new HashSet<String>();
 		String[] words = sentence.split(" ");

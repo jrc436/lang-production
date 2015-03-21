@@ -41,6 +41,12 @@ public abstract class AbstractStandardNgramModel extends NgramScorer {
     public void updateAfterRealization(String realized) {
     	
     }
+    /**
+     * This clears any intermediate data used for a single realization
+     */
+    public void clean() {
+    	
+    }
 
     /**
      * Creates a new ngram model with the specified order.

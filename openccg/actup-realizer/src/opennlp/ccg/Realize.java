@@ -62,6 +62,13 @@ public class Realize
     	this.ngramScorer = useACTR ? new ACTRNgramModel(4, modelFile) : new StandardNgramModel(4, modelFile);     
         System.out.println(ngramScorer.getClass());   
    }
+   protected boolean cleanLM() {
+	   if (ngramScorer == null) {
+		   return false;
+	   }
+	   ngramScorer.clean();
+	   return true;
+   }
    private List<Element> prepareInput(String inputfile) throws IOException {
     	 Document doc = grammar.loadFromXml(inputfile);
     	 Element root = doc.getRootElement();

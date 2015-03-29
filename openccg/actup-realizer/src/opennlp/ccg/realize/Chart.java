@@ -67,7 +67,7 @@ public class Chart
     
     //PREFERENCES
     public static final int EDGE_LIMIT = NO_EDGE_LIMIT;
-    public static final int TIME_LIMIT = NO_TIME_LIMIT;
+    public static final int TIME_LIMIT = 150;
     public static final double NEW_BEST_TIME_LIMIT = NO_TIME_LIMIT;
     public static final int CELL_PRUNING_VALUE = NO_PRUNING;
     public static final int PRUNING_VALUE = NO_PRUNING;  
@@ -86,7 +86,7 @@ public class Chart
 
     public boolean depthFirst = false;              
     /** Flag for whether to join best fragments if no complete realization found.  Defaults to false. */
-    public boolean joinFragments = false;
+    public boolean joinFragments = true;
 
     /** Flag for whether to glue fragments currently. Defaults to false. */
     public boolean gluingFragments = false;
@@ -204,14 +204,14 @@ public class Chart
     public Chart(EdgeFactory edgeFactory, PruningStrategy pruningStrategy) {
         this.edgeFactory = edgeFactory;
         this.pruningStrategy = pruningStrategy;
-        newBestTimeLimitPct = NO_TIME_LIMIT;
+        newBestTimeLimitPct = TIME_LIMIT;
         if (newBestTimeLimitPct >= 1) {
             newBestTimeLimit = (int) newBestTimeLimitPct;
-            newBestTimeLimitPct = NO_TIME_LIMIT; 
+            newBestTimeLimitPct = TIME_LIMIT; 
         }
-        edgeLimit = NO_EDGE_LIMIT;
-        pruningValue = NO_PRUNING;
-        cellPruningValue = NO_PRUNING;
+        edgeLimit = EDGE_LIMIT;
+        pruningValue = PRUNING_VALUE;
+        cellPruningValue = CELL_PRUNING_VALUE;
         usePacking = USE_PACKING; 
         collectCombos = !usePacking && USE_COMBOS;
         doUnpacking = usePacking && DO_UNPACKING;
@@ -643,7 +643,7 @@ public class Chart
         out.flush();
     }
     
-    public String getBestEdgeAsText() {
+    public Realization getBestRealization(String goal) {
     	printEdge(bestEdge);
         if (!edgeFactory.labeledNominals.isEmpty()) {
             try {
@@ -658,7 +658,7 @@ public class Chart
             }
         }
         String bracketedEdge = bestEdge.sign.getBracketedString();
-        return bracketedEdge.replace(")", "").replace("(", "");
+        return new Realization(bracketedEdge.replace(")", "").replace("(", ""), goal, bestEdge.complete());
     }
     
     /** Prints the best joined edge. */

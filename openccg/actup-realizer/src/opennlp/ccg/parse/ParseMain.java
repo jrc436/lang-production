@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package opennlp.ccg;
+package opennlp.ccg.parse;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -31,9 +31,6 @@ import opennlp.ccg.grammar.Grammar;
 import opennlp.ccg.hylo.HyloHelper;
 import opennlp.ccg.hylo.Nominal;
 import opennlp.ccg.lexicon.Tokenizer;
-import opennlp.ccg.parse.ParseException;
-import opennlp.ccg.parse.Parser;
-import opennlp.ccg.parse.Supertagger;
 import opennlp.ccg.parse.supertagger.WordAndPOSDictionaryLabellingStrategy;
 import opennlp.ccg.synsem.Category;
 import opennlp.ccg.synsem.LF;
@@ -54,7 +51,12 @@ import org.jdom.output.XMLOutputter;
  * @author      Michael White
  * @version     $Revision: 1.2 $, $Date: 2010/10/28 02:46:32 $
  */
-public class Parse {		
+
+//parser config
+//public static final int nBestListSize = 1;
+//public static final String defaultScorer = "opennlp.ccg.ngrams.NgramPrecisionModel";
+//public static final String defaultConfig = "../../config/tagger/stconfig";
+public class ParseMain {		
 	public void parseMain(String grammarfile, String inputfile, String outputfile, String parseScorerClass, String stconfig, int nBestListSize) throws IOException {
               
 		// make test doc, sign map

@@ -11,10 +11,14 @@
 <PEERS>
 <P ID="actr-swm1">actr-swm1-000.spl</P>
 <P ID="actr-wsj">actr-wsj-000.spl</P>
+<P ID="std-swm1">std-swm1-000.spl</P>
+<P ID="std-wsj">std-wsj-000.spl</P>
 </PEERS>
 <MODELS>
 <M ID="actr-swm1">gold-000.spl</M>
 <M ID="actr-wsj">gold-000.spl</M>
+<M ID="std-swm1">gold-000.spl</M>
+<M ID="std-wsj">gold-000.spl</M>
 </MODELS>
 </EVAL>
 </ROUGE-EVAL>

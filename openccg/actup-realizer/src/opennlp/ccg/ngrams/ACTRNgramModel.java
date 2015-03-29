@@ -11,15 +11,18 @@ import opennlp.ccg.synsem.Sign;
 
 
 public class ACTRNgramModel extends StandardNgramModel {
-	private static final double negD = -0.16; //hindi paper acl
-	private static final double words_per_ngram = 1.0; //pulled from thin air
-	private static final double speaking_rate = 196.0; //cite swbd speaking rate paper
-	private static final double year_seconds = 31557600; //365.25 * 24 * 3600	
-	private static final double exposure_years = 15; //cite david
-	private static final double percentage_speaking_prior = 0.2; //pulled from thin air
-	private static final int k = 3; //pulled from thin air
+	private final double negD; //hindi paper acl	
+	private final double exposure_years; //cite david
+	private final double percentage_speaking_prior; //pulled from thin air
+	private final int k;
 	
-	private static final double exposure_seconds = year_seconds * exposure_years;
+	private static final double speaking_rate = 196.0; //cite swbd speaking rate paper
+	private static final double words_per_ngram = 1.0; //pulled from thin air, but I believe this should always be 1.0, see speaking_rate_eff
+	private static final double year_seconds = 31557600; //365.25 * 24 * 3600	
+	private final double exposure_seconds;
+	
+	//the first division is to convert it into words / second. The second division is to convert it into ngrams / second. 
+	//Realistically, as we're really using this to compute the TIME that's passing, NOT the ngrams, words_per_ngram shoudl always be 1.0
 	private static final double speaking_rate_eff = (speaking_rate / 60.0) / words_per_ngram;
 	
 	private double convoElapsedTime = 0.0;
@@ -32,8 +35,13 @@ public class ACTRNgramModel extends StandardNgramModel {
 	//the most recent timestamp is always stored at 0, the least recent at k
 	private Presentations nGramPresentations;
 	
-	public ACTRNgramModel(int order, String modelFile) throws IOException {
+	public ACTRNgramModel(double negD, double ey, double psp, int k, int order, String modelFile) throws IOException {
 		super(order, modelFile);
+		this.k = k;
+		this.exposure_years = ey;
+		this.negD = negD;
+		this.percentage_speaking_prior = psp;
+		this.exposure_seconds = year_seconds * exposure_years;
 		nGramPresentations = new Presentations(k);
 	}
 	public synchronized double score(Sign sign, boolean complete) {
@@ -141,16 +149,16 @@ public class ACTRNgramModel extends StandardNgramModel {
 		}
 		private void addBaseRecency(Chunk c, double totalTime, int numPresentations) {
 			double N = (double) numPresentations;
-			double interval = exposure_seconds / N;
+			double interval = exposure_seconds / (N+2); //add two, because we're starting at one interval from t0 and ending one interval before the convo
 			for (int i = 0; i < depth; i++) {
 				double j = (double) (i+1);
-				c.addPresentation((totalTime - exposure_seconds) + j * interval);
+				c.addPresentation((totalTime - exposure_seconds) + j * interval, false); //these presentations were already added to the numPresentations, so don't need to be added again
 			}
 		}
 		private int calculateNumPresentations(double ngramPrior) {
 			//subtracting k because those will be added when we add them as baserecency
 			int numPresentations = (int) Math.round(exposure_seconds * ngramPrior * speaking_rate_eff * percentage_speaking_prior);
-			return Math.max(1, numPresentations - depth);
+			return Math.max(depth, numPresentations); //need at least depth presentations for it to really make sense...
 		}
 		private double calculateInitTime(int numPresentations, double totalTime) {
 			double N = (double) numPresentations;
@@ -216,6 +224,9 @@ public class ACTRNgramModel extends StandardNgramModel {
 		}
 		
 		public double t_k() {
+			if (recentP.length == 0) {
+				return 0;
+			}
 			return recentP[recentP.length-1]; //returns the least recent still tracked timestamp as desired by the equation
 		}
 		
@@ -233,10 +244,10 @@ public class ACTRNgramModel extends StandardNgramModel {
 		}
 		
 		public void addPresentation() {
-			addPresentation(0.0);
+			addPresentation(0.0, true);
 		}
 		
-		public void addPresentation(double t) {
+		public void addPresentation(double t, boolean counts) {
 			for (int i = 0; i < recentP.length; i++) {
 				//times here refer to "how many seconds ago"
 				if (recentP[i] > t) {
@@ -251,7 +262,9 @@ public class ACTRNgramModel extends StandardNgramModel {
 					break;
 				}
 			}
-			totalP++;
+			if (counts) {
+				totalP++;
+			}
 		}
 		
 		public void decay(double time) {

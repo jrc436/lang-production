@@ -7,11 +7,12 @@ import optimization.VariableSet;
 
 //temporary solution...
 public class Settings {
-	//private static final String basePath = "/Users/jrc/Public/jrc-research/";
-	protected static final String basePath = "/work/research/"; //basepath refers to where the research dir is located
+	protected static final String basePath = "/Users/jrc/Public/jrc-research/";
+	//protected static final String basePath = "/work/research/"; //basepath refers to where the research dir is located
 	protected static final String trialSet = "actr-valley-climb-word"; //trialset refers to a single optimization run's name
 	protected static final int iterCap = 10000; //number of iterations before it terminates
 	protected static final int NumConcurrentStarts = 8; //should be roughly equal to number of processors
+	protected static final int NumRandomRestarts = 800;
 	private static final int startIndex = ACTRNgramModel.ey_index;
 	protected static final ModelType mType = ModelType.ACTR;
 	protected static final TrainingSet trSet = TrainingSet.SWBD;

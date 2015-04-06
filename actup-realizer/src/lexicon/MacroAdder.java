@@ -19,12 +19,20 @@
 
 package lexicon;
 
-import synsem.*;
-import util.*;
-import unify.*;
-import hylo.*;
+import grammar.Grammar;
+import hylo.HyloHelper;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import synsem.AtomCat;
+import synsem.Category;
+import synsem.LF;
+import unify.FeatureStructure;
+import unify.ModFcn;
+import unify.Mutable;
+import util.IntHashSetMap;
 
 /**
  * Adds the features from macros to a category.
@@ -38,10 +46,16 @@ public class MacroAdder {
 
     private IntHashSetMap _specificMacros;
     private List<MacroItem> _macroItems; // for LF macros
-
-    public MacroAdder(IntHashSetMap sm, List<MacroItem> macroItems) {
+    private final Grammar grammar;
+    
+    public MacroAdder(IntHashSetMap sm, List<MacroItem> macroItems, Grammar grammar) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         _specificMacros = sm;
         _macroItems = macroItems;
+        this.grammar = grammar;
     }
 
     public void addMacros(Category cat) {
@@ -61,11 +75,11 @@ public class MacroAdder {
                     );
                     continue;
                 }
-                lf = HyloHelper.append(lf, pred);
+                lf = HyloHelper.append(grammar, lf, pred);
             }
         }
         // sort and reset LF
-        HyloHelper.sort(lf);
+        HyloHelper.sort(grammar, lf);
         cat.setLF(lf);
     }
     

@@ -33,9 +33,10 @@ public class ForwardApplication extends AbstractApplicationRule {
 
 	private static final long serialVersionUID = 1336124476870410093L;
 
-	public ForwardApplication() {
+	public ForwardApplication(Grammar grammar) {
+		super(grammar);
 		_name = ">";
-		_functorSlash = new Slash('/');
+		_functorSlash = new Slash(grammar, '/');
 		_functorSlash.setAbility("active");
 	}
 

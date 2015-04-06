@@ -54,9 +54,10 @@ public class TypeChangingRule extends AbstractRule implements LexSemOrigin {
 
 
     /** Constructor. */
-    public TypeChangingRule(Category arg, Category result, String name, LF firstEP) {
-        _arg = arg; _result = result; _name = name.intern(); _firstEP = firstEP;
-        setOrigin();
+    public TypeChangingRule(Grammar grammar, Category arg, Category result, String name, LF firstEP) {
+    	super(grammar);
+    	_arg = arg; _result = result; _name = name.intern(); _firstEP = firstEP;
+    	setOrigin();
     }
 
 
@@ -97,7 +98,7 @@ public class TypeChangingRule extends AbstractRule implements LexSemOrigin {
 
         // unify
         Substitution sub = new GSubstitution();
-        GUnifier.unify(input, arg, sub);
+        GUnifier.unify(grammar, input, arg, sub);
         ((GSubstitution)sub).condense();
 
         // fill in result

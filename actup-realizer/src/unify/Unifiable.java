@@ -17,6 +17,7 @@
 //////////////////////////////////////////////////////////////////////////////
 package unify;
 
+
 /**
  * An interface for classes that may be unified.
  * 
@@ -46,11 +47,11 @@ public interface Unifiable {
 
 	/**
 	 * Unify this Unfiable with another Object.
-	 * 
-	 * @param o
-	 *            object to unify with
 	 * @param s
 	 *            Substitution containing the variable resolutions
+	 * @param o
+	 *            object to unify with
+	 * 
 	 * @exception UnifyFailure
 	 *                if this Unifiable cannot be unified with the Object
 	 * @return an object which represents the unification of this Unifiable with
@@ -80,9 +81,9 @@ public interface Unifiable {
 	/**
 	 * Replaces any variables in this Unifiable with the values found for them
 	 * in the Substitution argument.
-	 * 
 	 * @param s
 	 *            Substitution containing the variable resolutions
+	 * 
 	 * @return a copy of this Unifiable with all variables from the Substitution
 	 *         replaced by their values.
 	 */

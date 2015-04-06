@@ -19,6 +19,7 @@
 package synsem;
 
 import gnu.trove.TObjectIntHashMap;
+import grammar.Grammar;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -45,31 +46,48 @@ public final class SetArg implements Arg, Serializable {
 	private static final long serialVersionUID = -7067480310511294657L;
 	
 	private ArgStack _args;
+	
+	private final Grammar grammar;
 
 	@SuppressWarnings("unchecked")
-	public SetArg(Element el) {
+	public SetArg(Grammar grammar, Element el) {
+		if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+		this.grammar = grammar;
 		List<Element> info = el.getChildren();
 		List<Arg> args = new ArrayList<Arg>();
 		for (Iterator<Element> infoIt = info.iterator(); infoIt.hasNext();) {
-			Slash s = new Slash(infoIt.next());
-			Category c = CatReader.getCat(infoIt.next());
+			Slash s = new Slash(grammar, infoIt.next());
+			Category c = CatReader.getCat(grammar, infoIt.next());
 			args.add(new BasicArg(s, c));
 		}
 		Arg[] list = new Arg[args.size()];
 		args.toArray(list);
-		_args = new ArgStack(list);
+		_args = new ArgStack(grammar, list);
 	}
 
-	public SetArg(Arg[] args) {
-		_args = new ArgStack(args);
+	public SetArg(Grammar grammar, Arg[] args) {
+		if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+		this.grammar = grammar;
+		_args = new ArgStack(grammar, args);
 	}
 
-	public SetArg(ArgStack args) {
+	public SetArg(Grammar grammar, ArgStack args) {
+		if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
 		_args = args;
+		this.grammar = grammar;
 	}
 
 	public Arg copy() {
-		return new SetArg(_args.copy());
+		return new SetArg(grammar, _args.copy());
 	}
 
 	public void add(ArgStack as) {
@@ -88,7 +106,7 @@ public final class SetArg implements Arg, Serializable {
 				return _args.get(0);
 			}
 		} else {
-			return new SetArg(_args.copyWithout(pos));
+			return new SetArg(grammar, _args.copyWithout(pos));
 		}
 	}
 
@@ -109,7 +127,7 @@ public final class SetArg implements Arg, Serializable {
 		for (int i = 0; i < _args.size() && index < 0; i++) {
 			try {
 				a.unifySlash(((BasicArg) _args.get(i)).getSlash());
-				GUnifier.unify(getCat(i), a.getCat());
+				GUnifier.unify(grammar, getCat(i), a.getCat());
 				index = i;
 			} catch (UnifyFailure uf) {
 			}
@@ -126,7 +144,7 @@ public final class SetArg implements Arg, Serializable {
 		int index = -1;
 		for (int i = 0; i < _args.size() && index < 0; i++) {
 			try {
-				GUnifier.unify(getCat(i), cat);
+				GUnifier.unify(grammar, getCat(i), cat);
 				index = i;
 			} catch (UnifyFailure uf) {
 			}
@@ -177,7 +195,7 @@ public final class SetArg implements Arg, Serializable {
 	}
 
 	public Object fill(Substitution s) throws UnifyFailure {
-		return new SetArg(_args.fill(s));
+		return new SetArg(grammar, _args.fill(s));
 	}
 
 	public void deepMap(ModFcn mf) {

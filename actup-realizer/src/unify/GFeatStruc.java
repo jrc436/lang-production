@@ -49,18 +49,29 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
 	boolean _empty = true;
     int _index = 0;
     int _inheritsFrom = 0;
+    private final Grammar grammar;
     
-    public GFeatStruc() {
-        super(3);
+    public GFeatStruc(Grammar grammar) {
+        this(grammar, 3);
     }
 
-    public GFeatStruc(int i) {
+    public GFeatStruc(Grammar grammar, int i) {
         super(i);
+        if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+        this.grammar = grammar;
     }
 
     @SuppressWarnings("unchecked")
-	public GFeatStruc(Element fsEl) {
+	public GFeatStruc(Grammar grammar, Element fsEl) {
         super(fsEl.getChildren().size());
+        if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+        this.grammar = grammar;
         String index = fsEl.getAttributeValue("id");
         if (index != null) {
             _index = Integer.parseInt(index);
@@ -105,19 +116,19 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
         if (val == null) val = e.getAttributeValue("v");
         Object value;
         if (val != null) {
-            value = Grammar.theGrammar.types.getSimpleType(val);
+            value = grammar.types.getSimpleType(val);
         } else {
             Element valEl = (Element)e.getChildren().get(0);
             if (valEl.getName().equals("featvar") || valEl.getName().equals("fvar")) {
                 String[] name = valEl.getAttributeValue("name").split(":");
                 if (name[0]==null) name = valEl.getAttributeValue("n").split(":",2);
                 if (name.length<2) {
-                    value = new GFeatVar(name[0]);
+                    value = new GFeatVar(grammar, name[0]);
                 }
                 else
-                    value = new GFeatVar(name[0], Grammar.theGrammar.types.getSimpleType(name[1]));
+                    value = new GFeatVar(grammar, name[0], grammar.types.getSimpleType(name[1]));
             } else {
-                value = HyloHelper.getLF((Element)e.getChildren().get(0));
+                value = HyloHelper.getLF(grammar, (Element)e.getChildren().get(0));
             }
         }
         setFeature(attr, value);
@@ -168,7 +179,7 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
     public int hashCode() { return super.hashCode() + _index; }
 
     public FeatureStructure copy() { 
-        GFeatStruc $fs = new GFeatStruc(size());
+        GFeatStruc $fs = new GFeatStruc(grammar, size());
         $fs.setIndex(_index);
         $fs._inheritsFrom = _inheritsFrom;
         for (Iterator<String> i=getAttributes().iterator(); i.hasNext();) {
@@ -237,7 +248,7 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
         } 
 
         FeatureStructure fs2 = (FeatureStructure)u;
-        FeatureStructure $fs = new GFeatStruc(size());
+        FeatureStructure $fs = new GFeatStruc(grammar, size());
         Set<String> keys1 = getAttributes();
         Set<String> keys2 = fs2.getAttributes();
         for (Iterator<String> i1=keys1.iterator(); i1.hasNext();) {
@@ -282,7 +293,7 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
             if (value instanceof Variable) {
                 Object varVal = sub.getValue((Variable)value);
                 if (null != varVal) {
-                    $fs.setFeature(a, Unifier.unify(value,varVal,sub));
+                    $fs.setFeature(a, Unifier.unify(value, varVal,sub));
                 }
             }
         }
@@ -337,7 +348,7 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
         
         if (_empty) return sb.toString();
 
-        String featsToShow = Grammar.theGrammar.featsToShow;
+        String featsToShow = grammar.featsToShow;
 
         sb.append('{');
 
@@ -378,7 +389,7 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
         StringBuffer sb = new StringBuffer();
         ArrayList<String> attrs = new ArrayList<String>(getAttributes());
         Collections.sort(attrs);
-        Set<String> supertagFeatures = Grammar.theGrammar.supertagFeatures;
+        Set<String> supertagFeatures = grammar.supertagFeatures;
         for (int i = 0; i < attrs.size(); i++) {
             String attr = attrs.get(i);
             if (!supertagFeatures.contains(attr)) continue;
@@ -426,7 +437,7 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
             sb.append(" \\subsf{ < "); sb.append(_index); sb.append(" > } ");
         }
         if (_empty) return sb.toString();
-        String featsToShow = Grammar.theGrammar.featsToShow;
+        String featsToShow = grammar.featsToShow;
         sb.append(" \\subsf{ ");
         if ((_index > 0)) {
             sb.append("  < "); sb.append(_index); sb.append(" > ");

@@ -18,6 +18,7 @@
 
 package unify;
 
+
 /**
  * Interface for functions which modify Mutable objects.
  *
@@ -28,7 +29,6 @@ public interface ModFcn {
 
     /**
      * Changes a Mutable object in some way.
-     *
      * @param mf a function to be applied
      **/
     public void modify (Mutable m);

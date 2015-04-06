@@ -19,6 +19,7 @@
 package synsem;
 
 import gnu.trove.TObjectIntHashMap;
+import grammar.Grammar;
 
 import java.io.Serializable;
 
@@ -47,16 +48,22 @@ public final class Dollar implements Arg, Variable, Mutable, Indexed, Serializab
 	private int _index = 0;
 
 	private boolean _hasMostGeneralSlash = false;
+	protected final Grammar grammar;
 
-	public Dollar(String name) {
-		this(new Slash(), name);
+	public Dollar(Grammar grammar, String name) {
+		this(grammar, new Slash(grammar), name);
 	}
 
-	public Dollar(Slash s, String name) {
-		this(s, name, 0);
+	public Dollar(Grammar grammar, Slash s, String name) {
+		this(grammar, s, name, 0);
 	}
 
-	public Dollar(Slash s, String name, int id) {
+	public Dollar(Grammar grammar, Slash s, String name, int id) {
+		if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+		this.grammar = grammar;
 		_slash = s;
 		_name = name;
 		_index = id;
@@ -78,7 +85,7 @@ public final class Dollar implements Arg, Variable, Mutable, Indexed, Serializab
 	}
 
 	public Arg copy() {
-		return new Dollar(_slash.copy(), _name, _index);
+		return new Dollar(grammar, _slash.copy(), _name, _index);
 	}
 
 	public void forall(CategoryFcn fcn) {

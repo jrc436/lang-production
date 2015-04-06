@@ -18,6 +18,7 @@
 
 package unify;
 
+import grammar.Grammar;
 import synsem.AtomCat;
 import synsem.Category;
 import synsem.ComplexCat;
@@ -30,11 +31,19 @@ import synsem.ComplexCat;
  */
 public class GUnifier { 
 
-    public static Category unify (Category c1, Category c2) throws UnifyFailure {
-        return (Category)unify(c1, c2, new EmptySubstitution());
+    public static Category unify (Grammar grammar, Category c1, Category c2) throws UnifyFailure {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+        return (Category)unify(grammar, c1, c2, new EmptySubstitution());
     }
 
-    public static Category unify (Category c1, Category c2, Substitution sub) throws UnifyFailure {
+    public static Category unify (Grammar grammar, Category c1, Category c2, Substitution sub) throws UnifyFailure {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         if (c1 instanceof AtomCat && c2 instanceof ComplexCat) {
             c2.unifyCheck(c1);
             return (Category)c2.unify(c1, sub);

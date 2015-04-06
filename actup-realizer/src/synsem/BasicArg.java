@@ -85,8 +85,7 @@ public final class BasicArg implements Arg, Serializable {
 	public Object unify(Object u, Substitution sub) throws UnifyFailure {
 		if (u instanceof BasicArg) {
 			return new BasicArg((Slash) _slash
-					.unify(((BasicArg) u)._slash, sub), (Category) _cat.unify(
-					((BasicArg) u)._cat, sub));
+					.unify(((BasicArg) u)._slash, sub), (Category) _cat.unify(((BasicArg) u)._cat, sub));
 		} else {
 			throw new UnifyFailure();
 		}

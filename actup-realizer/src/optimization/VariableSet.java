@@ -1,5 +1,7 @@
 package optimization;
 
+import java.util.Random;
+
 public class VariableSet {
 	private Variable[] vars;
 	private int currentIndex;
@@ -69,6 +71,7 @@ public class VariableSet {
 		for (int i = 0; i < vars.length; i++) {
 			vars[i].resetValueRandom(); //this will produce a value between 0 and 1, so it has to be normalized with the range...
 		}
+		this.currentIndex = vars.length == 0 ? 0 : new Random().nextInt(vars.length);
 	}
 	protected void forceAll(double[] vals) {
 		for (int i = 0; i < vars.length; i++) {

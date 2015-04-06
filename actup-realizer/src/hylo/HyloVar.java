@@ -21,7 +21,9 @@ package hylo;
 import grammar.*;
 import synsem.*;
 import unify.*;
+
 import org.jdom.*;
+
 import gnu.trove.*;
 
 /**
@@ -41,19 +43,22 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
     protected int _hashCode;
     protected SimpleType type;
     
-    public HyloVar(String name) {
-        this(name, 0, null);
+    
+    public HyloVar(Grammar grammar, String name) {
+        this(grammar, name, 0, null);
     }
 
-    public HyloVar(String name, SimpleType st) {
-        this(name, 0, st);
+    public HyloVar(Grammar grammar, String name, SimpleType st) {
+        this(grammar, name, 0, st);
     }
 
-    protected HyloVar(String name, int index, SimpleType st) {
-        _name = name;
+    protected HyloVar(Grammar grammar, String name, int index, SimpleType st) {
+    	super(grammar);
+    	_name = name;
         _index = index;
-        type = (st != null) ? st : Grammar.theGrammar.types.getSimpleType(Types.TOP_TYPE);
+        type = (st != null) ? st : grammar.types.getSimpleType(Types.TOP_TYPE);
         _hashCode = _name.hashCode() + _index + type.getIndex();
+        
     }
     
     public String name() {
@@ -61,7 +66,7 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
     }
 
     public LF copy() {
-        return new HyloVar(_name, _index, type);
+        return new HyloVar(grammar, _name, _index, type);
     }
 
 
@@ -124,7 +129,7 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
             // otherwise make new hylo var with intersection type, 
             // name based on comparison order and index, and new index
             String name = (compareTo(u_hv) >= 0) ? (u_hv._name + u_hv._index) : (_name + this._index);
-            HyloVar hv_st = new HyloVar(name, UnifyControl.getUniqueVarIndex(), st);
+            HyloVar hv_st = new HyloVar(grammar, name, UnifyControl.getUniqueVarIndex(), st);
             // and subst both
             sub.makeSubstitution(u_hv, hv_st);
             return sub.makeSubstitution(this, hv_st); 
@@ -135,7 +140,7 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
             // if no or same type, just subst
             if (st == null || prop.getType().equals(st)) return sub.makeSubstitution(this, prop);
             // otherwise subst prop with name of type
-            Proposition prop_st = new Proposition(st.getName(), st); 
+            Proposition prop_st = new Proposition(grammar, st.getName(), st); 
             return sub.makeSubstitution(this, prop_st);
         }
         // otherwise, do occurs check ... 

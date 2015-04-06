@@ -18,11 +18,15 @@
 
 package hylo;
 
-import synsem.*;
-import util.Pair;
+import grammar.Grammar;
 
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import synsem.LF;
+import util.Pair;
 
 /**
  * A class implementing LF scoring in terms of recall and precision 
@@ -73,10 +77,14 @@ public class EPsScorer {
 	/**
 	 * Returns the results of scoring an LF against a gold LF.
 	 */
-	public static Results score(LF lf, LF goldLF) {
+	public static Results score(Grammar grammar, LF lf, LF goldLF) {
+		if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
 		// get EPs
-		List<SatOp> eps = HyloHelper.flatten(lf);
-		List<SatOp> goldEPs = HyloHelper.flatten(goldLF);
+		List<SatOp> eps = HyloHelper.flatten(grammar, lf);
+		List<SatOp> goldEPs = HyloHelper.flatten(grammar, goldLF);
 		Set<SatOp> epsSet = new HashSet<SatOp>(eps);
 		Set<SatOp> goldEPsSet = new HashSet<SatOp>(goldEPs);
 		// get unlabeled deps

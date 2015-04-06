@@ -19,12 +19,19 @@
 package hylo;
 
 
-import synsem.*;
-import util.*;
+import gnu.trove.TIntArrayList;
+import grammar.Grammar;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Stack;
 
-import gnu.trove.*;
+import synsem.LF;
+import util.ListMap;
 
 /**
  * A class for performing flattening operations on LFs.
@@ -59,11 +66,13 @@ public class Flattener {
 	// map from nominal to highest parent nominal in original expression, or null if a root
 	private Map<Nominal,Nominal> parentMap = new HashMap<Nominal,Nominal>();
 	
-	// null nominal for use in dummy parents during flattening
-	private static Nominal nullNom = new NominalAtom("null");
-
+//	// null nominal for use in dummy parents during flattening
+	private Nominal nullNom;
 	// null prop for use in dummy parents during flattening
-	private static Proposition nullProp = new Proposition("null");
+	private Proposition nullProp;
+	private final Grammar grammar;
+
+	
 
 	/**
 	 * Returns a map from a nominal to its highest parent nominal in the original expression, 
@@ -71,6 +80,15 @@ public class Flattener {
 	 */
 	public Map<Nominal,Nominal> getHighestParentMap() {
 		return parentMap;
+	}
+	public Flattener(Grammar grammar) {
+		if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+		this.nullNom =  new NominalAtom(grammar, "null"); 
+		this.grammar = grammar;
+		this.nullProp = new Proposition(grammar, "null");
 	}
 	
     /**
@@ -87,11 +105,7 @@ public class Flattener {
     }
 
     // recursive flattening, with conversion of alts and opts
-    private void flatten(
-        LF lf, 
-        Nominal currentNominal, SatOp parent, int depth, 
-        Stack<Alt> alts, TIntArrayList opts
-    ) {
+    private void flatten(LF lf, Nominal currentNominal, SatOp parent, int depth, Stack<Alt> alts,  TIntArrayList opts) {
         if (lf instanceof SatOp) {
             // flatten arg with new current nominal
             SatOp satOp = (SatOp) lf;
@@ -133,7 +147,7 @@ public class Flattener {
             if (currentNominal == null) {
                 throw new RuntimeException("No current nominal in trying to flatten " + lf);
             }
-            SatOp satOp = new SatOp(currentNominal, lf);
+            SatOp satOp = new SatOp(grammar, currentNominal, lf);
             addSatOp(satOp, parent, depth, alts, opts, lf);
         }
         else if (lf instanceof HyloVar) {
@@ -144,7 +158,7 @@ public class Flattener {
             LF arg = diamond.getArg();
             if (arg instanceof Proposition || arg instanceof Nominal || arg instanceof HyloVar) {
                 // add SatOp for diamond
-                SatOp satOp = new SatOp(currentNominal, lf);
+                SatOp satOp = new SatOp(grammar, currentNominal, lf);
                 addSatOp(satOp, parent, depth, alts, opts, lf);
             }
             else if (arg instanceof Op && ((Op)arg)._name.equals(Op.CONJ)) {
@@ -159,7 +173,7 @@ public class Flattener {
                 }
                 Nominal firstNominalArg = (Nominal) firstArg;
                 // add SatOp for diamond
-                SatOp satOp = new SatOp(currentNominal, new Diamond(diamond.getMode(), firstNominalArg));
+                SatOp satOp = new SatOp(grammar, currentNominal, new Diamond(grammar, diamond.getMode(), firstNominalArg));
                 addSatOp(satOp, parent, depth, alts, opts, lf);
                 // flatten rest of list
                 for (; args.hasNext(); ) {
@@ -190,7 +204,7 @@ public class Flattener {
                         }
                         // add SatOp for diamond
                         Nominal disjunctNominal = (Nominal) firstArg;
-                        SatOp satOp = new SatOp(currentNominal, new Diamond(diamond.getMode(), disjunctNominal));
+                        SatOp satOp = new SatOp(grammar, currentNominal, new Diamond(grammar, diamond.getMode(), disjunctNominal));
                         addSatOp(satOp, dummyParent, depth+1, alts, opts, lf);
                         // flatten rest of list
                         for (; args.hasNext(); ) {
@@ -201,7 +215,7 @@ public class Flattener {
                     else {
                         // just add SatOp for diamond
                         Nominal disjunctNominal = (Nominal) disjunct;
-                        SatOp satOp = new SatOp(currentNominal, new Diamond(diamond.getMode(), disjunctNominal));
+                        SatOp satOp = new SatOp(grammar, currentNominal, new Diamond(grammar, diamond.getMode(), disjunctNominal));
                         addSatOp(satOp, dummyParent, depth+1, alts, opts, lf);
                     }
                     alts.pop();
@@ -215,14 +229,19 @@ public class Flattener {
     }
 
     // makes a dummy satop for the given nominal, if any; otherwise uses nullNom
-    private static SatOp makeDummySatOp(Nominal nom) {
-        return new SatOp((nom != null) ? nom : nullNom, nullProp);
+    private SatOp makeDummySatOp(Nominal nom) {  	
+    	SatOp op = null;
+    	synchronized(nullNom) { //shouldn't be necessary but just in case
+        	op = new SatOp(grammar, (nom != null) ? nom : nullNom, nullProp);
+        }
+        return op;
     }
 
     // handles new preds
     private void addSatOp(SatOp satOp, SatOp parent, int depth, Stack<Alt> alts, TIntArrayList opts, LF lf) {
     	// add non-dummy satops to result
-        if (satOp._arg != nullProp) preds.add(satOp);
+    	if ( nullNom == null) {}
+    	if (satOp._arg != nullProp) preds.add(satOp);
         // update roots, maps
         if (parent == null) roots.add(satOp);
         else childMap.put(parent, satOp);
@@ -231,7 +250,9 @@ public class Flattener {
 	        if (!nomMap.containsKey(nom) || depth < depthMap.get(nom)) {
 	    		nomMap.put(nom, satOp);
 	    		depthMap.put(nom, depth);
-	    		parentMap.put(nom, (parent != null && parent._nominal != nullNom) ? parent._nominal : null);
+	    		synchronized(nullNom) { //shouldn't be necessary but just in case
+	    			parentMap.put(nom, (parent != null && parent._nominal != nullNom) ? parent._nominal : null);
+	    		}
 	        }
         }
         // set alts, opts, chunks

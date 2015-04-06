@@ -18,12 +18,21 @@
 
 package hylo;
 
-import java.io.Serializable;
-import org.jdom.*;
-import gnu.trove.*;
+import gnu.trove.TIntArrayList;
+import gnu.trove.TObjectIntHashMap;
+import grammar.Grammar;
 
-import synsem.*;
-import unify.*;
+import java.io.Serializable;
+
+import org.jdom.Element;
+
+import synsem.LF;
+import unify.ModFcn;
+import unify.SimpleType;
+import unify.Substitution;
+import unify.Unifiable;
+import unify.UnifyFailure;
+import unify.Variable;
 
 /**
  * A parent class to implement reasonable default behavior for classes
@@ -34,6 +43,15 @@ import unify.*;
  * @version     $Revision: 1.13 $, $Date: 2009/12/21 03:27:19 $
  **/
 public abstract class HyloFormula implements LF, Serializable {
+	
+	protected final Grammar grammar;
+	public HyloFormula(Grammar grammar) {
+		if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+		this.grammar = grammar;
+	}
     
 	private static final long serialVersionUID = 1L;
 	
@@ -72,7 +90,6 @@ public abstract class HyloFormula implements LF, Serializable {
     /**
      * Applies a ModFcn to this LF and then applies it to all fields
      * which are themselves Mutables.
-     *
      * @param mf a function to be applied
      */
     public void deepMap(ModFcn mf) {
@@ -87,9 +104,9 @@ public abstract class HyloFormula implements LF, Serializable {
      * <b>NB:</b> The implementation of unification in the hylo package is not 
      * complete; a particular limitation is that no attempt is made to unify lists of terms 
      * connected by an Op instance.
-     *
-     * @param o object to unify with
      * @param s Substitution containing the variable resolutions
+     * @param o object to unify with
+     *
      * @exception UnifyFailure if this Unifiable cannot be unified with 
      *            the Object
      * @return an object which represents the unification of 
@@ -125,8 +142,8 @@ public abstract class HyloFormula implements LF, Serializable {
     /**
      * Replaces any variables in this Unifiable with the values found
      * for them in the Substitution argument.
-     *
      * @param s Substitution containing the variable resolutions
+     *
      * @return a copy of this Unifiable with all variables from the
      *         Substitution replaced by their values.  
      */

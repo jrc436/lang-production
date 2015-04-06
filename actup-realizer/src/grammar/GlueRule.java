@@ -43,7 +43,10 @@ public class GlueRule extends AbstractRule {
 	public static final String resultType = "frag";
 	
 	/** Constructor. */
-	public GlueRule() { _name = "glue"; }
+	public GlueRule(Grammar grammar) {
+		super(grammar);
+		_name = "glue"; 
+	}
 	
 	/** Arity. */
 	public int arity() { return 2; }
@@ -63,7 +66,7 @@ public class GlueRule extends AbstractRule {
 		// make result cat
         List<Category> results = new ArrayList<Category>(1);
         _headCats.clear();
-        AtomCat ac = new AtomCat(resultType);
+        AtomCat ac = new AtomCat(grammar, resultType);
         appendLFs(inputs[0], inputs[1], ac, emptySubst);
         results.add(ac);
         // guess head, with left as default

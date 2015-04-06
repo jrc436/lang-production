@@ -135,7 +135,7 @@ public class EdgeFactory
     private final RuleGroup ruleInstancesGroup;
     
     // rule for joining fragments
-    private final FragmentJoining fragmentRule = new FragmentJoining();
+    private final FragmentJoining fragmentRule;
     
     // helper class for licensing features
     private final FeatureLicenser featureLicenser;
@@ -213,9 +213,15 @@ public class EdgeFactory
     
     /** Constructor with hypertagger. */
     public EdgeFactory(Grammar grammar, List<SatOp> preds, SignScorer signScorer) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         this.grammar = grammar;
         this.preds = preds;
         this.signScorer = signScorer;
+        
+        fragmentRule = new FragmentJoining(grammar);
         
         lexicon = grammar.lexicon;
         generalRules = new RuleGroup(grammar);
@@ -932,7 +938,7 @@ public class EdgeFactory
             // index subcategorized semantically null words
             featureLicenser.indexSemanticallyNullWords(filledCat);
             // update lex origins for new sign
-            Sign newSign = new Sign(words, filledCat);
+            Sign newSign = new Sign(grammar, words, filledCat);
             newSign.setOrigin();
             // and add new edge
             List<List<Alt>> activeLfAlts = getActiveLfAlts(lfAlts, bitset);
@@ -968,7 +974,7 @@ public class EdgeFactory
             featureLicenser.indexSemanticallyNullWords(filledResult);
             // and return new rule instance
             BitSet indices = getIndices(filledResult, filledArg);
-            TypeChangingRule newRule = new TypeChangingRule(filledArg, filledResult, rule.name(), rule.getFirstEP());
+            TypeChangingRule newRule = new TypeChangingRule(grammar, filledArg, filledResult, rule.name(), rule.getFirstEP());
             ruleInstancesGroup.addRule(newRule);
             List<List<Alt>> activeLfAlts = getActiveLfAlts(lfAlts, bitset);
             RuleInstance ruleInst = new RuleInstance(newRule, bitset, indices, activeLfAlts);
@@ -1014,8 +1020,10 @@ public class EdgeFactory
         List<Pair<Substitution,BitSet>> prev = new ArrayList<Pair<Substitution,BitSet>>(3);
         retval.add(new Pair<Substitution, BitSet>(subst, bitset));
         // loop until empty or no changes, in order to propagate matches
+       // List<SatOp> removePreds;
         while (!remainingPreds.isEmpty() && remainingPreds.size() != prevSize) {
             prevSize = remainingPreds.size();
+           // removePreds = new ArrayList<SatOp>();
             for (Iterator<SatOp> it = remainingPreds.iterator(); it.hasNext(); ) {
             	SatOp lfPred = it.next();
                 try {
@@ -1146,7 +1154,9 @@ public class EdgeFactory
     public List<Edge> createNewEdges(Edge edge, Edge next, boolean collectCombos) {
         
         // check for sem overlap
-        if (edge.intersects(next)) return Collections.emptyList();
+        if (edge.intersects(next)) {
+        	return Collections.emptyList();
+        }
         // check LF chunk constraints
         if (useChunks) {
             if (!edge.meetsLfChunkConstraints(next) || 
@@ -1195,7 +1205,7 @@ public class EdgeFactory
                     Sign lexHead = (rightward == lefthead) 
                     	? next.sign.getLexHead() 
             			: furtherEdge.sign.getLexHead(); 
-                	Sign altSign = Sign.createDerivedSignWithNewLF(resultCat, signs, rule, lexHead);
+                	Sign altSign = Sign.createDerivedSignWithNewLF(grammar, resultCat, signs, rule, lexHead);
                     newEdges.add(makeAltEdge(altSign, resultEdge));
                 }
             }
@@ -1461,7 +1471,7 @@ public class EdgeFactory
                 Sign lexHead = (rightward == lefthead) 
                 	? edge.sign.getLexHead() 
         			: comboEdge.sign.getLexHead();
-                Sign altSign = Sign.createDerivedSignWithNewLF(resultCat, signs, rule, lexHead);
+                Sign altSign = Sign.createDerivedSignWithNewLF(grammar, resultCat, signs, rule, lexHead);
                 results.add(makeAltEdge(altSign, resultEdge));
             }
         }
@@ -1475,7 +1485,7 @@ public class EdgeFactory
             Rule rule = resultSign.getDerivationHistory().getRule();
             Sign[] signs = { edge.sign };
             Sign lexHead = edge.sign.getLexHead();
-            Sign altSign = Sign.createDerivedSignWithNewLF(resultCat, signs, rule, lexHead);
+            Sign altSign = Sign.createDerivedSignWithNewLF(grammar, resultCat, signs, rule, lexHead);
             results.add(makeAltEdge(altSign, resultEdge));
         }
     }
@@ -1553,7 +1563,7 @@ public class EdgeFactory
 	            for (Category instCat : instantiatedCats) {
                     featureLicenser.updateFeatureMap(instCat);
                     featureLicenser.indexSemanticallyNullWords(instCat);
-	                Sign instSign = new Sign(sign.getWords(), instCat);
+	                Sign instSign = new Sign(grammar, sign.getWords(), instCat);
 	                instEdges.add(makeEdge(instSign, new BitSet(preds.size()), emptyLfAlts));
 	            }
 	            // add edges for uninstantiated cats to no-sem edges, updating
@@ -1561,7 +1571,7 @@ public class EdgeFactory
 	            for (Category uninstCat : uninstantiatedCats) {
                     featureLicenser.updateFeatureMap(uninstCat);
                     featureLicenser.indexSemanticallyNullWords(uninstCat);
-	                Sign uninstSign = new Sign(sign.getWords(), uninstCat);
+	                Sign uninstSign = new Sign(grammar, sign.getWords(), uninstCat);
 	                Edge noSemEdge = makeEdge(uninstSign, new BitSet(preds.size()), emptyLfAlts); 
 	                uninstEdges.add(noSemEdge);
 	            }

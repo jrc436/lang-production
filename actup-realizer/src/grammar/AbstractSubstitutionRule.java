@@ -32,12 +32,16 @@ import java.util.*;
  */
 public abstract class AbstractSubstitutionRule extends AbstractApplicationRule {
 
+	public AbstractSubstitutionRule(Grammar grammar) {
+		super(grammar);
+	}
+
 	private static final long serialVersionUID = 1L;
 	
 	protected boolean _isHarmonic;
     protected Slash _argSlash;
 
-    protected List<Category> apply (Category xyzCat, Category yzCat)
+    protected List<Category> apply(Category xyzCat, Category yzCat)
         throws UnifyFailure {
         
         if (xyzCat instanceof ComplexCat && yzCat instanceof ComplexCat) {
@@ -66,11 +70,10 @@ public abstract class AbstractSubstitutionRule extends AbstractApplicationRule {
 
             GSubstitution sub = new GSubstitution();
 
-            GUnifier.unify(primaryArgZ.getCat(), secondaryArgZ.getCat(), sub);
-            GUnifier.unify(primaryArgY.getCat(), secondaryY, sub);         
+            GUnifier.unify(grammar, primaryArgZ.getCat(), secondaryArgZ.getCat(), sub);
+            GUnifier.unify(grammar, primaryArgY.getCat(), secondaryY, sub);         
             
-            Category result =
-                new ComplexCat(xyzCC.getTarget(), primaryStack.copyWithout(size-2));
+            Category result = new ComplexCat(grammar, xyzCC.getTarget(), primaryStack.copyWithout(size-2));
             ((GSubstitution)sub).condense();
             result = (Category)result.fill(sub);
             ((ComplexCat)result).getOuterArg().setSlashModifier(false);

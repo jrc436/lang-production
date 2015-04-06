@@ -20,6 +20,7 @@
 package synsem;
 
 import gnu.trove.TObjectIntHashMap;
+import grammar.Grammar;
 import hylo.HyloHelper;
 import hylo.Nominal;
 
@@ -48,6 +49,7 @@ public abstract class AbstractCat implements Category, Serializable {
 
 	/** The feature structure, which should only be used with atomic categories. */
     protected FeatureStructure _featStruc;
+    protected final Grammar grammar;
     
     /** The logical form, which should be used only with the outermost category. */
     protected LF _lf;
@@ -65,20 +67,31 @@ public abstract class AbstractCat implements Category, Serializable {
     protected String _supertag = null;
     
     /** Default constructor. */
-    public AbstractCat() {}
 
     /** Constructor which sets the LF. */
-    public AbstractCat(LF lf) { _lf = lf; }
+    public AbstractCat(Grammar grammar, LF lf) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+    	_lf = lf; 
+    	this.grammar = grammar;
+    }
 
     /** 
      * Constructor which retrieves the LF from the XML element 
      * and flattens it to a conjunction of elementary predications
      * (or a single one). 
      */
-    public AbstractCat(Element elt) {
+    public AbstractCat(Grammar grammar, Element elt) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         Element lfElt = elt.getChild("lf");
+        this.grammar = grammar;
         if (lfElt != null) {
-            _lf = HyloHelper.flattenLF(HyloHelper.getLF(lfElt));
+            _lf = HyloHelper.flattenLF(grammar, HyloHelper.getLF(grammar, lfElt));
         }
     }
 
@@ -226,13 +239,17 @@ public abstract class AbstractCat implements Category, Serializable {
      * as long as features and predicates are in the same order.
      * The implementation calls equalsNoLF(obj, varMap, varMap2).
      */
-    public boolean equals(Object obj) { return equals(obj, true); }
+    public boolean equals(Object obj) { 
+    	return equals(obj, true); 
+    }
     
     /** 
      * Returns whether this category equals the given object, 
      * ignoring the LFs (if any).
      */
-    public boolean equalsNoLF(Object obj) { return equals(obj, false); }
+    public boolean equalsNoLF(Object obj) { 
+    	return equals(obj, false); 
+    }
 
     // checks equality, with a flag whether to check the LFs
     private boolean equals(Object obj, boolean checkLF) {

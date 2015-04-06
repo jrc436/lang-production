@@ -119,8 +119,8 @@ public interface FeatureStructure extends Unifiable, Mutable {
      * Changes this feature structure such that all its features that
      * are in another feature structure are changed to have the values of
      * the other feature structure.  This is destructive.
-     *
      * @param f the feature structure to inherit from
+     *
      * @return the changed feature structure
      */
     public FeatureStructure inherit(FeatureStructure fs);

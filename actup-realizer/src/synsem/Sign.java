@@ -77,29 +77,38 @@ public class Sign implements LexSemOrigin, Serializable {
     /** List of transient data objects, for retrieval by class. */
     protected LinkedList<Object> data = null; 
     
+    protected final Grammar grammar;
+    
 
     /** Constructor for subclasses. */
-    protected Sign() {}
+    protected Sign(Grammar grammar) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+    	this.grammar = grammar;
+    }
     
     /** Constructor with derivation history. */
     @SuppressWarnings("unchecked")
-	protected Sign(List<Word> words, Category cat, DerivationHistory dh, Sign lexHead) {
-        _words = (List<Word>) Interner.globalIntern(words); 
+	protected Sign(Grammar grammar, List<Word> words, Category cat, DerivationHistory dh, Sign lexHead) {
+        this(grammar);
+    	_words = (List<Word>) Interner.globalIntern(words); 
         _cat = cat;
         _history = dh;
         _lexHead = lexHead;
     }
 
     /** Constructor with no additional derivation history. */
-    public Sign(List<Word> words, Category cat) {
-        this(words, cat, null, null);
-        _history = new DerivationHistory(this);
+    public Sign(Grammar grammar, List<Word> words, Category cat) {
+        this(grammar, words, cat, null, null);
+        _history = new DerivationHistory(grammar, this);
         _lexHead = this;
     }
 
     /** Constructor with no additional derivation history. */
-    public Sign(Word word, Category cat) {
-        this(new SingletonList<Word>(word), cat);
+    public Sign(Grammar grammar, Word word, Category cat) {
+        this(grammar, new SingletonList<Word>(word), cat);
     }
     
     
@@ -130,14 +139,18 @@ public class Sign implements LexSemOrigin, Serializable {
 
     
     /** Factory method for creating a sign from a lexical sign plus a coarticulation one. */
-    public static Sign createCoartSign(Category cat, Sign lexSign, Sign coartSign) {
+    public static Sign createCoartSign(Grammar grammar, Category cat, Sign lexSign, Sign coartSign) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         List<Word> words = lexSign.getWords();
         if (words.size() > 1) 
             throw new RuntimeException("Can't create coarticulation sign from multiple words.");
         Word word = words.get(0);
         Word coartWord = coartSign.getWords().get(0);
         Word wordPlus = Word.createWordWithAttrs(word, coartWord);
-        Sign retval = new Sign(new SingletonList<Word>(wordPlus), cat, null, null);
+        Sign retval = new Sign(grammar, new SingletonList<Word>(wordPlus), cat, null, null);
         retval._lexHead = retval;
         Rule coartRule = new Rule() {
             public String name() { return "coart"; }
@@ -146,38 +159,46 @@ public class Sign implements LexSemOrigin, Serializable {
             public RuleGroup getRuleGroup() { throw new RuntimeException("Not supported."); }
             public void setRuleGroup(RuleGroup ruleGroup) { throw new RuntimeException("Not supported."); }
         };
-        retval._history = new DerivationHistory(new Sign[]{lexSign,coartSign}, retval, coartRule);
+        retval._history = new DerivationHistory(grammar, new Sign[]{lexSign,coartSign}, retval, coartRule);
         return retval;
     }
     
     /** Factory method for creating derived signs with the given cat from the given inputs, rule and lex head. */
-    public static Sign createDerivedSign(Category cat, Sign[] inputs, Rule rule, Sign lexHead) {
-        return new Sign(cat, inputs, rule, lexHead);
+    public static Sign createDerivedSign(Grammar grammar, Category cat, Sign[] inputs, Rule rule, Sign lexHead) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+        return new Sign(grammar, cat, inputs, rule, lexHead);
     }
 
     /** Factory method for creating derived signs from the given result cat, inputs, rule and lex head, 
         with a new LF constructed from the inputs.
         Note that unlike with rule applications, the result LF is constructed with 
         no var substitutions, so it is useful only for creating alternative signs during realization. */
-    public static Sign createDerivedSignWithNewLF(Category cat, Sign[] inputs, Rule rule, Sign lexHead) {
+    public static Sign createDerivedSignWithNewLF(Grammar grammar, Category cat, Sign[] inputs, Rule rule, Sign lexHead) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         Category copyCat = cat.shallowCopy();
         LF lf = null;
         for (int i = 0; i < inputs.length; i++) {
-            lf = HyloHelper.append(lf, inputs[i].getCategory().getLF());
+            lf = HyloHelper.append(grammar, lf, inputs[i].getCategory().getLF());
         }
         if (rule instanceof TypeChangingRule) {
             TypeChangingRule tcr = (TypeChangingRule) rule;
-            lf = HyloHelper.append(lf, tcr.getResult().getLF());
+            lf = HyloHelper.append(grammar, lf, tcr.getResult().getLF());
         }
-        if (lf != null) { HyloHelper.sort(lf); }
+        if (lf != null) { HyloHelper.sort(grammar, lf); }
         copyCat.setLF(lf);
-        return new Sign(copyCat, inputs, rule, lexHead);
+        return new Sign(grammar, copyCat, inputs, rule, lexHead);
     }
         
     /** Constructor with words and derivation history formed from the given inputs, rule and lex head. */
-    protected Sign(Category cat, Sign[] inputs, Rule rule, Sign lexHead) {
-        this(getRemainingWords(inputs, 0), cat, null, lexHead);
-        _history = new DerivationHistory(inputs, this, rule);
+    protected Sign(Grammar grammar, Category cat, Sign[] inputs, Rule rule, Sign lexHead) {
+        this(grammar, getRemainingWords(inputs, 0), cat, null, lexHead);
+        _history = new DerivationHistory(grammar, inputs, this, rule);
     }
     
     // returns the remaining words in a structure sharing way
@@ -198,7 +219,7 @@ public class Sign implements LexSemOrigin, Serializable {
 
     /** Returns the words as a string.  Delegates to the current tokenizer's getOrthography method. */
     public String getOrthography() {
-        return Grammar.theGrammar.lexicon.tokenizer.getOrthography(_words);
+        return grammar.lexicon.tokenizer.getOrthography(_words);
     }
 
     /** Returns the sign's category. */
@@ -411,7 +432,7 @@ public class Sign implements LexSemOrigin, Serializable {
     // multiwords are enclosed within a multiword element; 
     // any attribute-value pairs are added to the word or multiword element
     private void addWords(Element parent, Word word) {
-        List<String> orthWords = Grammar.theGrammar.lexicon.tokenizer.expandWord(word);
+        List<String> orthWords = grammar.lexicon.tokenizer.expandWord(word);
         Element child;
         if (orthWords.size() == 1) {
             Element wordElt = new Element("word");

@@ -18,6 +18,8 @@
 
 package hylo;
 
+import grammar.Grammar;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,8 +54,8 @@ public class Converter {
     private boolean skipAbsentProp = true;
        	
     /** Converts nominal vars to atoms, renaming them based on lexical propositions. */
-	static void convertNominals(LF lf) {
-		convertNominals(lf, null, null);
+	static void convertNominals(Grammar grammar, LF lf) {
+		convertNominals(grammar, lf, null, null);
     }
 	
 	/**
@@ -61,15 +63,19 @@ public class Converter {
 	 * a root sign is given, otherwise using lexical propositions; 
 	 * returns the converted nominal root. 
 	 */
-	static Nominal convertNominals(LF lf, Sign root, Nominal nominalRoot) {
+	static Nominal convertNominals(Grammar grammar, LF lf, Sign root, Nominal nominalRoot) {
+		if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
 		// check preference for naming with word positions; set root to null if false
         boolean useWordPositions = USE_WORD_POSITIONS_FOR_ATOM_CONVERSION;
 		if (!useWordPositions) root = null;
         // traverse twice, skipping absent props the first time
     	Converter converter = new Converter();
-    	converter.convertNoms(lf, root);
+    	converter.convertNoms(grammar, lf, root);
         converter.skipAbsentProp = false;
-    	converter.convertNoms(lf, root);
+    	converter.convertNoms(grammar, lf, root);
     	// return converted nominal root, if any
     	Nominal retval = null;
     	if (nominalRoot != null) {
@@ -79,7 +85,11 @@ public class Converter {
     }
 
     // recurse through lf, converting nominals
-    private void convertNoms(LF lf, Sign root) {
+    private void convertNoms(Grammar grammar, LF lf, Sign root) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         if (lf instanceof SatOp) {
             SatOp satOp = (SatOp) lf;
             // try finding word index of lex origin in root sign
@@ -107,16 +117,16 @@ public class Converter {
                 LF first = (LF) op.getArguments().get(0);
                 if (first instanceof Proposition) { prop = (Proposition) first; }
             }
-            Nominal convertedNom = convertNominal(oldNom, prop, wordIndex);
+            Nominal convertedNom = convertNominal(grammar, oldNom, prop, wordIndex);
             satOp.setNominal(convertedNom);
-            convertNoms(arg, root);
+            convertNoms(grammar, arg, root);
         }
         else if (lf instanceof Diamond) {
             Diamond d = (Diamond) lf;
             LF arg = d.getArg();
             if (arg instanceof Nominal) {
                 Nominal oldNom = (Nominal) arg;
-                Nominal convertedNom = convertNominal(oldNom, null, -1);
+                Nominal convertedNom = convertNominal(grammar, oldNom, null, -1);
                 d.setArg(convertedNom);
             }
             else if (arg instanceof Op) {
@@ -128,16 +138,16 @@ public class Converter {
                     LF second = args.get(1);
                     Proposition prop = null;
                     if (second instanceof Proposition) { prop = (Proposition) second; }
-                    Nominal convertedNom = convertNominal(oldNom, prop, -1);
+                    Nominal convertedNom = convertNominal(grammar, oldNom, prop, -1);
                     args.set(0, convertedNom);
                 }
-                convertNoms(arg, root);
+                convertNoms(grammar, arg, root);
             }
         }
         else if (lf instanceof Op) {
             List<LF> args = ((Op)lf).getArguments();
             for (int i = 0; i < args.size(); i++) {
-            	convertNoms(args.get(i), root);
+            	convertNoms(grammar, args.get(i), root);
             }
         }
     }
@@ -147,11 +157,15 @@ public class Converter {
     // wordIndex is used instead if non-negative;
     // the skipAbsentProp flag controls whether to skip a null prop, 
     // so that a meaningful name might be created later
-    private Nominal convertNominal(Nominal oldNom, Proposition prop, int wordIndex) {
+    private Nominal convertNominal(Grammar grammar, Nominal oldNom, Proposition prop, int wordIndex) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         // check for an atom
         if (oldNom instanceof NominalAtom) return oldNom;
         // handle word index case
-        if (wordIndex >= 0) return convertNominal(oldNom, "w" + wordIndex);
+        if (wordIndex >= 0) return convertNominal(grammar, oldNom, "w" + wordIndex);
         // skip absent props according to flag
         if (prop == null && skipAbsentProp) return oldNom;
         // check if already converted, and return copy
@@ -171,12 +185,16 @@ public class Converter {
         if (baseCount != null) { ext = baseCount.intValue() + 1; }
         nameMap.put(nameBase, new Integer(ext));
         String name = nameBase + ext;
-        return convertNominal(oldNom, name);
+        return convertNominal(grammar, oldNom, name);
     }
 
     // returns the converted nominal using the given name, updating the map
-    private Nominal convertNominal(Nominal oldNom, String name) {
-        Nominal retval = new NominalAtom(name, oldNom.getType());
+    private Nominal convertNominal(Grammar grammar, Nominal oldNom, String name) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+        Nominal retval = new NominalAtom(grammar, name, oldNom.getType());
         nominalMap.put(oldNom, retval);
         return retval;
     }

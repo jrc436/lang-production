@@ -48,18 +48,18 @@ public final class ComplexCat extends AbstractCat {
 	private ArgStack _args;
 
 	/** Constructor with target and single arg. */
-	public ComplexCat(TargetCat target, Arg arg) {
-		this(target, new ArgStack(arg));
+	public ComplexCat(Grammar grammar, TargetCat target, Arg arg) {
+		this(grammar, target, new ArgStack(grammar, arg));
 	}
 
 	/** Constructor with target and arg stack. */
-	public ComplexCat(TargetCat target, ArgStack args) {
-		this(target, args, null);
+	public ComplexCat(Grammar grammar, TargetCat target, ArgStack args) {
+		this(grammar, target, args, null);
 	}
 
 	/** Constructor with target, arg stack and LF. */
-	public ComplexCat(TargetCat target, ArgStack args, LF lf) {
-		super(lf);
+	public ComplexCat(Grammar grammar, TargetCat target, ArgStack args, LF lf) {
+		super(grammar, lf);
 		_target = target;
 		if (args.size() < 1) {
 			System.out.println("WARNING!!! Creating a ComplexCat with"
@@ -71,9 +71,9 @@ public final class ComplexCat extends AbstractCat {
 	/** Constructor which retrieves the complex category from the XML element. */
 	// also determines modifier slashes
 	@SuppressWarnings("unchecked")
-	public ComplexCat(Element el) {
+	public ComplexCat(Grammar grammar, Element el) {
 		// call super to get LF if present
-		super(el);
+		super(grammar, el);
 		// get children minus LF elt
 		List<Element> info = el.getChildren();
 		Element lfElt = el.getChild("lf");
@@ -81,8 +81,8 @@ public final class ComplexCat extends AbstractCat {
 			info.remove(lfElt);
 		}
 		// get target and args from first and rest of remaining children
-		_target = (TargetCat) CatReader.getCat(info.get(0));
-		_args = new ArgStack(info.subList(1, info.size()));
+		_target = (TargetCat) CatReader.getCat(grammar, info.get(0));
+		_args = new ArgStack(grammar, info.subList(1, info.size()));
 		// set modifier slashes
 		setModifierSlashes();
 	}
@@ -140,7 +140,7 @@ public final class ComplexCat extends AbstractCat {
 		if (upto == 0) {
 			return _target;
 		} else {
-			return new ComplexCat(_target, _args.subList(0, upto));
+			return new ComplexCat(grammar, _target, _args.subList(0, upto));
 		}
 	}
 
@@ -202,12 +202,11 @@ public final class ComplexCat extends AbstractCat {
 	}
 
 	public Category copy() {
-		return new ComplexCat((TargetCat) _target.copy(), _args.copy(),
-				(_lf == null) ? null : (LF) _lf.copy());
+		return new ComplexCat(this.grammar, (TargetCat) _target.copy(), _args.copy(), (_lf == null) ? null : (LF) _lf.copy());
 	}
 
 	public Category shallowCopy() {
-		return new ComplexCat(_target, _args, _lf);
+		return new ComplexCat(this.grammar, _target, _args, _lf);
 	}
 
 	public void deepMap(ModFcn mf) {
@@ -233,16 +232,16 @@ public final class ComplexCat extends AbstractCat {
 	public Object unify(Object u, Substitution sub) throws UnifyFailure {
 
 		if (u instanceof AtomCat && arity() == 1 & containsDollarArg()) {
-			sub.makeSubstitution((Dollar) _args.get(0), new ArgStack());
-			return GUnifier.unify(_target, (AtomCat) u, sub);
+			sub.makeSubstitution((Dollar) _args.get(0), new ArgStack(grammar));
+			return GUnifier.unify(grammar, _target, (AtomCat) u, sub);
 		} else if (u instanceof ComplexCat) {
 			ComplexCat cc = (ComplexCat) u;
 			ArgStack $args = _args.unify(cc._args, sub);
-			Category $target = GUnifier.unify(_target, cc._target, sub);
+			Category $target = GUnifier.unify(grammar, _target, cc._target, sub);
 			if ($args.size() == 0) {
 				return $target;
 			} else {
-				return new ComplexCat((TargetCat) $target, $args);
+				return new ComplexCat(grammar, (TargetCat) $target, $args);
 			}
 		} else {
 			throw new UnifyFailure();
@@ -263,7 +262,7 @@ public final class ComplexCat extends AbstractCat {
 			return $target;
 		}
 		if ($target instanceof TargetCat) {
-			return new ComplexCat((TargetCat) $target, $args, $lf);
+			return new ComplexCat(grammar, (TargetCat) $target, $args, $lf);
 		} else if ($target instanceof ComplexCat) {
 			((ComplexCat) $target).add($args);
 			$target.setLF($lf);
@@ -276,7 +275,7 @@ public final class ComplexCat extends AbstractCat {
 	public String toString() {
 	    StringBuffer sb = new StringBuffer();
 	    sb.append(_target.toString()).append(_args.toString());
-	    if (_lf != null && Grammar.theGrammar.showSem) {
+	    if (_lf != null && grammar.showSem) {
 	    	sb.append(" : ").append(_lf.toString());
 	    }
 	    return sb.toString();

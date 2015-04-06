@@ -19,17 +19,32 @@
 
 package grammar;
 
-import synsem.*;
-import hylo.*;
-import unify.*;
-import util.*;
+import gnu.trove.THashSet;
+import gnu.trove.TObjectHashingStrategy;
+import hylo.HyloHelper;
 
-import org.jdom.*;
-import gnu.trove.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.Serializable;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import org.jdom.Element;
+
+import synsem.CatReader;
+import synsem.Category;
+import synsem.LF;
+import synsem.Sign;
+import unify.UnifyFailure;
+import util.GroupMap;
+import util.XmlScanner;
 
 /**
  * A set of rules for combining categories.
@@ -48,7 +63,7 @@ public class RuleGroup implements Serializable {
 	private static final long serialVersionUID = -6240266013357142289L;
 
 	/** The grammar that this rule group is part of. */
-    public transient Grammar grammar;
+    public final Grammar grammar;
     
     // rules
     private List<Rule> unaryRules = new ArrayList<Rule>();
@@ -59,10 +74,10 @@ public class RuleGroup implements Serializable {
     private GroupMap<String,TypeChangingRule> relsToRules = new GroupMap<String,TypeChangingRule>();
     
     // rule for use in applying coarticulations
-    private BackwardApplication bapp = new BackwardApplication();
+    private BackwardApplication bapp;
 
     // glue rule
-    private GlueRule glueRule = new GlueRule();
+    private GlueRule glueRule;
     
     // supercat-rule combos, to support filtering on observed ones
     private class SupercatRuleCombo {
@@ -156,8 +171,14 @@ public class RuleGroup implements Serializable {
      * Constructs an empty rule group for the given grammar.
      */
     public RuleGroup(Grammar grammar) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         this.grammar = grammar;
-        bapp.setRuleGroup(this);
+        bapp = new BackwardApplication(grammar);
+        glueRule = new GlueRule(grammar);
+        bapp.setRuleGroup(this);      
     }
     
     /**
@@ -165,10 +186,7 @@ public class RuleGroup implements Serializable {
      * the given grammar.
      */
     public RuleGroup(URL url, Grammar grammar) throws IOException {
-
-        this.grammar = grammar;
-        bapp.setRuleGroup(this);
-        
+        this(grammar);
         XmlScanner ruleScanner = new XmlScanner() {
         	public void handleElement(Element ruleEl) {
                 String active = ruleEl.getAttributeValue("active");
@@ -184,13 +202,13 @@ public class RuleGroup implements Serializable {
         ruleScanner.parse(url);
     }
 
-    
-    // during deserialization, sets grammar to the current grammar
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-    	in.defaultReadObject();
-    	grammar = Grammar.theGrammar;
-    	borrowSupercatRuleCombos(grammar.rules);
-    }
+//    
+//    // during deserialization, sets grammar to the current grammar
+//    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+//    	in.defaultReadObject();
+//    	grammar = Grammar.theGrammar;
+//    	borrowSupercatRuleCombos(grammar.rules);
+//    }
     
     
     // reads in a rule
@@ -200,27 +218,27 @@ public class RuleGroup implements Serializable {
         if (type.equals("application")) {
             String dir = ruleEl.getAttributeValue("dir");
             if (dir.equals("forward")) {
-                r = new ForwardApplication();
+                r = new ForwardApplication(grammar);
             } else {
-                r = new BackwardApplication();
+                r = new BackwardApplication(grammar);
             }
         } else if (type.equals("composition")) {
             String dir = ruleEl.getAttributeValue("dir");
             String harmonic = ruleEl.getAttributeValue("harmonic");
             boolean isHarmonic = new Boolean(harmonic).booleanValue();
             if (dir.equals("forward")) {
-                r = new ForwardComposition(isHarmonic);
+                r = new ForwardComposition(grammar, isHarmonic);
             } else {
-                r = new BackwardComposition(isHarmonic);
+                r = new BackwardComposition(grammar, isHarmonic);
             }
         } else if (type.equals("substitution")) {
             String dir = ruleEl.getAttributeValue("dir");
             String harmonic = ruleEl.getAttributeValue("harmonic");
             boolean isHarmonic = new Boolean(harmonic).booleanValue();
             if (dir.equals("forward")) {
-                r = new ForwardSubstitution(isHarmonic);
+                r = new ForwardSubstitution(grammar, isHarmonic);
             } else {
-                r = new BackwardSubstitution(isHarmonic);
+                r = new BackwardSubstitution(grammar, isHarmonic);
             }
         } else if (type.equals("typeraising")) {
             String dir = ruleEl.getAttributeValue("dir");
@@ -229,17 +247,17 @@ public class RuleGroup implements Serializable {
             Category arg = null;
             Element argElt = ruleEl.getChild("arg");
             if (argElt != null) {
-                arg = CatReader.getCat((Element)argElt.getChildren().get(0));
+                arg = CatReader.getCat(grammar, (Element)argElt.getChildren().get(0));
             }
             Category result = null;
             Element resultElt = ruleEl.getChild("result");
             if (resultElt != null) {
-                result = CatReader.getCat((Element)resultElt.getChildren().get(0));
+                result = CatReader.getCat(grammar, (Element)resultElt.getChildren().get(0));
             }
             if (dir.equals("forward")) {
-                r = new ForwardTypeRaising(addDollar, arg, result);
+                r = new ForwardTypeRaising(grammar, addDollar, arg, result);
             } else {
-                r = new BackwardTypeRaising(addDollar, arg, result);
+                r = new BackwardTypeRaising(grammar, addDollar, arg, result);
             }
         } else if (type.equals("typechanging")) {
             r = readTypeChangingRule(ruleEl);
@@ -254,20 +272,20 @@ public class RuleGroup implements Serializable {
         
         String rname = ruleEl.getAttributeValue("name");
         Element argCatElt = (Element)ruleEl.getChild("arg").getChildren().get(0);
-        Category arg = CatReader.getCat(argCatElt);
+        Category arg = CatReader.getCat(grammar, argCatElt);
         Element resultCatElt = (Element)ruleEl.getChild("result").getChildren().get(0);
         Element lfElt = resultCatElt.getChild("lf");
-        Category result = CatReader.getCat(resultCatElt);
+        Category result = CatReader.getCat(grammar, resultCatElt);
         LF firstEP = null;
         if (lfElt != null) {
-            firstEP = HyloHelper.firstEP(HyloHelper.getLF(lfElt));
+            firstEP = HyloHelper.firstEP(grammar, HyloHelper.getLF(grammar, lfElt));
         }
         
         grammar.lexicon.propagateTypes(result, arg);
         grammar.lexicon.propagateDistributiveAttrs(result, arg);
         grammar.lexicon.expandInheritsFrom(result, arg);
 
-        return new TypeChangingRule(arg, result, rname, firstEP);
+        return new TypeChangingRule(grammar, arg, result, rname, firstEP);
     }
 
     /**
@@ -528,7 +546,7 @@ public class RuleGroup implements Serializable {
             for (Iterator<Category> it = resultCats.iterator(); it.hasNext();) {
                 Category catResult = it.next();
                 bapp.distributeTargetFeatures(catResult);
-                Sign sign = Sign.createCoartSign(catResult, lexSign, coartSign);
+                Sign sign = Sign.createCoartSign(grammar, catResult, lexSign, coartSign);
                 results.add(sign);
             }
         } catch (UnifyFailure uf) {}

@@ -35,7 +35,10 @@ public class FragmentJoining extends AbstractRule {
 	private static final long serialVersionUID = 7451163798607652012L;
 
 	/** Constructor. */
-	public FragmentJoining() { _name = "*"; }
+	public FragmentJoining(Grammar grammar) { 
+		super(grammar);
+		_name = "*"; 
+	}
 	
 	/**
 	 *  Returns the result of applying this rule to two input signs.

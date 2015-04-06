@@ -19,12 +19,16 @@
 
 package lexicon;
 
-import unify.*;
-import synsem.*;
+import grammar.Grammar;
 import hylo.HyloHelper;
 
-import org.jdom.*;
-import java.util.*;
+import java.util.List;
+
+import org.jdom.Element;
+
+import synsem.LF;
+import unify.FeatureStructure;
+import unify.GFeatStruc;
 
 /**
  * Data structure for storing information about morphological macros.
@@ -38,17 +42,19 @@ public class MacroItem {
     private String name;
     private FeatureStructure[] featStrucs;
     private LF[] preds;
-    
-    public MacroItem() {};
 
     @SuppressWarnings("unchecked")
-	public MacroItem (Element e) {
+	public MacroItem (Grammar grammar, Element e) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         name = e.getAttributeValue("name");
         if (name == null) { name = e.getAttributeValue("n"); }
         List<Element> fsEls = e.getChildren("fs");
         featStrucs = new FeatureStructure[fsEls.size()];
         for (int i=0; i<featStrucs.length; i++) {
-            featStrucs[i] = new GFeatStruc(fsEls.get(i));
+            featStrucs[i] = new GFeatStruc(grammar, fsEls.get(i));
         }
         Element lfElt = e.getChild("lf");
         if (lfElt == null) preds = new LF[0];
@@ -56,7 +62,7 @@ public class MacroItem {
             List<Element> predElts = lfElt.getChildren();
             preds = new LF[predElts.size()];
             for (int i=0; i < predElts.size(); i++) {
-                preds[i] = HyloHelper.getLF(predElts.get(i));
+                preds[i] = HyloHelper.getLF(grammar, predElts.get(i));
             }
         }
     }

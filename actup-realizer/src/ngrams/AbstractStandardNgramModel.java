@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import lexicon.Tokenizer;
 import lexicon.Word;
 import util.Pair;
 
@@ -42,16 +43,25 @@ public abstract class AbstractStandardNgramModel extends NgramScorer {
      * Creates a new ngram model of the given order.
      * @param order The order of the model.
      * @param useSemClasses Whether this model should use semantic classes.
-     * @see NgramScorer#NgramScorer(int, boolean)
+     * @see NgramScorer#NgramScorer(int, boolean, Tokenizer)
      */
-    protected AbstractStandardNgramModel(int order, boolean useSemClasses, double[] varValues) {
-		super(order, useSemClasses);
+    protected AbstractStandardNgramModel(int order, boolean useSemClasses, Tokenizer tokenizer, double[] varValues) {
+		super(order, useSemClasses, tokenizer);
 		numNgrams = new int[order];
 		this.params = varValues;
 	}
-    protected AbstractStandardNgramModel(int order, boolean useSemClasses) {
-    	this(order, useSemClasses, new double[0]);
+    protected AbstractStandardNgramModel(int order, boolean useSemClasses, Tokenizer tokenizer) {
+    	this(order, useSemClasses, tokenizer, new double[0]);
     }
+//    protected AbstractStandardNgramModel(int order) {
+//  		this(order, new DefaultTokenizer());
+//  	}
+//    protected AbstractStandardNgramModel(int order, boolean useSemClasses) {
+//    	this(order, useSemClasses, new DefaultTokenizer());
+//    }
+      protected AbstractStandardNgramModel(int order, Tokenizer tokenizer) {
+      	this(order, false, tokenizer);
+      }
     /**
      * This allows an ngram model to update its scoring methodology after each realization. Primarily
      * implemented for the ACTR language model
@@ -70,9 +80,7 @@ public abstract class AbstractStandardNgramModel extends NgramScorer {
      * Creates a new ngram model with the specified order.
      * @see AbstractStandardNgramModel#AbstractStandardNgramModel(int, boolean)
      */
-    protected AbstractStandardNgramModel(int order) {
-		this(order, false, new double[0]);
-	}
+  
 
 	/**
      * Converts the words in wordsToScore to strings in stringsToScore, before

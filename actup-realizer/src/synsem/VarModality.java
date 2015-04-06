@@ -18,6 +18,7 @@
 package synsem;
 
 import gnu.trove.TObjectIntHashMap;
+import grammar.Grammar;
 
 import java.io.Serializable;
 
@@ -46,18 +47,25 @@ public class VarModality implements Variable, Indexed, Mutable, Modality, Serial
     
     private static int UNIQUE_STAMP = 0;
     
-    public VarModality() {
-        this("VM"+UNIQUE_STAMP++);
+    private final Grammar grammar;
+    
+    public VarModality(Grammar grammar) {
+        this(grammar, "VM"+UNIQUE_STAMP++);
     }
     
-    public VarModality(String name) {
-        this(name, 0);
+    public VarModality(Grammar grammar, String name) {
+        this(grammar, name, 0);
     }
 
-    protected VarModality(String name, int index) {
+    protected VarModality(Grammar grammar, String name, int index) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         _name = name;
         _index = index;
         _hashCode = _name.hashCode() + _index;
+        this.grammar = grammar;
     }
     
     public String name() {
@@ -65,7 +73,7 @@ public class VarModality implements Variable, Indexed, Mutable, Modality, Serial
     }
 
     public Object copy() {
-        return new VarModality(_name, _index);
+        return new VarModality(grammar, _name, _index);
     }
     
     public void deepMap(ModFcn mf) {
@@ -132,9 +140,7 @@ public class VarModality implements Variable, Indexed, Mutable, Modality, Serial
             return sub.makeSubstitution(this, u);    
         } else if (u instanceof VarModality) {
             VarModality var2 = (VarModality)u;
-            Variable $var = new VarModality(_name+var2._name,
-                            UnifyControl.getUniqueVarIndex());
-            
+            Variable $var = new VarModality(grammar, _name+var2._name,  UnifyControl.getUniqueVarIndex());          
             sub.makeSubstitution(this, $var);
             sub.makeSubstitution(var2, $var);
             return $var;

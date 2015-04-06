@@ -101,12 +101,20 @@ public class Lexicon {
      * Constructor
      *************************************************************/
     public Lexicon(Grammar grammar) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         this.grammar = grammar;
         this.tokenizer = new DefaultTokenizer();
     }
 
     /** Constructor with tokenizer. */
     public Lexicon(Grammar grammar, Tokenizer tokenizer) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         this.grammar = grammar;
         this.tokenizer = tokenizer;
     }
@@ -366,12 +374,12 @@ public class Lexicon {
                     if (gfs.hasAttribute(att)) continue;
                     String varName = att.toUpperCase() + inhf;
                     if (_lfAttrs.contains(att)) {
-                        gfs.setFeature(att, new HyloVar(varName));
-                        inhfFS.setFeature(att, new HyloVar(varName));
+                        gfs.setFeature(att, new HyloVar(grammar, varName));
+                        inhfFS.setFeature(att, new HyloVar(grammar, varName));
                     }
                     else {
-                        gfs.setFeature(att, new GFeatVar(varName));
-                        inhfFS.setFeature(att, new GFeatVar(varName));
+                        gfs.setFeature(att, new GFeatVar(grammar, varName));
+                        inhfFS.setFeature(att, new GFeatVar(grammar, varName));
                     }
                 }
             }
@@ -516,8 +524,8 @@ public class Lexicon {
      * For a string of 1 or more surface words, return all of the lexical
      * entries for each word as a list of sign hashes.
      * Tokenization is performed using the configured tokenizer.
-     *
      * @param w the words in string format
+     *
      * @return a list of sign hashes
      * @exception LexException thrown if word not found
      */
@@ -542,8 +550,8 @@ public class Lexicon {
      * otherwise an exception is thrown.
      * If the word has coarticulations, all applicable coarticulation 
      * entries are applied to the base word, in an arbitrary order.
-     *
      * @param w the word
+     *
      * @return a sign hash
      * @exception LexException thrown if word not found
      */
@@ -754,7 +762,7 @@ public class Lexicon {
 	        Word word = Word.createFullWord(w, mi.getWord(), cat.getSupertag());
 
 	        // set origin and lexprob
-	        Sign sign = new Sign(word, cat);
+	        Sign sign = new Sign(grammar, word, cat);
 	        sign.setOrigin();
 	        //if (lexprob != null) {
 	        //	sign.addData(new SupertaggerAdapter.LexLogProb((float) Math.log10(lexprob)));
@@ -763,9 +771,7 @@ public class Lexicon {
 	        result.insert(sign);
         }
         catch (RuntimeException exc) {
-        	System.err.println(
-        			"Warning: ignoring entry: " + item.getName() + " of family: " + item.getFamilyName() + 
-        			" for stem: " + stem + " b/c: " + exc.toString()
+        	System.err.println("Warning: ignoring entry: "+item.getName()+" of family: "+item.getFamilyName()+" for stem: "+stem + " b/c: " + exc.toString()
         	);
         }
     }
@@ -868,7 +874,7 @@ public class Lexicon {
                     " not found for word '" + mi.getWord() + "'");
             }
         }
-        retval = new MacroAdder(macrosFromLex, macroItems);
+        retval = new MacroAdder(macrosFromLex, macroItems, grammar);
         
         // update map and return
         macAdderMap.put(mi, retval);
@@ -1112,7 +1118,7 @@ public class Lexicon {
     	public void handleElement(Element e) {
             // create morph item
 			if (e.getName().equals("entry")) {
-                try { morphItems.add(new MorphItem(e)); }
+                try { morphItems.add(new MorphItem(grammar, e)); }
                 catch (RuntimeException exc) {
                     System.err.println("Skipping morph item: " + e.getAttributeValue("word"));
                     System.err.println(exc.toString());
@@ -1120,7 +1126,7 @@ public class Lexicon {
             }
             // create macro item
 			else if (e.getName().equals("macro")) {
-                try { macroItems.add(new MacroItem(e)); }
+                try { macroItems.add(new MacroItem(grammar, e)); }
                 catch (RuntimeException exc) {
                     System.err.println("Skipping macro item: " + e.getAttributeValue("name"));
                     System.err.println(exc.toString());
@@ -1145,7 +1151,9 @@ public class Lexicon {
     	public void handleElement(Element e) {
             // create family
 			if (e.getName().equals("family")) {
-                try { lexicon.add(new Family(e)); }
+				try {
+					lexicon.add(new Family(grammar, e));
+				}
                 catch (RuntimeException exc) {
                     System.err.println("Skipping family: " + e.getAttributeValue("name"));
                     System.err.println(exc.toString());

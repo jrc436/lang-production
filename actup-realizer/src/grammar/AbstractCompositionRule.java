@@ -46,6 +46,12 @@ import unify.UnifyFailure;
  */
 public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 
+	
+	
+	public AbstractCompositionRule(Grammar grammar) {
+		super(grammar);
+	}
+
 	private static final long serialVersionUID = 1L;
 
 	/** Preference key for Eisner constraints. */
@@ -90,7 +96,7 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 					ArgStack zStack = yzCC.getArgStack();
 					zStack.slashesUnify(_argSlash);
 					Substitution sub = new GSubstitution();
-					GUnifier.unify(xyOuterCat, yzCC.getTarget(), sub);
+					GUnifier.unify(grammar, xyOuterCat, yzCC.getTarget(), sub);
 					xySlash = (Slash) xySlash.fill(sub);
 					xySlash.unifyCheck(_functorSlash);
 					Category outcome = createResult(xyCC.getResult(), zStack, xySlash, sub);
@@ -118,7 +124,7 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 					xySlash.unifyCheck(_functorSlash);
 					if (eisner() && xySlash.isHarmonicCompositionResult()) throw new UnifyFailure();
 					Substitution sub = new GSubstitution();
-					GUnifier.unify(xyOuterSet.getCat(targetIndex), yzTarget, sub);
+					GUnifier.unify(grammar, xyOuterSet.getCat(targetIndex), yzTarget, sub);
 					Category result = xyCC.copy();
 					((ComplexCat) result).setOuterArgument(xyOuterSet.copyWithout(targetIndex));
 					ArgStack zStack = yzCC.getArgStack();
@@ -163,8 +169,8 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 		}
 	}
 
-	private Category createResult(Category result, ArgStack zStack,
-			Slash xySlash, Substitution sub) throws UnifyFailure {
+	private Category createResult(Category result, ArgStack zStack, Slash xySlash,
+			Substitution sub) throws UnifyFailure {
 		((GSubstitution) sub).condense();
 		result = (Category) result.fill(sub);
 		ArgStack newStack = zStack.fill(sub);
@@ -179,7 +185,7 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 		if (result instanceof ComplexCat) {
 			((ComplexCat) result).add(newStack);
 		} else {
-			result = new ComplexCat((TargetCat) result, newStack);
+			result = new ComplexCat(grammar, (TargetCat) result, newStack);
 		}
 		return result;
 	}
@@ -195,10 +201,10 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 		}
 	};
 
-	private ArgStack composeComplexY(ComplexCat xyOuterCC, Slash xySlash,
-			ComplexCat yzCC, Substitution sub) throws UnifyFailure {
+	private ArgStack composeComplexY(ComplexCat xyOuterCC, Slash xySlash, ComplexCat yzCC,
+			Substitution sub) throws UnifyFailure {
 
-		GUnifier.unify(xyOuterCC.getTarget(), yzCC.getTarget(), sub);
+		GUnifier.unify(grammar, xyOuterCC.getTarget(), yzCC.getTarget(), sub);
 		ArgStack zStack = yzCC.getArgStack();
 		if (xyOuterCC.containsDollarArg()) {
 			// e.g. s$/(s$\n) s\n/n

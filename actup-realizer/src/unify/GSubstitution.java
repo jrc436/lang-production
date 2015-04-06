@@ -47,9 +47,9 @@ public class GSubstitution extends THashMap implements Substitution {
      * object. Automagically condenses the Substitution so that all
      * other values in this Substitution get the new value for the
      * variable if they contain it.
-     *
      * @param var the variable whose value has been determined
      * @param o the Object identified with the variable
+     *
      * @return the Object identified with the variable, which has
      * potentially undergone further unifications as a result of
      * making the substitution

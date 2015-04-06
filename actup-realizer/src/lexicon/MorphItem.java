@@ -48,14 +48,17 @@ public class MorphItem {
     public MorphItem() {};
 
     /** Constructor from XML element. */
-    public MorphItem(Element e) {
-        
+    public MorphItem(Grammar grammar, Element e) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         String coartString = e.getAttributeValue("coart");
         if ("true".equals(coartString)) coart = true;
         
         String wordString = e.getAttributeValue("word");
         boolean strictFactors = coart; // parse with flag for strict factors with coart items
-        Word tokenizedWord = Grammar.theGrammar.lexicon.tokenizer.parseToken(wordString, strictFactors);
+        Word tokenizedWord = grammar.lexicon.tokenizer.parseToken(wordString, strictFactors);
         surfaceWord = Word.createSurfaceWord(tokenizedWord);
         
         String stem = e.getAttributeValue("stem");

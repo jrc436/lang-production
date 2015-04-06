@@ -18,9 +18,14 @@
 
 package hylo;
 
-import synsem.*;
-import unify.*;
-import org.jdom.*;
+import grammar.Grammar;
+
+import org.jdom.Element;
+
+import synsem.LF;
+import unify.SimpleType;
+import unify.Substitution;
+import unify.UnifyFailure;
 
 /**
  * A class for variables over ModeLabel objects.
@@ -35,12 +40,12 @@ public class ModeVar extends HyloVar implements Mode {
     
 	private static final long serialVersionUID = -6872985893931836901L;
 
-	public ModeVar(String name) {
-        super(name);
+	public ModeVar(Grammar grammar, String name) {
+        super(grammar, name);
     }
 
-    protected ModeVar(String name, int index, SimpleType st) {
-        super(name, index, st);
+    protected ModeVar(Grammar grammar, String name, int index, SimpleType st) {
+        super(grammar, name, index, st);
     }
     
     /**
@@ -53,7 +58,7 @@ public class ModeVar extends HyloVar implements Mode {
 	}
 
 	public LF copy() {
-        return new ModeVar(_name, _index, type);
+        return new ModeVar(grammar, _name, _index, type);
     }
 
     

@@ -19,8 +19,11 @@
 
 package lexicon;
 
-import org.jdom.*;
-import java.util.*;
+import grammar.Grammar;
+
+import java.util.List;
+
+import org.jdom.Element;
 
 /**
  * Lexicon category family.
@@ -39,10 +42,16 @@ public class Family {
     private String coartRel = ""; 
     private DataItem[] data;
     private EntriesItem[] entries;
+    
+    //p final Grammar grammar;
 
     @SuppressWarnings("unchecked")
-	public Family(Element famel) {
-    	
+	public Family(Grammar grammar, Element famel) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+    	//this.grammar = grammar;
         setName(famel.getAttributeValue("name"));
         pos = famel.getAttributeValue("pos");
         
@@ -60,7 +69,7 @@ public class Family {
         List<Element> entriesList = famel.getChildren("entry");
         entries = new EntriesItem[entriesList.size()];
         for (int j=0; j < entriesList.size(); j++) {
-            entries[j] = new EntriesItem(entriesList.get(j), this);
+            entries[j] = new EntriesItem(grammar, entriesList.get(j), this);
         }
         
         List<Element> members = famel.getChildren("member");
@@ -70,7 +79,14 @@ public class Family {
         }
     }
 
-    public Family(String s) { setName(s); }
+    public Family(String s) {
+//    	if (grammar == null ) {
+//    		System.err.println("Someone's tricksing you");
+//    		System.exit(1);
+//    	}
+    	//this.grammar = grammar;
+    	setName(s); 
+    }
 
     public boolean isClosed() { return closed.booleanValue(); }
     

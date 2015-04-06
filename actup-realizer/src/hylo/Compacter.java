@@ -18,10 +18,17 @@
 
 package hylo;
 
-import synsem.*;
-import util.*;
+import grammar.Grammar;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import synsem.LF;
+import util.GroupMap;
 
 /**
  * A class implementing compaction of flattened LFs.
@@ -38,7 +45,11 @@ public class Compacter {
      * If there are any duplicate predications, an attempt 
      * is made to attach them in different locations.
      */
-    static LF compact(LF lf, Nominal root) {
+    static LF compact(Grammar grammar, LF lf, Nominal root) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         // get preds, make copies
         List<SatOp> preds = HyloHelper.getPreds(lf);
         for (int i=0; i < preds.size(); i++) {
@@ -120,7 +131,7 @@ public class Compacter {
         }
         
         // ensure sorted
-        HyloHelper.sort(preds);
+        HyloHelper.sort(grammar, preds);
         
         // combine preds on same nominal
         // also: gather any duplicate preds 
@@ -145,7 +156,7 @@ public class Compacter {
             }
             // otherwise combine
             else {
-                combine(currentSatOp, satOp);
+                combine(grammar, currentSatOp, satOp);
             }
         }
         
@@ -160,7 +171,7 @@ public class Compacter {
                 if (nom1.equals(nom2)) continue;
                 if (!parents.containsKey(nom2)) continue;
                 if (nom1.equals(parents.get(nom2))) {
-                    subst(satOp1, satOp2, nom2, null);
+                    subst(grammar, satOp1, satOp2, nom2, null);
                 }
             }
         }
@@ -218,7 +229,7 @@ public class Compacter {
                 if (closestDist == -1 || closestRootIndex == -1) { continue; }
                 // otherwise compact under root pred of parent closest to root
                 SatOp closestRootPred = rootPreds.get(closestRootIndex);
-                subst(closestRootPred, pred, nom, parentClosestToRoot);
+                subst(grammar, closestRootPred, pred, nom, parentClosestToRoot);
                 // update parents map
                 parents.put(nom, parentClosestToRoot);
                 // and remove from iterator
@@ -232,13 +243,13 @@ public class Compacter {
         retPreds.addAll(rootPreds);
         retPreds.addAll(multipleParentPreds);
         if (retPreds.size() == 1) { retval = retPreds.get(0); }
-        else { retval = new Op(Op.CONJ, retPreds); }
+        else { retval = new Op(grammar, Op.CONJ, retPreds); }
         
         // tmp
         for (SatOp dup : dupPreds) {
         	Nominal nom = dup.getNominal();
         	Nominal dupParent = findDupParent(retval, dup, nom);
-        	subst(retval, dup, nom, dupParent); 
+        	subst(grammar, retval, dup, nom, dupParent); 
         }
 
         // return
@@ -249,7 +260,11 @@ public class Compacter {
     // combines two preds for the same nominal into the first pred, 
     // where either both preds are elementary, 
     // or the first is the result of an earlier combination
-    private static void combine(SatOp satOp1, SatOp satOp2) {
+    private static void combine(Grammar grammar, SatOp satOp1, SatOp satOp2) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         // get args
         LF arg1 = satOp1.getArg();
         LF arg2 = satOp2.getArg();
@@ -262,7 +277,7 @@ public class Compacter {
         else {
             List<LF> args = new ArrayList<LF>(2);
             args.add(arg1); args.add(arg2);
-            satOp1.setArg(new Op(Op.CONJ, args));
+            satOp1.setArg(new Op(grammar, Op.CONJ, args));
         }
     }
     
@@ -270,17 +285,21 @@ public class Compacter {
     // substitutes the second satop into the first lf at nom2, optionally 
     // respecting the given parent constraint (if non-null)
     // returns whether the substitution has been made
-    private static boolean subst(LF lf, SatOp satOp2, Nominal nom2, Nominal requiredParent) {
-        return subst(lf, null, satOp2, nom2, requiredParent);
+    private static boolean subst(Grammar grammar, LF lf, SatOp satOp2, Nominal nom2, Nominal requiredParent) {
+        return subst(grammar, lf, null, satOp2, nom2, requiredParent);
     }
     
     // recursive implementation that tracks the current parent and 
     // returns whether the substitution has been made
-    private static boolean subst(LF lf, Nominal currentParent, SatOp satOp2, Nominal nom2, Nominal requiredParent) {
+    private static boolean subst(Grammar grammar, LF lf, Nominal currentParent, SatOp satOp2, Nominal nom2, Nominal requiredParent) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         // recurse to nom2, then append if requiredParent constraint met
         if (lf instanceof SatOp) {
             SatOp satOp = (SatOp) lf;
-            return subst(satOp.getArg(), satOp.getNominal(), satOp2, nom2, requiredParent);
+            return subst(grammar, satOp.getArg(), satOp.getNominal(), satOp2, nom2, requiredParent);
         }
         else if (lf instanceof Diamond) {
             Diamond d = (Diamond) lf;
@@ -288,11 +307,11 @@ public class Compacter {
             // check for nom2, and that requiredParent constraint met
             if (arg.equals(nom2) && (requiredParent == null || requiredParent.equals(currentParent))) {
                 // make substitution
-                d.setArg(HyloHelper.append(arg, satOp2.getArg()));
+                d.setArg(HyloHelper.append(grammar, arg, satOp2.getArg()));
                 return true;
             }
             else {
-                return subst(arg, currentParent, satOp2, nom2, requiredParent);
+                return subst(grammar, arg, currentParent, satOp2, nom2, requiredParent);
             }
         }
         else if (lf instanceof Op) {
@@ -314,7 +333,7 @@ public class Compacter {
 	                    continue;
                     }
                 }
-                boolean madeSubst = subst(arg, currentParent, satOp2, nom2, requiredParent);
+                boolean madeSubst = subst(grammar, arg, currentParent, satOp2, nom2, requiredParent);
                 if (madeSubst) return true;
             }
         }

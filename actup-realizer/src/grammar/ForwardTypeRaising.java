@@ -32,9 +32,8 @@ public class ForwardTypeRaising extends AbstractTypeRaisingRule {
 	private static final long serialVersionUID = 1417585756957436141L;
 
 	/** Creates a forward type raising rule with the given parameters. */
-    public ForwardTypeRaising (boolean useDollar, Category arg, Category result) {
-        super(">T", new Slash('/', new VarModality("i")), new Slash('\\', new VarModality("i")),
-              useDollar, arg, result);
+    public ForwardTypeRaising (Grammar grammar, boolean useDollar, Category arg, Category result) {
+        super(grammar, ">T", new Slash(grammar, '/', new VarModality(grammar, "i")), new Slash(grammar, '\\', new VarModality(grammar, "i")), useDollar, arg, result);
     }
     
     public String toString() {

@@ -14,7 +14,7 @@ public class Rouge extends Evaluator {
 
 	private String rougePath;
 	ShellScriptExecute exc;
-	public Rouge(ScoringStrategy strat, String rougePath) throws IOException {
+	public Rouge(ScoringStrategy strat, String rougePath) {
 		super(strat);
 		this.rougePath = rougePath;
 		exc = new ShellScriptExecute(Runtime.getRuntime());

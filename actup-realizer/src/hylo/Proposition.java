@@ -18,9 +18,14 @@
 
 package hylo;
 
-import synsem.*;
-import unify.*;
-import org.jdom.*;
+import grammar.Grammar;
+
+import org.jdom.Element;
+
+import synsem.LF;
+import unify.SimpleType;
+import unify.Substitution;
+import unify.UnifyFailure;
 
 /**
  * A propositional value, such as the predicate "sleep", 
@@ -35,16 +40,16 @@ public class Proposition extends HyloAtom {
 
 	private static final long serialVersionUID = -5392519210634765414L;
 
-	public Proposition(String name) {
-        super(name);
+	public Proposition(Grammar grammar, String name) {
+        super(grammar, name);
     }
     
-    public Proposition(String name, SimpleType st) {
-        super(name, st);
+    public Proposition(Grammar grammar, String name, SimpleType st) {
+        super(grammar, name, st);
     }
     
     public LF copy() {
-        return new Proposition(_name, type);
+        return new Proposition(grammar, _name, type);
     }
     
     public Object unify(Object u, Substitution sub) throws UnifyFailure {
@@ -59,7 +64,7 @@ public class Proposition extends HyloAtom {
             if (st.equals(type)) return this;
             if (st.equals(prop.type)) return prop;
             // otherwise return prop with name of intersection type
-            return new Proposition(st.getName(), st);
+            return new Proposition(grammar, st.getName(), st);
         }
         // otherwise defer to default routine
         return super.unify(u, sub);
@@ -73,4 +78,9 @@ public class Proposition extends HyloAtom {
         retval.setAttribute("name", toString());
         return retval;
     }
+
+	@Override
+	public String prettyPrint(String indent) {
+		return prettyPrint(indent);
+	}
 }

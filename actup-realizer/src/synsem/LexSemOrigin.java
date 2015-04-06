@@ -18,6 +18,7 @@
 
 package synsem;
 
+
 /**
  * An interface for items which introduce lexical semantics, covering 
  * (lexical) signs and unary type changing rules.

@@ -109,12 +109,12 @@ public class FeatureLicenser
                 if (index == null) {
                     do {
                         index = "w" + ++wordCounter;
-                        nom = new NominalAtom(index);
+                        nom = new NominalAtom(edgeFactory.grammar, index);
                     } while (edgeFactory.nominals.containsKey(nom));
                     wordIndexMap.put(lexVal, index);
                     edgeFactory.nominals.put(nom, edgeFactory.nominals.size());
                 }
-                else nom = new NominalAtom(index);
+                else nom = new NominalAtom(edgeFactory.grammar, index);
                 fs.setFeature("index", nom);
             }
         }
@@ -348,7 +348,7 @@ public class FeatureLicenser
             // ensure cats with lex feature have an index var
             FeatureStructure fs = ac.getFeatureStructure();
             if (fs.hasAttribute("lex") && !fs.hasAttribute("index")) {
-                fs.setFeature("index", new NominalVar("W"));
+                fs.setFeature("index", new NominalVar(edgeFactory.grammar, "W"));
                 UnifyControl.reindex(ac);
             }
             // unify with appropriate initial cats

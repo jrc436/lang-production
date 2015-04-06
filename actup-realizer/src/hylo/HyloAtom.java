@@ -18,8 +18,10 @@
 
 package hylo;
 
-import unify.*;
-import gnu.trove.*;
+import gnu.trove.TObjectIntHashMap;
+import grammar.Grammar;
+import unify.SimpleType;
+import unify.Variable;
 
 /**
  * A logical atomic formula.
@@ -36,12 +38,13 @@ public abstract class HyloAtom extends HyloFormula {
 	protected String _name;
     protected SimpleType type;
 
-    protected HyloAtom(String name) {
-        this(name, null);
+    protected HyloAtom(Grammar grammar, String name) {
+        this(grammar, name, null);
     }
     
-    protected HyloAtom(String name, SimpleType st) {
-        _name = name; type = st;
+    protected HyloAtom(Grammar grammar, String name, SimpleType st) {
+        super(grammar);
+    	_name = name; type = st;
     }
     
     public void setAtomName(String name) {

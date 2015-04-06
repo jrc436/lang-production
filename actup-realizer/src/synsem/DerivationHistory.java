@@ -43,20 +43,32 @@ public class DerivationHistory implements Serializable, Comparable<DerivationHis
     private boolean _noHistory = false;
     private transient int _complexity = -1;
     
+    private final Grammar grammar;
+    
     /** Constructor for a sign with no prior history. */
-    public DerivationHistory(Sign output) {
+    public DerivationHistory(Grammar grammar, Sign output) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         _noHistory = true;
         _output = output;
+        this.grammar = grammar;
     }
     
     /** Constructor for a sign created by rule. */
-    public DerivationHistory(Sign[] inputs, Sign output, Rule rule) {
+    public DerivationHistory(Grammar grammar, Sign[] inputs, Sign output, Rule rule) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         _inputs = new Sign[inputs.length];
         for (int i=0; i < inputs.length; i++) {
             _inputs[i] = inputs[i];
         }
         _output = output;
         _rule = rule;
+        this.grammar = grammar;
     }
 
 
@@ -94,7 +106,7 @@ public class DerivationHistory implements Serializable, Comparable<DerivationHis
         }
         // type-changing rule (possibly)
         String ruleName = _rule.name();
-        TypeChangingRule tcr = Grammar.theGrammar.rules.getTypeChangingRule(ruleName);
+        TypeChangingRule tcr = grammar.rules.getTypeChangingRule(ruleName);
         if (tcr != null) {
             sb.append("(gram) ");
             for (int i = 6; i < maxRuleLen; i++) { sb.append(' '); }

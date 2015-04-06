@@ -39,20 +39,26 @@ public class GFeatVar implements Variable, Indexed, Mutable, Serializable {
     protected int _index;
     protected int _hashCode;
     protected SimpleType type;
+    private final Grammar grammar;
     
-    public GFeatVar(String name) {
-        this(name, 0, null);
+    public GFeatVar(Grammar grammar, String name) {
+        this(grammar, name, 0, null);
     }
 
-    public GFeatVar(String name, SimpleType st) {
-        this(name, 0, st);
+    public GFeatVar(Grammar grammar, String name, SimpleType st) {
+        this(grammar, name, 0, st);
     }
 
-    protected GFeatVar(String name, int index, SimpleType st) {
+    protected GFeatVar(Grammar grammar, String name, int index, SimpleType st) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         _name = name;
         _index = index;
-        type = (st != null) ? st : Grammar.theGrammar.types.getSimpleType(Types.TOP_TYPE);
+        type = (st != null) ? st : grammar.types.getSimpleType(Types.TOP_TYPE);
         _hashCode = _name.hashCode() + _index + type.getIndex();
+        this.grammar = grammar;
     }
     
     public String name() {
@@ -60,7 +66,7 @@ public class GFeatVar implements Variable, Indexed, Mutable, Serializable {
     }
 
     public Object copy() {
-        return new GFeatVar(_name, _index, type);
+        return new GFeatVar(grammar, _name, _index, type);
     }
     
     public void deepMap(ModFcn mf) {
@@ -144,7 +150,7 @@ public class GFeatVar implements Variable, Indexed, Mutable, Serializable {
             else if (st3.equals(st1)) return sub.makeSubstitution(var, this);
             else {
                 // need a new var with intersection type
-                GFeatVar var3 = new GFeatVar(_name, UnifyControl.getUniqueVarIndex(), st3);
+                GFeatVar var3 = new GFeatVar(grammar, _name, UnifyControl.getUniqueVarIndex(), st3);
                 sub.makeSubstitution(var, var3);
                 return sub.makeSubstitution(this, var3);
             }

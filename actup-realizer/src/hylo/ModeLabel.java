@@ -18,9 +18,13 @@
 
 package hylo;
 
-import synsem.*;
-import unify.*;
-import org.jdom.*;
+import grammar.Grammar;
+
+import org.jdom.Element;
+
+import synsem.LF;
+import unify.Substitution;
+import unify.UnifyFailure;
 
 /**
  * A modality label.
@@ -34,12 +38,12 @@ public final class ModeLabel extends HyloAtom implements Mode {
 
 	private static final long serialVersionUID = -4101305505903588678L;
 
-	public ModeLabel(String name) {
-        super(name);
+	public ModeLabel(Grammar grammar, String name) {
+        super(grammar, name);
     }
 
     public LF copy() {
-        return new ModeLabel(_name);
+        return new ModeLabel(grammar, _name);
     }
 
     public Object unify(Object u, Substitution sub) throws UnifyFailure {
@@ -54,4 +58,8 @@ public final class ModeLabel extends HyloAtom implements Mode {
     public Element toXml() {
         throw new RuntimeException("toXml() not currently supported for ModeLabel.");
     }
+	@Override
+	public String prettyPrint(String indent) {
+		return super.prettyPrint(indent);
+	}
 }

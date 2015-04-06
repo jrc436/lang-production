@@ -18,9 +18,13 @@
 
 package hylo;
 
-import synsem.*;
-import unify.*;
-import org.jdom.*;
+import grammar.Grammar;
+
+import org.jdom.Element;
+
+import synsem.LF;
+import unify.Substitution;
+import unify.UnifyFailure;
 
 
 /**
@@ -33,16 +37,16 @@ public final class Box extends ModalOp {
 
 	private static final long serialVersionUID = 1575311851235814524L;
 
-	public Box(Element e) {
-        super(e);
+	public Box(Grammar grammar, Element e) {
+        super(grammar, e);
     }
 
-    private Box(Mode mode, LF arg) {
-        super(mode, arg);
+    private Box(Grammar grammar, Mode mode, LF arg) {
+        super(grammar, mode, arg);
     }
 
     public LF copy() {
-        return new Box ((Mode)_mode.copy(), _arg.copy());
+        return new Box(grammar, (Mode)_mode.copy(), _arg.copy());
     }
     
     public boolean equals(Object o) {
@@ -62,7 +66,7 @@ public final class Box extends ModalOp {
     }
 
     public Object fill(Substitution sub) throws UnifyFailure {
-        return new Box((Mode)_mode.fill(sub), (LF)_arg.fill(sub));
+        return new Box(grammar, (Mode)_mode.fill(sub), (LF)_arg.fill(sub));
     }
     
     /** Returns the string form of this modal op, without the arg. */
@@ -78,4 +82,9 @@ public final class Box extends ModalOp {
     public Element toXml() {
         throw new RuntimeException("toXml() not currently supported for Box.");
     }
+
+	@Override
+	public String prettyPrint(String indent) {
+		return prettyPrint(indent);
+	}
 }

@@ -57,12 +57,7 @@ import synsem.Sign;
  * @version     $Revision: 1.32 $, $Date: 2010/08/10 04:10:15 $
  */
 public class Edge extends Tracker
-{
-	//preferences
-	public static final Boolean SHOW_COMPLETENESS = true;
-	public static final Boolean SHOW_BITSET = true;
-
-    
+{    
     /** The sign. */
     protected Sign sign;
     
@@ -93,7 +88,8 @@ public class Edge extends Tracker
     {
         super(bitset, indices, activeLfAlts);
         this.sign = sign;
-        this.completeness = completeness; this.score = score; 
+        this.completeness = completeness; 
+        this.score = score; 
         this.incompleteLfChunk = incompleteLfChunk;
     }
 
@@ -103,7 +99,7 @@ public class Edge extends Tracker
     
     /** Returns whether this edge has completeness 1.0, ie, covers all the input preds. */
     public boolean complete() {
-        return (completeness == 1.0);
+        return completeness == 1.0;
     }
     
 
@@ -116,16 +112,19 @@ public class Edge extends Tracker
      * coverage vector.
      */
     public boolean meetsLfChunkConstraints(Tracker tracker) {
-        if (incompleteLfChunk == null || tracker.bitset.isEmpty()) return true;
-        return incompleteLfChunk.intersects(tracker.bitset);
+        return incompleteLfChunk == null || tracker.bitset.isEmpty() || incompleteLfChunk.intersects(tracker.bitset);
     }
     
 
     /** Returns whether this edge is a representative. */
-    public boolean isRepresentative() { return altEdges != null; }
+    public boolean isRepresentative() { 
+    	return altEdges != null; 
+    }
     
     /** Returns whether this edge is disjunctive. */
-    public boolean isDisjunctive() { return altEdges != null && altEdges.size() > 1; }
+    public boolean isDisjunctive() { 
+    	return altEdges != null && altEdges.size() > 1; 
+    }
     
     /** Returns the list of alt edges, or the empty list if none. */
     public List<Edge> getAltEdges() {
@@ -197,9 +196,8 @@ public class Edge extends Tracker
      * {completeness} [score] orthography :- category {bitset}. 
      */
     public String toString() {
-       // Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
-        boolean showCompleteness = SHOW_COMPLETENESS;//prefs.getBoolean(SHOW_COMPLETENESS, false);
-        boolean showBitset = SHOW_BITSET;//prefs.getBoolean(SHOW_BITSET, false);
+        boolean showCompleteness = true;
+        boolean showBitset = true;
         StringBuffer sbuf = new StringBuffer();
         //sbuf.append(indices + " ");
         if (showCompleteness) { sbuf.append("{" + nf2.format(completeness) + "} "); }

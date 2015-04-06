@@ -18,9 +18,14 @@
 
 package hylo;
 
-import synsem.*;
-import unify.*;
-import org.jdom.*;
+import grammar.Grammar;
+
+import org.jdom.Element;
+
+import synsem.LF;
+import unify.Substitution;
+import unify.Unifier;
+import unify.UnifyFailure;
 
 /**
  * A modal diamond operator, such as &lt;P&gt;p.
@@ -33,16 +38,16 @@ public final class Diamond extends ModalOp {
 
 	private static final long serialVersionUID = 543211908001651361L;
 
-	public Diamond(Element e) {
-        super(e);
+	public Diamond(Grammar grammar, Element e) {
+        super(grammar, e);
     }
 
-    public Diamond(Mode mode, LF arg) {
-        super(mode, arg);
+    public Diamond(Grammar grammar, Mode mode, LF arg) {
+        super(grammar, mode, arg);
     }
 
     public LF copy() {
-        return new Diamond ((Mode)_mode.copy(), _arg.copy());
+        return new Diamond(grammar, (Mode)_mode.copy(), _arg.copy());
     }
     
     public boolean equals(Object o) {
@@ -65,17 +70,17 @@ public final class Diamond extends ModalOp {
         if (u instanceof HyloFormula) {
             if (u instanceof Diamond) {
                 Mode $mode = (Mode) Unifier.unify(_mode, ((Diamond)u)._mode, sub);
-                LF $arg = (LF) Unifier.unify(_arg,((Diamond)u)._arg, sub);
-                return new Diamond($mode, $arg);
+                LF $arg = (LF) Unifier.unify(_arg, ((Diamond)u)._arg,sub);
+                return new Diamond(grammar, $mode, $arg);
             }
-            else return super.unify(u,sub);
+            else return super.unify(u, sub);
         } else {
             throw new UnifyFailure();
         }
     }
 
     public Object fill(Substitution sub) throws UnifyFailure {
-        return new Diamond((Mode)_mode.fill(sub), (LF)_arg.fill(sub));
+        return new Diamond(grammar, (Mode)_mode.fill(sub), (LF)_arg.fill(sub));
     }
     
     /** Returns the string form of this modal op, without the arg. */
@@ -93,4 +98,9 @@ public final class Diamond extends ModalOp {
         retval.addContent(argElt);
         return retval;
     }
+
+	@Override
+	public String prettyPrint(String indent) {
+		return prettyPrint(indent);
+	}
 }

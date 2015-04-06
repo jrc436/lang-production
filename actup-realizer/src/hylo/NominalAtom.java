@@ -18,17 +18,15 @@
 
 package hylo;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import grammar.Grammar;
+import grammar.Types;
 
-import grammar.*;
-import synsem.*;
-import unify.*;
+import org.jdom.Element;
 
-import org.jdom.*;
+import synsem.LF;
+import unify.SimpleType;
+import unify.Substitution;
+import unify.UnifyFailure;
 
 /**
  * A hybrid logic nominal, an atomic formula which holds true at exactly one
@@ -47,17 +45,17 @@ public class NominalAtom extends HyloAtom implements Nominal {
 	
 	protected boolean shared = false;
     
-    public NominalAtom(String name) {
-        this(name, null);
+    public NominalAtom(Grammar grammar, String name) {
+        this(grammar, name, null);
     }
     
-    public NominalAtom(String name, SimpleType st) {
-        this(name, st, false);
+    public NominalAtom(Grammar grammar, String name, SimpleType st) {
+        this(grammar, name, st, false);
     }
     
-    public NominalAtom(String name, SimpleType st, boolean shared) {
-        super(name, st);
-        type = (st != null) ? st : Grammar.theGrammar.types.getSimpleType(Types.TOP_TYPE);
+    public NominalAtom(Grammar grammar, String name, SimpleType st, boolean shared) {
+        super(grammar, name, st);
+        type = (st != null) ? st : grammar.types.getSimpleType(Types.TOP_TYPE);
         this.shared = shared;
     }
 
@@ -68,7 +66,7 @@ public class NominalAtom extends HyloAtom implements Nominal {
     public void setShared(boolean shared) { this.shared = shared; }
     
     public LF copy() {
-        return new NominalAtom(_name, type, shared);
+        return new NominalAtom(grammar, _name, type, shared);
     }
 
     /** Returns a hash code based on the atom name and type. */
@@ -113,23 +111,9 @@ public class NominalAtom extends HyloAtom implements Nominal {
         retval.setAttribute("name", toString());
         return retval;
     }
-    
-    /** Tests serialization. */
-    public static void debugSerialization() throws IOException, ClassNotFoundException {
-        // test serialization
-        NominalAtom n = new NominalAtom("w1");
-    	String filename = "tmp.ser";
-    	ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename));
-    	System.out.println("Writing n: " + n);
-    	out.writeObject(n);
-    	out.close();
-    	ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename));
-    	System.out.print("Reading n2: ");
-    	NominalAtom n2 = (NominalAtom) in.readObject();
-    	System.out.println(n2);
-    	in.close();
-    	// test identity and equality
-    	System.out.println("n == n2?: " + (n == n2));
-    	System.out.println("n.equals(n2)?: " + (n.equals(n2)));
-    }
+
+	@Override
+	public String prettyPrint(String indent) {
+		return prettyPrint(indent);
+	}
 }

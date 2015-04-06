@@ -17,6 +17,8 @@
 //////////////////////////////////////////////////////////////////////////////
 package unify;
 
+import grammar.Grammar;
+
 /**
  * A unification utility that abstracts a few basic issues such
  * Variables and not needed to pass a substitution object explictly.
@@ -34,7 +36,11 @@ public class Unifier {
      * @param u2 the second of two Unifiables to unify
      * @return the result of unifying u1 and u2
      **/
-    public static final Object unify (Object u1, Object u2) throws UnifyFailure {
+    public static final Object unify (Grammar grammar, Object u1, Object u2) throws UnifyFailure {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         Substitution sub = new SelfCondensingSub();
         Object result =  unify(u1, u2, sub);
         if (result instanceof Unifiable) {
@@ -50,11 +56,11 @@ public class Unifier {
      * for a set of classes, you don't have to have each Unifiable
      * check to see if the thing it is trying to be unified with is a
      * Variable.
-     *
      * @param u1 the first of two Unifiables to unify
      * @param u2 the second of two Unifiables to unify
      * @param sub the substitution object holding global unification
      * information
+     *
      * @return the result of unifying u1 and u2
      **/
     public static final Object unify (Object u1, Object u2, Substitution sub) throws UnifyFailure {

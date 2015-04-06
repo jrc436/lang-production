@@ -16,10 +16,11 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package realize;
+package ngrams;
 
 import java.util.List;
 
+import pruning.DiversityPruningStrategy;
 import lexicon.Word;
 import synsem.Sign;
 
@@ -36,10 +37,13 @@ import synsem.Sign;
 public class StemPruningStrategy extends DiversityPruningStrategy
 {
     /** Constructor, defaults singleBestPerGroup to true. */
-    public StemPruningStrategy() { this(true); }
+    public StemPruningStrategy(int pruneVal) { 
+    	this(pruneVal, true); 
+    }
 
     /** Full constructor. */
-    public StemPruningStrategy(boolean singleBestPerGroup) { 
+    public StemPruningStrategy(int pruneVal, boolean singleBestPerGroup) {
+    	super(pruneVal);
         this.singleBestPerGroup = singleBestPerGroup;
     }
     

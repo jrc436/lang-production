@@ -50,37 +50,37 @@ public final class AtomCat extends AbstractCat implements TargetCat {
     public boolean fragCompletion = false;
     
     /** Constructor which creates an atomic category with the given type. */
-    public AtomCat(String t) {
-        this(t, new GFeatStruc());
+    public AtomCat(Grammar grammar, String t) {
+        this(grammar, t, new GFeatStruc(grammar));
     }
 
     /** Constructor which creates an atomic category with the given type and feature structure. */
-    public AtomCat(String t, FeatureStructure fs) {
-        this(t, fs, null); 
+    public AtomCat(Grammar grammar, String t, FeatureStructure fs) {
+        this(grammar, t, fs, null); 
     }
 
     /** Constructor which creates an atomic category with the given type, feature structure and LF. */
-    public AtomCat(String t, FeatureStructure fs, LF lf) {
-        super(lf);
+    public AtomCat(Grammar grammar, String t, FeatureStructure fs, LF lf) {
+        super(grammar, lf);
         type = t; 
         _featStruc = fs; 
     }
 
     /** Constructor which retrieves the atomic category from the XML element. */
-    public AtomCat(Element acel) {
+    public AtomCat(Grammar grammar, Element acel) {
         // call super to get LF if present
-        super(acel);
+        super(grammar, acel);
         // get type
         type = acel.getAttributeValue("type");
         if (type == null) type = acel.getAttributeValue("t"); 
         // get feature structure
         Element fsEl = acel.getChild("fs");
         if (fsEl != null) {
-            _featStruc = new GFeatStruc(fsEl);
+            _featStruc = new GFeatStruc(grammar, fsEl);
         }
         // or create empty one
         else {
-            _featStruc = new GFeatStruc();
+            _featStruc = new GFeatStruc(grammar);
         }
     }
 
@@ -97,13 +97,13 @@ public final class AtomCat extends AbstractCat implements TargetCat {
 
     
     public Category copy() {
-    	AtomCat retval = new AtomCat(type, _featStruc.copy(), (_lf == null) ? null : (LF) _lf.copy());
+    	AtomCat retval = new AtomCat(grammar, type, _featStruc.copy(), (_lf == null) ? null : (LF) _lf.copy());
     	retval.fragCompletion = fragCompletion;
         return retval;
     }
 
     public Category shallowCopy() {
-        AtomCat retval = new AtomCat(type, _featStruc, _lf);
+        AtomCat retval = new AtomCat(grammar, type, _featStruc, _lf);
     	retval.fragCompletion = fragCompletion;
         return retval;
     }
@@ -141,18 +141,16 @@ public final class AtomCat extends AbstractCat implements TargetCat {
             } else {
                 $fs = (FeatureStructure)_featStruc.unify(u_ac._featStruc, sub);
             }
-            return new AtomCat(type, $fs);
+            return new AtomCat(grammar, type, $fs);
         }
         else {
             throw new UnifyFailure();
         }
     }
 
-    public Object fill (Substitution s) throws UnifyFailure {
+    public Object fill(Substitution s) throws UnifyFailure {
         AtomCat $ac =
-            new AtomCat(type,
-                        (FeatureStructure)_featStruc.fill(s),
-                        (_lf == null) ? null : (LF) _lf.fill(s));
+            new AtomCat(grammar, type, (FeatureStructure)_featStruc.fill(s), (_lf == null) ? null : (LF) _lf.fill(s));
         return $ac;
     }
 
@@ -171,10 +169,10 @@ public final class AtomCat extends AbstractCat implements TargetCat {
         sb.append(type);
         if (fragCompletion) sb.append("_c");
         
-        if(_featStruc != null && Grammar.theGrammar.showFeats)
+        if(_featStruc != null && grammar.showFeats)
             sb.append(_featStruc.toString());
 
-        if (_lf != null && Grammar.theGrammar.showSem) {
+        if (_lf != null && grammar.showSem) {
             sb.append(" : ").append(_lf.toString());
         }
 
@@ -198,7 +196,7 @@ public final class AtomCat extends AbstractCat implements TargetCat {
     public String toTeX() {
         StringBuffer sb = new StringBuffer();
         sb.append(type);
-        if(_featStruc != null && Grammar.theGrammar.showFeats)
+        if(_featStruc != null && grammar.showFeats)
             sb.append(_featStruc.toTeX());
         if (sb.length() == 0) return "UnknownCat";
         return sb.toString();

@@ -18,9 +18,15 @@
 
 package hylo;
 
-import synsem.*;
-import unify.*;
-import org.jdom.*;
+import grammar.Grammar;
+
+import org.jdom.Element;
+
+import synsem.LF;
+import unify.SimpleType;
+import unify.Substitution;
+import unify.UnifyControl;
+import unify.UnifyFailure;
 
 /**
  * A class for variables over NominalAtom objects.
@@ -37,25 +43,25 @@ public class NominalVar extends HyloVar implements Nominal {
 	
 	protected boolean shared = false;
     
-    public NominalVar(String name) {
-        super(name);
+    public NominalVar(Grammar grammar, String name) {
+        super(grammar, name);
     }
 
-    public NominalVar(String name, SimpleType st) {
-        super(name, st);
+    public NominalVar(Grammar grammar, String name, SimpleType st) {
+        super(grammar, name, st);
     }
 
-    public NominalVar(String name, SimpleType st, boolean shared) {
-        super(name, st);
+    public NominalVar(Grammar grammar, String name, SimpleType st, boolean shared) {
+        super(grammar, name, st);
         this.shared = shared;
     }
 
-    protected NominalVar(String name, int index, SimpleType st) {
-        super(name, index, st);
+    protected NominalVar(Grammar grammar, String name, int index, SimpleType st) {
+        super(grammar, name, index, st);
     }
     
-    protected NominalVar(String name, int index, SimpleType st, boolean shared) {
-        super(name, index, st);
+    protected NominalVar(Grammar grammar, String name, int index, SimpleType st, boolean shared) {
+        super(grammar, name, index, st);
         this.shared = shared;
     }
     
@@ -71,7 +77,7 @@ public class NominalVar extends HyloVar implements Nominal {
     }
     
     public LF copy() {
-        return new NominalVar(_name, _index, type, shared);
+        return new NominalVar(grammar, _name, _index, type, shared);
     }
 
     
@@ -116,7 +122,7 @@ public class NominalVar extends HyloVar implements Nominal {
             // otherwise make new nom var with intersection type, 
             // name based on comparison order and index, and new index
             String name = (super.compareTo(u_nv) >= 0) ? (u_nv._name + u_nv._index) : (_name + _index);
-            NominalVar nv_st = new NominalVar(name, UnifyControl.getUniqueVarIndex(), st);
+            NominalVar nv_st = new NominalVar(grammar, name, UnifyControl.getUniqueVarIndex(), st);
             // and subst both
             sub.makeSubstitution(u_nv, nv_st);
             return sub.makeSubstitution(this, nv_st); 
@@ -128,7 +134,7 @@ public class NominalVar extends HyloVar implements Nominal {
             if (type.equals(st)) return sub.makeSubstitution(u_hv, this); 
             // otherwise make new nom var with intersection type, 
             // same name, and new index
-            NominalVar nv_st = new NominalVar(this._name, UnifyControl.getUniqueVarIndex(), st);
+            NominalVar nv_st = new NominalVar(grammar, this._name, UnifyControl.getUniqueVarIndex(), st);
             // and subst both
             sub.makeSubstitution(u_hv, nv_st);
             return sub.makeSubstitution(this, nv_st); 

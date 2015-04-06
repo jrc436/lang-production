@@ -18,6 +18,7 @@
 
 package synsem;
 
+
 /**
  * A set of functions that can be applied to Categories.  This is a way of
  * getting around the fact that Java doesn't have 1st class functions.
@@ -49,7 +50,6 @@ public interface CategoryFcn {
     
     /**
      * Performs some destructive operation given a category
-     *
      * @param c The category used for whatever purpose
      */
     public void forall(Category c);

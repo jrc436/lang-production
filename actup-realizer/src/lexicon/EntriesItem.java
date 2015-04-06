@@ -18,8 +18,12 @@
 //////////////////////////////////////////////////////////////////////////////
 package lexicon;
 
-import synsem.*;
-import org.jdom.*;
+import grammar.Grammar;
+
+import org.jdom.Element;
+
+import synsem.CatReader;
+import synsem.Category;
 
 /**
  * Data structure for storing information about a category family entry.
@@ -38,7 +42,11 @@ public class EntriesItem {
     private String indexRel;
     private Category cat;
 
-    public EntriesItem(Element el, Family family) {
+    public EntriesItem(Grammar grammar, Element el, Family family) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         this.family = family;
         name = el.getAttributeValue("name");
 
@@ -53,7 +61,7 @@ public class EntriesItem {
         if (indexRelVal != null) indexRel = indexRelVal;
         else indexRel = family.getIndexRel();
 
-        cat = CatReader.getCat((Element)el.getChildren().get(0));
+        cat = CatReader.getCat(grammar, (Element)el.getChildren().get(0));
     }
 
     public Boolean getActive() { return active; }

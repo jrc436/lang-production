@@ -5,15 +5,16 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 
+import ngrams.ACTRNgramModel;
+import realize.Realization;
+import realize.RealizeMain;
+import runconfig.IOSettings;
 import runconfig.ModelType;
-import runconfig.Settings;
+import runconfig.RealizationSettings;
 import evaluation.Evaluator;
 import evaluation.LevenshteinDistance;
 import evaluation.LevenshteinDistanceWord;
 import evaluation.Rouge;
-import ngrams.ACTRNgramModel;
-import realize.Realization;
-import realize.RealizeMain;
 
 
 //a hillclimber... that likes valleys
@@ -22,43 +23,31 @@ public class ValleyClimber implements Optimizer {
 	private String realizationLogPath;
 	private String goldRealizationDir;
 	private String resultsLogPath;
-	private Settings runSettings;
+	private IOSettings runSettings;
+	private RealizationSettings rs;
 	private Evaluator eval;
 	private String grammarFile;
-	public ValleyClimber(Settings s, String grammarFile, String inputFileDir, String realizationLogPath, String resultsLogPath, String goldRealizationDir) {
+	public ValleyClimber(IOSettings s, RealizationSettings rs, String grammarFile, String inputFileDir, String realizationLogPath, String resultsLogPath, String goldRealizationDir) {
 		this.goldRealizationDir = goldRealizationDir;
 		//this.opt = opt;
+		this.rs = rs;
 		this.inputFileDir = inputFileDir;
 		this.realizationLogPath = realizationLogPath;
 		this.resultsLogPath = resultsLogPath;
 		this.runSettings = s;
 		this.grammarFile = grammarFile;
-		try { 
-			switch (s.getEvaluationType()) {
-				case EditDistanceChar:
-					eval = new LevenshteinDistance(s.getScoringStrategy());
-					break;
-				case EditDistanceWord:
-					eval = new LevenshteinDistanceWord(s.getScoringStrategy());
-					break;
-				case ROUGE:
-					eval = new Rouge(s.getScoringStrategy(), s.getEvaluationType().extPath());
-					break;
-			}
-		}
-		catch (IOException io) {
-			io.printStackTrace();
-			System.err.println("Unable to initialize evaluator!");
-			System.exit(1);
+		switch (s.getEvaluationType()) {
+			case EditDistanceChar:
+				eval = new LevenshteinDistance(s.getScoringStrategy());
+				break;
+			case EditDistanceWord:
+				eval = new LevenshteinDistanceWord(s.getScoringStrategy());
+				break;
+			case ROUGE:
+				eval = new Rouge(s.getScoringStrategy(), s.getEvaluationType().extPath());
+				break;
 		}
 	}
-//	public void randomRestart() {
-//		opt.forceRandomAll();
-//	}
-//	public void resetOpt(double[] vars) {
-//		opt.forceAll(vars);
-//	}
-	//startIndex refers to which variable to optimize first!
 	
 	//experiment name should be a specific run of an experiment... which should be independent of the settings
 	//and only dependent on opt
@@ -66,8 +55,9 @@ public class ValleyClimber implements Optimizer {
 		RealizeMain r = null;
 		FileWriter fw = null;
 		try {
-			r = new RealizeMain(this.grammarFile);
-			fw = new FileWriter(resultsLogPath+experimentName);
+			//it's for obvious reasons very important that no one holds the same experiment name in a concurrent setup!!!
+			r = new RealizeMain(this.rs, this.grammarFile);
+			fw = new FileWriter(resultsLogPath+experimentName, true);
 			fw.write(this.runSettings.toString()+"\n");
 		}
 		catch (IOException io) {
@@ -85,13 +75,9 @@ public class ValleyClimber implements Optimizer {
 			}
 			iterName = experimentName+"-i"+String.format("%04d", currentIter);
 			lastScore = currentScore;
-			try {
-				currentScore = performRun(iterName, opt, r, fw);
-			}
-			catch (IOException e) {
-				e.printStackTrace();
-				System.err.println("Error when logging!!");
-			}
+			
+			currentScore = performRun(iterName, opt, r, fw);
+
 			//making strictly less will let it terminate a bit faster, but will explore less values
 			boolean goodStep = currentScore <= lastScore;
 			if (goodStep) { opt.acknowledgeImprovement(); }
@@ -140,7 +126,7 @@ public class ValleyClimber implements Optimizer {
 		
 	}
 	
-	private double performRun(String runName, VariableSet opt, RealizeMain r, FileWriter fw) throws IOException {	
+	private double performRun(String runName, VariableSet opt, RealizeMain r, FileWriter fw)  {	
 		//String num = in.getName().split("-")[1];
 		System.out.println("This realization is a: " + runSettings.toString());
 		File[] list = new File(this.inputFileDir).listFiles();
@@ -162,15 +148,35 @@ public class ValleyClimber implements Optimizer {
 			}
 		}
 		if (goldRealizationDir != null) {
-			eval.loadFiles(goldRealizationDir, realizationLogPath);
+			//this should only generally be used if storing things in RAM is impractical for some reason.
+			//not really thread safe as is.
+			try {
+				eval.loadFiles(goldRealizationDir, realizationLogPath);
+			}
+			catch (IOException io) {
+				io.printStackTrace();
+				System.err.println("Error loading from gold direcotry");
+				System.exit(1);
+			}
 		}
 		else {
 			eval.loadData(rOut);
 		}
 		double score = eval.scoreAll().getScore();
+		try {
+			writeout(fw, runName, score, opt);
+		}
+		catch (IOException io) {
+			io.printStackTrace();
+			System.err.println("Error writing output");
+			System.exit(1);
+		}
 		
+		return score;
+	}
+	//this shouldn't need to be synchronized because every name that's being written to should be separate... but be careful!!
+	private void writeout(FileWriter fw, String runName, double score, VariableSet opt) throws IOException {
 		fw.write(runName+":: "+"score: "+score+"; "+actrVarToString(opt)+"\n");
 		fw.flush();
-		return score;
 	}
 }

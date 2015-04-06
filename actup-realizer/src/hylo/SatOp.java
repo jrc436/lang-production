@@ -18,11 +18,21 @@
 
 package hylo;
 
-import synsem.*;
-import unify.*;
-import org.jdom.*;
-import java.util.*;
-import gnu.trove.*;
+import gnu.trove.TIntArrayList;
+import gnu.trove.TObjectIntHashMap;
+import grammar.Grammar;
+
+import java.util.List;
+
+import org.jdom.Element;
+
+import synsem.LF;
+import synsem.LexSemOrigin;
+import unify.ModFcn;
+import unify.Substitution;
+import unify.Unifier;
+import unify.UnifyFailure;
+import unify.Variable;
 
 /**
  * A hybrid logic satifaction operator, which tests whether a formula is true
@@ -81,23 +91,25 @@ public class SatOp extends HyloFormula {
     protected Nominal _nominal;
     protected LF _arg;
 
-    public SatOp(Element e) {
+    public SatOp(Grammar grammar, Element e) {
+    	super(grammar);
         boolean shared = "true".equals(e.getAttributeValue("shared"));
         String nom = e.getAttributeValue("nom");
         if (nom != null) {
-            _nominal = new NominalAtom(HyloHelper.prefix(nom), HyloHelper.type(nom), shared);
+            _nominal = new NominalAtom(grammar, HyloHelper.prefix(nom), HyloHelper.type(grammar, nom), shared);
         } else {
             nom = e.getAttributeValue("nomvar");
             if (nom != null) {
-                _nominal = new NominalVar(HyloHelper.prefix(nom), HyloHelper.type(nom), shared);
+                _nominal = new NominalVar(grammar, HyloHelper.prefix(nom), HyloHelper.type(grammar, nom), shared);
             } else {
                 throw new RuntimeException("Satop must have a nom or nomvar.");
             }
         }
-        _arg = HyloHelper.getLF_FromChildren(e);
+        _arg = HyloHelper.getLF_FromChildren(grammar, e);
     }
 
-    public SatOp(Nominal nom, LF arg) {
+    public SatOp(Grammar grammar, Nominal nom, LF arg) {
+    	super(grammar);
         _nominal = nom;
         _arg = arg;
     }
@@ -109,7 +121,7 @@ public class SatOp extends HyloFormula {
     public void setArg(LF arg) { _arg = arg; }
     
     public LF copy() {
-        SatOp retval = new SatOp((Nominal)_nominal.copy(), _arg.copy());
+        SatOp retval = new SatOp(grammar, (Nominal)_nominal.copy(), _arg.copy());
         retval._origin = _origin;
         return retval;
     }
@@ -140,19 +152,19 @@ public class SatOp extends HyloFormula {
         if (u instanceof HyloFormula) {
             if (u instanceof SatOp) {
                 Nominal $nom = (Nominal) Unifier.unify(_nominal, ((SatOp)u)._nominal, sub);
-                LF $arg = (LF)Unifier.unify(_arg,((SatOp)u)._arg, sub);
-                SatOp retval = new SatOp($nom, $arg);
+                LF $arg = (LF)Unifier.unify(_arg, ((SatOp)u)._arg,sub);
+                SatOp retval = new SatOp(grammar, $nom, $arg);
                 retval._origin = _origin;
                 return retval;
             }
-            else return super.unify(u,sub);
+            else return super.unify(u, sub);
         } else {
             throw new UnifyFailure();
         }
     }
 
     public Object fill(Substitution sub) throws UnifyFailure {
-        SatOp retval = new SatOp((Nominal)_nominal.fill(sub), (LF)_arg.fill(sub));
+        SatOp retval = new SatOp(grammar, (Nominal)_nominal.fill(sub), (LF)_arg.fill(sub));
         retval._origin = _origin;
         return retval;
     }

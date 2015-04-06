@@ -36,8 +36,8 @@ public interface Rule {
 
     /**
      * Apply this rule to some input categories.
-     *
      * @param inputs the input categories to try to combine
+     *
      * @return the Category (or categories) resulting from using this Rule to combine the
      *         inputs
      * @exception UnifyFailure if the inputs cannot be combined by this Rule

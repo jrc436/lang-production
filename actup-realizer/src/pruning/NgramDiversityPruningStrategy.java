@@ -16,13 +16,12 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package ngrams;
+package pruning;
+
+import java.util.List;
 
 import lexicon.Word;
-import realize.*;
 import synsem.Sign;
-
-import java.util.*;
 
 /**
  * A diversity pruning strategy that defines signs to be 
@@ -43,11 +42,15 @@ public class NgramDiversityPruningStrategy extends DiversityPruningStrategy
     protected int order;
     
     /** Constructor that defaults singleBestPerGroup to true. */
-    public NgramDiversityPruningStrategy(int order) { this(order, true); }
+    public NgramDiversityPruningStrategy(int pruneVal, int order) { 
+    	this(pruneVal, order, true); 
+    }
     
     /** Full constructor. */
-    public NgramDiversityPruningStrategy(int order, boolean singleBestPerGroup) { 
-        this.order = order; this.singleBestPerGroup = singleBestPerGroup;
+    public NgramDiversityPruningStrategy(int pruneVal, int order, boolean singleBestPerGroup) { 
+    	super(pruneVal);
+        this.order = order; 
+        this.singleBestPerGroup = singleBestPerGroup;
     }
     
     /** Returns true iff the given signs are not compellingly different.

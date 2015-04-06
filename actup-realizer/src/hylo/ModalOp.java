@@ -18,11 +18,17 @@
 
 package hylo;
 
-import synsem.*;
-import unify.*;
-import org.jdom.*;
-import java.util.*;
-import gnu.trove.*;
+import gnu.trove.TObjectIntHashMap;
+import grammar.Grammar;
+
+import java.util.List;
+
+import org.jdom.Element;
+
+import synsem.LF;
+import unify.ModFcn;
+import unify.UnifyFailure;
+import unify.Variable;
 
 /**
  * A parent class for modal operators, such as &lt;P&gt;p, [F]q, and
@@ -40,20 +46,22 @@ public abstract class ModalOp extends HyloFormula {
     protected LF _arg;
 
     @SuppressWarnings("unchecked")
-	protected ModalOp(Element e) {
+	protected ModalOp(Grammar grammar, Element e) {
+    	super(grammar);
         String atomLabel = e.getAttributeValue("mode");
         if (atomLabel == null) atomLabel = e.getAttributeValue("m");
         if (atomLabel != null) {
-            _mode = new ModeLabel(atomLabel);
-            _arg = HyloHelper.getLF_FromChildren(e);
+            _mode = new ModeLabel(grammar, atomLabel);
+            _arg = HyloHelper.getLF_FromChildren(grammar, e);
         } else {
             List<Element> children = e.getChildren();
-            _mode = (Mode)HyloHelper.getLF((Element)children.get(0));
-            _arg = HyloHelper.getLF((Element)children.get(1));
+            _mode = (Mode)HyloHelper.getLF(grammar, (Element)children.get(0));
+            _arg = HyloHelper.getLF(grammar, (Element)children.get(1));
         }
     }
     
-    protected ModalOp(Mode mode, LF arg) {
+    protected ModalOp(Grammar grammar, Mode mode, LF arg) {
+    	super(grammar);
         _mode = mode;
         _arg = arg;
     }

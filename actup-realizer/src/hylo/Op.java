@@ -21,8 +21,11 @@ package hylo;
 import synsem.*;
 import unify.*;
 import grammar.Grammar;
+
 import org.jdom.*;
+
 import java.util.*;
+
 import gnu.trove.*;
 
 /**
@@ -61,7 +64,8 @@ public class Op extends HyloFormula {
     
     /** Element constructor. */
     @SuppressWarnings("unchecked")
-	public Op(Element e) {
+	public Op(Grammar grammar, Element e) {
+    	super(grammar);
         String name = e.getAttributeValue("name");
         if (name == null) name = e.getAttributeValue("n");
         _name = name;
@@ -69,23 +73,25 @@ public class Op extends HyloFormula {
         int argSize = argElements.size();
         List<LF> args = new ArrayList<LF>(argSize);
         for (int i=0; i<argSize; i++) {
-            args.add(HyloHelper.getLF((Element)argElements.get(i)));
+            args.add(HyloHelper.getLF(grammar, (Element)argElements.get(i)));
         }
         // add implicit CONJ op with NEG or OPT
         if (args.size() > 1 && (name.equals(NEG) || name.equals(OPT))) {
             _args = new ArrayList<LF>(1);
-            _args.add(new Op(CONJ, args));
+            _args.add(new Op(grammar, CONJ, args));
         }
         else _args = args;
     }
 
     /** Constructor. */
-    public Op(String name, List<LF> args) {
+    public Op(Grammar grammar, String name, List<LF> args) {
+    	super(grammar);
         _name = name; _args = args; 
     }
 
     /** Two arg convenience constructor. */
-    public Op(String name, LF first, LF second) {
+    public Op(Grammar grammar, String name, LF first, LF second) {
+    	super(grammar);
         _name = name;
         _args = new ArrayList<LF>();
         _args.add(first); _args.add(second);
@@ -118,7 +124,7 @@ public class Op extends HyloFormula {
         for (LF arg : _args) {
             $args.add(arg.copy());
         }
-        return new Op(_name, $args);
+        return new Op(grammar, _name, $args);
     }
 
     public void deepMap(ModFcn mf) {
@@ -163,7 +169,7 @@ public class Op extends HyloFormula {
         for (LF arg : _args) {
             $args.add((LF)arg.fill(sub));
         }
-        return new Op(_name, $args);
+        return new Op(grammar, _name, $args);
     }
     
     public String toString() {
@@ -187,6 +193,7 @@ public class Op extends HyloFormula {
     /**
      * Returns a pretty-printed string of this LF, with the given indent.
      */
+    @Override
     public String prettyPrint(String indent) {
         StringBuffer sb = new StringBuffer();
         String opString = printOp(_name);
@@ -216,7 +223,7 @@ public class Op extends HyloFormula {
     
     // filters out semantic features if apropos
     private List<LF> filteredArgs() {
-        String featsToShow = Grammar.theGrammar.featsToShow;
+        String featsToShow = grammar.featsToShow;
         if (featsToShow.length() == 0) return _args;
         List<LF> retval = new ArrayList<LF>(_args.size());
         for (Iterator<LF> it = _args.iterator(); it.hasNext(); ) {

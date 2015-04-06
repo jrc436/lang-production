@@ -23,9 +23,7 @@ import gnu.trove.THashSet;
 import gnu.trove.TObjectHashingStrategy;
 import gnu.trove.TObjectIdentityHashingStrategy;
 import hylo.Alt;
-import hylo.SatOp;
 
-import java.io.ByteArrayOutputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -34,11 +32,12 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import pruning.PruningStrategy;
+import runconfig.RealizationSettings;
 import synsem.Category;
 import synsem.DerivationHistory;
 import synsem.Sign;
@@ -57,61 +56,17 @@ import synsem.Sign;
  * @version     $Revision: 1.79 $, $Date: 2011/08/28 04:05:39 $
  */
 public class Chart
-{
-    public static final int NO_EDGE_LIMIT = 0;
-    public static final int NO_PRUNING = 0; 
-    
-    //PREFERENCES
-    public static final int EDGE_LIMIT = NO_EDGE_LIMIT;
-   // public static final long TIME_LIMIT = NO_TIME_LIMIT;
-    //public static final double NEW_BEST_TIME_LIMIT = NO_TIME_LIMIT;
-    public static final int CELL_PRUNING_VALUE = NO_PRUNING;
-    public static final int PRUNING_VALUE = NO_PRUNING;  
-    public static final boolean DO_UNPACKING = true;    
-    public static final boolean USE_COMBOS = true;   
-    public static final boolean USE_PACKING = false;
-    
-    public long edgeLimit;    
-    public int pruningValue;
-    public int cellPruningValue;
-    public boolean collectCombos;
-    public boolean usePacking;
-    public boolean doUnpacking;
- //   public long newBestTimeLimit;
- //   public double newBestTimeLimitPct;
+{                 
+    private final RealizationSettings rSet;
+    private final EdgeFactory edgeFactory;
+    private final PruningStrategy pruningStrategy;   
 
-    public boolean depthFirst = false;              
-    /** Flag for whether to join best fragments if no complete realization found.  Defaults to false. */
-    public boolean joinFragments = true;
-
-    /** Flag for whether to glue fragments currently. Defaults to false. */
-    public boolean gluingFragments = false;
-
-    
-    /** The edge factory for the realization request. */
-    public final EdgeFactory edgeFactory;
-    /** The pruning strategy. */
-    public final PruningStrategy pruningStrategy;
-    
-    // the agenda of edges that have yet to be added to the chart
-    private List<Edge> agenda = new ArrayList<Edge>();
-    
-    // the (representative) edges in the chart
-    private List<Edge> edges = new ArrayList<Edge>();
-    
-    // all unpruned (and unpacked, if apropos) edges in the chart
-    private List<Edge> allEdges = new ArrayList<Edge>();
-
-    // edges to be removed from the chart, after having been superceded 
-    // by an edge with an equivalent sign (up to surface words) and 
-    // a less complex derivation
-    private List<Edge> supercededEdgesPendingRemoval = new ArrayList<Edge>();
-
-    // maps signs to edges (w/o optional bits marked as covered)
-    private Map<Sign,Edge> signMap = new IdentityHashMap<Sign,Edge>();
-    
-    // the edges seen so far
-    private EdgeHash edgeHash = new EdgeHash();
+    private final List<Edge> agenda = new ArrayList<Edge>(); //edges not yet added
+    private final List<Edge> edges = new ArrayList<Edge>(); //representative edges
+    private final List<Edge> allEdges = new ArrayList<Edge>(); //all unpruned and unpacked edges
+    private final List<Edge> supercededEdgesPendingRemoval = new ArrayList<Edge>(); //edges to be removed because less complex derivation found
+    private final Map<Sign,Edge> signMap = new IdentityHashMap<Sign,Edge>(); //keeps track of the current edge for that sign
+    private final EdgeHash edgeHash = new EdgeHash(); //all edges that have been encountered
     
 
     // maps edges to representative edges, according to their 
@@ -141,105 +96,22 @@ public class Chart
     // reusable bitset for checking non-empty cells
     private transient BitSet tmpBitSet = new BitSet();
     
-    /** 
-     * The best edge found so far (or null), 
-     * where a complete edge is always given preference 
-     * to an incomplete one.
-     */
-    public Edge bestEdge = null;
-    
-    /** The best edge created by joining fragments, if necessary. */
-    public Edge bestJoinedEdge = null;
-    
-    /** Whether the realization search has been completed. */
-    public boolean done = false;
-    
-    /** The number of nominals in the input LF. */
-    public int numNominals = 0;
-    
-    /** The number of elementary predications in the input LF. */
-    public int numPreds = 0;
-    
-    /** The number of edges created and added to the agenda. */
-    public int numEdges = 0;
-    
-    /** The number of pruned edges removed from the chart. */
-    public int numPrunedRemoved = 0;
-    
-    /** The number of pruned edges never added to the chart. */
-    public int numPrunedNeverAdded = 0;
-    
-    /** The number of new complete best edges found after the first one. */
-    public int newBest = 0;
-    
-    /** The maximum number of edges in a cell. */
-    public int cellMax = 0;
-    
-//    /** The time at which realization started. */
-//    protected long startTime = System.nanoTime();
-//    /** The time in ms until lex lookup was completed. */
-//    public long timeTilLex = 0;
-//    /** The time in ms until the first complete edge was found. */
-//    public long timeTilFirst = 0;
-//    /** The time in ms until the best edge was found. */
-//    public long timeTilBest = 0;
-//    /** The time in ms until the search was stopped. */
-//    public long timeTilStopped = 0;
-//    /** The time in ms until the packed chart was completed. */
-//    public long timeTilPacked = 0;
-//    /** The time in ms until the search was finished. */
-//    public long timeTilDone = 0;
-//    
-    
-    /** 
-     * Constructor with explicit pruning strategy. 
-     */
-     // * NB: Even with a non-default pruning strategy, it could potentially help 
-     // *     to set the pruning value to an estimate of the number of 
-     // *     edges per equivalent category that will be stored.
-    public Chart(EdgeFactory edgeFactory, PruningStrategy pruningStrategy) {
+    private Edge bestEdge = null; //best edge found so far (always complete if possible)
+    private Edge bestJoinedEdge = null; //best edge, counting joined edges   
+    private int numEdges = 0; //total number of edges that have been added to agenda
+    private int cellMax = 0; //maximum number of edges presently in a cell
+   
+   
+    public Chart(RealizationSettings rs, EdgeFactory edgeFactory, PruningStrategy pruningStrategy) {
+    	this.rSet = rs;
         this.edgeFactory = edgeFactory;
         this.pruningStrategy = pruningStrategy;
-//        newBestTimeLimitPct = TIME_LIMIT;
-//        if (newBestTimeLimitPct >= 1) {
-//            newBestTimeLimit = (int) newBestTimeLimitPct;
-//            newBestTimeLimitPct = TIME_LIMIT; 
-//        }
-        edgeLimit = EDGE_LIMIT;
-        pruningValue = PRUNING_VALUE;
-        cellPruningValue = CELL_PRUNING_VALUE;
-        usePacking = USE_PACKING; 
-        collectCombos = !usePacking && USE_COMBOS;
-        doUnpacking = usePacking && DO_UNPACKING;
     }
-        
-    
-    /** Returns the number of (representative) edges in the chart. */
-    public int numEdgesInChart() { return edges.size(); }
-
-    /** Returns the number of unpruned (and unpacked, if apropos) edges in the chart. */
-    public int numUnprunedEdges() { return allEdges.size(); }
-
-    
-    //-----------------------------------------------------------------
-    // main algorithm routines    
-    
-    /** Initializes the agenda. */
     public void initialize() {
-        // record number of nominals
-        numNominals = edgeFactory.nominals.size();
-        numPreds = edgeFactory.preds.size();
-        // create various initial edges and add to the agenda
-        for (Edge edge : edgeFactory.createInitialEdges())  
+        for (Edge edge : edgeFactory.createInitialEdges())  {
             addEdgeToAgenda(edge);
-        // record time 'til lex
-//        long currentTime = System.nanoTime();
-//        timeTilLex = currentTime - startTime;
+        }
     }
-    
-    /** Returns whether there were no uncovered lexical or featural preds after lex lookup. */
-    public boolean noUncoveredPreds() { return !edgeFactory.hasUncoveredPreds; }
-    
     
     /** 
      * Reinitializes the agenda for gluing fragments.  
@@ -247,19 +119,25 @@ public class Chart
      */
     public void reInitForGluing() {
     	// check packing mode
-    	if (!usePacking) throw new RuntimeException("Packing mode required for gluing fragments.");
+    	if (!rSet.usingPacking()) {
+    		System.err.println("Can't glue fragments unless in packing mode!!");
+    		return;
+    	}
     	// set flags here and in edge factory
-    	gluingFragments = true; 
-    	edgeFactory.gluingFragments = true; edgeFactory.useIndexing = false;
+    	edgeFactory.gluingFragments = true;
+    	edgeFactory.useIndexing = false;
     	// add opt for uncovered preds, unless already done for relaxed relation matching
-    	if (!edgeFactory.useRelaxedRelationMatching)
+    	if (!edgeFactory.useRelaxedRelationMatching) {
     		edgeFactory.addLFOptsForUncoveredPreds();
+    	}
     	// add opts for rule instances
     	edgeFactory.addLFOptsForRuleInstances();
     	// record non-empty cells
     	nonEmptyCells = new HashSet<BitSet>(cellMap.keySet());
     	// add edges back to agenda, for possible gluing
-    	for (Edge edge : edges) addEdgeToAgenda(edge);
+    	for (Edge edge : edges) {
+    		addEdgeToAgenda(edge);
+    	}
     }
     
     
@@ -282,72 +160,33 @@ public class Chart
      * if the edge instead has an already seen category, new edges are created as 
      * alternatives to the collected combos in its representative, much as with unpacking.
      */
-    public void combine(int iterLim, boolean waitForCompleteEdge) {
-        
-        // until agenda is empty
+    public void combine(int iterLim) {
     	int currentIter = 0;
-        while (!agenda.isEmpty()) {
-
-            // check for timeout
-//            long currentTime = System.nanoTime();
-//            long timeSoFar = currentTime - startTime;
-//            long timeSinceFirst = timeSoFar - timeTilFirst;
-           
-            boolean bestEdgeComplete = (bestEdge != null && bestEdge.complete()); 
-            if (
-//            	// edge limit case
-            	(edgeLimit != NO_EDGE_LIMIT && numEdges > edgeLimit && (!waitForCompleteEdge || bestEdgeComplete))
-            	||
-//                // timeout case
-//                (timeLimitMS != NO_TIME_LIMIT && timeSoFar > timeLimitMS && (!waitForCompleteEdge || bestEdgeComplete))
-//                ||
-                (currentIter > iterLim && (!waitForCompleteEdge || bestEdgeComplete))
-//                ||
-//                // new best timeout case (anytime only)
-//                (!usePacking && bestEdgeComplete && ((newBestTimeLimit != NO_TIME_LIMIT && timeSinceFirst > newBestTimeLimit) ||
-//                  (newBestTimeLimitPct != NO_TIME_LIMIT && 
-//                   (double) timeSinceFirst / (double) timeTilFirst > newBestTimeLimitPct)))
-            ) {
-                // ensure best edge in chart
-                if (!allEdges.contains(bestEdge)) { addEdgeToChart(bestEdge); }
-                // set timing
-//                timeTilStopped = timeSoFar;
-                // stop
+        while (!agenda.isEmpty()) {    
+            boolean bestEdgeComplete = bestEdge != null && bestEdge.complete(); 
+            if (bestEdgeComplete || numEdges > rSet.getEdgeLimit() || currentIter > iterLim) {
+                if (!allEdges.contains(bestEdge)) { 
+                	addEdgeToChart(bestEdge); 
+                }
                 break;
             }
-            
-            // take edge from agenda
-            Edge next = agenda.remove(0);
-            
-            // add edge to chart
-            boolean actuallyAdded = addEdgeToChart(next);
-            
-            // skip if edge didn't survive pruning (anytime case), 
-            // or was folded into an existing edge (packing case)
-            if (!actuallyAdded) { continue; }
-            
-            // otherwise do combos 
+            Edge next = agenda.remove(0);            
+            if (!addEdgeToChart(next)) { 
+            	continue; //edge was pruned or combined with existing edge
+            }           
             doEdgeCombos(next);
             currentIter++;
         }
 
         // set done packing time
-        if (usePacking) {
-        //    long donePackingTime = System.nanoTime();
-        //    timeTilPacked = donePackingTime - startTime;
-            // do unpacking, if apropos
-            if (doUnpacking) doUnpacking();
-        }
-        
-        // set done flag, timing
-        done = agenda.isEmpty();
-        if (done) {
-	   //     long endTime = System.nanoTime();
-	   //     timeTilDone = endTime - startTime;
+        if (rSet.doingUnpacking()) {
+            doUnpacking();
         }
         
         // join best fragments, if nec.
-        if (joinFragments && !bestEdge.complete()) joinBestFragments(); 
+        if (rSet.joiningFragments() && !bestEdge.complete()) {
+        	joinBestFragments(); 
+        }
     }
     
     // does binary combinations with all edges in the chart and unary ones too; 
@@ -355,9 +194,11 @@ public class Chart
     // prunes superceded edges before returning
     private void doEdgeCombos(Edge next) {
     	// skip semantically null edges when gluing fragments
-    	if (gluingFragments && next.bitset.isEmpty()) return;
+    	if (rSet.gluingFragments() && next.bitset.isEmpty()) {
+    		return;
+    	}
     	// when collecting combos ...
-        if (collectCombos) {
+        if (rSet.collectingCombos()) {
             // existing rep case: just make alt edges from collected combos
             Edge nextRep = catMap.get(next);
             if (next != nextRep) {
@@ -368,22 +209,22 @@ public class Chart
             }
         }
         // otherwise combine edge with those in chart 
-        List<Edge> edgesToUse = (usePacking || collectCombos) ? edges : allEdges;
+        List<Edge> edgesToUse = (rSet.usingPacking() || rSet.collectingCombos()) ? edges : allEdges;
         for (Edge edge : edgesToUse) {
             if (edge == next) continue; // skip this edge
             // skip fragment gluing if semantically null or if result cell non-empty
-            if (gluingFragments) {
+            if (rSet.gluingFragments()) {
             	if (edge.bitset.isEmpty()) continue;
             	tmpBitSet.clear();
             	tmpBitSet.or(edge.bitset); tmpBitSet.or(next.bitset);
             	if (nonEmptyCells.contains(tmpBitSet)) continue;
             }
             // add new combos to agenda
-            addNewEdges(edgeFactory.createNewEdges(edge, next, collectCombos));
+            addNewEdges(edgeFactory.createNewEdges(edge, next, rSet.collectingCombos()));
         }
         // combine edge via unary rules and with semantically null edges, 
         // adding new edges to the agenda
-    	addNewEdges(edgeFactory.createNewEdges(next, collectCombos));
+    	addNewEdges(edgeFactory.createNewEdges(next, rSet.collectingCombos()));
         // prune any superceded edges before returning
         pruneSupercededEdges();
     }
@@ -440,11 +281,6 @@ public class Chart
         return bestFrag;  
     }
     
-    
-    
-    //-----------------------------------------------------------------
-    // unpacking    
-    
     /** Unpack complete edges, if any; otherwise unpack all. */
 	protected void doUnpacking() {
 	    @SuppressWarnings("unchecked")
@@ -476,7 +312,7 @@ public class Chart
         List<Edge> mergedList = new ArrayList<Edge>(merged.asEdgeSet());
         Collections.sort(mergedList, edgeComparator);
         List<Edge> prunedEdges = pruningStrategy.pruneEdges(mergedList);
-        numPrunedNeverAdded += prunedEdges.size();
+        prunedEdges.size();
         // replace edge's alts, add to unpruned edges
         edge.altEdges.clear(); edge.altEdges.addAll(mergedList);
         allEdges.addAll(mergedList);
@@ -522,7 +358,7 @@ public class Chart
         List<Sign[]> altCombos = inputCombos(inputEdges, 0);
         for (Sign[] combo : altCombos) {
         	Sign lexHead = (lefthead) ? combo[0].getLexHead() : combo[1].getLexHead();
-            Sign sign = Sign.createDerivedSignWithNewLF(resultCat, combo, history.getRule(), lexHead);
+            Sign sign = Sign.createDerivedSignWithNewLF(edgeFactory.grammar, resultCat, combo, history.getRule(), lexHead);
             Edge edgeToAdd = (sign.equals(alt.sign))
                 ? alt // use this alt for equiv sign
                 : edgeFactory.makeAltEdge(sign, alt); // otherwise make edge for new alt
@@ -560,317 +396,68 @@ public class Chart
         return retval;
     }
     
-    
-    //-----------------------------------------------------------------
-    // best edges (single best is available directly as bestEdge)
-    
-    // cached best edges
-    private transient List<Edge> bestEdges = null;
-    
-    /** 
-     * Returns the best complete edges, sorted by their score and 
-     * pruned by the pruning strategy. 
-     */
+
     public List<Edge> bestEdges() {
-    	if (bestEdges != null) return bestEdges;
-        bestEdges = new ArrayList<Edge>();
-        if (!bestEdge.complete()) return bestEdges;
-        List<Edge> edgesToUse = (usePacking && !doUnpacking) ? edges : allEdges;
-        for (Edge edge : edgesToUse) {
-            if (edge.complete()) bestEdges.add(edge); 
+        ArrayList<Edge> bestEdges = new ArrayList<Edge>();
+        //no complete edges!
+        if (!bestEdge.complete()) {
+        	return bestEdges;
         }
-        Collections.sort(bestEdges, edgeComparator);
+        List<Edge> edgesToUse = rSet.doingUnpacking() ? edges : allEdges;
+        for (Edge edge : edgesToUse) {
+            if (edge.complete()) {
+            	this.addSorted(bestEdges, edge); 
+            }
+        }
         pruningStrategy.pruneEdges(bestEdges);
         return bestEdges;
     }
-    
-    
-    //-----------------------------------------------------------------
-    // printing routines
-    
-    /** The PrintWriter to use with the printing routines.  Default wraps System.out. */
-    public PrintWriter out = new PrintWriter(System.out);
-
-    /** Prints the best edge found. */
-    public void printBestEdge() {
-        printEdge(bestEdge);
-        if (!edgeFactory.labeledNominals.isEmpty()) {
-            try {
-                ByteArrayOutputStream bstr = new ByteArrayOutputStream();
-                edgeFactory.grammar.serializeXml(
-                    bestEdge.sign.getWordsInXml(edgeFactory.labeledNominals), bstr
-                );
-                out.println(bstr.toString());
-            }
-            catch (java.io.IOException exc) { 
-                throw (RuntimeException) new RuntimeException().initCause(exc);
-            }
-        }
-        out.println("Best Edge:" + bestEdge.sign.getBracketedString());
-        out.flush();
+    public Edge getBestEdge() {
+    	return bestEdge;
     }
     
     public Realization getBestRealization(String goal) {
-//    	printEdge(bestEdge);
-//        if (!edgeFactory.labeledNominals.isEmpty()) {
-//            try {
-//                ByteArrayOutputStream bstr = new ByteArrayOutputStream();
-//                edgeFactory.grammar.serializeXml(
-//                    bestEdge.sign.getWordsInXml(edgeFactory.labeledNominals), bstr
-//                );
-//                out.println(bstr.toString());
-//            }
-//            catch (java.io.IOException exc) { 
-//                throw (RuntimeException) new RuntimeException().initCause(exc);
-//            }
-//        }
         String bracketedEdge = bestEdge.sign.getBracketedString();
         return new Realization(bracketedEdge.replace(")", "").replace("(", ""), goal, bestEdge.complete());
     }
     
-    /** Prints the best joined edge. */
-    public void printBestJoinedEdge() {
-    	if (bestJoinedEdge == null) return;
-        printEdge(bestJoinedEdge);
-        out.println(bestJoinedEdge.sign.getBracketedString());
-        out.flush();
+    public String getBestEdgeDerivation() {
+    	Edge edge = bestEdge;
+    	//determines, basically, whether pruned edges are included
+    	ArrayList<Edge> edgeList = rSet.doingUnpacking() ? new ArrayList<Edge>(edges) : new ArrayList<Edge>(allEdges); 
+    	return edgeDerivation(edge, edgeList);
+    	
     }
-    
-//    /** Prints the timing (and related) info. */
-//    public void printTiming() {
-//        out.println();
-//        if (!usePacking) {
-//            if (bestEdge != null && bestEdge.complete())
-//                out.println("time 'til first   (ms): " + timeTilFirst);
-//            if (bestEdge != null)
-//                out.println("time 'til best    (ms): " + timeTilBest);
-//            if (timeTilStopped != 0)
-//                out.println("time 'til stopped (ms): " + timeTilStopped);
-//        }
-//        else {
-//            out.println("time 'til packed  (ms): " + timeTilPacked); 
-//        }
-//        if (timeTilDone != 0)
-//            out.println("time 'til done    (ms): " + timeTilDone); 
-//        out.println();
-//        out.println("rule apps:   " + edgeFactory.ruleApps());
-//        out.println("# edges:     " + edges.size());
-//        out.println("# unpruned edges:     " + allEdges.size());
-//        if (!usePacking) {
-//            out.println("# pruned:    " + numPrunedRemoved + " removed, " + numPrunedNeverAdded + " never added");
-//        }
-//        if (doUnpacking) {
-//            out.println("# pruned:    " + numPrunedNeverAdded);
-//        }
-//        out.println("cell max:    " + cellMax);
-//        out.flush();
-//    }
-    
-    /** Prints all chart edges, unsorted. */
-    public void printEdges() { printEdges(false); }
-    
-    /** Prints chart edges unsorted, using the complete edges filter according to the given flag. */ 
-    public void printEdges(boolean complete) { printEdges(complete, false); }
-    
-    /** 
-     * Prints chart edges using the complete edges filter according to the given flag 
-     * and sorting according to the given flag.
-     * In the packing only case, the representative edges are shown, otherwise 
-     * the unpruned (and possibly unpacked) edges are shown.
-     */ 
-    public void printEdges(boolean complete, boolean sort) {
-        List<Edge> edgeList = (usePacking && !doUnpacking) ? edges : allEdges;
-        if (sort) {
-            edgeList = new ArrayList<Edge>(edgeList);
-            Collections.sort(edgeList, edgeComparator);
-        }
-        for (int i=0; i < edgeList.size(); i++) { 
-        	Edge edge = edgeList.get(i);
-            if (!complete || edge.complete()) {
-            	if (!sort) printEdge(edge, i, edgeList);
-            	else printEdge(edge);
-            }
-                
-        }
-        out.flush();
-    }
-
-    /**
-     * Prints the agenda.
-     */
-    public void printAgenda() {
-        for (Edge edge : agenda) {
-            printEdge(edge);
-        }
-        out.flush();
-    }
-    
-    /**
-     * Prints the initial edges.
-     */
-    public void printInitialEdges() {
-        for (Edge edge : edgeFactory.initialEdges) {
-            printEdge(edge);
-        }
-        out.flush();
-    }
-    
-    // prints edge with incomplete LF chunks and active alts
-    private void printEdge(Edge edge) { printEdge(edge, -1, null); }
-    
-    // prints also with edge index and derivation, if index non-negative
-    private void printEdge(Edge edge, int index, List<Edge> edgeList) {
-        String str = "";
-        if (index >= 0) str += index + ". ";
-        str += edge.toString();
-        if (edge.incompleteLfChunk != null) {
-            int id = edgeFactory.lfChunks.indexOf(edge.incompleteLfChunk);
-            str += " <[" + id + "]>";
-        }
-        if (edge.activeLfAlts.size() > 0) str += " ";
-        for (List<Alt> altSet : edge.activeLfAlts) {
-            for (Alt alt : altSet) str += "?" + alt.altSet + "." + alt.numInSet;
-        }
-        str += edgeDerivation(edge, index, edgeList);
-        out.println(str);
-        // show alts subordinated in packing only case
-        if (usePacking && !doUnpacking && edge.isDisjunctive()) {
-            for (Edge alt : edge.altEdges) {
-                if (alt != edge) 
-                	out.println(" \\_ " + alt + edgeDerivation(alt, index, edgeList));
-            }
-        }
-    }
-    
-    // returns derivation, if index non-negative
-    private String edgeDerivation(Edge edge, int index, List<Edge> edgeList) {
-    	if (index < 0) return "";
-    	if (edge.optCompletes != null) {
-    		return " (" + edgeList.indexOf(edge.optCompletes) + " optC)";
+    private String edgeDerivation(Edge edge, List<Edge> edgeList) {
+    	if (edgeList == null) {
+    		return ""; //no way to determine the derivation!
     	}
     	DerivationHistory history = edge.sign.getDerivationHistory();
     	Sign[] inputs = history.getInputs();
-    	if (inputs == null) return " (lex)";
-    	String retval = " (";
-		for (Sign sign : inputs) {
-			Edge repEdge = signMap.get(sign);
-			if (repEdge != null) retval += edgeList.indexOf(repEdge) + " ";
+    	if (inputs == null) { 
+    		return " (lex)";
+    	}
+    	String retval = " (";  	
+    	for (Sign sign : inputs) {
+			Edge repEdge = signMap.get(sign); //if signmap has it, then it should be in edgelist
+			if (repEdge != null) { 
+				retval += edgeList.indexOf(repEdge) + " ";
+			}
 		}
 		retval += history.getRule().name() + ")";
     	return retval;
     }
 
-    
-    /**
-     * Prints the licensed, marked initial edges.
-     */
-    public void printMarkedEdges() {
-        for (Edge edge : edgeFactory.markedEdges) {
-            printEdge(edge);
-        }
-        out.flush();
-    }
-    
-    /**
-     * Prints the licensed, instantiated purely syntactic (semantically null) edges.
-     */
-    public void printInstantiatedNoSemEdges() {
-        for (Edge edge : edgeFactory.instantiatedNoSemEdges) {
-            printEdge(edge);
-        }
-        out.flush();
-    }
-    
-    /**
-     * Prints the licensed, uninstantiated purely syntactic (semantically null) edges.
-     */
-    public void printNoSemEdges() {
-        for (Edge edge : edgeFactory.noSemEdges) {
-            out.println(edge.toString());
-        }
-        out.flush();
-    }
-    
-    /**
-     * Prints the rule instances, with instantiated semantics.
-     */
-    public void printRuleInstances() {
-        for (Iterator<?> it = edgeFactory.ruleInstances.iterator(); it.hasNext(); ) {
-            out.println(it.next().toString());
-        }
-        out.flush();
-    }
-    
-    /**
-     * Prints the LF chunks.
-     */
-    public void printLfChunks() {
-        List<BitSet> chunks = edgeFactory.lfChunks;
-        for (int i = 0; i < chunks.size(); i++) {
-            BitSet chunk = chunks.get(i);
-            out.println("chunk[" + i + "]:  " + Edge.toString(chunk));
-        }
-        out.flush();
-    }
-    
-    /**
-     * Prints the LF alternatives.
-     */
-    public void printLfAlts() {
-        for (List<Alt> altSet : edgeFactory.lfAlts) {
-            for (Alt alt : altSet) {
-                out.print("alt[" + alt.altSet + "." + alt.numInSet + "]: ");
-                out.println(Edge.toString(alt.bitset));
-            }
-        }
-        out.flush();
-    }
-    
-    /**
-     * Prints the LF optional parts.
-     */
-    public void printLfOpts() {
-        List<BitSet> opts = edgeFactory.lfOpts;
-        for (int i = 0; i < opts.size(); i++) {
-            BitSet opt = opts.get(i);
-            out.println("opt[" + i + "]:  " + Edge.toString(opt));
-        }
-        out.flush();
-    }
-    
-    /**
-     * Prints the elementary predications.
-     */
-    public void printEPs() {
-        List<SatOp> preds = edgeFactory.preds; 
-        for (int i=0; i < preds.size(); i++) {
-            SatOp lf_i = preds.get(i);
-            out.println("ep[" + i + "]:  " + lf_i);
-        }
-        out.flush();
-    }
-    
-    
-    
-    //-----------------------------------------------------------------
-    // chart management
-
-    // in the anytime case, first checks signs to see whether an edge 
-    // whose sign is equivalent (up to surface words) and which has 
-    // an equal or higher score or equal 
-    // or lower derivational complexity has been seen already, and drops 
-    // the given edge if so (in the packing case, this equivalence check is 
-    // performed during unpacking);
+    // in the anytime case, first checks signs to see whether an edge whose sign is equivalent (up to surface words) and which has 
+    // an equal or higher score or equal or lower derivational complexity has been seen already, and drops 
+    // the given edge if so (in the packing case, this equivalence check is performed during unpacking);
     // if the edge replaces an (essentially) equivalent edge of lower score or higher 
-    // derivational complexity, removes the old edge from the agenda 
-    // or removes it from its equivalence class and puts it on a list of 
-    // superceded edges to be pruned from the chart;
-    // then, in all cases, adds the given edge to the agenda, 
-    // and updates the best edge so far, with preference given to completeness, 
-    // then sign score
+    // derivational complexity, removes the old edge from the agenda or removes it from its equivalence class and puts it on a list of 
+    // superceded edges to be pruned from the chart; then, in all cases, adds the given edge to the agenda, 
+    // and updates the best edge so far, with preference given to completeness, then sign score
     private void addEdgeToAgenda(Edge edge) {
     	numEdges++;
-    	if (!usePacking) {
+    	if (!rSet.usingPacking()) {
 	    	// update edgeHash, checking for equivalent edge of equal or lower complexity
     		Edge retEdge = edgeHash.insert(edge);
     		boolean actuallyInserted = (retEdge != null);
@@ -880,11 +467,7 @@ public class Chart
 	    	if (oldEdge != null) {
 	    		// check agenda first
 	    		boolean onAgenda = agenda.remove(oldEdge);
-	    		// if not on agenda, remove from equiv class, if present, 
-	    		// and add to list of superceded edges pending removal
-	    		// nb: delaying pruning of superceded edges from chart 
-	    		//     is nec. to avoid a problem with concurrent access 
-	    		//     to allEdges in doEdgeCombos
+	    		// if not on agenda, remove from equiv class, if present, and add to list of superceded edges pending removal
 	    		if (!onAgenda) {
 	    	        Edge repEdge = catMap.get(oldEdge);
 	    	        if (repEdge != null) {
@@ -894,72 +477,54 @@ public class Chart
 	    		}
 	    	}
     	}
-        if (depthFirst) { agenda.add(0, edge); }
-        else if (edge.score == 0) { agenda.add(edge); }
-        else { addSorted(agenda, edge); }
+        addSorted(agenda, edge);
         updateBestEdge(edge);
     }
-    
-    // update bestEdge wrt given edge, and adjust timing info
+
     private void updateBestEdge(Edge edge) {
-        if (bestEdge == null) {
+        //if there isn't a best edge, or if the edge's completeness is better, or if the completeness is the same but the score is higher
+        if (bestEdge == null || bestEdge.completeness < edge.completeness || 
+        (bestEdge.completeness == edge.completeness && edge.score > bestEdge.score)) {
             bestEdge = edge; 
-//            long endTime = System.nanoTime();
-//            timeTilBest = endTime - startTime;
-//            if (bestEdge.complete()) timeTilFirst = timeTilBest; 
-            return;
-        }
-        if (bestEdge.completeness > edge.completeness) return;
-        if (bestEdge.completeness < edge.completeness) {
-            bestEdge = edge; 
-//            long endTime = System.nanoTime();
-//            timeTilBest = endTime - startTime;
-//            if (bestEdge.complete()) timeTilFirst = timeTilBest; 
-            return;
-        }
-        if (edge.score > bestEdge.score) {
-            bestEdge = edge;
-//            long endTime = System.nanoTime();
-//            timeTilBest = endTime - startTime;
-            if (bestEdge.complete()) newBest++;
         }
     }
     
     // removes superceded edges from the chart
     private void pruneSupercededEdges() {
     	for (Edge oldEdge : supercededEdgesPendingRemoval) {
-    		allEdges.remove(oldEdge); numPrunedRemoved++;
+    		allEdges.remove(oldEdge);
     	}
     	supercededEdgesPendingRemoval.clear();
     }
     
-    // adds the edge to the chart and makes it a representative edge if it's the 
-    // first one added for its equiv class; otherwise it's added as an alternative;
-    // in the anytime case, prunes the edges listed as alts for the representative edge, 
-    // and adds the edge to the list of all unpruned edges, if it survives pruning;
-    // returns true if the edge is actually added, and false if it doesn't survive 
-    // the pruning (anytime case), or is folded into an existing edge (packing case);
+    // adds the edge to the chart and makes it a representative edge if it's the first one added for its equiv class; otherwise it's added as an alternative;
+    // in the anytime case, prunes the edges listed as alts for the representative edge, nd adds the edge to the list of all unpruned edges, if it survives pruning;
+    // returns true if the edge is actually added, and false if it doesn't survive the pruning (anytime case), or is folded into an existing edge (packing case);
     // prunes the edge and returns false if the cell count is exceeded
     private boolean addEdgeToChart(Edge edge) {
     	// check cell count
-    	if (cellPruningValue != NO_PRUNING && cellCount(edge) >= cellPruningValue) {
-    		numPrunedNeverAdded++; return false;
+    	if (cellCount(edge) >= rSet.getCellPruningValue()) {
+    		return false;
     	}
     	// inc cell count
     	incCellCount(edge);
         // get representative edge for this edge
         Edge repEdge = catMap.get(edge);
         // check for same edge already in chart; pretend it's been added
-        if (edge == repEdge) return true;
+        if (edge == repEdge) { 
+        	return true;
+        }
         // if none, make this edge into one, adding it to the chart
         if (repEdge == null) {
             edge.initAltEdges(); // nb: could try capacity of pruningValue+1
-            if (collectCombos) edge.initEdgeCombos();
+            if (rSet.collectingCombos()) {
+            	edge.initEdgeCombos();
+            }
             catMap.put(edge, edge);
             edges.add(edge);
         	signMap.put(edge.sign, edge);
             // anytime case: add to all edges list too
-            if (!usePacking) allEdges.add(edge);
+            if (!rSet.usingPacking()) allEdges.add(edge);
             // and return
             return true;
         }
@@ -967,21 +532,15 @@ public class Chart
         else {
             addSorted(repEdge.altEdges, edge);
             // packing case: return false, as edge is simply folded into repEdge
-            if (usePacking) return false;
+            if (rSet.usingPacking()) return false;
         }
-        // anytime case: if not pruning, just add edge to all edges list, and return
-        if (pruningValue == NO_PRUNING) {
-            allEdges.add(edge);
-        	signMap.put(edge.sign, edge); // for debugging
-            return true;
-        }
-        // otherwise do pruning
+        
+        //do pruning
         List<Edge> prunedEdges = pruningStrategy.pruneEdges(repEdge.altEdges);
         boolean edgeItselfPruned = false;
         for (Edge prunedEdge : prunedEdges) {
             if (prunedEdge != edge) {
                 allEdges.remove(prunedEdge);
-                numPrunedRemoved++;
             }
             else edgeItselfPruned = true;
         }
@@ -991,8 +550,6 @@ public class Chart
         	signMap.put(edge.sign, edge); // for debugging
             return true;
         }
-        // otherwise false
-        numPrunedNeverAdded++;
         return false;
     }
     
@@ -1006,19 +563,13 @@ public class Chart
     private void incCellCount(Edge edge) {
     	int count = cellCount(edge);
     	cellMap.put(edge.bitset, ++count);
-    	if (count > cellMax) cellMax = count;
+    	if (count > cellMax) {
+    		cellMax = count;
+    	}
     }
     
-    
-    //-----------------------------------------------------------------
-    // edge sorted insertion and comparison
-    
-    // adds the given edge into the already sorted list, 
-    // maintaining the sort order;
-    // when gluing fragments, edges are sorted first by size, 
-    // otherwise by score
     private void addSorted(List<Edge> list, Edge edge) {
-    	Comparator<Edge> comparator = (gluingFragments) ? edgeSizeComparator : edgeComparator; 
+    	Comparator<Edge> comparator = (rSet.gluingFragments()) ? edgeSizeComparator : edgeComparator; 
         // do binary search
         int index = Collections.binarySearch(list, edge, comparator);
         // check if search found an edge with the same sort pos
@@ -1054,5 +605,46 @@ public class Chart
             return -1 * Double.compare(edge1.score, edge2.score);
         }
     };
+    
+    /** The PrintWriter to use with the printing routines.  Default wraps System.out. */
+    public PrintWriter log = new PrintWriter(System.out);
+    
+    //prints sorted edges
+    public void printEdges(boolean complete) {
+        List<Edge> edgeList = rSet.doingUnpacking() ? edges : allEdges;
+        edgeList = new ArrayList<Edge>(edgeList);
+        //shouldn't need to sort! maintaining sort order always now
+        
+        for (int i=0; i < edgeList.size(); i++) {
+        	Edge edge = edgeList.get(i);
+            if (!complete || edge.complete()) {
+                printEdge(edge, null);
+            }
+
+        }
+        log.flush();
+    }
+    private void printEdge(Edge edge, List<Edge> edgeList) {
+        String str = edge.toString();
+        if (edge.incompleteLfChunk != null) {
+            int id = edgeFactory.lfChunks.indexOf(edge.incompleteLfChunk);
+            str += " <[" + id + "]>";
+        }
+        if (edge.activeLfAlts.size() > 0) str += " ";
+        for (List<Alt> altSet : edge.activeLfAlts) {
+            for (Alt alt : altSet) str += "?" + alt.altSet + "." + alt.numInSet;
+        }
+        str += edgeDerivation(edge, edgeList);
+        log.println(str);
+        // show alts subordinated in packing only case
+        if (rSet.doingUnpacking() && edge.isDisjunctive()) {
+            for (Edge alt : edge.altEdges) {
+                if (alt != edge)
+                        log.println(" \\_ " + alt + edgeDerivation(alt, edgeList));
+            }
+        }
+    }
+
+
 }
     

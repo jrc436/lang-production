@@ -58,11 +58,9 @@ public abstract class AbstractTypeRaisingRule extends AbstractRule {
      * use dollar switch; arg category; and result category.  Defaults are used 
      * for the arg and result categories if null.
      */
-    protected AbstractTypeRaisingRule(
-        String name, Slash uslash, Slash eslash, 
-        boolean useDollar, Category arg, Category result
-    ) {
-        _name = name;
+    protected AbstractTypeRaisingRule(Grammar grammar, String name, Slash uslash, Slash eslash, boolean useDollar, Category arg, Category result) {
+        super(grammar);
+    	_name = name;
         _upperSlash = uslash;
         _upperSlash.setAbility("active");
         _upperSlash.setModifier(true);
@@ -70,22 +68,22 @@ public abstract class AbstractTypeRaisingRule extends AbstractRule {
         _embeddedSlash.setAbility("active");
 
         if (arg != null) { _arg = arg; }
-        else { _arg = new AtomCat("np", new GFeatStruc()); }
+        else { _arg = new AtomCat(grammar, "np", new GFeatStruc(grammar)); }
 
         if (result != null) { 
             _result = result;
             result.getFeatureStructure().setIndex(1);
         }
         else {
-            GFeatStruc resfs = new GFeatStruc();
+            GFeatStruc resfs = new GFeatStruc(grammar);
             resfs.setIndex(1);
-            _result = new AtomCat("s", resfs);
+            _result = new AtomCat(grammar, "s", resfs);
         }
         
         if (useDollar) {
-            Dollar dol = new Dollar("1");
+            Dollar dol = new Dollar(grammar, "1");
             dol.setIndex(1);
-            _result = new ComplexCat((AtomCat)_result, dol);
+            _result = new ComplexCat(grammar, (AtomCat)_result, dol);
         }
         
     }
@@ -117,10 +115,8 @@ public abstract class AbstractTypeRaisingRule extends AbstractRule {
             range.add(new BasicArg(_embeddedSlash, arg));
             ((ComplexCat)result).add(new BasicArg(_upperSlash, range));
         } else {
-            range = new ComplexCat((TargetCat)result.copy(),
-                                   new BasicArg(_embeddedSlash, arg));
-            result = new ComplexCat((TargetCat)result.copy(),
-                                    new BasicArg(_upperSlash, range));
+            range = new ComplexCat(grammar, (TargetCat)result.copy(), new BasicArg(_embeddedSlash, arg));
+            result = new ComplexCat(grammar, (TargetCat)result.copy(), new BasicArg(_upperSlash, range));
         }
         
         // nb: with defined type changing rules, this step is done when the 

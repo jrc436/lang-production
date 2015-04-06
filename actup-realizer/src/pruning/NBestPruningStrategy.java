@@ -16,10 +16,12 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package realize;
+package pruning;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import realize.Edge;
 
 /**
  * Default, n-best edge pruning strategy.
@@ -30,20 +32,14 @@ import java.util.List;
 public class NBestPruningStrategy implements PruningStrategy
 {
     /** The current pruning val. */
-    protected int CAT_PRUNE_VAL;
+    protected int pruneCutoff;
     
     /** Reusable return list. */
     protected List<Edge> retval = new ArrayList<Edge>();
     
     /** Constructor with pruning val. */
     public NBestPruningStrategy(int pruningVal) {
-        CAT_PRUNE_VAL = pruningVal;
-    }
-    
-    /** Default constructor retrieves pruning val from preferences. */
-    public NBestPruningStrategy() {
-      //  Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
-        CAT_PRUNE_VAL = Chart.PRUNING_VALUE;
+        pruneCutoff = pruningVal;
     }
     
     /**
@@ -54,27 +50,10 @@ public class NBestPruningStrategy implements PruningStrategy
      * ones in the given list.
      */
     public List<Edge> pruneEdges(List<Edge> catEdges) {
-        // clear reusable return list
         retval.clear();
-        // ensure pruning enabled
-        if (CAT_PRUNE_VAL == Chart.NO_PRUNING) {
-        	return retval;
+        while (pruneCutoff < catEdges.size()) {
+            retval.add(catEdges.remove(pruneCutoff));
         }
-        // nb: could add an option to prune all egdes with zero score
-        /*
-        for (Iterator it = catEdges.iterator(); it.hasNext(); ) {
-            Edge edge = it.next();
-            if (edge.score == 0) {
-                retval.add(edge);
-                it.remove();
-            }
-        }
-        */
-        // return edges at bottom of list, starting with CAT_PRUNE_VAL (if any)
-        while (CAT_PRUNE_VAL < catEdges.size()) {
-            retval.add(catEdges.remove(CAT_PRUNE_VAL));
-        }
-        // done
         return retval;
     }
 }

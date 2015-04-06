@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package realize;
+package pruning;
 
 import gnu.trove.THashSet;
 import gnu.trove.TObjectIdentityHashingStrategy;
@@ -25,6 +25,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import realize.Edge;
+import runconfig.Consts;
 import synsem.Sign;
 
 /**
@@ -41,7 +43,11 @@ import synsem.Sign;
  */
 abstract public class DiversityPruningStrategy extends NBestPruningStrategy
 {
-    /** Flag for whether to keep only the single best edge among those that 
+    public DiversityPruningStrategy(int pruningVal) {
+		super(pruningVal);
+	}
+
+	/** Flag for whether to keep only the single best edge among those that 
         are not compellingly different (defaults to false). */
     public boolean singleBestPerGroup = false;
     
@@ -65,9 +71,11 @@ abstract public class DiversityPruningStrategy extends NBestPruningStrategy
         // clear reusable return list
         retval.clear();
         // ensure pruning enabled
-        if (CAT_PRUNE_VAL == Chart.NO_PRUNING) return retval;
+        if (pruneCutoff == Consts.PRUNE_LEAST_EDGES) {
+        	return retval;
+        }
         // ensure there are edges to prune
-        if (!singleBestPerGroup && catEdges.size() <= CAT_PRUNE_VAL) return retval;
+        if (!singleBestPerGroup && catEdges.size() <= pruneCutoff) return retval;
         // group edges into ranked equivalence classes, 
         // by using a list of lists, preserving order
         List<List<Edge>> groups = new ArrayList<List<Edge>>();
@@ -76,7 +84,7 @@ abstract public class DiversityPruningStrategy extends NBestPruningStrategy
             for (int i = 0; i < groups.size(); i++) {
                 List<Edge> members = groups.get(i);
                 Edge first = members.get(0);
-                if (notCompellinglyDifferent(first.sign, edge.sign)) {
+                if (notCompellinglyDifferent(first.getSign(), edge.getSign())) {
                     members.add(edge); 
                     foundGroup = true; break;
                 }
@@ -92,7 +100,7 @@ abstract public class DiversityPruningStrategy extends NBestPruningStrategy
         keepers.clear();
         int counter = 0;
         int numGroups = groups.size();
-        while (keepers.size() < CAT_PRUNE_VAL && 
+        while (keepers.size() < pruneCutoff && 
                (!singleBestPerGroup || counter < numGroups)) 
         {
             int groupNum = counter % numGroups;

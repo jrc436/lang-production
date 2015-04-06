@@ -18,6 +18,8 @@
 //////////////////////////////////////////////////////////////////////////////
 package synsem;
 
+import grammar.Grammar;
+
 import org.jdom.Element;
 
 /**
@@ -30,16 +32,20 @@ import org.jdom.Element;
  */
 public class CatReader {
     
-    public static Category getCat(Element catel) {
+    public static Category getCat(Grammar grammar, Element catel) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         Category cat = null;
         String catType = catel.getName();
         
         if (catType.equals("atomcat") || catType.equals("ac")) {    
-            cat =  new AtomCat(catel);
+            cat =  new AtomCat(grammar, catel);
         }
         
         else if (catType.equals("complexcat") || catType.equals("cc")) {    
-            cat =  new ComplexCat(catel);
+            cat =  new ComplexCat(grammar, catel);
         }
 
         return cat;

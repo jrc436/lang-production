@@ -18,8 +18,6 @@
 
 package ngrams;
 
-import grammar.Grammar;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
@@ -43,15 +41,25 @@ import util.TrieMap;
  */
 public abstract class NgramScorer implements SignScorer, Reversible
 {
-	protected NgramScorer() {}
+    
+    // tokenizer reference
+    protected final Tokenizer tokenizer;
 	
+	protected NgramScorer() {
+		this(1);
+	}
 	protected NgramScorer(int order) {
-		this(order, false);
+		this(order, new DefaultTokenizer());
 	}
 	
-	protected NgramScorer(int order, boolean useSemClasses) {
+	protected NgramScorer(int order, Tokenizer tokenizer) {
+		this(order, false, tokenizer);
+	}
+	
+	protected NgramScorer(int order, boolean useSemClasses, Tokenizer tokenizer) {
 		this.order = order;
 		this.useSemClasses = useSemClasses;
+		this.tokenizer = tokenizer;
 	}
 	
     /** The n-gram order of the model. */
@@ -345,20 +353,11 @@ public abstract class NgramScorer implements SignScorer, Reversible
      * Defaults to false.
      */
     protected boolean useSemClasses = false;
-    
-    // tokenizer reference
-    private Tokenizer tokenizer = null;
 
-    private Tokenizer getTokenizer() {
-        if (tokenizer != null) return tokenizer;
-        if (Grammar.theGrammar != null) tokenizer = Grammar.theGrammar.lexicon.tokenizer;
-        else tokenizer = new DefaultTokenizer();
-        return tokenizer;
-    }
     
     /** Returns whether the given semantic class is a replacement one. */
     protected boolean isReplacementSemClass(String semClass) {
-        return semClass != null && getTokenizer().isReplacementSemClass(semClass);
+        return semClass != null && tokenizer.isReplacementSemClass(semClass);
     }
     
     /**

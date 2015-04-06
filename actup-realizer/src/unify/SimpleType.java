@@ -18,10 +18,8 @@
 
 package unify;
 
-import grammar.Grammar;
 import grammar.Types;
 
-import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.util.BitSet;
 
@@ -93,10 +91,5 @@ public class SimpleType implements Unifiable, Serializable {
         if (!(o instanceof SimpleType)) return false;
         if (index == ((SimpleType)o).getIndex()) return true;
         else return false;
-    }
-    
-    /** Returns canonical version of deserialized type based on current grammar. */
-    public Object readResolve() throws ObjectStreamException {
-    	return Grammar.theGrammar.types.getSimpleType(name);
     }
 }

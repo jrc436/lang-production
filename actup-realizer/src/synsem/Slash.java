@@ -19,6 +19,7 @@
 package synsem;
 
 import gnu.trove.TObjectIntHashMap;
+import grammar.Grammar;
 
 import java.io.Serializable;
 
@@ -65,7 +66,14 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 
 	private boolean _harmonicCompositionResult = false;
 	
-	public Slash(Element el) {
+	private final Grammar grammar;
+	
+	public Slash(Grammar grammar, Element el) {
+		if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+		this.grammar = grammar;
 		String d = el.getAttributeValue("dir");
 		if (d == null)
 			d = el.getAttributeValue("d");
@@ -84,7 +92,7 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 			if (vm == null)
 				vm = el.getAttributeValue("varModality");
 			if (vm != null) {
-				_modality = new VarModality(vm);
+				_modality = new VarModality(grammar, vm);
 			} else {
 				_modality = new SlashMode();
 			}
@@ -96,33 +104,53 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 		}
 	}
 
-	public Slash() {
-		this('|');
+	public Slash(Grammar grammar) {
+		this(grammar, '|');
 	}
 
-	public Slash(char sd) {
+	public Slash(Grammar grammar, char sd) {
+		if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+		this.grammar = grammar;
 		_dir = encode(sd);
 		_modality = new SlashMode();
 	}
 
-	public Slash(char sd, String md) {
+	public Slash(Grammar grammar, char sd, String md) {
+		if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+		this.grammar = grammar;
 		_dir = encode(sd);
 		_modality = new SlashMode(md);
 	}
 
-	public Slash(char sd, Modality md) {
+	public Slash(Grammar grammar, char sd, Modality md) {
+		if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+		this.grammar = grammar;
 		_dir = encode(sd);
 		_modality = md;
 	}
 
-	private Slash(byte d, Modality m, byte a) {
+	private Slash(Grammar grammar, byte d, Modality m, byte a) {
+		if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+		this.grammar = grammar;
 		_dir = d;
 		_modality = m;
 		_ability = a;
 	}
 
 	public Slash copy() {
-		Slash retval = new Slash(_dir, (Modality) _modality.copy(), _ability);
+		Slash retval = new Slash(grammar, _dir, (Modality) _modality.copy(), _ability);
 		retval._modifier = _modifier;
 		retval._harmonicCompositionResult = _harmonicCompositionResult;
 		return retval;
@@ -209,7 +237,7 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 			}
 
 			Modality newModality = (Modality) _modality.unify(((Slash) u)._modality, sub);
-			Slash retval = new Slash(newDir, newModality, newAbility);
+			Slash retval = new Slash(grammar, newDir, newModality, newAbility);
 			retval._modifier = _modifier;
 			return retval;
 		} else {
@@ -219,7 +247,7 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 	}
 
 	public Object fill(Substitution sub) throws UnifyFailure {
-		Slash retval = new Slash(_dir, (Modality) _modality.fill(sub), _ability);
+		Slash retval = new Slash(grammar, _dir, (Modality) _modality.fill(sub), _ability);
 		retval._modifier = _modifier;
 		return retval;
 	}

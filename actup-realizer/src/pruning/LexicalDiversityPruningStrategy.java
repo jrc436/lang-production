@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 //////////////////////////////////////////////////////////////////////////////
 
-package realize;
+package pruning;
 
 import gnu.trove.THashSet;
 import gnu.trove.TObjectIdentityHashingStrategy;
@@ -46,7 +46,8 @@ public class LexicalDiversityPruningStrategy extends DiversityPruningStrategy
 	protected Set<String> stemsSeen = new THashSet(new TObjectIdentityHashingStrategy());
     
     /** Constructor, which sets POS classes of interest. */
-    public LexicalDiversityPruningStrategy() {
+    public LexicalDiversityPruningStrategy(int pruneVal) {
+    	super(pruneVal);
     	String[] poslist = {
     		"JJ", "JJR", "JJS",
     		"NN", "NNP", "NNS", "NNPS",

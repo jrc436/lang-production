@@ -48,6 +48,10 @@ public class Types {
 	
     /** Constructor for an empty hierarchy (with just the top type). */
     public Types(Grammar grammar) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         getSimpleType(TOP_TYPE);
         this.grammar = grammar;
     }
@@ -58,6 +62,10 @@ public class Types {
      */
     @SuppressWarnings("unchecked")
 	public Types(URL url, Grammar grammar) throws IOException {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
         this.grammar = grammar;
         SAXBuilder builder = new SAXBuilder();
         Document doc;

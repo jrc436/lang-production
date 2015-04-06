@@ -32,6 +32,10 @@ import java.util.*;
  */
 public abstract class AbstractApplicationRule extends AbstractRule {
 	
+	public AbstractApplicationRule(Grammar grammar) {
+		super(grammar);
+	}
+
 	private static final long serialVersionUID = 1L;
 	
 	protected Slash _functorSlash;
@@ -54,7 +58,7 @@ public abstract class AbstractApplicationRule extends AbstractRule {
                 xyOuter.unifySlash(_functorSlash);
                 Category xyOuterCat = ((BasicArg)xyOuter).getCat();
                 Substitution sub = new GSubstitution();
-                GUnifier.unify(xyOuterCat, yCat, sub);
+                GUnifier.unify(grammar, xyOuterCat, yCat, sub);
                 results = new ArrayList<Category>(1);
                 ((GSubstitution)sub).condense();
                 Category result = (Category) xyCurCat.getResult().fill(sub);
@@ -70,7 +74,7 @@ public abstract class AbstractApplicationRule extends AbstractRule {
                     try {
                         argi.unifySlash(_functorSlash);
                         Substitution sub = new GSubstitution();
-                        GUnifier.unify(argi.getCat(), yCat, sub);
+                        GUnifier.unify(grammar, argi.getCat(), yCat, sub);
                         ComplexCat result = (ComplexCat)xyCurCat.copy();
                         result.setOuterArgument(xyOuterSet.copyWithout(i));
                         ((GSubstitution)sub).condense();

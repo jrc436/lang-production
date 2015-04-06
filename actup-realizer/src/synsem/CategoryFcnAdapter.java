@@ -18,6 +18,7 @@
 
 package synsem;
 
+
 /**
  * An adapter for Category Functions so that you only have to implement the
  * methods you want.

@@ -18,9 +18,15 @@
 
 package hylo;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import synsem.*;
+import synsem.LexSemOrigin;
+import synsem.Sign;
 
 /** 
  * A class for tracking semantic dependencies between lexical items.

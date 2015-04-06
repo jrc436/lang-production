@@ -3,14 +3,15 @@ package ngrams;
 import java.util.HashMap;
 import java.util.Random;
 
+import lexicon.Tokenizer;
 import synsem.Sign;
 
 public class RandomModel extends AbstractStandardNgramModel {
 
 	HashMap<Sign, Double> signScores;
 	Random gen;
-	public RandomModel(int order) {
-		super(order);
+	public RandomModel(int order, Tokenizer tokenizer) {
+		super(order, tokenizer);
 		gen = new Random();
 		signScores = new HashMap<Sign, Double>();
 	}

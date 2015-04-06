@@ -14,33 +14,35 @@ import optimization.VariableSet;
 public class Client {	
 	
 	
-	public static void main(String[] args) throws Exception {
+	public static void main(String[] args) throws Exception {		
 		VariableSet opt = new VariableSet(new Variable[0], 0);
-		Settings s = new Settings(Settings.mType, Settings.eval, Settings.trSet, Settings.strat);
+		IOSettings s = new IOSettings();
+		RealizationSettings rs = new RealizationSettings();
 		
-		if (Settings.mType == ModelType.ACTR) {
-			opt = Settings.actr_opt;
+		if (s.getModelType() == ModelType.ACTR) {
+			opt = IOSettings.actr_opt;
 		}
 		try {
-			if (Settings.logRealizations) { Files.createDirectory(Paths.get(Consts.trialRealizationSetPath)); }
+			if (IOSettings.logRealizations) { Files.createDirectory(Paths.get(Consts.trialRealizationSetPath)); }
 			Files.createDirectory(Paths.get(Consts.trialOutputPath));
 		}
 		catch (FileAlreadyExistsException ex) {
 			System.err.println("You are overwriting a run!!!");
 		}
-		String logRealizations = Settings.logRealizations ? Consts.trialRealizationSetPath : null;
-		String goldPath = Settings.loadGoldFromFile ? Consts.goldPath : null;
-		ValleyClimber hc = new ValleyClimber(s, Consts.grammarPath, Consts.inputPath, logRealizations, Consts.trialOutputPath, goldPath);
+		String logRealizations = IOSettings.logRealizations ? Consts.trialRealizationSetPath : null;
+		String goldPath = IOSettings.loadGoldFromFile ? Consts.goldPath : null;
+		ValleyClimber hc = new ValleyClimber(s, rs, Consts.grammarPath, Consts.inputPath, logRealizations, Consts.trialOutputPath, goldPath);
+		opt.randomAll();
+		hc.optimizeVariables("e"+String.format("%02d", 0), opt, IOSettings.iterCap);	
 		
-		
-		for (int j = 0; j < Settings.NumRandomRestarts / Settings.NumConcurrentStarts; j++) {
-			ExecutorService es = Executors.newCachedThreadPool();
-			for (int i = 0; i < Settings.NumConcurrentStarts; i++) {
-				es.execute(new optThread(opt, hc, j*i+i));
-			}
-			es.shutdown();
-			es.awaitTermination(12, TimeUnit.HOURS);
-		}
+//		for (int j = 0; j <= (Settings.NumRandomRestarts+1) / Settings.NumConcurrentStarts; j++) {
+//			ExecutorService es = Executors.newCachedThreadPool();
+//			for (int i = 0; i < Settings.NumConcurrentStarts; i++) {
+//				es.execute(new optThread(opt, hc, j*i+i));
+//			}
+//			es.shutdown();
+//			es.awaitTermination(12, TimeUnit.HOURS);
+//		}
 		//once this completes, realistically, we can do random restarts forever.
 	}
 }
@@ -55,6 +57,6 @@ class optThread implements Runnable {
 	}
 	public void run() {
 		opt.randomAll();
-		hc.optimizeVariables("e"+String.format("%02d", threadNum), opt, Settings.iterCap);		
+		hc.optimizeVariables("e"+String.format("%02d", threadNum), opt, IOSettings.iterCap);		
 	}
 }

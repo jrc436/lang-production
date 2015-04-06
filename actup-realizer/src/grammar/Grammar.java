@@ -21,17 +21,13 @@ package grammar;
 import hylo.HyloHelper;
 
 import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
@@ -68,9 +64,7 @@ import org.xml.sax.SAXException;
 import org.xml.sax.XMLFilter;
 import org.xml.sax.XMLReader;
 
-import realize.Realizer;
 import synsem.LF;
-import synsem.Sign;
 
 /**
  * A CCG grammar is essentially a lexicon plus a rule group.
@@ -89,33 +83,17 @@ public class Grammar {
     public boolean showSem = false;
     //Which features to show. 
     public String featsToShow = "";
-	
-	
-	
-    /** The lexicon. */
-    public final Lexicon lexicon;
-    
-    /** The rule group. */
+		
+
+    public final Lexicon lexicon; 
     public final RuleGroup rules;
-
-    /** The type hierarchy. */
     public final Types types;
+    public final Set<String> supertagFeatures = new HashSet<String>(); //feats to include in supertags
     
-    /** The features to include in supertags. */
-    public final Set<String> supertagFeatures = new HashSet<String>();
+    //I don't understand this.
+    public final URL[] fromXmlTransforms; //xml to LF transforms   
+    public final URL[] toXmlTransforms; //LFs to xml transforms
     
-    /** The sequence of transformations to use when loading LFs from XML. */
-    public final URL[] fromXmlTransforms;
-    
-    /** The sequence of transformations to use when saving LFs to XML. */
-    public final URL[] toXmlTransforms;
-
-    /** Preferences for displaying elements in this grammar. */
-    //public DisplayPrefs prefs = new DisplayPrefs();
-   
-    /** For access to the current grammar; should be generalized eventually. */
-    public static Grammar theGrammar;
-	
     // name of the grammar
     private String grammarName = null;
 
@@ -163,7 +141,6 @@ public class Grammar {
     /** Loads a grammar from the given URL, with the given flag for whether to ignore rule combos. */
     @SuppressWarnings("unchecked")
 	public Grammar(URL url, boolean ignoreCombos) throws IOException {
-        theGrammar = this;
         // read XML
         SAXBuilder builder = new SAXBuilder();
         Document doc;
@@ -173,7 +150,7 @@ public class Grammar {
             throw (IOException) new IOException().initCause(jde);
         }
         Element root = doc.getRootElement();	// root corresponds to <grammar>
-		    grammarName = root.getAttributeValue("name");
+        grammarName = root.getAttributeValue("name");
 		
         Element supertagsElt = root.getChild("supertags");
         if (supertagsElt != null) {
@@ -190,33 +167,16 @@ public class Grammar {
             supertagFeatures.add("form"); supertagFeatures.add("lex"); 
         }
         
-        Tokenizer tokenizer = null;
-        Element tokenizerElt = root.getChild("tokenizer");
-        if (tokenizerElt != null) {
-            String tokenizerClass = tokenizerElt.getAttributeValue("classname");
-            if (tokenizerClass != null) {
-                try {
-                    tokenizer = (Tokenizer) Class.forName(tokenizerClass).newInstance();
-                } catch (Exception exc) {
-                    throw (IOException) new IOException().initCause(exc);
-                }
-            }
-            else tokenizer = new DefaultTokenizer();
-            String replacementSemClasses = tokenizerElt.getAttributeValue("replacement-sem-classes");
-            if (replacementSemClasses != null) {
-                String[] semClasses = replacementSemClasses.split("\\s+");
-                for (int i = 0; i < semClasses.length; i++) {
-                    tokenizer.addReplacementSemClass(semClasses[i]);
-                }
-            }
-        }
+        Tokenizer tokenizer = initTokenizer(root.getChild("tokenizer"));       
         
         Element typesElt = root.getChild("types");
         URL typesUrl;
         if (typesElt != null) {
             typesUrl = new URL(url, typesElt.getAttributeValue("file"));
         }
-        else typesUrl = null;
+        else {
+        	typesUrl = null;
+        }
         Element lexiconElt = root.getChild("lexicon");
         boolean openlex = "true".equals(lexiconElt.getAttributeValue("openlex"));
         URL lexiconUrl = new URL(url, lexiconElt.getAttributeValue("file")); 
@@ -248,11 +208,15 @@ public class Grammar {
         }
         
         // load type hierarchy, lexicon and rules
-        if (typesUrl != null) types = new Types(typesUrl, this);
+        if (typesUrl != null) {
+        	types = new Types(typesUrl, this);
+        }
         else types = new Types(this);
-        if (tokenizer != null) lexicon = new Lexicon(this, tokenizer);
-        else lexicon = new Lexicon(this);
+    	lexicon = new Lexicon(this, tokenizer);
+        
         lexicon.openlex = openlex;
+        
+        
         lexicon.init(lexiconUrl, morphUrl); 
         rules = new RuleGroup(rulesUrl, this);
         
@@ -270,7 +234,27 @@ public class Grammar {
 	        rules.setDynamicCombos(dynamic);
         }
     }
-
+    private Tokenizer initTokenizer(Element tokenizerElt) {
+    	Tokenizer tokenizer = null;
+    	if (tokenizerElt == null) {
+    		return new DefaultTokenizer();
+    	}
+		String tokenClass = tokenizerElt.getAttributeValue("classname");	
+		try {
+			tokenizer = tokenClass == null ? new DefaultTokenizer() : (Tokenizer) Class.forName(tokenClass).newInstance();
+		} 
+		catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
+			e.printStackTrace();
+			System.err.println(tokenClass+" is not a valid classname, apparently");
+			System.exit(1);
+		}       
+    	String repClasses = tokenizerElt.getAttributeValue("replacement-sem-classes");
+        String[] semClasses = repClasses == null ? new String[0] : repClasses.split("\\s+");
+        for (String cl : semClasses) {
+            tokenizer.addReplacementSemClass(cl);
+        }  	
+    	return tokenizer;
+    }
     
     /**
      * Returns a file url string relative to the user's current directory 
@@ -472,32 +456,6 @@ public class Grammar {
             throw (IOException) new IOException().initCause(exc);
         }
     }
-
-    
-    /**
-     * Transforms an LF by applying the configured to-XML and from-XML transformations, 
-     * then loading the LF from the resulting doc.
-     */
-    public synchronized LF transformLF(LF lf) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        saveToXml(lf, "", out);
-        ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-        Document doc = loadFromXml(in);
-        return Realizer.getLfFromDoc(doc);
-    }
-    
-    /**
-     * Loads an LF by applying the configured from-XML transformations, 
-     * then loading the LF from the resulting doc.
-     */
-    public synchronized LF loadLF(Document doc) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        serializeXml(doc, out);
-        ByteArrayInputStream in = new ByteArrayInputStream(out.toByteArray());
-        Document doc2 = loadFromXml(in);
-        return Realizer.getLfFromDoc(doc2);
-    }
-    
     
     /**
      * Convenience method to serialize XML.
@@ -562,45 +520,6 @@ public class Grammar {
         }
         return boundaryTonesSet.contains(s);
     }
-    
-    
-    /**
-     * Saves the given sign's words, pitch accents and boundary tones 
-     * to an APML file with the given filename.
-     */
-    public synchronized void saveToApml(Sign sign, String filename) throws IOException {
-        // ensure dirs exist for filename
-        File file = new File(filename);
-        File parent = file.getParentFile();
-        if (parent != null && !parent.exists()) { parent.mkdirs(); }
-        // do transformation
-        FileWriter fw = new FileWriter(file);
-        saveToApml(sign, fw);
-        fw.close();
-    }
-    
-    /**
-     * Saves the given sign's words, pitch accents and boundary tones 
-     * as APML to the given writer.
-     * The orthography is first converted to XML using Sign.getWordsInXml, 
-     * and then converted to APML using opennlp/ccg/grammar/to-apml.xsl.
-     * The string is assumed to be a single performative.
-     */
-    public synchronized void saveToApml(Sign sign, Writer writer) throws IOException { 
-        // convert words
-        Document doc = sign.getWordsInXml();
-        // write transformed doc to file
-        try {
-            // do setup and get source
-            initializeTransformers();
-            Source source = new JDOMSource(doc);
-            // do transformation
-            apmlTransformer.transform(source, new StreamResult(writer));
-        } catch (TransformerException exc) { 
-            throw (IOException) new IOException().initCause(exc);
-        }
-    }
-
 
 	/**
 	* Returns the name of the loaded grammar. Null if no name given.

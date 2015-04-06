@@ -33,20 +33,21 @@ public class ForwardSubstitution extends AbstractSubstitutionRule {
 
 	private static final long serialVersionUID = 7324585108055853456L;
 
-	public ForwardSubstitution() {
-		this(true);
+	public ForwardSubstitution(Grammar grammar) {
+		this(grammar, true);
 	}
 
-	public ForwardSubstitution(boolean isHarmonic) {
+	public ForwardSubstitution(Grammar grammar, boolean isHarmonic) {
+		super(grammar);
 		_isHarmonic = isHarmonic;
 		if (isHarmonic) {
 			_name = ">S";
-			_functorSlash = new Slash('/', "^");
-			_argSlash = new Slash('/', "^");
+			_functorSlash = new Slash(grammar, '/', "^");
+			_argSlash = new Slash(grammar, '/', "^");
 		} else {
 			_name = ">Sx";
-			_functorSlash = new Slash('/', "x");
-			_argSlash = new Slash('\\', "x");
+			_functorSlash = new Slash(grammar, '/', "x");
+			_argSlash = new Slash(grammar, '\\', "x");
 		}
 		_functorSlash.setAbility("active");
 	}

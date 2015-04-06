@@ -7,7 +7,7 @@ public enum EvaluationType {
 	public String extPath() {
 		switch (this) {
 			case ROUGE:
-				return Settings.basePath+"actup-production/rouge/";
+				return IOSettings.basePath+"actup-production/rouge/";
 			default:
 				return "";
 		}

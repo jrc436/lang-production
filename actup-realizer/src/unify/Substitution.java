@@ -29,11 +29,11 @@ public interface Substitution {
 
 	/**
 	 * Request the Substitution to identify a variable with an object.
-	 * 
 	 * @param var
 	 *            the variable whose value has been determined
 	 * @param o
 	 *            the Object identified with the variable
+	 * 
 	 * @return the Object identified with the variable, which has potentially
 	 *         undergone further unifications as a result of making the
 	 *         substitution

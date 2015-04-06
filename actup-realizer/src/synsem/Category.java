@@ -79,7 +79,6 @@ public interface Category extends Unifiable, Mutable, java.io.Serializable {
     /**
      * Iterates through this Category applying a function to this category
      * and every subcategory.
-     *
      * @param f a function to be applied
      */    
     public void forall(CategoryFcn f); //to ls

@@ -26,6 +26,7 @@ import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.List;
 
+import lexicon.Tokenizer;
 import util.TrieMap;
 
 /**
@@ -43,9 +44,9 @@ public class StandardNgramModel extends AbstractStandardNgramModel
      * the given reader, with the given flag controlling whether words are
      * replaced by their semantic classes.
      */
-    public StandardNgramModel(int order, Reader in, boolean useSemClasses, double[] varValues)
+    public StandardNgramModel(int order, Reader in, boolean useSemClasses, double[] varValues, Tokenizer tokenizer)
     		throws IOException {
-        super(order, useSemClasses, varValues);
+        super(order, useSemClasses, tokenizer, varValues);
         this.numNgrams = new int[order];
         readModel(in);
     }
@@ -54,8 +55,8 @@ public class StandardNgramModel extends AbstractStandardNgramModel
      * Loads an n-gram model of the given order in ARPA (Doug Paul) format from
      * the given reader. Words are not replaced by their semantic classes.
      */
-	public StandardNgramModel(int order, Reader in, double[] varValues) throws IOException {
-		this(order, in, false, varValues);
+	public StandardNgramModel(int order, Reader in, double[] varValues, Tokenizer tokenizer) throws IOException {
+		this(order, in, false, varValues, tokenizer);
 	}
 
 	/** 
@@ -63,24 +64,24 @@ public class StandardNgramModel extends AbstractStandardNgramModel
      * the given file, with the given flag controlling whether words are
      * replaced by their semantic classes.
      */
-	public StandardNgramModel(int order, String filename, boolean useSemClasses, double[] varValues)
+	public StandardNgramModel(int order, String filename, boolean useSemClasses, double[] varValues, Tokenizer tokenizer)
 			throws IOException {
 		this(order, new BufferedReader(new FileReader(filename)),
-        		useSemClasses, varValues);
+        		useSemClasses, varValues, tokenizer);
 	}
-	public StandardNgramModel(int order, String filename, double[] varValues) throws IOException {
-		this(order, filename, false, varValues); 
+	public StandardNgramModel(int order, String filename, double[] varValues, Tokenizer tokenizer) throws IOException {
+		this(order, filename, false, varValues, tokenizer); 
 	}
-	public StandardNgramModel(int order, String filename, boolean useSemClasses) throws IOException {
-		this(order, filename, useSemClasses, new double[0]); 
+	public StandardNgramModel(int order, String filename, boolean useSemClasses, Tokenizer tokenizer) throws IOException {
+		this(order, filename, useSemClasses, new double[0], tokenizer); 
 	}
 
 	/** 
      * Loads an n-gram model of the given order in ARPA (Doug Paul) format from
      * the given file. Words are not replaced by their semantic classes.
      */
-	public StandardNgramModel(int order, String filename) throws IOException {
-		this(order, filename, false, new double[0]); 
+	public StandardNgramModel(int order, String filename, Tokenizer tokenizer) throws IOException {
+		this(order, filename, false, new double[0], tokenizer); 
 	}
 	
 	// reads in model

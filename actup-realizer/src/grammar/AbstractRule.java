@@ -43,7 +43,16 @@ public abstract class AbstractRule implements Rule, Serializable {
     protected RuleGroup _ruleGroup;
     
     /** Reusable list of head cats, one for each result. */
-    protected List<Category> _headCats = new ArrayList<Category>(); 
+    protected List<Category> _headCats = new ArrayList<Category>();
+    
+    protected final Grammar grammar;
+    public AbstractRule(Grammar grammar) {
+    	if (grammar == null ) {
+    		System.err.println("Someone's tricksing you");
+    		System.exit(1);
+    	}
+    	this.grammar = grammar;
+    }
 
     /** Applies the rule to the given input signs, adding to the given list of results. */
     public void applyRule(Sign[] inputs, List<Sign> results) {
@@ -69,7 +78,7 @@ public abstract class AbstractRule implements Rule, Serializable {
                 for (int j=0; j < inputs.length; j++) {
                 	if (inputs[j].getCategory() == headCat) lexHead = inputs[j].getLexHead();
                 }
-                Sign sign = Sign.createDerivedSign(catResult, inputs, this, lexHead);
+                Sign sign = Sign.createDerivedSign(grammar, catResult, inputs, this, lexHead);
                 results.add(sign);
             }
         } catch (UnifyFailure uf) {}
@@ -123,8 +132,8 @@ public abstract class AbstractRule implements Rule, Serializable {
 
     /**
      * Apply this rule to some input categories.
-     *
      * @param inputs the input categories to try to combine
+     *
      * @return the categories resulting from using this rule to combine the
      *         inputs
      * @exception UnifyFailure if the inputs cannot be combined by this rule
@@ -173,10 +182,10 @@ public abstract class AbstractRule implements Rule, Serializable {
     protected void appendLFs(Category cat1, Category cat2, Category result, Substitution sub) 
         throws UnifyFailure
     {
-        LF lf = HyloHelper.append(cat1.getLF(), cat2.getLF());
+        LF lf = HyloHelper.append(grammar, cat1.getLF(), cat2.getLF());
         if (lf != null) {
             lf = (LF) lf.fill(sub);
-            HyloHelper.sort(lf);
+            HyloHelper.sort(grammar, lf);
             HyloHelper.check(lf);
         }
         result.setLF(lf);

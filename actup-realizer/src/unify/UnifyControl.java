@@ -57,7 +57,7 @@ public class UnifyControl {
     private static TIntIntHashMap _reindexed = new TIntIntHashMap();
 
     private static CategoryFcn indexFcn = new CategoryFcnAdapter() {
-        public void forall (Category c) {
+        public void forall(Category c) {
             FeatureStructure fs = c.getFeatureStructure();
             if (fs != null) {
                 int index = fs.getIndex();

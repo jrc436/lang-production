@@ -23,7 +23,7 @@ public abstract class Evaluator implements TextScorer {
 	public Evaluator(ScoringStrategy strat) {
 		this.strat = strat;
 	}
-	public void loadFiles(String goldDirPath, String testDirPath) throws IOException {
+	public synchronized void loadFiles(String goldDirPath, String testDirPath) throws IOException {
 		realizations = new ArrayList<Realization>();
 		File[] evalFiles = new File(testDirPath).listFiles();
 		Arrays.sort(evalFiles);

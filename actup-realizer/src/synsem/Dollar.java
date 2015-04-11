@@ -18,15 +18,17 @@
 
 package synsem;
 
-import gnu.trove.TObjectIntHashMap;
 import grammar.Grammar;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 
 import unify.Indexed;
 import unify.ModFcn;
 import unify.Mutable;
 import unify.Substitution;
+import unify.Unifiable;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 import unify.Variable;
 
@@ -59,10 +61,7 @@ public final class Dollar implements Arg, Variable, Mutable, Indexed, Serializab
 	}
 
 	public Dollar(Grammar grammar, Slash s, String name, int id) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+		
 		this.grammar = grammar;
 		_slash = s;
 		_name = name;
@@ -141,7 +140,7 @@ public final class Dollar implements Arg, Variable, Mutable, Indexed, Serializab
 	public void unifyCheck(Object u) throws UnifyFailure {
 	}
 
-	public Object unify(Object u, Substitution sub) throws UnifyFailure {
+	public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
 		if (u instanceof ArgStack && !((ArgStack) u).occurs(this)) {
 			((ArgStack) u).slashesUnify(_slash);
 		} else if (u instanceof Arg && !((Arg) u).occurs(this)) {
@@ -190,7 +189,7 @@ public final class Dollar implements Arg, Variable, Mutable, Indexed, Serializab
 	/**
 	 * Returns a hash code using the given map from vars to ints.
 	 */
-	public int hashCode(TObjectIntHashMap varMap) {
+	public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) {
 		int retval = _slash.hashCode(varMap);
 		// see if this already in map
 		if (varMap.containsKey(this)) {
@@ -209,7 +208,7 @@ public final class Dollar implements Arg, Variable, Mutable, Indexed, Serializab
 	 * Returns whether this dollar equals the given object up to variable names,
 	 * using the given maps from vars to ints.
 	 */
-	public boolean equals(Object obj, TObjectIntHashMap varMap, TObjectIntHashMap varMap2) {
+	public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
 		if (this == obj) return true;
 		if (obj.getClass() != this.getClass()) return false;
 		Dollar d = (Dollar) obj;

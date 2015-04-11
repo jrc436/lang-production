@@ -32,6 +32,10 @@ public class SelfCondensingSub extends HashMap<Variable,Object> implements Subst
 
 	private static final long serialVersionUID = 1L;
 
+	private final UnifyControl uc;
+	public SelfCondensingSub(UnifyControl uc) {
+		this.uc = uc;
+	}
 	/**
 	 * Request the Substitution to identify a variable with an object.
 	 * Automagically condenses the Substitution so that all other values in this
@@ -57,7 +61,7 @@ public class SelfCondensingSub extends HashMap<Variable,Object> implements Subst
 			Object val2 = getValue(var2);
 			if (val1 != null) {
 				if (val2 != null)
-					u = Unifier.unify(var, val2, this);
+					u = Unifier.unify(uc, var, val2, this);
 				else
 					u = makeSubstitution(var2, val1);
 			} else {
@@ -67,7 +71,7 @@ public class SelfCondensingSub extends HashMap<Variable,Object> implements Subst
 					put(var, var2);
 			}
 		} else if (val1 != null) {
-			u = Unifier.unify(val1, u, this);
+			u = Unifier.unify(uc, val1, u, this);
 		}
 		put(var, u);
 		for (Iterator<Variable> i = keySet().iterator(); i.hasNext();) {

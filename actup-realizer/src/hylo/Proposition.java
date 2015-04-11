@@ -25,6 +25,7 @@ import org.jdom.Element;
 import synsem.LF;
 import unify.SimpleType;
 import unify.Substitution;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 
 /**
@@ -52,14 +53,14 @@ public class Proposition extends HyloAtom {
         return new Proposition(grammar, _name, type);
     }
     
-    public Object unify(Object u, Substitution sub) throws UnifyFailure {
+    public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
         // check equality
         if (equals(u)) return this;
         // check for prop with compatible type
         if (u instanceof Proposition) {
             Proposition prop = (Proposition) u;
             if (type == null || prop.type == null) throw new UnifyFailure();
-            SimpleType st = (SimpleType) type.unify(prop.type, sub);
+            SimpleType st = (SimpleType) type.unify(prop.type, sub, uc);
             // return prop with most specific type
             if (st.equals(type)) return this;
             if (st.equals(prop.type)) return prop;
@@ -67,7 +68,7 @@ public class Proposition extends HyloAtom {
             return new Proposition(grammar, st.getName(), st);
         }
         // otherwise defer to default routine
-        return super.unify(u, sub);
+        return super.unify(u, sub, uc);
     }
     
     /**

@@ -33,19 +33,19 @@ public class BackwardSubstitution extends AbstractSubstitutionRule {
 
 	private static final long serialVersionUID = -4597839433754132265L;
 
-	public BackwardSubstitution(Grammar grammar) {
-		this(grammar, true);
+	public BackwardSubstitution(Grammar rg) {
+		this(rg, true);
 	}
 
-	public BackwardSubstitution(Grammar grammar, boolean isHarmonic) {
-		super(grammar);
+	public BackwardSubstitution(Grammar rg, boolean isHarmonic) {
+		super(rg);
 		_isHarmonic = isHarmonic;
 		if (isHarmonic) {
-			_name = "<S";
+			name = "<S";
 			_functorSlash = new Slash(grammar, '\\', "^");
 			_argSlash = new Slash(grammar, '\\', "^");
 		} else {
-			_name = "<Sx";
+			name = "<Sx";
 			_functorSlash = new Slash(grammar, '\\', "x");
 			_argSlash = new Slash(grammar, '/', "x");
 		}

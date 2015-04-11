@@ -19,11 +19,9 @@
 
 package unify;
 
-import gnu.trove.THashMap;
-import gnu.trove.TIntIntHashMap;
-import gnu.trove.TIntObjectHashMap;
-
 import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Implementation of Substitution interface which ensures that all
@@ -35,13 +33,19 @@ import java.util.Iterator;
  * @author      Gunes Erkan
  * @version     $Revision: 1.13 $, $Date: 2009/12/21 03:27:19 $ 
 */
-public class GSubstitution extends THashMap implements Substitution {
+public class GSubstitution extends LinkedHashMap<Variable, Object> implements Substitution {// extends THashMap implements Substitution {
 
 	private static final long serialVersionUID = 1L;
 
-	private TIntObjectHashMap _indexedObjects = new TIntObjectHashMap();
-    private TIntIntHashMap _newFeatStrucIndexes = new TIntIntHashMap();
-
+	private Map<Integer, Object> _indexedObjects = new LinkedHashMap<Integer, Object>();
+    private Map<Integer, Integer> _newFeatStrucIndexes = new LinkedHashMap<Integer, Integer>();
+    private final UnifyControl uc;
+    
+    public GSubstitution(UnifyControl uc) {
+    	this.uc = uc;
+    }
+    
+    
     /**
      * Request the Substitution to identify a variable with an
      * object. Automagically condenses the Substitution so that all
@@ -56,7 +60,6 @@ public class GSubstitution extends THashMap implements Substitution {
      * @exception throws UnifyFailure if the Object cannot be unified
      * with a previous value substituted for the Variable.
      */
-    @SuppressWarnings("unchecked")
 	public Object makeSubstitution(Variable var, Object u) throws UnifyFailure {
         Object val1 = getValue(var);
         if (u instanceof Variable) {
@@ -72,7 +75,7 @@ public class GSubstitution extends THashMap implements Substitution {
                     throw new UnifyFailure();
                 }
                 if (val2 != null) {
-                    u = Unifier.unify(var, val2, this);
+                    u = Unifier.unify(uc, var, val2, this);
                 } else {
                     u = makeSubstitution(var2, val1);
                 }
@@ -83,7 +86,7 @@ public class GSubstitution extends THashMap implements Substitution {
                 makeSubstitution(var, val2);
             } 
         } else if (val1 != null) {
-            u = Unifier.unify(val1, u, this);
+            u = Unifier.unify(uc, val1, u, this);
         }
         put(var, u);
         for (Iterator<Variable> i=keySet().iterator(); i.hasNext();) {
@@ -120,13 +123,12 @@ public class GSubstitution extends THashMap implements Substitution {
         return val;
     }
 
-    @SuppressWarnings("unchecked")
 	public Iterator<Variable> varIterator() {
         return keySet().iterator();
     }
 
     public int makeNewIndex(int fs1Index, int fs2Index) {
-        int index = UnifyControl.getUniqueFeatureStructureIndex();
+        int index = uc.getUniqueFeatureStructureIndex();
         int fs1IndexUpdated = getUpdatedIndex(fs1Index);
         int fs2IndexUpdated = getUpdatedIndex(fs2Index);
         addReindex(fs1IndexUpdated, index);
@@ -159,7 +161,7 @@ public class GSubstitution extends THashMap implements Substitution {
     }
 
     public void condense() throws UnifyFailure {
-        int[] keys = _indexedObjects.keys();
+        Integer[] keys = _indexedObjects.keySet().toArray(new Integer[_indexedObjects.keySet().size()]);
         for (int i=0; i < keys.length; i++) {
             Object obj = _indexedObjects.get(keys[i]);
             if (obj instanceof Unifiable) {
@@ -175,7 +177,6 @@ public class GSubstitution extends THashMap implements Substitution {
         }
     }
 
-    @SuppressWarnings("unchecked")
 	public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append("vars: \t");
@@ -185,7 +186,7 @@ public class GSubstitution extends THashMap implements Substitution {
         }
         sb.append('\n');
         sb.append("indexes: \t");
-        int indexKeys[] = _newFeatStrucIndexes.keys();
+        Integer[] indexKeys = _newFeatStrucIndexes.keySet().toArray(new Integer[_newFeatStrucIndexes.keySet().size()]);
         for (int i = 0; i < indexKeys.length; i++) {
             sb.append(indexKeys[i] + "->" + _newFeatStrucIndexes.get(indexKeys[i]) + "\t");
         }

@@ -18,17 +18,28 @@
 
 package grammar;
 
-import util.*;
-import unify.*;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.Stack;
 
-import org.jdom.*;
-import org.jdom.input.*;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
-
-import gnu.trove.*;
+import unify.SimpleType;
+import util.GroupMap;
 
 /**
  * Class for constructing and holding the hierarchical simple type maps.
@@ -40,7 +51,7 @@ import gnu.trove.*;
 public class Types {
 
     public final Grammar grammar;
-    private final HashMap<String,SimpleType> nameToType = new HashMap<String,SimpleType>();
+    private final LinkedHashMap<String,SimpleType> nameToType = new LinkedHashMap<String,SimpleType>();
     private final ArrayList<SimpleType> indexToType = new ArrayList<SimpleType>();
     private int maxTypeIndex = 0;
     public static final String TOP_TYPE = "top";
@@ -48,10 +59,6 @@ public class Types {
 	
     /** Constructor for an empty hierarchy (with just the top type). */
     public Types(Grammar grammar) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
         getSimpleType(TOP_TYPE);
         this.grammar = grammar;
     }
@@ -61,20 +68,18 @@ public class Types {
      * the given grammar.
      */
     @SuppressWarnings("unchecked")
-	public Types(URL url, Grammar grammar) throws IOException {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+	public Types(URL url, Grammar grammar) {
         this.grammar = grammar;
         SAXBuilder builder = new SAXBuilder();
-        Document doc;
+        Document doc = null;
         try {
             doc = builder.build(url);
         }
-        catch (JDOMException exc) {
+        catch (JDOMException | IOException exc) {
           getSimpleType(TOP_TYPE);
-          throw (IOException) new IOException().initCause(exc);
+          exc.printStackTrace();
+          System.err.println("Some kind of error whiel loading the types from the grammar url");
+          System.exit(1);
         }
         List<Element> entries = doc.getRootElement().getChildren();
         readTypes(entries);
@@ -113,7 +118,7 @@ public class Types {
         
         GroupMap<String,String> hierarchy = new GroupMap<String,String>(); // map from types to all subtypes
         GroupMap<String,String> parents = new GroupMap<String,String>(); // map from types to parents
-        TObjectIntHashMap depthMap = new TObjectIntHashMap(); // map from types to max depth
+        LinkedHashMap<String, Integer> depthMap = new LinkedHashMap<String, Integer>(); // map from types to max depth
 
         // Construct the initial hierarchy of types without 
         // taking transitive closure.
@@ -196,11 +201,11 @@ public class Types {
     /** 
      * Creates the SimpleType objects and constructs the nameToType and indexToType maps. 
      */
-    private void createSimpleTypes(GroupMap<String,String> hierarchy, TObjectIntHashMap depthMap) {
+    private void createSimpleTypes(GroupMap<String,String> hierarchy, LinkedHashMap<String, Integer> depthMap) {
         
         // find max depth
         int maxDepth = 0;
-        int[] depths = depthMap.getValues();
+        Integer[] depths = depthMap.values().toArray(new Integer[depthMap.values().size()]);
         for (int i = 0; i < depths.length; i++) {
             maxDepth = Math.max(maxDepth, depths[i]);
         }
@@ -208,7 +213,7 @@ public class Types {
         // add types in order of increasing depth
         ArrayList<String> typesVisited = new ArrayList<String>();
         typesVisited.add(TOP_TYPE);
-        Object[] types = depthMap.keys();
+        String[] types = depthMap.keySet().toArray(new String[depthMap.keySet().size()]);
         ArrayList<String> typesAtSameDepth = new ArrayList<String>();
         for (int i = 1; i <= maxDepth; i++) {
             typesAtSameDepth.clear();

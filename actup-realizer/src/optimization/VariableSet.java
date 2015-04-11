@@ -3,11 +3,22 @@ package optimization;
 import java.util.Random;
 
 public class VariableSet {
-	private Variable[] vars;
+	private final Variable[] vars;
 	private int currentIndex;
 	private final int initIndex;
 	
 	private boolean lastSuperIterImproved;
+	
+	//copy constructor
+	public VariableSet(VariableSet deepCopy) {
+		this.initIndex = deepCopy.initIndex;
+		this.currentIndex = deepCopy.currentIndex;
+		this.vars = new Variable[deepCopy.vars.length];
+		for (int i = 0; i < vars.length; i++) {
+			vars[i] = new Variable(deepCopy.vars[i].getCurrentValue(), deepCopy.vars[i].getLower(), deepCopy.vars[i].getUpper(), deepCopy.vars[i].getIncrement());
+		}
+		this.lastSuperIterImproved = true;
+	}
 	
 	public VariableSet(Variable[] vars, int initIndex) {
 		this.vars = vars;

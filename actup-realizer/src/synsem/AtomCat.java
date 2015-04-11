@@ -19,8 +19,9 @@
 
 package synsem;
 
-import gnu.trove.TObjectIntHashMap;
 import grammar.Grammar;
+
+import java.util.LinkedHashMap;
 
 import org.jdom.Element;
 
@@ -28,6 +29,8 @@ import unify.FeatureStructure;
 import unify.GFeatStruc;
 import unify.ModFcn;
 import unify.Substitution;
+import unify.Unifiable;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 import unify.Variable;
 
@@ -128,7 +131,7 @@ public final class AtomCat extends AbstractCat implements TargetCat {
     }
 
     /** NB: The LF does not participate in unification. */
-    public Object unify (Object u, Substitution sub) 
+    public Object unify (Object u, Substitution sub, UnifyControl uc) 
         throws UnifyFailure {
 
         if (u instanceof AtomCat && type.equals(((AtomCat)u).type)) {
@@ -139,7 +142,7 @@ public final class AtomCat extends AbstractCat implements TargetCat {
             } else if (u_ac._featStruc == null) {
                 $fs = _featStruc;
             } else {
-                $fs = (FeatureStructure)_featStruc.unify(u_ac._featStruc, sub);
+                $fs = (FeatureStructure)_featStruc.unify(u_ac._featStruc, sub, uc);
             }
             return new AtomCat(grammar, type, $fs);
         }
@@ -168,13 +171,6 @@ public final class AtomCat extends AbstractCat implements TargetCat {
         StringBuffer sb = new StringBuffer();
         sb.append(type);
         if (fragCompletion) sb.append("_c");
-        
-        if(_featStruc != null && grammar.showFeats)
-            sb.append(_featStruc.toString());
-
-        if (_lf != null && grammar.showSem) {
-            sb.append(" : ").append(_lf.toString());
-        }
 
         if (sb.length() == 0) return "UnknownCat";
         return sb.toString();
@@ -196,8 +192,6 @@ public final class AtomCat extends AbstractCat implements TargetCat {
     public String toTeX() {
         StringBuffer sb = new StringBuffer();
         sb.append(type);
-        if(_featStruc != null && grammar.showFeats)
-            sb.append(_featStruc.toTeX());
         if (sb.length() == 0) return "UnknownCat";
         return sb.toString();
     }
@@ -207,7 +201,7 @@ public final class AtomCat extends AbstractCat implements TargetCat {
      * Returns a hash code for this category ignoring the LF, 
      * using the given map from vars to ints.
      */
-    public int hashCodeNoLF(TObjectIntHashMap varMap) {
+    public int hashCodeNoLF(LinkedHashMap<Unifiable, Integer> varMap) {
         int retval = type.hashCode();
         if (_featStruc != null) { 
             if (_featStruc instanceof GFeatStruc) {
@@ -224,7 +218,7 @@ public final class AtomCat extends AbstractCat implements TargetCat {
      * up to variable names, using the given maps from vars to ints, 
      * ignoring the LFs (if any).
      */
-    public boolean equalsNoLF(Object obj, TObjectIntHashMap varMap, TObjectIntHashMap varMap2) {
+    public boolean equalsNoLF(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
         if (obj.getClass() != this.getClass()) { return false; }
         AtomCat ac = (AtomCat) obj;
         if (_featStruc != null && ac._featStruc == null) { return false; }

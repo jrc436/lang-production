@@ -49,17 +49,14 @@ public class MorphItem {
 
     /** Constructor from XML element. */
     public MorphItem(Grammar grammar, Element e) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         String coartString = e.getAttributeValue("coart");
         if ("true".equals(coartString)) coart = true;
         
         String wordString = e.getAttributeValue("word");
         boolean strictFactors = coart; // parse with flag for strict factors with coart items
-        Word tokenizedWord = grammar.lexicon.tokenizer.parseToken(wordString, strictFactors);
-        surfaceWord = Word.createSurfaceWord(tokenizedWord);
+        Word tokenizedWord = grammar.getLexicon().getTokenizer().parseToken(grammar, wordString, strictFactors);
+        surfaceWord = Word.createSurfaceWord(grammar.getWordFactory(), tokenizedWord);
         
         String stem = e.getAttributeValue("stem");
         if (stem == null) stem = surfaceWord.getForm();
@@ -68,7 +65,7 @@ public class MorphItem {
         String supertag = null; // supertag comes later from syn cat
         String semClass = e.getAttributeValue("class");
         
-        word = Word.createFullWord(surfaceWord, stem, POS, supertag, semClass);
+        word = Word.createFullWord(grammar.getWordFactory(), surfaceWord, stem, POS, supertag, semClass);
         
         String macrosString = e.getAttributeValue("macros");
         if (macrosString != null) {
@@ -84,7 +81,7 @@ public class MorphItem {
         if (coart) {
             String indexAttr = wordString.substring(0, wordString.indexOf("-"));
             String indexVal = surfaceWord.getVal(indexAttr);
-            coartIndexingWord = Word.createWord(indexAttr, indexVal);
+            coartIndexingWord = Word.createWord(grammar.getWordFactory(), indexAttr, indexVal);
         }
     }
 

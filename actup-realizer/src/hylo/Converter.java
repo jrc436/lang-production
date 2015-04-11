@@ -54,7 +54,7 @@ public class Converter {
     private boolean skipAbsentProp = true;
        	
     /** Converts nominal vars to atoms, renaming them based on lexical propositions. */
-	static void convertNominals(Grammar grammar, LF lf) {
+	public static void convertNominals(Grammar grammar, LF lf) {
 		convertNominals(grammar, lf, null, null);
     }
 	
@@ -63,11 +63,8 @@ public class Converter {
 	 * a root sign is given, otherwise using lexical propositions; 
 	 * returns the converted nominal root. 
 	 */
-	static Nominal convertNominals(Grammar grammar, LF lf, Sign root, Nominal nominalRoot) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+	public static Nominal convertNominals(Grammar grammar, LF lf, Sign root, Nominal nominalRoot) {
+		
 		// check preference for naming with word positions; set root to null if false
         boolean useWordPositions = USE_WORD_POSITIONS_FOR_ATOM_CONVERSION;
 		if (!useWordPositions) root = null;
@@ -86,10 +83,7 @@ public class Converter {
 
     // recurse through lf, converting nominals
     private void convertNoms(Grammar grammar, LF lf, Sign root) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         if (lf instanceof SatOp) {
             SatOp satOp = (SatOp) lf;
             // try finding word index of lex origin in root sign
@@ -158,10 +152,7 @@ public class Converter {
     // the skipAbsentProp flag controls whether to skip a null prop, 
     // so that a meaningful name might be created later
     private Nominal convertNominal(Grammar grammar, Nominal oldNom, Proposition prop, int wordIndex) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         // check for an atom
         if (oldNom instanceof NominalAtom) return oldNom;
         // handle word index case
@@ -190,10 +181,7 @@ public class Converter {
 
     // returns the converted nominal using the given name, updating the map
     private Nominal convertNominal(Grammar grammar, Nominal oldNom, String name) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         Nominal retval = new NominalAtom(grammar, name, oldNom.getType());
         nominalMap.put(oldNom, retval);
         return retval;

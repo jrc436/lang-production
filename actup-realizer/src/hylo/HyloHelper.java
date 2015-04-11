@@ -18,16 +18,27 @@
 
 package hylo;
 
-import synsem.*;
-import unify.*;
-import grammar.*;
+import grammar.Grammar;
+import grammar.Types;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.Map;
+
 import lexicon.Lexicon;
 
-import org.jdom.*;
+import org.jdom.Element;
 
-import java.util.*;
-
-import gnu.trove.*;
+import synsem.LF;
+import synsem.LexSemOrigin;
+import synsem.Sign;
+import unify.SimpleType;
+import unify.UnifyFailure;
 
 /**
  * A utility class to help with certain global operations over hybrid logic
@@ -47,10 +58,7 @@ public class HyloHelper {
      * An "lf" element may be used to wrap one or more (implicitly conj-ed) terms.
      */
     public static LF getLF(Grammar grammar, Element e) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         LF retval = null;
         String type = e.getName();
         if (type.equals("op")) {
@@ -106,11 +114,8 @@ public class HyloHelper {
     
 //    // returns the simple type with the given name, if it exists, or null if not
     private static SimpleType existingType(Grammar grammar, String name) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
-        Types types = grammar.types;
+    	
+        Types types = grammar.getTypes();
         if (types.containsSimpleType(name)) return types.getSimpleType(name);
         else return null;
     }
@@ -124,13 +129,10 @@ public class HyloHelper {
 
 //    /** Returns the simple type given by the suffix of the name after the colon, or null if none. */
     protected static SimpleType type(Grammar grammar, String name) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         int index = name.indexOf(":");
         String suffix = (index >=0 && index+1 < name.length()) ? name.substring(index+1) : null;
-        if (suffix != null) return grammar.types.getSimpleType(suffix);
+        if (suffix != null) return grammar.getTypes().getSimpleType(suffix);
         else return null;
     }
     
@@ -141,10 +143,7 @@ public class HyloHelper {
      */
     @SuppressWarnings("unchecked")
 	public static LF getLF_FromChildren(Grammar grammar, Element e) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         List<Element> children = e.getChildren();
         if (children.size() > 1) {
             List<LF> preds = new ArrayList<LF>(children.size());
@@ -207,9 +206,9 @@ public class HyloHelper {
     }
     
     // converts chunk strings
-    private static TIntArrayList convertChunks(String chunks) {
+    private static ArrayList<Integer> convertChunks(String chunks) {
         String[] tokens = chunks.split("\\s+");
-        TIntArrayList retval = new TIntArrayList(tokens.length);
+        ArrayList<Integer> retval = new ArrayList<Integer>(tokens.length);
         for (int i = 0; i < tokens.length; i++) {
             retval.add(Integer.parseInt(tokens[i]));
         }
@@ -397,10 +396,7 @@ public class HyloHelper {
      */
     @SuppressWarnings("unchecked")
 	public static LF flattenLF(Grammar grammar, LF lf) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         List<?> preds = flatten(grammar, lf);
         if (preds.size() == 1) {
             return (LF) preds.get(0);
@@ -451,10 +447,7 @@ public class HyloHelper {
      * A runtime exception is thrown if the LF cannot be flattened.
      */
     public static List<SatOp> flatten(Grammar grammar, LF lf) { 
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         List<SatOp> retval = new Flattener(grammar).flatten(lf);
         sort(grammar, retval);
         return retval;
@@ -465,10 +458,7 @@ public class HyloHelper {
      * A runtime exception is thrown if the LF cannot be flattened.
      */
     public static LF firstEP(Grammar grammar, LF lf) { 
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         List<SatOp> preds = new Flattener(grammar).flatten(lf);
         return preds.get(0);
     }
@@ -553,10 +543,7 @@ public class HyloHelper {
     
     /** Composes compact and convertNominals. */
     public static LF compactAndConvertNominals(Grammar grammar, LF lf, Nominal root) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         LF retval = compact(grammar, lf, root);
         convertNominals(grammar, retval);
         return retval;
@@ -564,10 +551,7 @@ public class HyloHelper {
     
     /** Composes compact and convertNominals with a root sign, for conversion using word positions. */
     public static LF compactAndConvertNominals(Grammar grammar, LF lf, Nominal root, Sign rootSign) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         root = convertNominals(grammar, lf, rootSign, root);
         LF retval = compact(grammar, lf, root);
         return retval;
@@ -581,10 +565,7 @@ public class HyloHelper {
      * is made to attach them in different locations.
      */
     public static LF compact(Grammar grammar, LF lf, Nominal root) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
     	return Compacter.compact(grammar, lf, root);
     }
     
@@ -594,10 +575,7 @@ public class HyloHelper {
     
     /** Converts nominal vars to atoms, renaming them based on lexical propositions. */
     public static void convertNominals(Grammar grammar, LF lf) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
     	Converter.convertNominals(grammar, lf);
     }
 
@@ -607,10 +585,7 @@ public class HyloHelper {
 	 * returns the converted nominal root. 
 	 */
 	public static Nominal convertNominals(Grammar grammar, LF lf, Sign root, Nominal nominalRoot) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+		
 		return Converter.convertNominals(grammar, lf, root, nominalRoot);
 	}
 	
@@ -626,10 +601,7 @@ public class HyloHelper {
      * If both LFs are null, null is returned.
      */
     public static LF append(Grammar grammar, LF lf1, LF lf2) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         // set up new list
         int size = 0;
         List<LF> args1 = null;
@@ -675,10 +647,7 @@ public class HyloHelper {
      * or does nothing if the LF is not a conj op.
      */
     public static void sort(Grammar grammar, LF lf) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         if (lf instanceof Op && ((Op)lf).getName().equals(Op.CONJ)) {
             sort(grammar, ((Op)lf).getArguments());
         }
@@ -688,10 +657,7 @@ public class HyloHelper {
      * Sorts a list of elementary predications.
      */
     public static void sort(Grammar grammar, List<? extends LF> preds) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
     	PredCompare predComparator = new PredCompare(grammar);
         Collections.sort(preds, predComparator);
     }
@@ -706,9 +672,9 @@ public class HyloHelper {
         else return null;
     }
     
-    private static Integer LEX_PRED = new Integer(1);
-    private static Integer ATTR_PRED = new Integer(2);
-    private static Integer REL_PRED = new Integer(3);
+    private static final Integer LEX_PRED = new Integer(1);
+    private static final Integer ATTR_PRED = new Integer(2);
+    private static final Integer REL_PRED = new Integer(3);
 
     
     //-----------------------------------------------------------------
@@ -743,10 +709,7 @@ public class HyloHelper {
 class PredCompare implements Comparator<LF> {
 	private final Grammar grammar;
 	public PredCompare(Grammar grammar) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+		
 		this.grammar = grammar;
 	}
 	public int compare(LF lf1, LF lf2){
@@ -763,7 +726,7 @@ class PredCompare implements Comparator<LF> {
         // then rels
         String rel1 = HyloHelper.getRel(lf1);
         String rel2 = HyloHelper.getRel(lf2);
-        Lexicon theLexicon = grammar.lexicon;
+        Lexicon theLexicon = grammar.getLexicon();
         Integer rel1Index = theLexicon.getRelationSortIndex(rel1);
         Integer rel2Index = theLexicon.getRelationSortIndex(rel2);
         int relIndexCompare = rel1Index.compareTo(rel2Index);

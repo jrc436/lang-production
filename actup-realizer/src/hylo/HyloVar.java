@@ -18,13 +18,21 @@
 
 package hylo;
 
-import grammar.*;
-import synsem.*;
-import unify.*;
+import grammar.Grammar;
+import grammar.Types;
 
-import org.jdom.*;
+import java.util.LinkedHashMap;
 
-import gnu.trove.*;
+import org.jdom.Element;
+
+import synsem.LF;
+import unify.Indexed;
+import unify.SimpleType;
+import unify.Substitution;
+import unify.Unifiable;
+import unify.UnifyControl;
+import unify.UnifyFailure;
+import unify.Variable;
 
 /**
  * A class for objects which can stand for any HyloFormula object.
@@ -56,7 +64,7 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
     	super(grammar);
     	_name = name;
         _index = index;
-        type = (st != null) ? st : grammar.types.getSimpleType(Types.TOP_TYPE);
+        type = (st != null) ? st : grammar.getTypes().getSimpleType(Types.TOP_TYPE);
         _hashCode = _name.hashCode() + _index + type.getIndex();
         
     }
@@ -103,9 +111,9 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
         return retval;
     }
     
-    public Object unify(Object u, Substitution sub) throws UnifyFailure {
+    public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
         // with nominal vars, reverse direction of unification
-        if (u instanceof NominalVar) return ((NominalVar)u).unify(this, sub);
+        if (u instanceof NominalVar) return ((NominalVar)u).unify(this, sub, uc);
         // check for equality with u
         if (equals(u)) return this; 
         // make sure u is an LF
@@ -113,7 +121,7 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
         LF lf = (LF) u;
         // check type compatibility, if present
         SimpleType st = null;
-        if (lf.getType() != null) st = (SimpleType) type.unify(lf.getType(), sub);
+        if (lf.getType() != null) st = (SimpleType) type.unify(lf.getType(), sub, uc);
         // with hylo vars, substitute according to type specificity then comparison order, 
         // so that the direction of unification doesn't matter
         if (u instanceof HyloVar) {
@@ -129,7 +137,7 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
             // otherwise make new hylo var with intersection type, 
             // name based on comparison order and index, and new index
             String name = (compareTo(u_hv) >= 0) ? (u_hv._name + u_hv._index) : (_name + this._index);
-            HyloVar hv_st = new HyloVar(grammar, name, UnifyControl.getUniqueVarIndex(), st);
+            HyloVar hv_st = new HyloVar(grammar, name, uc.getUniqueVarIndex(), st);
             // and subst both
             sub.makeSubstitution(u_hv, hv_st);
             return sub.makeSubstitution(this, hv_st); 
@@ -179,7 +187,7 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
     /**
 	 * Returns a hash code using the given map from vars to ints.
 	 */
-	public int hashCode(TObjectIntHashMap varMap) {
+	public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) {
 		// see if this already in map
 		if (varMap.containsKey(this))
 			return varMap.get(this);
@@ -194,7 +202,7 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
 	 * using the given maps from vars to ints.
 	 * (Note that the name and index may differ, but the types must be equal.)
 	 */
-    public boolean equals(Object obj, TObjectIntHashMap varMap, TObjectIntHashMap varMap2) {
+    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
         if (obj.getClass() != this.getClass()) { return false; }
         HyloVar hv = (HyloVar) obj;
         if (varMap.get(this) != varMap2.get(hv)) return false;

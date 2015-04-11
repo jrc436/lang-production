@@ -26,6 +26,7 @@ import org.jdom.Element;
 import synsem.LF;
 import unify.SimpleType;
 import unify.Substitution;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 
 /**
@@ -55,7 +56,7 @@ public class NominalAtom extends HyloAtom implements Nominal {
     
     public NominalAtom(Grammar grammar, String name, SimpleType st, boolean shared) {
         super(grammar, name, st);
-        type = (st != null) ? st : grammar.types.getSimpleType(Types.TOP_TYPE);
+        type = (st != null) ? st : grammar.getTypes().getSimpleType(Types.TOP_TYPE);
         this.shared = shared;
     }
 
@@ -83,9 +84,9 @@ public class NominalAtom extends HyloAtom implements Nominal {
         return type.equals(nom.type);
     }
 
-    public Object unify(Object u, Substitution sub) throws UnifyFailure {
+    public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
         if (equals(u)) return this;
-        return super.unify(u, sub);
+        return super.unify(u, sub, uc);
     }
     
     public int compareTo(Nominal nom) {

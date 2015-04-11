@@ -18,15 +18,16 @@
 
 package hylo;
 
-import gnu.trove.TObjectIntHashMap;
 import grammar.Grammar;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.jdom.Element;
 
 import synsem.LF;
 import unify.ModFcn;
+import unify.Unifiable;
 import unify.UnifyFailure;
 import unify.Variable;
 
@@ -100,7 +101,7 @@ public abstract class ModalOp extends HyloFormula {
     /**
      * Returns a hash code using the given map from vars to ints.
      */
-    public int hashCode(TObjectIntHashMap varMap) { 
+    public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) { 
         return _mode.hashCode(varMap) + _arg.hashCode(varMap); 
     }
         
@@ -108,7 +109,7 @@ public abstract class ModalOp extends HyloFormula {
      * Returns whether this modal op equals the given object  
      * up to variable names, using the given maps from vars to ints.
      */
-    public boolean equals(Object obj, TObjectIntHashMap varMap, TObjectIntHashMap varMap2) {
+    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
         if (obj.getClass() != this.getClass()) { return false; }
         ModalOp mo = (ModalOp) obj;
         return _mode.equals(mo._mode, varMap, varMap2) && 

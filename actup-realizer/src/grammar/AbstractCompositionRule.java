@@ -46,10 +46,9 @@ import unify.UnifyFailure;
  */
 public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 
-	
-	
-	public AbstractCompositionRule(Grammar grammar) {
-		super(grammar);
+
+	protected AbstractCompositionRule(Grammar rg) {
+		super(rg);
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -62,13 +61,7 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 	 * The flag is initialized based on user preferences; 
 	 * it must be changed for further preferences to take effect. 
 	 */
-	public static boolean useEisnerConstraints = initEisnerConstraints();
-	
-	private static boolean initEisnerConstraints() {
-        /*Preferences prefs = Preferences.userNodeForPackage(TextCCG.class);
-        return prefs.getBoolean(EISNER_CONSTRAINTS, true);*/
-		return EISNER_CONSTRAINTS;
-	}
+	public boolean useEisnerConstraints = EISNER_CONSTRAINTS;
 	
 	protected boolean _isHarmonic;
 
@@ -80,7 +73,7 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 
 		if (xyCat instanceof ComplexCat && yzCat instanceof ComplexCat) {
 			List<Category> results = new ArrayList<Category>(1);
-            _headCats.clear();
+            headCats.clear();
 			ComplexCat xyCC = (ComplexCat) xyCat;
 			ComplexCat yzCC = (ComplexCat) yzCat;
 
@@ -95,24 +88,24 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 					// e.g. s/s Y/Z
 					ArgStack zStack = yzCC.getArgStack();
 					zStack.slashesUnify(_argSlash);
-					Substitution sub = new GSubstitution();
-					GUnifier.unify(grammar, xyOuterCat, yzCC.getTarget(), sub);
+					Substitution sub = new GSubstitution(grammar.getUnifyControl());
+					GUnifier.unify(grammar.getUnifyControl(), xyOuterCat, yzCC.getTarget(), sub);
 					xySlash = (Slash) xySlash.fill(sub);
 					xySlash.unifyCheck(_functorSlash);
 					Category outcome = createResult(xyCC.getResult(), zStack, xySlash, sub);
 					appendLFs(xyCat, yzCat, outcome, sub);
 					results.add(outcome);
-	                _headCats.add(xySlash.isModifier() ? yzCat : xyCat); 
+	                headCats.add(xySlash.isModifier() ? yzCat : xyCat); 
 				} else if (xyOuterCat instanceof ComplexCat) {
 					// e.g. s/(s/n) Y/Z
-					Substitution sub = new GSubstitution();
+					Substitution sub = new GSubstitution(grammar.getUnifyControl());
 					ArgStack zStack = composeComplexY((ComplexCat) xyOuterCat, xySlash, yzCC, sub);
 					xySlash = (Slash) xySlash.fill(sub);
 					xySlash.unifyCheck(_functorSlash);
 					Category outcome = createResult(xyCC.getResult(), zStack, xySlash, sub);
 					appendLFs(xyCat, yzCat, outcome, sub);
 					results.add(outcome);
-	                _headCats.add(xySlash.isModifier() ? yzCat : xyCat); 
+	                headCats.add(xySlash.isModifier() ? yzCat : xyCat); 
 				}
 			} else if (xyOuter instanceof SetArg) {
 				// e.g. s/{s,n} Y/Z
@@ -123,8 +116,8 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 					Slash xySlash = xyOuterSet.get(targetIndex).getSlash();
 					xySlash.unifyCheck(_functorSlash);
 					if (eisner() && xySlash.isHarmonicCompositionResult()) throw new UnifyFailure();
-					Substitution sub = new GSubstitution();
-					GUnifier.unify(grammar, xyOuterSet.getCat(targetIndex), yzTarget, sub);
+					Substitution sub = new GSubstitution(grammar.getUnifyControl());
+					GUnifier.unify(grammar.getUnifyControl(), xyOuterSet.getCat(targetIndex), yzTarget, sub);
 					Category result = xyCC.copy();
 					((ComplexCat) result).setOuterArgument(xyOuterSet.copyWithout(targetIndex));
 					ArgStack zStack = yzCC.getArgStack();
@@ -132,7 +125,7 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 					Category outcome = createResult(result, zStack, xySlash, sub);
 					appendLFs(xyCat, yzCat, outcome, sub);
 					results.add(outcome);
-	                _headCats.add(xySlash.isModifier() ? yzCat : xyCat); 
+	                headCats.add(xySlash.isModifier() ? yzCat : xyCat); 
 				} else {
 					boolean success = false;
 					for (int i = 0; i < xyOuterSet.size(); i++) {
@@ -142,7 +135,7 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 							xySlash.unifyCheck(_functorSlash);
 							if (eisner() && xySlash.isHarmonicCompositionResult()) throw new UnifyFailure();
 							ComplexCat yCat = (ComplexCat) yInSet.getCat();
-							Substitution sub = new GSubstitution();
+							Substitution sub = new GSubstitution(grammar.getUnifyControl());
 							ArgStack zStack = composeComplexY((ComplexCat) yCat, xySlash, yzCC, sub);
 							xySlash = (Slash) xySlash.fill(sub);
 							xySlash.unifyCheck(_functorSlash);
@@ -151,7 +144,7 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 							Category outcome = createResult(result, zStack, xySlash, sub);
 							appendLFs(xyCat, yzCat, outcome, sub);
 							results.add(outcome);
-			                _headCats.add(xySlash.isModifier() ? yzCat : xyCat); 
+			                headCats.add(xySlash.isModifier() ? yzCat : xyCat); 
 							success = true;
 						}
 					}
@@ -193,7 +186,7 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 	/**
 	 * A function that tries to unify the value ant=+ into feature structures.
 	 */
-	private static ModFcn INERTIZER_FCN = new ModFcn() {
+	private ModFcn INERTIZER_FCN = new ModFcn() {
 		public void modify(Mutable m) {
 			if (m instanceof Slash) {
 				((Slash) m).setAbility("inert");
@@ -204,7 +197,7 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 	private ArgStack composeComplexY(ComplexCat xyOuterCC, Slash xySlash, ComplexCat yzCC,
 			Substitution sub) throws UnifyFailure {
 
-		GUnifier.unify(grammar, xyOuterCC.getTarget(), yzCC.getTarget(), sub);
+		GUnifier.unify(grammar.getUnifyControl(), xyOuterCC.getTarget(), yzCC.getTarget(), sub);
 		ArgStack zStack = yzCC.getArgStack();
 		if (xyOuterCC.containsDollarArg()) {
 			// e.g. s$/(s$\n) s\n/n
@@ -227,7 +220,7 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 				int iaIndex = yzSetArg.indexOf(xyOuterOuter);
 				if (iaIndex == -1)
 					throw new UnifyFailure();
-				xyOuterOuter.unify(yzSetArg.get(iaIndex), sub);
+				xyOuterOuter.unify(yzSetArg.get(iaIndex), sub, grammar.getUnifyControl());
 				xySlash = (Slash) xySlash.fill(sub);
 				xySlash.unifyCheck(_functorSlash);
 				zStack = yzStack.copy();
@@ -239,7 +232,7 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 				if (yzStack.size() < 2) {
 					throw new UnifyFailure();
 				}
-				xyOuterOuter.unify(yzStackInner, sub);
+				xyOuterOuter.unify(yzStackInner, sub, grammar.getUnifyControl());
 				zStack = yzStack.subList(1).copy();
 				zStack.slashesUnify(_argSlash);
 				xySlash = (Slash) xySlash.fill(sub);
@@ -259,8 +252,8 @@ public abstract class AbstractCompositionRule extends AbstractApplicationRule {
 			BasicArg xyOuterOuter2 = (BasicArg) xyOuterCC.getArg(1);
 			Arg yzStackInner1 = yzStack.get(0);
 			Arg yzStackInner2 = yzStack.get(1);
-			xyOuterOuter1.unify(yzStackInner1, sub);
-			xyOuterOuter2.unify(yzStackInner2, sub);
+			xyOuterOuter1.unify(yzStackInner1, sub, grammar.getUnifyControl());
+			xyOuterOuter2.unify(yzStackInner2, sub, grammar.getUnifyControl());
 			zStack = yzStack.subList(2).copy();
 			zStack.slashesUnify(_argSlash);
 			xySlash = (Slash) xySlash.fill(sub);

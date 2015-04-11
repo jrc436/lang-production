@@ -18,9 +18,7 @@
 
 package pruning;
 
-import gnu.trove.THashSet;
-import gnu.trove.TObjectIdentityHashingStrategy;
-
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import lexicon.Word;
@@ -38,12 +36,10 @@ import synsem.Sign;
 public class LexicalDiversityPruningStrategy extends DiversityPruningStrategy
 {
     /** The interned POS values to use for relevant open class stems. */
-    @SuppressWarnings("unchecked")
-	protected Set<String> posValsToUse = new THashSet(new TObjectIdentityHashingStrategy());
+	protected Set<String> posValsToUse = new LinkedHashSet<String>();
     
     /** Reusable set of observed interned stems for comparison purposes. */
-    @SuppressWarnings("unchecked")
-	protected Set<String> stemsSeen = new THashSet(new TObjectIdentityHashingStrategy());
+	protected Set<String> stemsSeen = new LinkedHashSet<String>();
     
     /** Constructor, which sets POS classes of interest. */
     public LexicalDiversityPruningStrategy(int pruneVal) {

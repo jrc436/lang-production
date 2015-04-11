@@ -63,7 +63,7 @@ public class SimpleType implements Unifiable, Serializable {
         }
     }
 
-    public Object unify(Object u, Substitution sub) throws UnifyFailure {
+    public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
         if (!(u instanceof SimpleType)) {
             throw new UnifyFailure();
         }

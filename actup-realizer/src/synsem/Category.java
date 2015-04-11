@@ -19,8 +19,10 @@
 
 package synsem;
 
-import gnu.trove.TObjectIntHashMap;
 import hylo.Nominal;
+
+import java.util.LinkedHashMap;
+
 import unify.FeatureStructure;
 import unify.Mutable;
 import unify.Unifiable;
@@ -101,7 +103,7 @@ public interface Category extends Unifiable, Mutable, java.io.Serializable {
      * using the given map from vars to ints, 
      * to allow for equivalence up to variable names.
      */
-    public int hashCodeNoLF(TObjectIntHashMap varMap);
+    public int hashCodeNoLF(LinkedHashMap<Unifiable, Integer> varMap);
 
     
     /** 
@@ -122,7 +124,7 @@ public interface Category extends Unifiable, Mutable, java.io.Serializable {
      * up to variable names, using the given maps from vars to ints, 
      * ignoring the LFs (if any).
      */
-    public boolean equalsNoLF(Object obj, TObjectIntHashMap varMap, TObjectIntHashMap varMap2);
+    public boolean equalsNoLF(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2);
     
     
     /**

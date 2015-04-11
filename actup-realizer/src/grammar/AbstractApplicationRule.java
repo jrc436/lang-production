@@ -18,10 +18,19 @@
 
 package grammar;
 
-import unify.*;
-import synsem.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.*;
+import synsem.Arg;
+import synsem.BasicArg;
+import synsem.Category;
+import synsem.ComplexCat;
+import synsem.SetArg;
+import synsem.Slash;
+import unify.GSubstitution;
+import unify.GUnifier;
+import unify.Substitution;
+import unify.UnifyFailure;
 
 /**
  * Super class for application rules.
@@ -32,8 +41,8 @@ import java.util.*;
  */
 public abstract class AbstractApplicationRule extends AbstractRule {
 	
-	public AbstractApplicationRule(Grammar grammar) {
-		super(grammar);
+	protected AbstractApplicationRule(Grammar rg) {
+		super(rg);
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -52,20 +61,20 @@ public abstract class AbstractApplicationRule extends AbstractRule {
             Arg xyOuter = xyCurCat.getOuterArg();
 
             List<Category> results;
-            _headCats.clear();
+            headCats.clear();
 
             if (xyOuter instanceof BasicArg) {
                 xyOuter.unifySlash(_functorSlash);
                 Category xyOuterCat = ((BasicArg)xyOuter).getCat();
-                Substitution sub = new GSubstitution();
-                GUnifier.unify(grammar, xyOuterCat, yCat, sub);
+                Substitution sub = new GSubstitution(grammar.getUnifyControl());
+                GUnifier.unify(grammar.getUnifyControl(), xyOuterCat, yCat, sub);
                 results = new ArrayList<Category>(1);
                 ((GSubstitution)sub).condense();
                 Category result = (Category) xyCurCat.getResult().fill(sub);
                 appendLFs(xyCat, yCat, result, sub);
                 results.add(result);
                 Slash xyOuterSlash = ((BasicArg)xyOuter).getSlash();
-                _headCats.add(xyOuterSlash.isModifier() ? yCat : xyCat); 
+                headCats.add(xyOuterSlash.isModifier() ? yCat : xyCat); 
             } else if (xyOuter instanceof SetArg) {
                 SetArg xyOuterSet = (SetArg)xyOuter;
                 results = new ArrayList<Category>(xyOuterSet.size());
@@ -73,8 +82,8 @@ public abstract class AbstractApplicationRule extends AbstractRule {
                     BasicArg argi = xyOuterSet.get(i);
                     try {
                         argi.unifySlash(_functorSlash);
-                        Substitution sub = new GSubstitution();
-                        GUnifier.unify(grammar, argi.getCat(), yCat, sub);
+                        Substitution sub = new GSubstitution(grammar.getUnifyControl());
+                        GUnifier.unify(grammar.getUnifyControl(), argi.getCat(), yCat, sub);
                         ComplexCat result = (ComplexCat)xyCurCat.copy();
                         result.setOuterArgument(xyOuterSet.copyWithout(i));
                         ((GSubstitution)sub).condense();
@@ -82,7 +91,7 @@ public abstract class AbstractApplicationRule extends AbstractRule {
                         appendLFs(xyCat, yCat, result, sub);
                         results.add(result);
                         Slash xyOuterSlash = argi.getSlash();
-                        _headCats.add(xyOuterSlash.isModifier() ? yCat : xyCat); 
+                        headCats.add(xyOuterSlash.isModifier() ? yCat : xyCat); 
                     } catch (UnifyFailure uf) {}                
                 }
             } else {

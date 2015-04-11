@@ -19,8 +19,6 @@
 
 package grammar;
 
-import gnu.trove.THashSet;
-import gnu.trove.TObjectHashingStrategy;
 import hylo.HyloHelper;
 
 import java.io.BufferedReader;
@@ -31,10 +29,10 @@ import java.io.Serializable;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.jdom.Element;
 
@@ -63,7 +61,7 @@ public class RuleGroup implements Serializable {
 	private static final long serialVersionUID = -6240266013357142289L;
 
 	/** The grammar that this rule group is part of. */
-    public final Grammar grammar;
+    private final Grammar grammar;
     
     // rules
     private List<Rule> unaryRules = new ArrayList<Rule>();
@@ -79,90 +77,14 @@ public class RuleGroup implements Serializable {
     // glue rule
     private GlueRule glueRule;
     
-    // supercat-rule combos, to support filtering on observed ones
-    private class SupercatRuleCombo {
-    	// NB: strings must be interned
-		private String supercat; 
-    	private String supercat2;
-    	private String rule;
-    	// unary rule constructor
-    	public SupercatRuleCombo(String supercat, String rule) {
-    		setCombo(supercat.intern(), (rule != null) ? rule.intern() : null);
-    	}
-    	// binary rule constructor
-    	public SupercatRuleCombo(String supercat, String supercat2, String rule) {
-    		setCombo(supercat.intern(), supercat2.intern(), (rule != null) ? rule.intern() : null);
-    	}
-    	// setters
-    	// NB: assume interned strings!
-    	public void setCombo(String supercat, String rule) {
-    		this.supercat = supercat; this.supercat2 = null; this.rule = rule;
-    	}
-    	public void setCombo(String supercat, String supercat2, String rule) {
-    		this.supercat = supercat; this.supercat2 = supercat2; this.rule = rule;
-    	}
-    	// hashcode
-    	public int hashCode() {
-    		return 31*System.identityHashCode(supercat) + 17*System.identityHashCode(rule) + System.identityHashCode(supercat2);
-    	}
-    	// equals
-    	public boolean equals(Object obj) {
-    		if (!(obj instanceof SupercatRuleCombo)) return false;
-    		SupercatRuleCombo combo = (SupercatRuleCombo) obj;
-    		return supercat == combo.supercat && supercat2 == combo.supercat2 && rule == combo.rule;
-    	}
-    	// supercat hashcode, excluding rule
-    	public int supercatHashCode() {
-    		return 31*System.identityHashCode(supercat) + System.identityHashCode(supercat2);
-    	}
-    	// supercat equals
-    	public boolean supercatEquals(Object obj) {
-    		if (!(obj instanceof SupercatRuleCombo)) return false;
-    		SupercatRuleCombo combo = (SupercatRuleCombo) obj;
-    		return supercat == combo.supercat && supercat2 == combo.supercat2;
-    	}
-    	// toString
-    	public String toString() {
-    		StringBuffer sb = new StringBuffer(supercat);
-    		if (supercat2 != null) sb.append(' ').append(supercat2);
-    		sb.append(' ').append(rule);
-    		return sb.toString();
-    	}
-    }
-    
-    // class for seen combos when determined dynamically
-    // nb: for space efficiency, allows representative to be retrieved from set
-    private static class SupercatComboSet extends THashSet {
-		private static final long serialVersionUID = 1L;
-		SupercatComboSet() {
-    		super(
-    	        new TObjectHashingStrategy() {
-					private static final long serialVersionUID = 1L;
-					public int computeHashCode(Object o) {
-    					return (o instanceof SupercatRuleCombo) ? ((SupercatRuleCombo)o).supercatHashCode() : 0;
-    	            }
-    	            public boolean equals(Object o1, Object o2) {
-    					return (o1 instanceof SupercatRuleCombo) ? ((SupercatRuleCombo)o1).supercatEquals(o2) : false;
-    	            }
-    	        }
-        	);
-    	}
-    	// return the seen combo, or null if none
-    	SupercatRuleCombo get(SupercatRuleCombo combo) {
-    		int index = index(combo);
-    		if (index < 0) return null;
-    		return (SupercatRuleCombo) this._set[index];
-    	}
-    }
-    
     // observed supercat-rule combos
-    private transient Set<SupercatRuleCombo> supercatRuleCombos = null;
+    private Map<SupercatCombo, SupercatRuleCombo> supercatRuleCombos = null;
     
     // observed supercat combos (for which complete rule combos are known)
-    private transient SupercatComboSet supercatCombosSeen = null;
+    private Map<SupercatCombo, SupercatRuleCombo> supercatCombosSeen = null;
     
     // reusable combo for checking presence
-    private transient SupercatRuleCombo combo = new SupercatRuleCombo("dummy", "dummy");
+    private SupercatRuleCombo combo = new SupercatRuleCombo("dummy", "dummy");
     
     // flag for whether observed supercat combos is determined dynamically
     private boolean dynamicCombos = false;
@@ -171,14 +93,10 @@ public class RuleGroup implements Serializable {
      * Constructs an empty rule group for the given grammar.
      */
     public RuleGroup(Grammar grammar) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
         this.grammar = grammar;
         bapp = new BackwardApplication(grammar);
-        glueRule = new GlueRule(grammar);
-        bapp.setRuleGroup(this);      
+        bapp.setRuleGroup(this);
+        glueRule = new GlueRule(grammar);     
     }
     
     /**
@@ -201,15 +119,6 @@ public class RuleGroup implements Serializable {
         };
         ruleScanner.parse(url);
     }
-
-//    
-//    // during deserialization, sets grammar to the current grammar
-//    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-//    	in.defaultReadObject();
-//    	grammar = Grammar.theGrammar;
-//    	borrowSupercatRuleCombos(grammar.rules);
-//    }
-    
     
     // reads in a rule
     private Rule readRule(Element ruleEl) {
@@ -296,8 +205,8 @@ public class RuleGroup implements Serializable {
     	this.dynamicCombos = dynamic;
     	if (!dynamicCombos) supercatCombosSeen = null;
     	else if (dynamicCombos) {
-    		if (supercatCombosSeen == null) supercatCombosSeen = new SupercatComboSet();
-    		if (supercatRuleCombos == null) supercatRuleCombos = new HashSet<SupercatRuleCombo>();
+    		if (supercatCombosSeen == null) supercatCombosSeen = new LinkedHashMap<SupercatCombo, SupercatRuleCombo>();
+    		if (supercatRuleCombos == null) supercatRuleCombos = new LinkedHashMap<SupercatCombo, SupercatRuleCombo>();
     	}
     }
     
@@ -312,7 +221,7 @@ public class RuleGroup implements Serializable {
      * Missing files are ignored. 
      **/
     public void loadSupercatRuleCombos(URL url) throws IOException {
-    	supercatRuleCombos = new HashSet<SupercatRuleCombo>();
+    	supercatRuleCombos = new LinkedHashMap<SupercatCombo, SupercatRuleCombo>();
     	File combosFile = new File(url.getFile());
     	if (!combosFile.exists()) return;
     	System.out.println("Loading supercat combos from " + url.getFile());
@@ -325,13 +234,15 @@ public class RuleGroup implements Serializable {
     			continue;
     		}
     		if (tokens.length == 2) {
-    			supercatRuleCombos.add(new SupercatRuleCombo(tokens[0], tokens[1]));
+    			SupercatRuleCombo toAdd = new SupercatRuleCombo(tokens[0], tokens[1]);
+    			supercatRuleCombos.put(toAdd.getSupercat(), toAdd);
     		}
     		else {
 	    		if (tokens.length > 3) {
 	    			System.err.println("Warning: ignoring extra tokens (beyond 3rd) in supercat-rule combo: " + line);
 	    		}
-    			supercatRuleCombos.add(new SupercatRuleCombo(tokens[0], tokens[1], tokens[2]));
+	    		SupercatRuleCombo toAdd = new SupercatRuleCombo(tokens[0], tokens[1], tokens[2]);
+    			supercatRuleCombos.put(toAdd.getSupercat(), toAdd);
     		}
     	}
     	in.close();
@@ -347,7 +258,7 @@ public class RuleGroup implements Serializable {
     
     /** Adds the given rule. */
     public void addRule(Rule r) {
-        r.setRuleGroup(this);
+       r.setRuleGroup(this);
         if (r instanceof TypeChangingRule) {
             unaryRules.add(r);
             index((TypeChangingRule)r);
@@ -421,7 +332,7 @@ public class RuleGroup implements Serializable {
         boolean skip = false;
         if (dynamicCombos) {
     		combo.setCombo(supertag, null);
-    		SupercatRuleCombo rep = supercatCombosSeen.get(combo);
+    		SupercatRuleCombo rep = supercatCombosSeen.containsValue(combo) ? combo : null;
     		if (rep == null) dynamicCombosUpdate = true;
     		else if (rep.rule == null) skip = true;
         }
@@ -432,7 +343,7 @@ public class RuleGroup implements Serializable {
         	// filter on observed supercat-rule combos, if any, if not updating
         	if (!dynamicCombosUpdate && supercatRuleCombos != null) {
         		combo.setCombo(supertag, r.name());
-        		if (!supercatRuleCombos.contains(combo)) { continue; }
+        		if (!supercatRuleCombos.containsKey(combo.getSupercat())) { continue; }
         	}
         	// if updating combos, apply rule and record results
         	if (dynamicCombosUpdate) {
@@ -442,13 +353,13 @@ public class RuleGroup implements Serializable {
             	if (results.size() > prevsize) {
             		SupercatRuleCombo newCombo = null;
             		combo.setCombo(supertag, r.name());
-            		if (!supercatRuleCombos.contains(combo)) { 
+            		if (!supercatRuleCombos.containsKey(combo.getSupercat())) { 
             			newCombo = new SupercatRuleCombo(supertag, r.name());
-            			supercatRuleCombos.add(newCombo);
+            			supercatRuleCombos.put(newCombo.getSupercat(), newCombo);
             		}
-            		if (!supercatCombosSeen.contains(combo)) {
+            		if (!supercatCombosSeen.containsKey(combo.getSupercat())) {
             			if (newCombo == null) newCombo = new SupercatRuleCombo(supertag, r.name());
-                		supercatCombosSeen.add(newCombo);
+                		supercatCombosSeen.put(newCombo.getSupercat(), newCombo);
             		}
             	}
         	}
@@ -458,9 +369,9 @@ public class RuleGroup implements Serializable {
         // if updating combos and none succeeded, add one with null rule
         if (dynamicCombosUpdate) {
     		combo.setCombo(supertag, null);
-    		if (!supercatCombosSeen.contains(combo)) {
+    		if (!supercatCombosSeen.containsKey(combo.getSupercat())) {
     			SupercatRuleCombo newCombo = new SupercatRuleCombo(supertag, null);
-    			supercatCombosSeen.add(newCombo);
+    			supercatCombosSeen.put(newCombo.getSupercat(), newCombo);
     		}
         }
         // done
@@ -478,7 +389,7 @@ public class RuleGroup implements Serializable {
         boolean skip = false;
         if (dynamicCombos) {
     		combo.setCombo(supertag1, supertag2, null);
-    		SupercatRuleCombo rep = supercatCombosSeen.get(combo);
+    		SupercatRuleCombo rep = supercatCombosSeen.containsKey(combo.getSupercat()) ? combo : null;
     		if (rep == null) dynamicCombosUpdate = true;
     		else if (rep.rule == null) skip = true;
         }
@@ -489,7 +400,7 @@ public class RuleGroup implements Serializable {
         	// filter on observed supercat-rule combos, if any, if not updating
         	if (!dynamicCombosUpdate && supercatRuleCombos != null) {
         		combo.setCombo(supertag1, supertag2, r.name());
-        		if (!supercatRuleCombos.contains(combo)) { continue; }
+        		if (!supercatRuleCombos.containsKey(combo.getSupercat())) { continue; }
         	}
         	// if updating combos, apply rule and record results
         	if (dynamicCombosUpdate) {
@@ -499,13 +410,13 @@ public class RuleGroup implements Serializable {
             	if (results.size() > prevsize) {
             		SupercatRuleCombo newCombo = null;
             		combo.setCombo(supertag1, supertag2, r.name());
-            		if (!supercatRuleCombos.contains(combo)) { 
+            		if (!supercatRuleCombos.containsKey(combo.getSupercat())) { 
             			newCombo = new SupercatRuleCombo(supertag1, supertag2, r.name());
-            			supercatRuleCombos.add(newCombo);
+            			supercatRuleCombos.put(newCombo.getSupercat(), newCombo);
             		}
-            		if (!supercatCombosSeen.contains(combo)) {
+            		if (!supercatCombosSeen.containsKey(combo.getSupercat())) {
             			if (newCombo == null) newCombo = new SupercatRuleCombo(supertag1, supertag2, r.name());
-                		supercatCombosSeen.add(newCombo);
+                		supercatCombosSeen.put(newCombo.getSupercat(), newCombo);
             		}
             	}
         	}
@@ -515,9 +426,9 @@ public class RuleGroup implements Serializable {
         // if updating combos and none succeeded, add one with null rule
         if (dynamicCombosUpdate) {
     		combo.setCombo(supertag1, supertag2, null);
-    		if (!supercatCombosSeen.contains(combo)) {
+    		if (!supercatCombosSeen.containsKey(combo.getSupercat())) {
         		SupercatRuleCombo newCombo = new SupercatRuleCombo(supertag1, supertag2, null);
-    			supercatCombosSeen.add(newCombo);
+    			supercatCombosSeen.put(newCombo.getSupercat(), newCombo);
     		}
         }
         // done

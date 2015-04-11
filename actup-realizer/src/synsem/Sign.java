@@ -18,7 +18,6 @@
 
 package synsem;
 
-import gnu.trove.TObjectIntHashMap;
 import grammar.Grammar;
 import grammar.Rule;
 import grammar.RuleGroup;
@@ -32,10 +31,14 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import lexicon.Word;
@@ -43,10 +46,7 @@ import lexicon.Word;
 import org.jdom.Document;
 import org.jdom.Element;
 
-import util.Interner;
 import util.Pair;
-import util.SingletonList;
-import util.StructureSharingList;
 
 /**
  * A CCG sign, consisting of a list of words paired with a category.
@@ -57,7 +57,7 @@ import util.StructureSharingList;
  * @author      Michael White
  * @version     $Revision: 1.44 $, $Date: 2011/08/27 19:27:01 $
  */
-public class Sign implements LexSemOrigin, Serializable {
+public class Sign implements LexSemOrigin, Serializable, Comparable<Sign> {
     
 	private static final long serialVersionUID = 1072712272514007274L;
 
@@ -82,10 +82,7 @@ public class Sign implements LexSemOrigin, Serializable {
 
     /** Constructor for subclasses. */
     protected Sign(Grammar grammar) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
     	this.grammar = grammar;
     }
     
@@ -93,7 +90,7 @@ public class Sign implements LexSemOrigin, Serializable {
     @SuppressWarnings("unchecked")
 	protected Sign(Grammar grammar, List<Word> words, Category cat, DerivationHistory dh, Sign lexHead) {
         this(grammar);
-    	_words = (List<Word>) Interner.globalIntern(words); 
+    	_words = (List<Word>) grammar.getIntern().intern(words); 
         _cat = cat;
         _history = dh;
         _lexHead = lexHead;
@@ -108,7 +105,7 @@ public class Sign implements LexSemOrigin, Serializable {
 
     /** Constructor with no additional derivation history. */
     public Sign(Grammar grammar, Word word, Category cat) {
-        this(grammar, new SingletonList<Word>(word), cat);
+    	this(grammar, new ArrayList<Word>(Arrays.asList(word)), cat);
     }
     
     
@@ -116,7 +113,7 @@ public class Sign implements LexSemOrigin, Serializable {
     @SuppressWarnings("unchecked")
 	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
     	in.defaultReadObject();
-        _words = (List<Word>) Interner.globalIntern(_words); 
+        _words = (List<Word>) grammar.getIntern().intern(_words); 
     }
     
     // during serialization, skips non-serializable data objects
@@ -140,17 +137,14 @@ public class Sign implements LexSemOrigin, Serializable {
     
     /** Factory method for creating a sign from a lexical sign plus a coarticulation one. */
     public static Sign createCoartSign(Grammar grammar, Category cat, Sign lexSign, Sign coartSign) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         List<Word> words = lexSign.getWords();
         if (words.size() > 1) 
             throw new RuntimeException("Can't create coarticulation sign from multiple words.");
         Word word = words.get(0);
         Word coartWord = coartSign.getWords().get(0);
-        Word wordPlus = Word.createWordWithAttrs(word, coartWord);
-        Sign retval = new Sign(grammar, new SingletonList<Word>(wordPlus), cat, null, null);
+        Word wordPlus = Word.createWordWithAttrs(grammar.getWordFactory(), word, coartWord);
+        Sign retval = new Sign(grammar, new ArrayList<Word>(Arrays.asList(wordPlus)), cat, null, null);
         retval._lexHead = retval;
         Rule coartRule = new Rule() {
             public String name() { return "coart"; }
@@ -165,10 +159,7 @@ public class Sign implements LexSemOrigin, Serializable {
     
     /** Factory method for creating derived signs with the given cat from the given inputs, rule and lex head. */
     public static Sign createDerivedSign(Grammar grammar, Category cat, Sign[] inputs, Rule rule, Sign lexHead) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         return new Sign(grammar, cat, inputs, rule, lexHead);
     }
 
@@ -177,10 +168,7 @@ public class Sign implements LexSemOrigin, Serializable {
         Note that unlike with rule applications, the result LF is constructed with 
         no var substitutions, so it is useful only for creating alternative signs during realization. */
     public static Sign createDerivedSignWithNewLF(Grammar grammar, Category cat, Sign[] inputs, Rule rule, Sign lexHead) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         Category copyCat = cat.shallowCopy();
         LF lf = null;
         for (int i = 0; i < inputs.length; i++) {
@@ -203,12 +191,13 @@ public class Sign implements LexSemOrigin, Serializable {
     
     // returns the remaining words in a structure sharing way
     private static List<Word> getRemainingWords(Sign[] inputs, int index) {
-        // if (inputs.length == 0) throw new RuntimeException("Error: can't make sign from zero inputs");
-        if (index == (inputs.length - 1)) return inputs[index]._words;
-        return new StructureSharingList<Word>(
-            inputs[index]._words,
-            getRemainingWords(inputs, index+1)
-        );
+        if (index == (inputs.length - 1)) {
+        	return inputs[index]._words;
+        }
+        ArrayList<Word> retval = new ArrayList<Word>();
+        retval.addAll(inputs[index]._words);
+        retval.addAll(getRemainingWords(inputs, index+1));
+        return retval;
     }
 
     
@@ -219,7 +208,7 @@ public class Sign implements LexSemOrigin, Serializable {
 
     /** Returns the words as a string.  Delegates to the current tokenizer's getOrthography method. */
     public String getOrthography() {
-        return grammar.lexicon.tokenizer.getOrthography(_words);
+        return grammar.getLexicon().getTokenizer().getOrthography(_words);
     }
 
     /** Returns the sign's category. */
@@ -256,17 +245,6 @@ public class Sign implements LexSemOrigin, Serializable {
         Sign sign = (Sign) obj;
         return _words == sign._words && _cat.equals(sign._cat);
     }
-
-    
-    /** 
-     * Returns a hash code for this sign with the words restricted to surface words; 
-     * with lexical signs, however, the original hash code is returned, so that 
-     * words with signs that differ just in their pos tags can be distinguished 
-     * (for robustness).
-     */ 
-    public int surfaceWordHashCode() {
-    	return surfaceWordHashCode(false);
-    }
     
     /** 
      * Returns a hash code for this sign with the words restricted to surface words, 
@@ -287,7 +265,6 @@ public class Sign implements LexSemOrigin, Serializable {
         hc += (ignoreLF) ? _cat.hashCodeNoLF() : _cat.hashCode();
         return hc;
     }
-    
     /** 
      * Returns whether this sign and the given object have equal categories and
      * restrictions to surface words; 
@@ -323,7 +300,15 @@ public class Sign implements LexSemOrigin, Serializable {
         }
         return (ignoreLF) ? _cat.equalsNoLF(sign._cat) : _cat.equals(sign._cat);
     }
-
+    /** 
+     * Returns a hash code for this sign with the words restricted to surface words; 
+     * with lexical signs, however, the original hash code is returned, so that 
+     * words with signs that differ just in their pos tags can be distinguished 
+     * (for robustness).
+     */ 
+    public int surfaceWordHashCode() {
+    	return this.surfaceWordHashCode(false);
+    }
     
     /** Returns 'orthography :- category'. */
     public String toString() {
@@ -349,7 +334,7 @@ public class Sign implements LexSemOrigin, Serializable {
      * Words are also expanded using the grammar's tokenizer.
      */
     public Document getWordsInXml(Set<Nominal> nominals) {
-        TObjectIntHashMap nominalsMap = new TObjectIntHashMap(); 
+        Map<Nominal, Integer> nominalsMap = new LinkedHashMap<Nominal, Integer>(); 
         setMaxOrthLengths(nominals, nominalsMap);
         Document doc = new Document();
         Element root = new Element("seg");
@@ -359,7 +344,7 @@ public class Sign implements LexSemOrigin, Serializable {
     }
     
     // finds the maximum orthography lengths for signs headed by the given nominals
-    private void setMaxOrthLengths(Set<Nominal> nominals, TObjectIntHashMap nominalsMap) {
+    private void setMaxOrthLengths(Set<Nominal> nominals, Map<Nominal, Integer> nominalsMap) {
         // update map
         Nominal index = _cat.getIndexNominal();
         if (index != null && nominals.contains(index)) {
@@ -378,7 +363,7 @@ public class Sign implements LexSemOrigin, Serializable {
     
     // recursively adds orthographic words as XML to the given parent, 
     // using the nominals map to determine labeled spans
-    private void addWordsToXml(Element parent, TObjectIntHashMap nominalsMap) {
+    private void addWordsToXml(Element parent, Map<Nominal, Integer> nominalsMap) {
         // check for matching nominal as index of target cat; 
         // if found, update parent to labeled span element
         Nominal index = _cat.getIndexNominal();
@@ -432,7 +417,7 @@ public class Sign implements LexSemOrigin, Serializable {
     // multiwords are enclosed within a multiword element; 
     // any attribute-value pairs are added to the word or multiword element
     private void addWords(Element parent, Word word) {
-        List<String> orthWords = grammar.lexicon.tokenizer.expandWord(word);
+        List<String> orthWords = grammar.getLexicon().getTokenizer().expandWord(word);
         Element child;
         if (orthWords.size() == 1) {
             Element wordElt = new Element("word");
@@ -554,5 +539,34 @@ public class Sign implements LexSemOrigin, Serializable {
     	// test identity and equality
     	System.out.println("this == sign?: " + (this == sign));
     	System.out.println("this.equals(sign)?: " + (this.equals(sign)));
+    }
+
+	@Override
+	public int compareTo(Sign o) {
+		int cmp = 0;
+    	cmp = this.getDerivationHistory().compareTo(o.getDerivationHistory());
+    	if (cmp != 0) return cmp;
+    	List<Word> words1 = this.getWords(); 
+    	List<Word> words2 = o.getWords();
+    	cmp = compareTo(words1, words2);
+    	if (cmp != 0) return cmp;
+    	// TODO: implement compareTo method on categories
+    	int h1 = this.getCategory().hashCode();
+    	int h2 = o.getCategory().hashCode();
+    	if (h1 < h2) return -1;
+    	if (h1 > h2) return 1;
+    	return 0;
+	}
+	private int compareTo(List<Word> words1, List<Word> words2) {
+    	int i=0;
+    	while (i < words1.size() || i < words2.size()) {
+    		if (i == words1.size()) return -1;
+    		if (i == words2.size()) return 1;
+    		Word w1 = words1.get(i); Word w2 = words2.get(i);
+    		int cmp = w1.compareTo(w2);
+    		if (cmp != 0) return cmp;
+    		i++;
+    	}
+    	return 0;
     }
 }

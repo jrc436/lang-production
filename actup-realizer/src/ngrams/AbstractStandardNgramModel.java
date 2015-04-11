@@ -3,6 +3,8 @@
  */
 package ngrams;
 
+import grammar.Grammar;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -45,13 +47,13 @@ public abstract class AbstractStandardNgramModel extends NgramScorer {
      * @param useSemClasses Whether this model should use semantic classes.
      * @see NgramScorer#NgramScorer(int, boolean, Tokenizer)
      */
-    protected AbstractStandardNgramModel(int order, boolean useSemClasses, Tokenizer tokenizer, double[] varValues) {
-		super(order, useSemClasses, tokenizer);
+    protected AbstractStandardNgramModel(int order, boolean useSemClasses, Grammar grammar, double[] varValues) {
+		super(order, useSemClasses, grammar);
 		numNgrams = new int[order];
 		this.params = varValues;
 	}
-    protected AbstractStandardNgramModel(int order, boolean useSemClasses, Tokenizer tokenizer) {
-    	this(order, useSemClasses, tokenizer, new double[0]);
+    protected AbstractStandardNgramModel(int order, boolean useSemClasses, Grammar grammar) {
+    	this(order, useSemClasses, grammar, new double[0]);
     }
 //    protected AbstractStandardNgramModel(int order) {
 //  		this(order, new DefaultTokenizer());
@@ -59,8 +61,8 @@ public abstract class AbstractStandardNgramModel extends NgramScorer {
 //    protected AbstractStandardNgramModel(int order, boolean useSemClasses) {
 //    	this(order, useSemClasses, new DefaultTokenizer());
 //    }
-      protected AbstractStandardNgramModel(int order, Tokenizer tokenizer) {
-      	this(order, false, tokenizer);
+      protected AbstractStandardNgramModel(int order, Grammar grammar) {
+      	this(order, false, grammar);
       }
     /**
      * This allows an ngram model to update its scoring methodology after each realization. Primarily

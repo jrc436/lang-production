@@ -40,7 +40,7 @@ public class TypeChangingRule extends AbstractRule implements LexSemOrigin {
 	 * to satisfy the LexSemOrigin interface.
 	 * Defaults to "URULE".
 	 */
-	public static String POS_STRING = "URULE";
+	public static final String POS_STRING = "URULE";
 	
 
     /** The argument category. */   
@@ -54,9 +54,12 @@ public class TypeChangingRule extends AbstractRule implements LexSemOrigin {
 
 
     /** Constructor. */
-    public TypeChangingRule(Grammar grammar, Category arg, Category result, String name, LF firstEP) {
-    	super(grammar);
-    	_arg = arg; _result = result; _name = name.intern(); _firstEP = firstEP;
+    public TypeChangingRule(Grammar rg, Category arg, Category result, String name, LF firstEP) {
+    	super(rg);
+    	_arg = arg; 
+    	_result = result; 
+    	this.name = name.intern(); 
+    	_firstEP = firstEP;
     	setOrigin();
     }
 
@@ -94,11 +97,11 @@ public class TypeChangingRule extends AbstractRule implements LexSemOrigin {
         Category result = _result.copy();
         
         // make variables unique
-        UnifyControl.reindex(result, arg);
+        grammar.getUnifyControl().reindex(result, arg);
 
         // unify
-        Substitution sub = new GSubstitution();
-        GUnifier.unify(grammar, input, arg, sub);
+        Substitution sub = new GSubstitution(grammar.getUnifyControl());
+        GUnifier.unify(grammar.getUnifyControl(), input, arg, sub);
         ((GSubstitution)sub).condense();
 
         // fill in result
@@ -107,9 +110,9 @@ public class TypeChangingRule extends AbstractRule implements LexSemOrigin {
 
         // return
         List<Category> results = new ArrayList<Category>(1);
-        _headCats.clear();
+        headCats.clear();
         results.add($result);
-        _headCats.add(input);
+        headCats.add(input);
         return results;
     }
     
@@ -117,7 +120,7 @@ public class TypeChangingRule extends AbstractRule implements LexSemOrigin {
     /** Returns 'name: arg => result'. */
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(_name).append(": ");
+        sb.append(name).append(": ");
         sb.append(_arg).append(' ');
         sb.append("=> ").append(_result);
         return sb.toString();

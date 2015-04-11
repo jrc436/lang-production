@@ -18,6 +18,8 @@
 
 package ngrams;
 
+import grammar.Grammar;
+
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
@@ -26,8 +28,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import lexicon.DefaultTokenizer;
-import lexicon.Tokenizer;
 import lexicon.Word;
 import synsem.Sign;
 import synsem.SignScorer;
@@ -43,23 +43,16 @@ public abstract class NgramScorer implements SignScorer, Reversible
 {
     
     // tokenizer reference
-    protected final Tokenizer tokenizer;
+    protected final Grammar grammar;
 	
-	protected NgramScorer() {
-		this(1);
-	}
-	protected NgramScorer(int order) {
-		this(order, new DefaultTokenizer());
+	protected NgramScorer(int order, Grammar grammar) {
+		this(order, false, grammar);
 	}
 	
-	protected NgramScorer(int order, Tokenizer tokenizer) {
-		this(order, false, tokenizer);
-	}
-	
-	protected NgramScorer(int order, boolean useSemClasses, Tokenizer tokenizer) {
+	protected NgramScorer(int order, boolean useSemClasses, Grammar grammar) {
 		this.order = order;
 		this.useSemClasses = useSemClasses;
-		this.tokenizer = tokenizer;
+		this.grammar = grammar;
 	}
 	
     /** The n-gram order of the model. */
@@ -77,13 +70,6 @@ public abstract class NgramScorer implements SignScorer, Reversible
     /** Set reverse flag, and propagate to any reversible filters. */
     public void setReverse(boolean reverse) { 
         this.reverse = reverse; 
-        if (ngramFilters != null) {
-            for (int i = 0; i < ngramFilters.size(); i++) {
-                NgramFilter filter = ngramFilters.get(i);
-                if (filter instanceof Reversible) 
-                    ((Reversible)filter).setReverse(reverse);
-            }
-        }
     }
     
     /** Root of the n-gram trie.  Nodes store NgramFloats instances. */
@@ -115,18 +101,7 @@ public abstract class NgramScorer implements SignScorer, Reversible
     protected boolean debugScore = false;
     
     /** Sets the debug score flag. */
-    public void setDebug(boolean debugScore) { this.debugScore = debugScore; } 
-    
-    /** List of n-gram filters, for identifying unhappy sequences. */
-    protected List<NgramFilter> ngramFilters = null;
-    
-    /** Adds an n-gram filter. */
-    public void addFilter(NgramFilter filter) { 
-        if (ngramFilters == null) { ngramFilters = new ArrayList<NgramFilter>(); }
-        ngramFilters.add(filter);
-    }
-
-    
+    public void setDebug(boolean debugScore) { this.debugScore = debugScore; }  
     
     /** Weak hash map for cached log probs, keyed from a sign's words. */
     protected Map<List<Word>,Float> cachedLogProbs = null;
@@ -193,12 +168,6 @@ public abstract class NgramScorer implements SignScorer, Reversible
         }
         signToScore = sign;
         setWordsToScore(words, complete);
-        if (ngramFilters != null) {
-            for (int i = 0; i < ngramFilters.size(); i++) {
-                NgramFilter filter = ngramFilters.get(i);
-                if (filter.filterOut(wordsToScore)) return convertToLogProb(0);
-            }
-        }
         prepareToScoreWords();
         double retval = logprob();
         signToScore = null;
@@ -239,7 +208,7 @@ public abstract class NgramScorer implements SignScorer, Reversible
         wordsToScore.clear();
         tagsAdded = false; 
         if (complete && (reverse || words.get(0).getForm() != "<s>")) { 
-            wordsToScore.add(Word.createWord("<s>"));
+            wordsToScore.add(Word.createWord(grammar.getWordFactory(), "<s>"));
             tagsAdded = true;
         }
         if (reverse) {
@@ -252,7 +221,7 @@ public abstract class NgramScorer implements SignScorer, Reversible
         else
             wordsToScore.addAll(words);
         if (complete && (reverse || words.get(words.size()-1).getForm() != "</s>")) {
-            wordsToScore.add(Word.createWord("</s>"));
+            wordsToScore.add(Word.createWord(grammar.getWordFactory(), "</s>"));
             tagsAdded = true;
         }
     }
@@ -357,7 +326,7 @@ public abstract class NgramScorer implements SignScorer, Reversible
     
     /** Returns whether the given semantic class is a replacement one. */
     protected boolean isReplacementSemClass(String semClass) {
-        return semClass != null && tokenizer.isReplacementSemClass(semClass);
+        return semClass != null && grammar.getLexicon().getTokenizer().isReplacementSemClass(semClass);
     }
     
     /**
@@ -474,7 +443,7 @@ public abstract class NgramScorer implements SignScorer, Reversible
 
     
     /** Sets up tokenizer for reading in language models. */ 
-    protected static StreamTokenizer initTokenizer(Reader in) {
+    public static StreamTokenizer initTokenizer(Reader in) {
         StreamTokenizer tokenizer = new StreamTokenizer(in);
         tokenizer.resetSyntax();
         tokenizer.wordChars(0,255);
@@ -490,7 +459,7 @@ public abstract class NgramScorer implements SignScorer, Reversible
 	 * Reads a line of up to tokens.length tokens using the given tokenizer,
 	 * with the remaining array elements set to null.
 	 */
-    protected static void readLine(StreamTokenizer tokenizer, String[] tokens) throws IOException {
+    public static void readLine(StreamTokenizer tokenizer, String[] tokens) throws IOException {
         int index = 0;
         int ttype;
         while ( (ttype = tokenizer.nextToken()) != StreamTokenizer.TT_EOF && ttype != StreamTokenizer.TT_EOL ) {

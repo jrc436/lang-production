@@ -5,8 +5,17 @@ import java.util.Random;
 //a variable to be used for simple hill climbing
 public class Variable {
 	private double upperBound;
+	protected double getUpper() {
+		return upperBound;
+	}
 	private double increment;
+	protected double getIncrement() {
+		return increment;
+	}
 	private double lowerBound;
+	protected double getLower() {
+		return lowerBound;
+	}
 	private double currentValue;
 	private double lastValue;
 	private boolean settledP; //no more improvements in the P direction
@@ -31,7 +40,7 @@ public class Variable {
 		this.currentValue = newValue;
 	}
 	protected void resetValueRandom() {
-		this.currentValue = new Random().nextDouble() * (this.lowerBound + this.upperBound);
+		this.currentValue = new Random().nextDouble() * (this.upperBound - this.lowerBound) + this.lowerBound;
 	}
 	//if lastvalue is not set, then goodincr doesn't matter, we'll use whatever direction (typo caught by jamie) was initially set to
 	public boolean step(boolean goodIncr) throws Exception{

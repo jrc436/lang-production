@@ -18,12 +18,13 @@
 
 package synsem;
 
-import gnu.trove.TObjectIntHashMap;
-
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 
 import unify.ModFcn;
 import unify.Substitution;
+import unify.Unifiable;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 import unify.Variable;
 
@@ -82,10 +83,10 @@ public final class BasicArg implements Arg, Serializable {
 	public void unifyCheck(Object u) throws UnifyFailure {
 	}
 
-	public Object unify(Object u, Substitution sub) throws UnifyFailure {
+	public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
 		if (u instanceof BasicArg) {
 			return new BasicArg((Slash) _slash
-					.unify(((BasicArg) u)._slash, sub), (Category) _cat.unify(((BasicArg) u)._cat, sub));
+					.unify(((BasicArg) u)._slash, sub, uc), (Category) _cat.unify(((BasicArg) u)._cat, sub, uc));
 		} else {
 			throw new UnifyFailure();
 		}
@@ -139,7 +140,7 @@ public final class BasicArg implements Arg, Serializable {
 	/**
 	 * Returns a hash code for this, using the given map from vars to ints.
 	 */
-	public int hashCode(TObjectIntHashMap varMap) {
+	public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) {
 		return _slash.hashCode(varMap) + _cat.hashCodeNoLF(varMap);
 	}
 
@@ -147,8 +148,7 @@ public final class BasicArg implements Arg, Serializable {
 	 * Returns whether this arg equals the given object up to variable names,
 	 * using the given maps from vars to ints.
 	 */
-	public boolean equals(Object obj, TObjectIntHashMap varMap,
-			TObjectIntHashMap varMap2) {
+	public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
 		if (obj.getClass() != this.getClass()) {
 			return false;
 		}

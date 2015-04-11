@@ -19,19 +19,45 @@
 
 package lexicon;
 
-import grammar.*;
-import synsem.*;
-import unify.*;
-import util.*;
-import hylo.*;
+import grammar.Grammar;
+import hylo.HyloVar;
+import hylo.NominalVar;
+import hylo.Proposition;
+import hylo.SatOp;
 
-import org.jdom.*;
+import java.io.IOException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import java.io.*;
-import java.net.*;
-import java.util.*;
+import org.jdom.Element;
 
-import gnu.trove.*;
+import synsem.AtomCat;
+import synsem.Category;
+import synsem.CategoryFcn;
+import synsem.CategoryFcnAdapter;
+import synsem.LF;
+import synsem.Sign;
+import synsem.SignSurfaceWords;
+import unify.FeatureStructure;
+import unify.GFeatStruc;
+import unify.GFeatVar;
+import unify.ModFcn;
+import unify.Mutable;
+import unify.SimpleType;
+import unify.UnifyFailure;
+import util.GroupMap;
+import util.Interner;
+import util.Pair;
+import util.XmlScanner;
 
 
 /**
@@ -72,51 +98,42 @@ public class Lexicon {
     private GroupMap<String,String> _catsToAttrs;
     private Set<String> _lfAttrs;
     
-    // distributive attributes
+
     private String[] _distributiveAttrs = null;
-    
-    // licensing features
     private LicensingFeature[] _licensingFeatures = null;
-    
-    // relation sorting
     private HashMap<String,Integer> _relationIndexMap = new HashMap<String,Integer>();
-    
-    // interner for caching lex lookups during realization
     private Interner<Object> lookupCache = new Interner<Object>(true);
     
     /** The grammar that this lexicon is part of. */
-    public final Grammar grammar;
+    private final Grammar grammar;
+
     
     /** The tokenizer.  (Defaults to DefaultTokenizer.) */
-    public final Tokenizer tokenizer;
+    private final Tokenizer tokenizer;
+    public Tokenizer getTokenizer() {
+    	return tokenizer;
+    }
     
     /** Flag for whether the lexicon is open, ie complete lexical category mappings are not expected. (Defaults to false.) */
-    public boolean openlex = false;
+    private final boolean openlex;
     
     /** Flag for whether to show warnings for failed sem class unification. (Defaults to false.) */
-    public boolean debugSemClasses = false;
+    private final boolean debugSemClasses = false;
     
 
-    /*************************************************************
-     * Constructor
-     *************************************************************/
     public Lexicon(Grammar grammar) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
-        this.grammar = grammar;
-        this.tokenizer = new DefaultTokenizer();
+    	this(grammar, false);
+    }
+    public Lexicon(Grammar grammar, boolean openlex) {
+    	this(grammar, new DefaultTokenizer(), openlex);
     }
 
     /** Constructor with tokenizer. */
-    public Lexicon(Grammar grammar, Tokenizer tokenizer) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    public Lexicon(Grammar grammar, Tokenizer tokenizer, boolean openlex) {
+    	
         this.grammar = grammar;
         this.tokenizer = tokenizer;
+        this.openlex = openlex;
     }
 
     //------------------------------------------------------------- 
@@ -335,7 +352,7 @@ public class Lexicon {
     };
 
     // a map from indices to atomic categories, reset for each category
-    private TIntObjectHashMap featStrucMap = new TIntObjectHashMap();
+    private Map<Integer, FeatureStructure> featStrucMap = new LinkedHashMap<Integer, FeatureStructure>();
     
     // fills in featStrucMap for a category
     private CategoryFcn indexFeatStrucs = new CategoryFcnAdapter() {
@@ -357,13 +374,13 @@ public class Lexicon {
             GFeatStruc gfs = (GFeatStruc) fs;
             if (gfs == null || gfs.getInheritsFrom() == 0) return;
             int inhf = gfs.getInheritsFrom();
-            FeatureStructure inhfFS = (FeatureStructure) featStrucMap.get(inhf);
+            FeatureStructure inhfFS = featStrucMap.get(inhf);
             if (inhfFS != null) {
                 // copy values of features from inhfFS not already present
                 for (Iterator<String> it = inhfFS.getAttributes().iterator(); it.hasNext(); ) {
                     String att = it.next(); 
                     if (gfs.hasAttribute(att)) continue;
-                    gfs.setFeature(att, UnifyControl.copy(inhfFS.getValue(att)));
+                    gfs.setFeature(att, grammar.getUnifyControl().copy(inhfFS.getValue(att)));
                 }
                 // for each possible attr used with this type and not already present, 
                 // add feature equation
@@ -470,7 +487,7 @@ public class Lexicon {
             words = new ArrayList<Word>(specialTokenWords.size());
             for (Iterator<Word> it = specialTokenWords.iterator(); it.hasNext(); ) {
                 Word stw = it.next();
-                Word w = Word.createSurfaceWord(stw, pred);
+                Word w = Word.createSurfaceWord(grammar.getWordFactory(), stw, pred);
                 words.add(w);
             }
         }
@@ -479,8 +496,8 @@ public class Lexicon {
         for (Iterator<Word> it = words.iterator(); it.hasNext(); ) {
             Word w = it.next();
             try {
-                SignHash signs = getSignsFromWord(w, specialTokenConst, pred, targetRel);
-                retval.addAll(signs.asSignSet());
+                Map<SignSurfaceWords, Sign> signs = getSignsFromWord(w, specialTokenConst, pred, targetRel);
+                retval.addAll(signs.values());
             }
             // shouldn't happen
             catch (LexException exc) {
@@ -507,7 +524,7 @@ public class Lexicon {
                 // apply to each input
                 for (int j = 0; j < inputSigns.size(); j++) {
                     Sign sign = inputSigns.get(j);
-                    grammar.rules.applyCoart(sign, coartSign, outputSigns);
+                    grammar.getRules().applyCoart(sign, coartSign, outputSigns);
                 }
             }
             // switch output to input for next iteration
@@ -529,12 +546,12 @@ public class Lexicon {
      * @return a list of sign hashes
      * @exception LexException thrown if word not found
      */
-    public List<SignHash> getEntriesFromWords(String s) throws LexException { 
-        List<SignHash> entries = new ArrayList<SignHash>();
-        List<Word> words = tokenizer.tokenize(s);
+    public List<Map<SignSurfaceWords, Sign>> getEntriesFromWords(String s) throws LexException { 
+        List<Map<SignSurfaceWords, Sign>> entries = new ArrayList<Map<SignSurfaceWords, Sign>>();
+        List<Word> words = tokenizer.tokenize(grammar, s);
         for (Iterator<Word> it = words.iterator(); it.hasNext(); ) {
             Word w = it.next();
-            SignHash signs = getSignsFromWord(w);
+            Map<SignSurfaceWords, Sign> signs = getSignsFromWord(w);
             if (signs.size() == 0) {
                 throw new LexException("Word not in lexicon: \"" + w +"\"");
             }
@@ -555,14 +572,14 @@ public class Lexicon {
      * @return a sign hash
      * @exception LexException thrown if word not found
      */
-    public SignHash getSignsFromWord(Word w) throws LexException {
+    public Map<SignSurfaceWords, Sign> getSignsFromWord(Word w) throws LexException {
         // reduce word to its core, removing coart attrs if any
-    	Word surfaceWord = Word.createSurfaceWord(w);
+    	Word surfaceWord = Word.createSurfaceWord(grammar.getWordFactory(), w);
         Word coreWord = (surfaceWord.attrsIntersect(_coartAttrs)) 
-            ? Word.createCoreSurfaceWord(surfaceWord, _coartAttrs) 
+            ? Word.createCoreSurfaceWord(grammar.getWordFactory(), surfaceWord, _coartAttrs) 
             : surfaceWord;
         // lookup core word
-        SignHash result = getSignsFromWord(coreWord, null, null, null);
+            Map<SignSurfaceWords, Sign> result = getSignsFromWord(coreWord, null, null, null);
         if (result.size() == 0) {
             throw new LexException(coreWord + " not found in lexicon");
         }
@@ -574,9 +591,8 @@ public class Lexicon {
     }
     
     // look up and apply coarts for w to each sign in result
-    @SuppressWarnings("unchecked")
-	private void applyCoarts(Word w, SignHash result) throws LexException {
-        List<Sign> inputSigns = new ArrayList<Sign>(result.asSignSet());
+	private void applyCoarts(Word w, Map<SignSurfaceWords, Sign> result) throws LexException {
+        List<Sign> inputSigns = new ArrayList<Sign>(result.values());
         result.clear();
         List<Sign> outputSigns = new ArrayList<Sign>(inputSigns.size());
         // for each surface attr, lookup coarts and apply to input signs, storing results in output signs
@@ -585,14 +601,14 @@ public class Lexicon {
             String attr = (String) p.a;
             if (!_indexedCoartAttrs.contains(attr)) continue;
             String val = (String) p.b;
-            Word coartWord = Word.createWord(attr, val);
-            SignHash coartResult = getSignsFromWord(coartWord, null, null, null);
-            for (Iterator<Sign> it2 = coartResult.iterator(); it2.hasNext(); ) {
+            Word coartWord = Word.createWord(grammar.getWordFactory(), attr, val);
+            Map<SignSurfaceWords, Sign> coartResult = getSignsFromWord(coartWord, null, null, null);
+            for (Iterator<Sign> it2 = coartResult.values().iterator(); it2.hasNext(); ) {
                 Sign coartSign = it2.next();
                 // apply to each input
                 for (int j = 0; j < inputSigns.size(); j++) {
                     Sign sign = inputSigns.get(j);
-                    grammar.rules.applyCoart(sign, coartSign, outputSigns);
+                    grammar.getRules().applyCoart(sign, coartSign, outputSigns);
                 }
             }
             // switch output to input for next iteration
@@ -601,11 +617,13 @@ public class Lexicon {
             outputSigns.clear();
         }
         // add results back
-        result.addAll(inputSigns);
+        for (Sign s : inputSigns) {
+        	result.put(new SignSurfaceWords(s), s);
+        }
     }
     
     // get signs with additional args for a known special token const, target pred and target rel        
-    private SignHash getSignsFromWord(Word w, String specialTokenConst, String targetPred, String targetRel) throws LexException {
+    private Map<SignSurfaceWords, Sign> getSignsFromWord(Word w, String specialTokenConst, String targetPred, String targetRel) throws LexException {
 
         Collection<MorphItem> morphItems = (specialTokenConst == null)
             ? (Collection<MorphItem>) _words.get(w)
@@ -618,7 +636,7 @@ public class Lexicon {
                 targetPred = w.getForm();
             }
             if (specialTokenConst != null) {
-                Word key = Word.createSurfaceWord(w, specialTokenConst);
+                Word key = Word.createSurfaceWord(grammar.getWordFactory(), w, specialTokenConst);
                 morphItems = (Collection<MorphItem>) _words.get(key);
             }
             // otherwise throw lex exception
@@ -626,7 +644,7 @@ public class Lexicon {
                 throw new LexException(w + " not in lexicon");
         }
 
-        SignHash result = new SignHash();
+        Map<SignSurfaceWords, Sign> result = new LinkedHashMap<SignSurfaceWords, Sign>();
 
         for (Iterator<MorphItem> MI = morphItems.iterator(); MI.hasNext();) {
             getWithMorphItem(w, MI.next(), targetPred, targetRel, result);
@@ -637,7 +655,7 @@ public class Lexicon {
 
 
     // given MorphItem
-    private void getWithMorphItem(Word w, MorphItem mi, String targetPred, String targetRel, SignHash result)
+    private void getWithMorphItem(Word w, MorphItem mi, String targetPred, String targetRel, Map<SignSurfaceWords, Sign> result)
         throws LexException 
     {
     	// get supertags for filtering, if a supertagger is installed
@@ -701,7 +719,7 @@ public class Lexicon {
                                  MacroAdder macAdder,
                                  Map<String,Double> supertags,
                                  Set<String> supertagsFound,
-                                 SignHash result) 
+                                 Map<SignSurfaceWords, Sign> result) 
     {
         for (int i=0; i < entries.length; i++) {
             EntriesItem entry = entries[i];
@@ -719,7 +737,7 @@ public class Lexicon {
                                     MacroAdder macAdder,
                                     Map<String,Double> supertags,
                                     Set<String> supertagsFound,
-                                    SignHash result) 
+                                    Map<SignSurfaceWords, Sign> result) 
     {
         // ensure apropos
         if (targetPred != null && !targetPred.equals(pred)) return; 
@@ -759,7 +777,7 @@ public class Lexicon {
 	        expandInheritsFrom(cat);
 	        
 	        // merge stem, pos, sem class from morph item, plus supertag from cat
-	        Word word = Word.createFullWord(w, mi.getWord(), cat.getSupertag());
+	        Word word = Word.createFullWord(grammar.getWordFactory(), w, mi.getWord(), cat.getSupertag());
 
 	        // set origin and lexprob
 	        Sign sign = new Sign(grammar, word, cat);
@@ -768,7 +786,10 @@ public class Lexicon {
 	        //	sign.addData(new SupertaggerAdapter.LexLogProb((float) Math.log10(lexprob)));
 	        //}
 	        // return sign
-	        result.insert(sign);
+	        SignSurfaceWords sw = new SignSurfaceWords(sign);
+	        if (result.get(sw) == null || sign.getDerivationHistory().compareTo(result.get(sw).getDerivationHistory()) > 0) {
+	        	result.put(sw, sign);
+	        }
         }
         catch (RuntimeException exc) {
         	System.err.println("Warning: ignoring entry: "+item.getName()+" of family: "+item.getFamilyName()+" for stem: "+stem + " b/c: " + exc.toString()
@@ -782,7 +803,7 @@ public class Lexicon {
     // unify sem class with default nom var(s)
     private void unifySemClass(Category cat, String semClass) {
         if (semClass == null || cat.getLF() == null) return;
-        SEMCLASS = grammar.types.getSimpleType(semClass);
+        SEMCLASS = grammar.getTypes().getSimpleType(semClass);
         try {
             cat.getLF().deepMap(defaultNomvarUnifier);
         } catch (TypePropagationException tpe) {
@@ -810,7 +831,7 @@ public class Lexicon {
             if (st.equals(SEMCLASS)) return;
             // otherwise unify types, update nv
             try {
-                SimpleType stU = (SimpleType) st.unify(SEMCLASS, null);
+                SimpleType stU = (SimpleType) st.unify(SEMCLASS, null, grammar.getUnifyControl());
                 nv.setType(stU);
             } catch (UnifyFailure uf) {
                 throw new TypePropagationException(st, SEMCLASS);
@@ -836,7 +857,7 @@ public class Lexicon {
                     if (val instanceof SimpleType && 
                         ((SimpleType)val).getName().equals(DEFAULT_VAL))
                     {
-                        fs.setFeature(attr, grammar.types.getSimpleType(REPLACEMENT));
+                        fs.setFeature(attr, grammar.getTypes().getSimpleType(REPLACEMENT));
                     }
                 }
             }
@@ -855,11 +876,11 @@ public class Lexicon {
         if (retval != null) return retval;
         
         // set up macro adder
-        IntHashSetMap macrosFromLex = new IntHashSetMap();
+        GroupMap<Integer, FeatureStructure> macrosFromLex = new GroupMap<Integer, FeatureStructure>();
         String[] newMacroNames = mi.getMacros();
         List<MacroItem> macroItems = new ArrayList<MacroItem>();
         for (int i=0; i < newMacroNames.length; i++) {
-            Set<FeatureStructure> featStrucs = (Set<FeatureStructure>)_macros.get(newMacroNames[i]);
+            Set<FeatureStructure> featStrucs = _macros.get(newMacroNames[i]);
             if (featStrucs != null) {
                 for (Iterator<FeatureStructure> fsIt = featStrucs.iterator(); fsIt.hasNext();) {
                     FeatureStructure fs = fsIt.next();
@@ -912,18 +933,18 @@ public class Lexicon {
         
     // a map from a cat's nomvars to types, 
     // just using the var's name for equality
-    @SuppressWarnings("unchecked")
-	private Map<NominalVar,SimpleType> nomvarMap = new THashMap(
-        new TObjectHashingStrategy() {
-			private static final long serialVersionUID = 1L;
-			public int computeHashCode(Object o) {
-                return ((NominalVar)o).getName().hashCode();
-            }
-            public boolean equals(Object o1, Object o2) {
-                return ((NominalVar)o1).getName().equals(((NominalVar)o2).getName());
-            }
-        }
-    );
+  //  @SuppressWarnings("unchecked")
+	private Map<String,SimpleType> nomvarMap = new LinkedHashMap<String, SimpleType>();//new THashMap(
+//        new TObjectHashingStrategy() {
+//			private static final long serialVersionUID = 1L;
+//			public int computeHashCode(Object o) {
+//                return ((NominalVar)o).getName().hashCode();
+//            }
+//            public boolean equals(Object o1, Object o2) {
+//                return ((NominalVar)o1).getName().equals(((NominalVar)o2).getName());
+//            }
+//        }
+//    );
     
     // exception for unification failures in propagating types
     private class TypePropagationException extends RuntimeException {
@@ -943,14 +964,14 @@ public class Lexicon {
                 SimpleType st = nv.getType();
                 SimpleType st0 = nomvarMap.get(nv);
                 // add type to map if no type found
-                if (st0 == null) { nomvarMap.put(nv, st); return; }
+                if (st0 == null) { nomvarMap.put(nv.getName(), st); return; }
                 // check equality
                 if (st.equals(st0)) return;
                 // otherwise unify types, update nv and map
                 try {
-                    SimpleType stU = (SimpleType) st.unify(st0, null);
+                    SimpleType stU = (SimpleType) st.unify(st0, null, grammar.getUnifyControl());
                     nv.setType(stU);
-                    nomvarMap.put(nv, stU);
+                    nomvarMap.put(nv.getName(), stU);
                 } catch (UnifyFailure uf) {
                     throw new TypePropagationException(st, st0);
                 }
@@ -1035,7 +1056,7 @@ public class Lexicon {
                 String attr = _distributiveAttrs[i];
                 Object val = fs.getValue(attr);
                 if (val == null) {
-                    fs.setFeature(attr, UnifyControl.copy(distVal));
+                    fs.setFeature(attr, grammar.getUnifyControl().copy(distVal));
                 }
             }
         }
@@ -1142,7 +1163,6 @@ public class Lexicon {
         // return morph and macro items
         return new Pair<List<MorphItem>,List<MacroItem>>(morphScanner.morphItems, morphScanner.macroItems);
     }
-    
 	private class LexiconScanner extends XmlScanner {
     	List<Family> lexicon = new ArrayList<Family>();
     	Element distrElt = null;

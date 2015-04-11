@@ -25,6 +25,7 @@ import org.jdom.Element;
 import synsem.LF;
 import unify.SimpleType;
 import unify.Substitution;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 
 /**
@@ -67,7 +68,7 @@ public class ModeVar extends HyloVar implements Mode {
         return super.equals(o);
     }
     
-    public Object unify(Object u, Substitution sub) throws UnifyFailure {
+    public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
         if (u instanceof ModeLabel) {
             return sub.makeSubstitution(this, u);
         } else if (u instanceof ModeVar) {

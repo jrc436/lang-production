@@ -24,6 +24,7 @@ import org.jdom.Element;
 
 import synsem.LF;
 import unify.Substitution;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 
 /**
@@ -46,9 +47,9 @@ public final class ModeLabel extends HyloAtom implements Mode {
         return new ModeLabel(grammar, _name);
     }
 
-    public Object unify(Object u, Substitution sub) throws UnifyFailure {
+    public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
         if (equals(u)) return this;
-        return super.unify(u, sub);
+        return super.unify(u, sub, uc);
     }
     
     /**

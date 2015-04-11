@@ -49,15 +49,15 @@ public interface Unifiable {
 	 * Unify this Unfiable with another Object.
 	 * @param s
 	 *            Substitution containing the variable resolutions
+	 * @param uc TODO
 	 * @param o
 	 *            object to unify with
-	 * 
 	 * @exception UnifyFailure
 	 *                if this Unifiable cannot be unified with the Object
 	 * @return an object which represents the unification of this Unifiable with
 	 *         the Object
 	 */
-	public Object unify(Object u, Substitution s) throws UnifyFailure;
+	public Object unify(Object u, Substitution s, UnifyControl uc) throws UnifyFailure;
 
 	/**
 	 * Check if this Unifiable can unify with another Object. This should be

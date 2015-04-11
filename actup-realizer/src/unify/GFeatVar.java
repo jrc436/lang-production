@@ -17,11 +17,11 @@
 //////////////////////////////////////////////////////////////////////////////
 package unify;
 
-import gnu.trove.TObjectIntHashMap;
 import grammar.Grammar;
 import grammar.Types;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 
 /**
  * A class for variables which can stand for any feature.
@@ -50,13 +50,10 @@ public class GFeatVar implements Variable, Indexed, Mutable, Serializable {
     }
 
     protected GFeatVar(Grammar grammar, String name, int index, SimpleType st) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         _name = name;
         _index = index;
-        type = (st != null) ? st : grammar.types.getSimpleType(Types.TOP_TYPE);
+        type = (st != null) ? st : grammar.getTypes().getSimpleType(Types.TOP_TYPE);
         _hashCode = _name.hashCode() + _index + type.getIndex();
         this.grammar = grammar;
     }
@@ -104,7 +101,7 @@ public class GFeatVar implements Variable, Indexed, Mutable, Serializable {
     /**
 	 * Returns a hash code using the given map from vars to ints.
 	 */
-	public int hashCode(TObjectIntHashMap varMap) {
+	public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) {
 		// see if this already in map
 		if (varMap.containsKey(this))
 			return varMap.get(this);
@@ -119,7 +116,7 @@ public class GFeatVar implements Variable, Indexed, Mutable, Serializable {
 	 * using the given maps from vars to ints.
 	 * (Note that the name and index may differ, but the types must be equal.)
 	 */
-    public boolean equals(Object obj, TObjectIntHashMap varMap, TObjectIntHashMap varMap2) {
+    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
         if (this == obj) return true;
         if (obj.getClass() != this.getClass()) { return false; }
         GFeatVar gv = (GFeatVar) obj;
@@ -130,27 +127,27 @@ public class GFeatVar implements Variable, Indexed, Mutable, Serializable {
     
     public void unifyCheck(Object o) throws UnifyFailure {}
     
-    public Object unify(Object u, Substitution sub) throws UnifyFailure {
+    public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
         if (equals(u)) {
             return this;
         }
         else if (u instanceof SimpleType) {
             SimpleType st1 = getType();
             SimpleType st2 = (SimpleType)u;
-            return sub.makeSubstitution(this, st2.unify(st1, sub));
+            return sub.makeSubstitution(this, st2.unify(st1, sub, uc));
         }
         else if (u instanceof GFeatVar) {
             GFeatVar var = (GFeatVar) u;
             if (var.occurs(this)) throw new UnifyFailure();
             SimpleType st1 = getType();
             SimpleType st2 = var.getType();
-            SimpleType st3 = (SimpleType) st2.unify(st1, sub);
+            SimpleType st3 = (SimpleType) st2.unify(st1, sub, uc);
             // substitute var with most specific type
             if (st3.equals(st2)) return sub.makeSubstitution(this, var);
             else if (st3.equals(st1)) return sub.makeSubstitution(var, this);
             else {
                 // need a new var with intersection type
-                GFeatVar var3 = new GFeatVar(grammar, _name, UnifyControl.getUniqueVarIndex(), st3);
+                GFeatVar var3 = new GFeatVar(grammar, _name, grammar.getUnifyControl().getUniqueVarIndex(), st3);
                 sub.makeSubstitution(var, var3);
                 return sub.makeSubstitution(this, var3);
             }

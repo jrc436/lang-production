@@ -18,12 +18,12 @@
 
 package synsem;
 
-import gnu.trove.TObjectIntHashMap;
 import grammar.Grammar;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.jdom.Element;
@@ -31,6 +31,8 @@ import org.jdom.Element;
 import unify.GUnifier;
 import unify.ModFcn;
 import unify.Substitution;
+import unify.Unifiable;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 import unify.Variable;
 
@@ -51,10 +53,7 @@ public final class SetArg implements Arg, Serializable {
 
 	@SuppressWarnings("unchecked")
 	public SetArg(Grammar grammar, Element el) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+		
 		this.grammar = grammar;
 		List<Element> info = el.getChildren();
 		List<Arg> args = new ArrayList<Arg>();
@@ -69,19 +68,13 @@ public final class SetArg implements Arg, Serializable {
 	}
 
 	public SetArg(Grammar grammar, Arg[] args) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+		
 		this.grammar = grammar;
 		_args = new ArgStack(grammar, args);
 	}
 
 	public SetArg(Grammar grammar, ArgStack args) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+		
 		_args = args;
 		this.grammar = grammar;
 	}
@@ -127,7 +120,7 @@ public final class SetArg implements Arg, Serializable {
 		for (int i = 0; i < _args.size() && index < 0; i++) {
 			try {
 				a.unifySlash(((BasicArg) _args.get(i)).getSlash());
-				GUnifier.unify(grammar, getCat(i), a.getCat());
+				GUnifier.unify(grammar.getUnifyControl(), getCat(i), a.getCat());
 				index = i;
 			} catch (UnifyFailure uf) {
 			}
@@ -144,7 +137,7 @@ public final class SetArg implements Arg, Serializable {
 		int index = -1;
 		for (int i = 0; i < _args.size() && index < 0; i++) {
 			try {
-				GUnifier.unify(grammar, getCat(i), cat);
+				GUnifier.unify(grammar.getUnifyControl(), getCat(i), cat);
 				index = i;
 			} catch (UnifyFailure uf) {
 			}
@@ -190,7 +183,7 @@ public final class SetArg implements Arg, Serializable {
 	}
 
 	// nb: direct unification not implemented ...
-	public Object unify(Object u, Substitution sub) throws UnifyFailure {
+	public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
 		throw new UnifyFailure();
 	}
 
@@ -237,7 +230,7 @@ public final class SetArg implements Arg, Serializable {
 	/**
 	 * Returns a hash code for this arg, using the given map from vars to ints.
 	 */
-	public int hashCode(TObjectIntHashMap varMap) {
+	public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) {
 		return _args.hashCode(varMap);
 	}
 
@@ -245,8 +238,7 @@ public final class SetArg implements Arg, Serializable {
 	 * Returns whether this arg equals the given object up to variable names,
 	 * using the given maps from vars to ints.
 	 */
-	public boolean equals(Object obj, TObjectIntHashMap varMap,
-			TObjectIntHashMap varMap2) {
+	public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
 		if (obj.getClass() != this.getClass()) {
 			return false;
 		}

@@ -19,6 +19,8 @@ package lexicon;
 
 import org.jdom.*;
 
+//TODO: Unnecessary class.
+
 /**
  * Data structure for storing information about a lexical entry.  Specifically
  * used by LMR grammars.

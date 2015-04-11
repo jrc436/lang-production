@@ -96,7 +96,7 @@ public class NominalVar extends HyloVar implements Nominal {
     }
     
     
-    public Object unify(Object u, Substitution sub) throws UnifyFailure {
+    public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
         // check for equality with u
         if (equals(u)) return this; 
         // make sure u is an LF
@@ -104,7 +104,7 @@ public class NominalVar extends HyloVar implements Nominal {
         // check type compatibility
         LF lf = (LF) u;
         if (lf.getType() == null) throw new UnifyFailure();
-        SimpleType st = (SimpleType) type.unify(lf.getType(), sub);
+        SimpleType st = (SimpleType) type.unify(lf.getType(), sub, uc);
         // with nominal atoms, go ahead and substitute
         if (u instanceof NominalAtom) return sub.makeSubstitution(this, u); 
         // with nominal vars, substitute according to type specificity then comparison order,  
@@ -122,7 +122,7 @@ public class NominalVar extends HyloVar implements Nominal {
             // otherwise make new nom var with intersection type, 
             // name based on comparison order and index, and new index
             String name = (super.compareTo(u_nv) >= 0) ? (u_nv._name + u_nv._index) : (_name + _index);
-            NominalVar nv_st = new NominalVar(grammar, name, UnifyControl.getUniqueVarIndex(), st);
+            NominalVar nv_st = new NominalVar(grammar, name, uc.getUniqueVarIndex(), st);
             // and subst both
             sub.makeSubstitution(u_nv, nv_st);
             return sub.makeSubstitution(this, nv_st); 
@@ -134,7 +134,7 @@ public class NominalVar extends HyloVar implements Nominal {
             if (type.equals(st)) return sub.makeSubstitution(u_hv, this); 
             // otherwise make new nom var with intersection type, 
             // same name, and new index
-            NominalVar nv_st = new NominalVar(grammar, this._name, UnifyControl.getUniqueVarIndex(), st);
+            NominalVar nv_st = new NominalVar(grammar, this._name, uc.getUniqueVarIndex(), st);
             // and subst both
             sub.makeSubstitution(u_hv, nv_st);
             return sub.makeSubstitution(this, nv_st); 

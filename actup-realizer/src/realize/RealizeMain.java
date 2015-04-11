@@ -20,10 +20,8 @@ package realize;
 
 import grammar.Grammar;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -40,6 +38,7 @@ import org.jdom.Element;
 import runconfig.IOSettings;
 import runconfig.RealizationSettings;
 import synsem.LF;
+import unify.UnifyControl;
 
 public class RealizeMain
 {
@@ -79,8 +78,7 @@ public class RealizeMain
     }
     private synchronized void loadGrammar(String grammarFile, RealizationSettings rs) throws IOException {  	
     	synchronized(iolock) {
-	    	URL grammarURL = new File(grammarFile).toURI().toURL();
-	    	this.grammar = new Grammar(grammarURL);
+	    	this.grammar = new Grammar(grammarFile, new UnifyControl());
 	        this.realizer = new Realizer(rs, this.grammar);
     	}
     }
@@ -90,13 +88,13 @@ public class RealizeMain
 	    	switch (s.getModelType()) {
 		    	case ACTR:
 		    		//if for whatever reason you think it's a good idea to change the order from the natural order, don't do that.
-					this.ngramScorer = new ACTRNgramModel(v.getDoubleArray(), order, modelFile, this.grammar.lexicon.tokenizer);
+					this.ngramScorer = new ACTRNgramModel(v.getDoubleArray(), order, modelFile, this.grammar);
 					break;
 		    	case Ngram:
-		    		this.ngramScorer = new StandardNgramModel(order, modelFile, this.grammar.lexicon.tokenizer);
+		    		this.ngramScorer = new StandardNgramModel(order, modelFile, this.grammar);
 		    		break;
 		    	case Random:
-		    		this.ngramScorer = new RandomModel(order, this.grammar.lexicon.tokenizer);
+		    		this.ngramScorer = new RandomModel(order, this.grammar);
 		    		break;
 		    	default:
 					break;

@@ -18,9 +18,9 @@
 
 package synsem;
 
-import gnu.trove.TObjectIntHashMap;
 import grammar.Grammar;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.jdom.Element;
@@ -29,6 +29,8 @@ import unify.FeatureStructure;
 import unify.GUnifier;
 import unify.ModFcn;
 import unify.Substitution;
+import unify.Unifiable;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 import unify.Variable;
 
@@ -229,15 +231,15 @@ public final class ComplexCat extends AbstractCat {
 	}
 
 	/** NB: The LF does not participate in unification. */
-	public Object unify(Object u, Substitution sub) throws UnifyFailure {
+	public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
 
 		if (u instanceof AtomCat && arity() == 1 & containsDollarArg()) {
 			sub.makeSubstitution((Dollar) _args.get(0), new ArgStack(grammar));
-			return GUnifier.unify(grammar, _target, (AtomCat) u, sub);
+			return GUnifier.unify(grammar.getUnifyControl(), _target, (AtomCat) u, sub);
 		} else if (u instanceof ComplexCat) {
 			ComplexCat cc = (ComplexCat) u;
 			ArgStack $args = _args.unify(cc._args, sub);
-			Category $target = GUnifier.unify(grammar, _target, cc._target, sub);
+			Category $target = GUnifier.unify(grammar.getUnifyControl(), _target, cc._target, sub);
 			if ($args.size() == 0) {
 				return $target;
 			} else {
@@ -275,9 +277,6 @@ public final class ComplexCat extends AbstractCat {
 	public String toString() {
 	    StringBuffer sb = new StringBuffer();
 	    sb.append(_target.toString()).append(_args.toString());
-	    if (_lf != null && grammar.showSem) {
-	    	sb.append(" : ").append(_lf.toString());
-	    }
 	    return sb.toString();
 	}
 
@@ -304,7 +303,7 @@ public final class ComplexCat extends AbstractCat {
 	 * Returns a hash code for this category ignoring the LF, using the given
 	 * map from vars to ints.
 	 */
-	public int hashCodeNoLF(TObjectIntHashMap varMap) {
+	public int hashCodeNoLF(LinkedHashMap<Unifiable, Integer> varMap) {
 		int retval = _target.hashCodeNoLF(varMap);
 		retval += _args.hashCode(varMap);
 		return retval;
@@ -314,8 +313,7 @@ public final class ComplexCat extends AbstractCat {
 	 * Returns whether this category equals the given object up to variable
 	 * names, using the given maps from vars to ints, ignoring the LFs (if any).
 	 */
-	public boolean equalsNoLF(Object obj, TObjectIntHashMap varMap,
-			TObjectIntHashMap varMap2) {
+	public boolean equalsNoLF(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
 		if (obj.getClass() != this.getClass()) {
 			return false;
 		}

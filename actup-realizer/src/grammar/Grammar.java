@@ -28,8 +28,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -49,6 +52,8 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import lexicon.DefaultTokenizer;
+import lexicon.FullWordFactory;
+import lexicon.IWordFactory;
 import lexicon.Lexicon;
 import lexicon.Tokenizer;
 
@@ -65,6 +70,8 @@ import org.xml.sax.XMLFilter;
 import org.xml.sax.XMLReader;
 
 import synsem.LF;
+import unify.UnifyControl;
+import util.Interner;
 
 /**
  * A CCG grammar is essentially a lexicon plus a rule group.
@@ -76,72 +83,82 @@ import synsem.LF;
  * @version $Revision: 1.45 $, $Date: 2010/12/06 02:39:35 $ 
  */
 public class Grammar {
-
-	//prefs
-	public boolean showFeats = false; 
-    //Whether to show semantic info (logical forms) 
-    public boolean showSem = false;
-    //Which features to show. 
-    public String featsToShow = "";
-		
-
-    public final Lexicon lexicon; 
-    public final RuleGroup rules;
-    public final Types types;
-    public final Set<String> supertagFeatures = new HashSet<String>(); //feats to include in supertags
+	 /** The boundary tones recognized as separate tokens for translation to APML. */
+    private static final String[] boundaryTones = { 
+        "L", "H", "LL%", "HH%", "LH%", "HL%"
+    };
+    /** The pitch accents recognized as underscored suffixes for translation to APML. */
+    private static final String[] pitchAccents = { 
+        "H*", "L*", "L+H*", "L*+H", "H*+L", "H+L*"
+    };
     
-    //I don't understand this.
+	//prefs
+	public static final boolean showFeats = false; 
+    //Whether to show semantic info (logical forms) 
+    public static final boolean showSem = false;
+    //Which features to show. 
+    public static final String featsToShow = "";
+		
+    protected final IWordFactory wordFactory;
+    protected final Interner<Object> internStore;
+    protected final Lexicon lexicon; 
+    private final UnifyControl unifyController;
+    protected final RuleGroup rules;
+    protected final Types types;
+    protected final Set<String> supertagFeatures = new HashSet<String>(); //feats to include in supertags
+    
+    public Types getTypes() {
+    	return this.types;
+    }
+    public Lexicon getLexicon() {
+    	return this.lexicon;
+    }
+    public RuleGroup getRules() {
+    	return this.rules;
+    }
+    public IWordFactory getWordFactory() {
+    	return wordFactory;
+    }
+    public Interner<Object> getIntern() {
+    	return internStore;
+    }
+    public Set<String> getSuperTagFeatures() {
+    	return supertagFeatures;
+    }
+    public UnifyControl getUnifyControl() {
+		return unifyController;
+	}
+    
     public final URL[] fromXmlTransforms; //xml to LF transforms   
     public final URL[] toXmlTransforms; //LFs to xml transforms
+    private Transformer transformer = null;
+    private Templates[] fromXmlTemplates = null;
+    private Templates[] toXmlTemplates = null;
+    private Transformer apmlTransformer = null;
     
     // name of the grammar
     private String grammarName = null;
 
     // XML factories
     private SAXParserFactory spf = null; 
-    private static SAXTransformerFactory stf = null; 
+    private SAXTransformerFactory stf = null;
     
-    // transformer for loading/saving LFs from/to XML
-    private Transformer transformer = null;
-    
-    // transformations for loading/saving LFs from/to XML
-    private Templates[] fromXmlTemplates = null;
-    private Templates[] toXmlTemplates = null;
-    
-    // transformer for saving strings to APML
-    private Transformer apmlTransformer = null;
-    
-    /** The pitch accents recognized as underscored suffixes for translation to APML. */
-    public static final String[] pitchAccents = { 
-        "H*", "L*", "L+H*", "L*+H", "H*+L", "H+L*"
-    };
-
-    // set of pitch accents
-    private static Set<String> pitchAccentsSet = null;    
-    
-    /** The boundary tones recognized as separate tokens for translation to APML. */
-    public static final String[] boundaryTones = { 
-        "L", "H", "LL%", "HH%", "LH%", "HL%"
-    };
-    
-    // set of boundary tones
-    private static Set<String> boundaryTonesSet = null;    
+    private static final Set<String> pitchAccentsSet = new LinkedHashSet<String>(Arrays.asList(pitchAccents));    
+    private static final Set<String> boundaryTonesSet = new LinkedHashSet<String>(Arrays.asList(boundaryTones));    
 
     
-    /** Loads a grammar from the given filename. */
-    public Grammar(String filename) throws IOException {
-        this(new File(filename).toURI().toURL());
+    /** Loads a grammar from the given filename. 
+     * @param uc TODO*/
+    public Grammar(String filename, UnifyControl uc) throws IOException {
+        this(new File(filename).toURI().toURL(), uc, false);
     }
     
-    /** Loads a grammar from the given URL. */
-	public Grammar(URL url) throws IOException {
-    	this(url, false);
-    }
-    
-    /** Loads a grammar from the given URL, with the given flag for whether to ignore rule combos. */
-    @SuppressWarnings("unchecked")
-	public Grammar(URL url, boolean ignoreCombos) throws IOException {
-        // read XML
+    /** Loads a grammar from the given URL, with the given flag for whether to ignore rule combos. **/
+	public Grammar(URL url, UnifyControl uc, boolean ignoreCombos) throws IOException {
+    	this.unifyController = uc;
+    	this.internStore = new Interner<Object>();
+    	this.wordFactory = new FullWordFactory(internStore);
+    	
         SAXBuilder builder = new SAXBuilder();
         Document doc;
         try {
@@ -149,11 +166,63 @@ public class Grammar {
         } catch (JDOMException jde) {
             throw (IOException) new IOException().initCause(jde);
         }
+        
         Element root = doc.getRootElement();	// root corresponds to <grammar>
+        this.addSuperTagFeatures(root.getChild("supertags"));
         grammarName = root.getAttributeValue("name");
-		
-        Element supertagsElt = root.getChild("supertags");
-        if (supertagsElt != null) {
+        this.types = initTypes(root.getChild("types"), url);
+       
+        this.fromXmlTransforms = initFromXML(root.getChild("LF-from-XML"), url);
+        this.toXmlTransforms = initToXML(root.getChild("LF-to-XML"), url);
+        
+        Element lexElt = root.getChild("lexicon");
+        this.lexicon = this.setLexicon(lexElt, initTokenizer(root.getChild("tokenizer")));
+        this.initLexicon(url, root.getChild("lexicon"), root.getChild("morphology"));        
+        
+        this.rules = initRules(root.getChild("rules"), url, ignoreCombos);                
+    }
+	private RuleGroup initRules(Element rulesElt, URL url, boolean ignoreCombos) {
+        RuleGroup rules = null;
+		try {
+        	URL rulesUrl = new URL(url, rulesElt.getAttributeValue("file"));
+			rules = new RuleGroup(rulesUrl, this);
+			if (!ignoreCombos) {
+		        String combosfile = rulesElt.getAttributeValue("combosfile");
+		        if (combosfile != null) {
+		        	URL combosUrl = new URL(url, combosfile);
+		        	rules.loadSupercatRuleCombos(combosUrl);
+		        }
+		        // set dynamic combos: defaults to true with a combosfile, otherwise defaults to false
+		        boolean dynamic = (combosfile != null);
+		        String dynamicCombos = rulesElt.getAttributeValue("dynamic-combos");
+		        if (dynamicCombos != null) dynamic = Boolean.parseBoolean(dynamicCombos);
+		        rules.setDynamicCombos(dynamic);
+	        }
+		} 
+		catch (IOException e) {
+			e.printStackTrace();
+			System.exit(1);
+		}
+		return rules;
+       
+	}
+	private Types initTypes(Element typesElt, URL url) {
+		URL typesUrl = null;
+		Types types = null;
+        if (typesElt != null) {
+            try {
+				typesUrl = new URL(url, typesElt.getAttributeValue("file"));
+			} 
+            catch (MalformedURLException e) {
+				e.printStackTrace();
+				System.exit(1);
+			}
+        }
+        types = typesUrl != null ? new Types(typesUrl, this) : new Types(this);
+        return types;
+	}
+	private void addSuperTagFeatures(Element supertagsElt) {
+		if (supertagsElt != null) {
             String feats = supertagsElt.getAttributeValue("feats");
             if (feats != null) {
                 String[] names = feats.split("\\s+");
@@ -166,73 +235,73 @@ public class Grammar {
             // default is "form" and "lex"
             supertagFeatures.add("form"); supertagFeatures.add("lex"); 
         }
-        
-        Tokenizer tokenizer = initTokenizer(root.getChild("tokenizer"));       
-        
-        Element typesElt = root.getChild("types");
-        URL typesUrl;
-        if (typesElt != null) {
-            typesUrl = new URL(url, typesElt.getAttributeValue("file"));
-        }
-        else {
-        	typesUrl = null;
-        }
-        Element lexiconElt = root.getChild("lexicon");
-        boolean openlex = "true".equals(lexiconElt.getAttributeValue("openlex"));
-        URL lexiconUrl = new URL(url, lexiconElt.getAttributeValue("file")); 
-        Element morphElt = root.getChild("morphology");
-        URL morphUrl = new URL(url, morphElt.getAttributeValue("file"));
-        Element rulesElt = root.getChild("rules");
-        URL rulesUrl = new URL(url, rulesElt.getAttributeValue("file"));
-        Element fromXmlElt = root.getChild("LF-from-XML");
-        if (fromXmlElt != null) {
+	}
+    @SuppressWarnings("unchecked")
+	private URL[] initFromXML(Element fromXmlElt, URL url) {
+        URL[] fromXmlTransforms = null;
+    	if (fromXmlElt != null) {
             List<Element> children = fromXmlElt.getChildren();
             fromXmlTransforms = new URL[children.size()];
             for (int i = 0; i < children.size(); i++) {
                 Element transformElt = (Element) children.get(i);
-                fromXmlTransforms[i] = new URL(url, transformElt.getAttributeValue("file"));
+                try {
+					fromXmlTransforms[i] = new URL(url, transformElt.getAttributeValue("file"));
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
             }
-        } else {
+        }
+    	else {
             fromXmlTransforms = new URL[0];
         }
-        Element toXmlElt = root.getChild("LF-to-XML");
+    	return fromXmlTransforms;
+    }
+    @SuppressWarnings("unchecked")
+	private URL[] initToXML(Element toXmlElt, URL url) {
+        URL[] toXmlTransforms = null;
         if (toXmlElt != null) {
             List<Element> children = toXmlElt.getChildren();
             toXmlTransforms = new URL[children.size()];
             for (int i = 0; i < children.size(); i++) {
                 Element transformElt = (Element) children.get(i);
-                toXmlTransforms[i] = new URL(url, transformElt.getAttributeValue("file"));
+                try {
+					toXmlTransforms[i] = new URL(url, transformElt.getAttributeValue("file"));
+				} 
+                catch (MalformedURLException e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
             }
-        } else {
+        } 
+        else {
             toXmlTransforms = new URL[0];
         }
-        
-        // load type hierarchy, lexicon and rules
-        if (typesUrl != null) {
-        	types = new Types(typesUrl, this);
-        }
-        else types = new Types(this);
-    	lexicon = new Lexicon(this, tokenizer);
-        
-        lexicon.openlex = openlex;
-        
-        
-        lexicon.init(lexiconUrl, morphUrl); 
-        rules = new RuleGroup(rulesUrl, this);
-        
-        // add observed supertag-rule combos for filtering, if any, unless ignoring combos
-        if (!ignoreCombos) {
-	        String combosfile = rulesElt.getAttributeValue("combosfile");
-	        if (combosfile != null) {
-	        	URL combosUrl = new URL(url, combosfile);
-	        	rules.loadSupercatRuleCombos(combosUrl);
-	        }
-	        // set dynamic combos: defaults to true with a combosfile, otherwise defaults to false
-	        boolean dynamic = (combosfile != null);
-	        String dynamicCombos = rulesElt.getAttributeValue("dynamic-combos");
-	        if (dynamicCombos != null) dynamic = Boolean.parseBoolean(dynamicCombos);
-	        rules.setDynamicCombos(dynamic);
-        }
+        return toXmlTransforms;
+    }
+    private Lexicon setLexicon(Element lexiconElt, Tokenizer token) {
+    	 boolean openlex = "true".equals(lexiconElt.getAttributeValue("openlex"));  	
+        return new Lexicon(this, token, openlex);
+    }
+    private void initLexicon(URL url, Element lexiconElt, Element morphElt) {
+    	 URL lexiconUrl = null;
+    	 URL morphUrl = null;
+         try {
+			lexiconUrl = new URL(url, lexiconElt.getAttributeValue("file"));
+			morphUrl = new URL(url, morphElt.getAttributeValue("file"));
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+			System.err.println("Error loading lexicon or morphology!!");
+			System.exit(1);
+		} 
+         try {
+ 			this.lexicon.init(lexiconUrl, morphUrl);
+ 		} 
+         catch (IOException e) {
+ 			e.printStackTrace();
+ 			System.err.println("Error inititializing lexicon!!");
+ 			System.exit(1);
+ 		}
     }
     private Tokenizer initTokenizer(Element tokenizerElt) {
     	Tokenizer tokenizer = null;
@@ -499,12 +568,6 @@ public class Grammar {
      * Returns whether the given string is a recognized pitch accent.
      */
     public static boolean isPitchAccent(String s) {
-        if (pitchAccentsSet == null) {
-            pitchAccentsSet = new HashSet<String>();
-            for (int i = 0; i < pitchAccents.length; i++) {
-                pitchAccentsSet.add(pitchAccents[i]);
-            }
-        }
         return pitchAccentsSet.contains(s);
     }
     
@@ -512,12 +575,6 @@ public class Grammar {
      * Returns whether the given string is a recognized boundary tone. 
      */
     public static boolean isBoundaryTone(String s) {
-        if (boundaryTonesSet == null) {
-            boundaryTonesSet = new HashSet<String>();
-            for (int i = 0; i < boundaryTones.length; i++) {
-                boundaryTonesSet.add(boundaryTones[i]);
-            }
-        }
         return boundaryTonesSet.contains(s);
     }
 
@@ -527,5 +584,6 @@ public class Grammar {
 	public final String getName() {
 		return grammarName;
 	}
+	
 }
 

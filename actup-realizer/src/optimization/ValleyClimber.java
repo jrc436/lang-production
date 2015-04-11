@@ -79,7 +79,7 @@ public class ValleyClimber implements Optimizer {
 			currentScore = performRun(iterName, opt, r, fw);
 
 			//making strictly less will let it terminate a bit faster, but will explore less values
-			boolean goodStep = currentScore <= lastScore;
+			boolean goodStep = currentScore < lastScore;
 			if (goodStep) { opt.acknowledgeImprovement(); }
 			boolean stillMoving = opt.step(goodStep); //this checks if the variable itself is still improving
 			if (!opt.updateIndex(stillMoving)) {

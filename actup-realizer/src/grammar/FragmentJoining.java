@@ -34,10 +34,11 @@ public class FragmentJoining extends AbstractRule {
 
 	private static final long serialVersionUID = 7451163798607652012L;
 
-	/** Constructor. */
-	public FragmentJoining(Grammar grammar) { 
-		super(grammar);
-		_name = "*"; 
+	/** Constructor. 
+	 * @param rg TODO*/
+	public FragmentJoining(Grammar rg) { 
+		super(rg);
+		name = "*"; 
 	}
 	
 	/**
@@ -57,7 +58,7 @@ public class FragmentJoining extends AbstractRule {
     public List<Category> applyRule(Category[] inputs) throws UnifyFailure {
 		if (inputs.length != 2) { throw new UnifyFailure(); }
 		List<Category> results = new ArrayList<Category>(1);
-        _headCats.clear();
+        headCats.clear();
 		Category result = inputs[0].shallowCopy();
 		try {
 			appendLFs(inputs[0], inputs[1], result, new EmptySubstitution());
@@ -68,7 +69,7 @@ public class FragmentJoining extends AbstractRule {
 			// System.err.println("cat1: " + inputs[1] + " lf: " + inputs[1].getLF());
 		}
 		results.add(result);
-		_headCats.add(inputs[0]);
+		headCats.add(inputs[0]);
 		return results;
     }
 

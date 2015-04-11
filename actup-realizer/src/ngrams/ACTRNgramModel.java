@@ -1,11 +1,12 @@
 package ngrams;
 
+import grammar.Grammar;
+
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-import lexicon.Tokenizer;
 import lexicon.Word;
 import synsem.Sign;
 
@@ -36,8 +37,8 @@ public class ACTRNgramModel extends StandardNgramModel {
 	//the most recent timestamp is always stored at 0, the least recent at k
 	private Presentations nGramPresentations;
 	
-	public ACTRNgramModel(double[] varValues, int order, String modelFile, Tokenizer tokenizer) throws IOException {
-		super(order, modelFile, varValues, tokenizer);
+	public ACTRNgramModel(double[] varValues, int order, String modelFile, Grammar grammar) throws IOException {
+		super(order, modelFile, varValues, grammar);
 		this.priorExposureTime = year_seconds * params[ey_index];
 		nGramPresentations = new Presentations((int) Math.round(params[k_index]));
 	}

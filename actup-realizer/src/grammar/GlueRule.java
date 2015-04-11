@@ -18,10 +18,17 @@
 
 package grammar;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import synsem.*;
-import unify.*;
+import synsem.Arg;
+import synsem.AtomCat;
+import synsem.BasicArg;
+import synsem.Category;
+import synsem.ComplexCat;
+import unify.SimpleSubstitution;
+import unify.Substitution;
+import unify.UnifyFailure;
 
 /**
  * Implements a glue rule for combining a sequence of fragments.
@@ -37,15 +44,15 @@ public class GlueRule extends AbstractRule {
 	private static final long serialVersionUID = 4867141181941895272L;
 
 	// empty subst for combining LFs
-	private static final Substitution emptySubst = new SimpleSubstitution();
+	private final Substitution emptySubst = new SimpleSubstitution();
 	
 	/** Fragment result type. */
-	public static final String resultType = "frag";
+	public final String resultType = "frag";
 	
 	/** Constructor. */
-	public GlueRule(Grammar grammar) {
-		super(grammar);
-		_name = "glue"; 
+	public GlueRule(Grammar rg) {
+		super(rg);
+		name = "glue"; 
 	}
 	
 	/** Arity. */
@@ -65,7 +72,7 @@ public class GlueRule extends AbstractRule {
 		}
 		// make result cat
         List<Category> results = new ArrayList<Category>(1);
-        _headCats.clear();
+        headCats.clear();
         AtomCat ac = new AtomCat(grammar, resultType);
         appendLFs(inputs[0], inputs[1], ac, emptySubst);
         results.add(ac);
@@ -79,7 +86,7 @@ public class GlueRule extends AbstractRule {
         	leftHead = false;
         }
 		// return result cat with guessed head
-        _headCats.add(leftHead ? inputs[0] : inputs[1]);
+        headCats.add(leftHead ? inputs[0] : inputs[1]);
 		return results;
 	}
 	

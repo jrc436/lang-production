@@ -33,19 +33,19 @@ public class BackwardComposition extends AbstractCompositionRule {
 
 	private static final long serialVersionUID = -937944882697380690L;
 
-	public BackwardComposition(Grammar grammar) {
-		this(grammar, true);
+	public BackwardComposition(Grammar rg) {
+		this(rg, true);
 	}
 
-	public BackwardComposition(Grammar grammar, boolean isHarmonic) {
-		super(grammar);
+	public BackwardComposition(Grammar rg, boolean isHarmonic) {
+		super(rg);
 		_isHarmonic = isHarmonic;
 		if (isHarmonic) {
-			_name = "<B";
+			name = "<B";
 			_functorSlash = new Slash(grammar, '\\', "^");
 			_argSlash = new Slash(grammar, '\\', "^");
 		} else {
-			_name = "<Bx";
+			name = "<Bx";
 			_functorSlash = new Slash(grammar, '\\', "x");
 			_argSlash = new Slash(grammar, '/', "x");
 		}

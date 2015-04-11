@@ -34,17 +34,27 @@ public class FactorKey {
 
     /** The value. */
     public final String val;
+    
 
     /** Constructor.  Assumes interned components. */
-    private FactorKey(String factor, String val) { this.factor = factor; this.val = val; }
+    private FactorKey(String factor, String val) { 
+    	this.factor = factor; 
+    	this.val = val;
+    }
 
     /** Makes/retrieves an interned factor key for the given interned attr and val; 
         for the word form, the string itself is returned. 
         Null vals are replaced with &lt;NULL&gt;. */
-    public static Object getKey(String attr, String val) {
-        if (val == null) val = "<NULL>";
-        if (attr == Tokenizer.WORD_ATTR) return val;
-        else return Interner.globalIntern(new FactorKey(attr, val));
+    public static Object getKey(Interner<Object> intern, String attr, String val) {
+        if (val == null) {
+        	val = "<NULL>";
+        }
+        if (attr == Tokenizer.WORD_ATTR) {
+        	return val;
+        }
+        else{
+        	return intern.intern(new FactorKey(attr, val));
+        }
     }
 
     /** Returns a hash code constructed from the component identity hash codes. */

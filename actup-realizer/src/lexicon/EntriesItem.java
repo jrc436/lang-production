@@ -43,10 +43,7 @@ public class EntriesItem {
     private Category cat;
 
     public EntriesItem(Grammar grammar, Element el, Family family) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         this.family = family;
         name = el.getAttributeValue("name");
 

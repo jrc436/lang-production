@@ -19,19 +19,21 @@
 
 package synsem;
 
-import gnu.trove.TObjectIntHashMap;
 import grammar.Grammar;
 import hylo.HyloHelper;
 import hylo.Nominal;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 
 import org.jdom.Element;
 
 import unify.FeatureStructure;
 import unify.ModFcn;
 import unify.Substitution;
+import unify.Unifiable;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 import unify.Variable;
 
@@ -61,7 +63,7 @@ public abstract class AbstractCat implements Category, Serializable {
     private transient int _hashCodeNoLF = -1;
     
     /** The mapping from vars to ints, if already computed. */
-    private transient TObjectIntHashMap _varMap = null;
+    private LinkedHashMap<Unifiable, Integer> _varMap = null;
 
     /** The supertag, if already computed. */
     protected String _supertag = null;
@@ -70,10 +72,7 @@ public abstract class AbstractCat implements Category, Serializable {
 
     /** Constructor which sets the LF. */
     public AbstractCat(Grammar grammar, LF lf) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
     	_lf = lf; 
     	this.grammar = grammar;
     }
@@ -84,10 +83,7 @@ public abstract class AbstractCat implements Category, Serializable {
      * (or a single one). 
      */
     public AbstractCat(Grammar grammar, Element elt) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         Element lfElt = elt.getChild("lf");
         this.grammar = grammar;
         if (lfElt != null) {
@@ -147,7 +143,7 @@ public abstract class AbstractCat implements Category, Serializable {
     public abstract Object fill (Substitution s) throws UnifyFailure;
     public abstract void unifyCheck (Object u) throws UnifyFailure;
     /** NB: The LF does not participate in unification. */
-    public abstract Object unify (Object u, Substitution sub) 
+    public abstract Object unify (Object u, Substitution sub, UnifyControl uc) 
         throws UnifyFailure;
 
     /**
@@ -204,7 +200,7 @@ public abstract class AbstractCat implements Category, Serializable {
     	// NB: caching of the hash code has been turned off to avoid problems with stale values;
     	//     in principle, a check for staleness could be added
         //if (_varMap != null && _hashCode != -1) { return _hashCode; }
-        _varMap = new TObjectIntHashMap();
+        _varMap = new LinkedHashMap<Unifiable, Integer>();
         _hashCodeNoLF = hashCodeNoLF(_varMap);
         _hashCode = _hashCodeNoLF;
         if (_lf != null) { _hashCode += _lf.hashCode(_varMap); }
@@ -221,7 +217,7 @@ public abstract class AbstractCat implements Category, Serializable {
     	// NB: caching of the hash code has been turned off to avoid problems with stale values;
     	//     in principle, a check for staleness could be added
         //if (_varMap != null && _hashCodeNoLF != -1) { return _hashCodeNoLF; }
-        _varMap = new TObjectIntHashMap();
+        _varMap = new LinkedHashMap<Unifiable, Integer>();
         _hashCodeNoLF = hashCodeNoLF(_varMap);
         return _hashCodeNoLF;
     }
@@ -231,7 +227,7 @@ public abstract class AbstractCat implements Category, Serializable {
      * using the given map from vars to ints, 
      * to allow for equivalence up to variable names.
      */
-    public abstract int hashCodeNoLF(TObjectIntHashMap varMap);
+    public abstract int hashCodeNoLF(LinkedHashMap<Unifiable, Integer> varMap);
 
     /** 
      * Returns whether this category equals the given object. 
@@ -282,7 +278,7 @@ public abstract class AbstractCat implements Category, Serializable {
      * up to variable names, using the given maps from vars to ints, 
      * ignoring the LFs (if any).
      */
-    public abstract boolean equalsNoLF(Object obj, TObjectIntHashMap varMap, TObjectIntHashMap varMap2);
+    public abstract boolean equalsNoLF(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2);
 
 
     /**

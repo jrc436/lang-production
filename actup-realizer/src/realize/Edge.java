@@ -100,8 +100,7 @@ public class Edge extends Tracker
     /** Returns whether this edge has completeness 1.0, ie, covers all the input preds. */
     public boolean complete() {
         return completeness == 1.0;
-    }
-    
+    }  
 
     /**
      * Returns true iff this edge can combine with the given tracker 
@@ -115,6 +114,15 @@ public class Edge extends Tracker
         return incompleteLfChunk == null || tracker.bitset.isEmpty() || incompleteLfChunk.intersects(tracker.bitset);
     }
     
+    public EdgeSemantics getSemantics() {
+    	return new EdgeSemantics(this.bitset, this.sign);
+    }
+    public EdgeSurfaceWords getSW() {
+    	return new EdgeSurfaceWords(this.bitset, this.indices, this.sign);
+    }
+    public int getDerivationComplexity() {
+    	return sign.getDerivationHistory().complexity();
+    }
 
     /** Returns whether this edge is a representative. */
     public boolean isRepresentative() { 
@@ -158,15 +166,7 @@ public class Edge extends Tracker
         int retval = sign.hashCode() + 31 * bitset.hashCode() + indices.hashCode();
         retval += (int) (31000 * score);
         return retval;
-    }
-    
-    /** 
-     * Returns a hash code for this edge based on the surface words, 
-     * ignoring the LF and ignoring the score. 
-     */
-    public int surfaceWordHashCode() {
-    	return sign.surfaceWordHashCode(true) + 31 * bitset.hashCode() + indices.hashCode();
-    }
+    } 
     
     /** Returns whether this edge equals the given object. (Alternatives are not considered.) */
     public boolean equals(Object obj) {
@@ -177,20 +177,7 @@ public class Edge extends Tracker
         	completeness == edge.completeness && score == edge.score &&
         	sign.equals(edge.sign);
     }
-    
-    /** 
-     * Returns whether this edge equals the given object based on the surface words, 
-     * ignoring the LF and ignoring the score. 
-     */
-    public boolean surfaceWordEquals(Object obj) {
-        if (obj == this) return true;
-        if (!(obj instanceof Edge)) return false;
-        Edge edge = (Edge) obj;
-        return bitset.equals(edge.bitset) && indices.equals(edge.indices) &&
-               sign.surfaceWordEquals(edge.sign, true);
-    }
-    
-    
+  
     /**
      * Returns a string for the edge in the format
      * {completeness} [score] orthography :- category {bitset}. 

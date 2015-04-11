@@ -18,12 +18,24 @@
 
 package grammar;
 
-import unify.*;
-import synsem.*;
-import hylo.*;
+import hylo.HyloHelper;
 
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import synsem.AtomCat;
+import synsem.Category;
+import synsem.CategoryFcn;
+import synsem.CategoryFcnAdapter;
+import synsem.ComplexCat;
+import synsem.LF;
+import synsem.Sign;
+import unify.FeatureStructure;
+import unify.GFeatStruc;
+import unify.Substitution;
+import unify.UnifyFailure;
+import unify.Variable;
 
 /**
  * Implements some default behavior for Rule objects.
@@ -37,22 +49,19 @@ public abstract class AbstractRule implements Rule, Serializable {
 	private static final long serialVersionUID = 1L;
 
 	/** The interned name of this rule. */
-    protected String _name;
+    protected String name;
     
     /** The rule group which contains this rule. */
-    protected RuleGroup _ruleGroup;
+    protected final Grammar grammar;
+    protected RuleGroup ruleGroup;
+    
+    protected AbstractRule(Grammar rg) {
+    	this.grammar = rg;
+    }
     
     /** Reusable list of head cats, one for each result. */
-    protected List<Category> _headCats = new ArrayList<Category>();
+    protected List<Category> headCats = new ArrayList<Category>();
     
-    protected final Grammar grammar;
-    public AbstractRule(Grammar grammar) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
-    	this.grammar = grammar;
-    }
 
     /** Applies the rule to the given input signs, adding to the given list of results. */
     public void applyRule(Sign[] inputs, List<Sign> results) {
@@ -73,10 +82,10 @@ public abstract class AbstractRule implements Rule, Serializable {
             for (int i=0; i < resultCats.size(); i++) {
             	Category catResult = resultCats.get(i);
                 distributeTargetFeatures(catResult);
-                Category headCat = _headCats.get(i);
+                Category headCat = headCats.get(i);
                 Sign lexHead = inputs[0].getLexHead();
                 for (int j=0; j < inputs.length; j++) {
-                	if (inputs[j].getCategory() == headCat) lexHead = inputs[j].getLexHead();
+                	if (inputs[j].getCategory().equals(headCat)) lexHead = inputs[j].getLexHead();
                 }
                 Sign sign = Sign.createDerivedSign(grammar, catResult, inputs, this, lexHead);
                 results.add(sign);
@@ -84,12 +93,8 @@ public abstract class AbstractRule implements Rule, Serializable {
         } catch (UnifyFailure uf) {}
     }
     
-    /** Propagates distributive features from target cat to the rest. */
-    // nb: it would be nicer to combine inheritsFrom with $, but 
-    //     this would be complicated, as inheritsFrom is compiled out
     protected void distributeTargetFeatures(Category cat) {
-    	if (_ruleGroup == null) return;
-        if (_ruleGroup.grammar.lexicon.getDistributiveAttrs() == null) return;
+        if (grammar.lexicon.getDistributiveAttrs() == null) return;
         if (!(cat instanceof ComplexCat)) return;
         ComplexCat complexCat = (ComplexCat) cat;
         Category targetCat = (Category) complexCat.getTarget();
@@ -110,12 +115,12 @@ public abstract class AbstractRule implements Rule, Serializable {
             if (!(c instanceof AtomCat)) return;
             FeatureStructure fs = c.getFeatureStructure();
             if (fs == null) return;
-            if (fs == targetFS) return;
-            String[] distrAttrs = _ruleGroup.grammar.lexicon.getDistributiveAttrs();
+            if (fs.equals(targetFS)) return;
+            String[] distrAttrs = grammar.lexicon.getDistributiveAttrs();
             for (int i = 0; i < distrAttrs.length; i++) {
                 Object targetVal = targetFS.getValue(distrAttrs[i]);
                 if (targetVal != null && !(targetVal instanceof Variable)) {
-                    fs.setFeature(distrAttrs[i], UnifyControl.copy(targetVal));
+                    fs.setFeature(distrAttrs[i], grammar.getUnifyControl().copy(targetVal));
                 }
             }
         }
@@ -144,7 +149,7 @@ public abstract class AbstractRule implements Rule, Serializable {
     /** Prints an apply instance for the given categories to System.out. */
     protected void showApplyInstance(Category[] inputs) {
         StringBuffer sb = new StringBuffer();  
-        sb.append(_name).append(": ");
+        sb.append(name).append(": ");
         
         for (int i=0; i < inputs.length; i++) {
             sb.append(inputs[i]).append(' ');
@@ -164,18 +169,20 @@ public abstract class AbstractRule implements Rule, Serializable {
      * Returns the interned name of this rule.
      */
     public String name() {
-        return _name;
+        return name;
     }
     
     /**
      * Returns the rule group which contains this rule.
      */
-    public RuleGroup getRuleGroup() { return _ruleGroup; }
+    public RuleGroup getRuleGroup() { return ruleGroup; }
     
     /**
      * Sets this rule's rule group.
      */
-    public void setRuleGroup(RuleGroup ruleGroup) { _ruleGroup = ruleGroup; }
+    public void setRuleGroup(RuleGroup ruleGroup) { 
+    	this.ruleGroup = ruleGroup; 
+    }
 
     
     /** Appends, fills, sorts and checks the LFs from cats 1 and 2 into the result cat. */

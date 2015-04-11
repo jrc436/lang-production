@@ -18,6 +18,8 @@
 
 package ngrams;
 
+import grammar.Grammar;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -26,7 +28,6 @@ import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.List;
 
-import lexicon.Tokenizer;
 import util.TrieMap;
 
 /**
@@ -44,9 +45,9 @@ public class StandardNgramModel extends AbstractStandardNgramModel
      * the given reader, with the given flag controlling whether words are
      * replaced by their semantic classes.
      */
-    public StandardNgramModel(int order, Reader in, boolean useSemClasses, double[] varValues, Tokenizer tokenizer)
+    public StandardNgramModel(int order, Reader in, boolean useSemClasses, double[] varValues, Grammar grammar)
     		throws IOException {
-        super(order, useSemClasses, tokenizer, varValues);
+        super(order, useSemClasses, grammar, varValues);
         this.numNgrams = new int[order];
         readModel(in);
     }
@@ -55,8 +56,8 @@ public class StandardNgramModel extends AbstractStandardNgramModel
      * Loads an n-gram model of the given order in ARPA (Doug Paul) format from
      * the given reader. Words are not replaced by their semantic classes.
      */
-	public StandardNgramModel(int order, Reader in, double[] varValues, Tokenizer tokenizer) throws IOException {
-		this(order, in, false, varValues, tokenizer);
+	public StandardNgramModel(int order, Reader in, double[] varValues, Grammar grammar) throws IOException {
+		this(order, in, false, varValues, grammar);
 	}
 
 	/** 
@@ -64,24 +65,24 @@ public class StandardNgramModel extends AbstractStandardNgramModel
      * the given file, with the given flag controlling whether words are
      * replaced by their semantic classes.
      */
-	public StandardNgramModel(int order, String filename, boolean useSemClasses, double[] varValues, Tokenizer tokenizer)
+	public StandardNgramModel(int order, String filename, boolean useSemClasses, double[] varValues, Grammar grammar)
 			throws IOException {
 		this(order, new BufferedReader(new FileReader(filename)),
-        		useSemClasses, varValues, tokenizer);
+        		useSemClasses, varValues, grammar);
 	}
-	public StandardNgramModel(int order, String filename, double[] varValues, Tokenizer tokenizer) throws IOException {
-		this(order, filename, false, varValues, tokenizer); 
+	public StandardNgramModel(int order, String filename, double[] varValues, Grammar grammar) throws IOException {
+		this(order, filename, false, varValues, grammar); 
 	}
-	public StandardNgramModel(int order, String filename, boolean useSemClasses, Tokenizer tokenizer) throws IOException {
-		this(order, filename, useSemClasses, new double[0], tokenizer); 
+	public StandardNgramModel(int order, String filename, boolean useSemClasses, Grammar grammar) throws IOException {
+		this(order, filename, useSemClasses, new double[0], grammar); 
 	}
 
 	/** 
      * Loads an n-gram model of the given order in ARPA (Doug Paul) format from
      * the given file. Words are not replaced by their semantic classes.
      */
-	public StandardNgramModel(int order, String filename, Tokenizer tokenizer) throws IOException {
-		this(order, filename, false, new double[0], tokenizer); 
+	public StandardNgramModel(int order, String filename, Grammar grammar) throws IOException {
+		this(order, filename, false, new double[0], grammar); 
 	}
 	
 	// reads in model

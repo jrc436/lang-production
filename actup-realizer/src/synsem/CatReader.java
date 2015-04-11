@@ -33,10 +33,7 @@ import org.jdom.Element;
 public class CatReader {
     
     public static Category getCat(Grammar grammar, Element catel) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         Category cat = null;
         String catType = catel.getName();
         

@@ -18,8 +18,8 @@
 
 package synsem;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TObjectIntHashMap;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import org.jdom.Element;
 
@@ -45,12 +45,12 @@ public interface LF extends Unifiable, Mutable {
      * The chunks are numbered starting with 0, 
      * and null represents no chunks.
      */
-    public void setChunks(TIntArrayList chunks);
+    public void setChunks(ArrayList<Integer> chunks);
     
     /**
      * Gets the LF chunks to which this LF belongs.
      */
-    public TIntArrayList getChunks();
+    public ArrayList<Integer> getChunks();
     
 
     /** Returns the simple type of this LF, or null if none. */
@@ -66,13 +66,13 @@ public interface LF extends Unifiable, Mutable {
     /**
      * Returns a hash code using the given map from vars to ints.
      */
-    public int hashCode(TObjectIntHashMap varMap);
+    public int hashCode(LinkedHashMap<Unifiable, Integer> varMap);
 
     /**
      * Returns whether this LF equals the given object  
      * up to variable names, using the given maps from vars to ints.
      */
-    public boolean equals(Object obj, TObjectIntHashMap varMap, TObjectIntHashMap varMap2);
+    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2);
     
     /**
      * Returns an XML representation of this LF.

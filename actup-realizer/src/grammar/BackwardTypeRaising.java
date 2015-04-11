@@ -31,9 +31,10 @@ public class BackwardTypeRaising extends AbstractTypeRaisingRule {
 
 	private static final long serialVersionUID = 4334502669369098203L;
 
-	/** Creates a backward type raising rule with the given parameters. */
-    public BackwardTypeRaising(Grammar grammar, boolean useDollar, Category arg, Category result) {
-        super(grammar, "<T", new Slash(grammar, '\\', new VarModality(grammar, "i")), new Slash(grammar, '/', new VarModality(grammar, "i")), useDollar, arg, result);
+	/** Creates a backward type raising rule with the given parameters. 
+	 * @param rg TODO*/
+    public BackwardTypeRaising(Grammar rg, boolean useDollar, Category arg, Category result) {
+        super(rg, "<T", new Slash(rg, '\\', new VarModality(rg, "i")), new Slash(rg, '/', new VarModality(rg, "i")), useDollar, arg, result);
     }
     
     public String toString() {

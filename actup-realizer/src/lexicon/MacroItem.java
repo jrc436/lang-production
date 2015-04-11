@@ -45,10 +45,7 @@ public class MacroItem {
 
     @SuppressWarnings("unchecked")
 	public MacroItem (Grammar grammar, Element e) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         name = e.getAttributeValue("name");
         if (name == null) { name = e.getAttributeValue("n"); }
         List<Element> fsEls = e.getChildren("fs");

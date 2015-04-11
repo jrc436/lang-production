@@ -18,18 +18,19 @@
 
 package synsem;
 
-import gnu.trove.TObjectIntHashMap;
 import grammar.Grammar;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.jdom.Element;
 
 import unify.ModFcn;
 import unify.Substitution;
+import unify.Unifiable;
 import unify.UnifyFailure;
 import unify.Variable;
 
@@ -51,19 +52,13 @@ public class ArgStack implements Serializable {
 	protected boolean _hasSet = false;
 
 	public ArgStack(Grammar grammar) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+		
 		this.grammar = grammar;
 		_list = new Arg[0];
 	}
 
 	public ArgStack(Grammar grammar, Arg c) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+		
 		this.grammar = grammar;
 		_list = new Arg[1];
 		_list[0] = c;
@@ -79,10 +74,7 @@ public class ArgStack implements Serializable {
 	}
 
 	public ArgStack(Grammar grammar, Arg[] list) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+		
 		this.grammar = grammar;
 		_list = list;
 		checkForDollar();
@@ -92,10 +84,7 @@ public class ArgStack implements Serializable {
 	private final Grammar grammar;
 
 	public ArgStack(Grammar grammar, List<Element> info) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+		
 		this.grammar = grammar;
 		List<Arg> args = new ArrayList<Arg>();
 		for (Iterator<Element> infoIt = info.iterator(); infoIt.hasNext();) {
@@ -362,7 +351,7 @@ public class ArgStack implements Serializable {
 		int asIndex = as.size();
 		for (int i = _list.length - 1; i >= 0; i--) {
 			asIndex--;
-			get(i).unify(as.get(asIndex), sub);
+			get(i).unify(as.get(asIndex), sub, grammar.getUnifyControl());
 		}
 		return asIndex;
 	}
@@ -397,7 +386,7 @@ public class ArgStack implements Serializable {
 
 		ArgStack $args = new ArgStack(grammar);
 		for (int i = upto - 1; i >= 0; i--) {
-			$args.addFront((Arg) _list[i].unify(as.get(i), sub));
+			$args.addFront((Arg) _list[i].unify(as.get(i), sub, grammar.getUnifyControl()));
 		}
 		return $args;
 	}
@@ -416,7 +405,7 @@ public class ArgStack implements Serializable {
 
 			if ((aArg instanceof BasicArg && bArg instanceof BasicArg)
 					|| (aArg instanceof SetArg && bArg instanceof SetArg)) {
-				$args.addFront((Arg) aArg.unify(bArg, sub));
+				$args.addFront((Arg) aArg.unify(bArg, sub, grammar.getUnifyControl()));
 				aIndex--;
 				bIndex--;
 			} else if (aArg instanceof BasicArg && bArg instanceof SetArg) {
@@ -426,14 +415,14 @@ public class ArgStack implements Serializable {
 					for (; aIndex > stop;) {
 						aIndex--;
 						if (bArg instanceof BasicArg) {
-							$args.addFront((Arg) aArg.unify(bArg, sub));
+							$args.addFront((Arg) aArg.unify(bArg, sub, grammar.getUnifyControl()));
 						} else {
 							int idInSet = ((SetArg) bArg)
 									.indexOf((BasicArg) aArg);
 							if (idInSet == -1)
 								throw new UnifyFailure();
 							$args.addFront((Arg) aArg.unify(((SetArg) bArg)
-									.get(idInSet), sub));
+									.get(idInSet), sub, grammar.getUnifyControl()));
 							aArg = get(aIndex);
 							bArg = ((SetArg) bArg).copyWithout(idInSet);
 						}
@@ -473,7 +462,7 @@ public class ArgStack implements Serializable {
 				} else {
 					ArgStack $subArgs = otherStack.subList(0, otherIndex + 1);
 					// Slash dsl = ((Dollar) argi).getSlash();
-					((Dollar) argi).unify($subArgs.copy(), sub);
+					((Dollar) argi).unify($subArgs.copy(), sub, grammar.getUnifyControl());
 					otherIndex = 0;
 					$args.addFront($subArgs);
 				}
@@ -484,14 +473,14 @@ public class ArgStack implements Serializable {
 
 				Arg otherArg = otherStack.get(otherIndex);
 				if (otherArg instanceof BasicArg) {
-					$args.addFront((Arg) argi.unify(otherArg, sub));
+					$args.addFront((Arg) argi.unify(otherArg, sub, grammar.getUnifyControl()));
 					otherIndex--;
 				} else if (otherArg instanceof SetArg) {
 					SetArg sa = (SetArg) otherArg;
 					int id = sa.indexOf((BasicArg) argi);
 					if (id == -1)
 						throw new UnifyFailure();
-					$args.addFront((Arg) argi.unify(sa.get(id), sub));
+					$args.addFront((Arg) argi.unify(sa.get(id), sub, grammar.getUnifyControl()));
 					otherStack.set(otherIndex, sa.copyWithout(id));
 				}
 			} else {
@@ -509,10 +498,10 @@ public class ArgStack implements Serializable {
 		ArgStack $args;
 		if (size() == 1) {
 			$args = as.subList(0, upto);
-			((Dollar) get(0)).unify($args.copy(), sub);
+			((Dollar) get(0)).unify($args.copy(), sub, grammar.getUnifyControl());
 		} else if (upto == 1) {
 			$args = subList(0, size());
-			((Dollar) as.get(0)).unify($args.copy(), sub);
+			((Dollar) as.get(0)).unify($args.copy(), sub, grammar.getUnifyControl());
 		} else if (upto == size()) {
 			$args = unifySimple(as, upto, sub);
 		} else {
@@ -591,7 +580,7 @@ public class ArgStack implements Serializable {
 	/**
 	 * Returns a hash code using the given map from vars to ints.
 	 */
-	public int hashCode(TObjectIntHashMap varMap) {
+	public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) {
 		int retval = 0;
 		for (int i = 0; i < _list.length; i++) {
 			retval += _list[i].hashCode(varMap);
@@ -603,8 +592,7 @@ public class ArgStack implements Serializable {
 	 * Returns whether this arg stack equals the given object up to variable
 	 * names, using the given maps from vars to ints.
 	 */
-	public boolean equals(Object obj, TObjectIntHashMap varMap,
-			TObjectIntHashMap varMap2) {
+	public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
 		if (obj.getClass() != this.getClass()) {
 			return false;
 		}

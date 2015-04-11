@@ -18,7 +18,9 @@
 
 package lexicon;
 
-import java.util.*;
+import grammar.Grammar;
+
+import java.util.List;
 
 /**
  * The Tokenizer interface provides a way to customize tokenization 
@@ -98,7 +100,7 @@ public interface Tokenizer {
      * and the semantic class of special tokens.
      * Tokens are parsed into words using parseToken.
      */
-    public List<Word> tokenize(String s);
+    public List<Word> tokenize(Grammar grammar, String s);
 
     /**
      * Parses an input string into a list of words, 
@@ -107,20 +109,20 @@ public interface Tokenizer {
      * Tokens are parsed into words using parseToken, according to the given 
      * flag for whether to parse factors strictly.
      */
-    public List<Word> tokenize(String s, boolean strictFactors);
+    public List<Word> tokenize(Grammar grammar, String s, boolean strictFactors);
     
     /** 
      * Parses a token into a word, including any explicitly given factors 
      * and the semantic class of special tokens.
      */
-    public Word parseToken(String token);
+    public Word parseToken(Grammar grammar, String token);
  
     /** 
      * Parses a token into a word, including any explicitly given factors 
      * and the semantic class of special tokens, according to the given 
      * flag for whether to parse factors strictly.
      */
-    public Word parseToken(String token, boolean strictFactors);
+    public Word parseToken(Grammar grammar, String token, boolean strictFactors);
  
  
     /**

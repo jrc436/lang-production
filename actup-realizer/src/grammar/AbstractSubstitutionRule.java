@@ -32,8 +32,8 @@ import java.util.*;
  */
 public abstract class AbstractSubstitutionRule extends AbstractApplicationRule {
 
-	public AbstractSubstitutionRule(Grammar grammar) {
-		super(grammar);
+	protected AbstractSubstitutionRule(Grammar rg) {
+		super(rg);
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -68,10 +68,10 @@ public abstract class AbstractSubstitutionRule extends AbstractApplicationRule {
             secondaryArgZ.unifySlash(_argSlash);
             Category secondaryY = yzCC.getResult();
 
-            GSubstitution sub = new GSubstitution();
+            GSubstitution sub = new GSubstitution(grammar.getUnifyControl());
 
-            GUnifier.unify(grammar, primaryArgZ.getCat(), secondaryArgZ.getCat(), sub);
-            GUnifier.unify(grammar, primaryArgY.getCat(), secondaryY, sub);         
+            GUnifier.unify(grammar.getUnifyControl(), primaryArgZ.getCat(), secondaryArgZ.getCat(), sub);
+            GUnifier.unify(grammar.getUnifyControl(), primaryArgY.getCat(), secondaryY, sub);         
             
             Category result = new ComplexCat(grammar, xyzCC.getTarget(), primaryStack.copyWithout(size-2));
             ((GSubstitution)sub).condense();
@@ -81,9 +81,9 @@ public abstract class AbstractSubstitutionRule extends AbstractApplicationRule {
             appendLFs(xyzCat, yzCat, result, sub);
             
             List<Category> results = new ArrayList<Category>(1);
-            _headCats.clear();
+            headCats.clear();
             results.add(result);
-            _headCats.add(primaryArgY.getSlash().isModifier() ? yzCat : xyzCat); 
+            headCats.add(primaryArgY.getSlash().isModifier() ? yzCat : xyzCat); 
             return results;
         } else {
             throw new UnifyFailure();

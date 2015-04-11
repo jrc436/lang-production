@@ -18,7 +18,6 @@
 
 package unify;
 
-import gnu.trove.TObjectIntHashMap;
 import grammar.Grammar;
 import hylo.HyloHelper;
 
@@ -27,10 +26,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 
 import org.jdom.Element;
+
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
 /**
@@ -57,20 +59,14 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
 
     public GFeatStruc(Grammar grammar, int i) {
         super(i);
-        if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+        
         this.grammar = grammar;
     }
 
     @SuppressWarnings("unchecked")
 	public GFeatStruc(Grammar grammar, Element fsEl) {
         super(fsEl.getChildren().size());
-        if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+        
         this.grammar = grammar;
         String index = fsEl.getAttributeValue("id");
         if (index != null) {
@@ -116,7 +112,7 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
         if (val == null) val = e.getAttributeValue("v");
         Object value;
         if (val != null) {
-            value = grammar.types.getSimpleType(val);
+            value = grammar.getTypes().getSimpleType(val);
         } else {
             Element valEl = (Element)e.getChildren().get(0);
             if (valEl.getName().equals("featvar") || valEl.getName().equals("fvar")) {
@@ -126,7 +122,7 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
                     value = new GFeatVar(grammar, name[0]);
                 }
                 else
-                    value = new GFeatVar(grammar, name[0], grammar.types.getSimpleType(name[1]));
+                    value = new GFeatVar(grammar, name[0], grammar.getTypes().getSimpleType(name[1]));
             } else {
                 value = HyloHelper.getLF(grammar, (Element)e.getChildren().get(0));
             }
@@ -184,7 +180,7 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
         $fs._inheritsFrom = _inheritsFrom;
         for (Iterator<String> i=getAttributes().iterator(); i.hasNext();) {
             String a = i.next();
-            $fs.setFeature(a, UnifyControl.copy(getValue(a)));
+            $fs.setFeature(a, grammar.getUnifyControl().copy(getValue(a)));
         }
         return $fs;
     }
@@ -241,7 +237,7 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
         }
     }
 
-    public Object unify(Object u, Substitution sub) throws UnifyFailure { 
+    public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure { 
 
         if (!(u instanceof FeatureStructure)) {
             throw new UnifyFailure();
@@ -256,16 +252,16 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
             Object val1 = getValue(k1);
             Object val2 = fs2.getValue(k1);
             if (val2 != null) {
-                $fs.setFeature(k1, Unifier.unify(val1, val2, sub));
+                $fs.setFeature(k1, Unifier.unify(grammar.getUnifyControl(), val1, val2, sub));
             }
             else {
-                $fs.setFeature(k1, UnifyControl.copy(val1));
+                $fs.setFeature(k1, grammar.getUnifyControl().copy(val1));
             }
         }
         for (Iterator<String> i2=keys2.iterator(); i2.hasNext();) {
             String k2 = i2.next();
             if (!keys1.contains(k2))
-                $fs.setFeature(k2, UnifyControl.copy(fs2.getValue(k2)));
+                $fs.setFeature(k2, grammar.getUnifyControl().copy(fs2.getValue(k2)));
         }
 
         int fs2Index = fs2.getIndex();
@@ -293,7 +289,7 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
             if (value instanceof Variable) {
                 Object varVal = sub.getValue((Variable)value);
                 if (null != varVal) {
-                    $fs.setFeature(a, Unifier.unify(value, varVal,sub));
+                    $fs.setFeature(a, Unifier.unify(grammar.getUnifyControl(), value, varVal,sub));
                 }
             }
         }
@@ -302,7 +298,7 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
                 (FeatureStructure)((GSubstitution)sub).getIndexedObject(_index);
             if (null != otherVals) {
                 if (!$fs.equals(otherVals)) {
-                    $fs = (FeatureStructure)$fs.unify(otherVals, sub);
+                    $fs = (FeatureStructure)$fs.unify(otherVals, sub, grammar.getUnifyControl());
                     $fs.setIndex(otherVals.getIndex());
                 }
             }
@@ -314,7 +310,7 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
         FeatureStructure $fs = copy();
         for (Iterator<String> i = fs.getAttributes().iterator(); i.hasNext();) {
             String a = i.next();
-            $fs.setFeature(a, UnifyControl.copy(fs.getValue(a)));
+            $fs.setFeature(a, grammar.getUnifyControl().copy(fs.getValue(a)));
         }
         return $fs;
     }
@@ -348,21 +344,11 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
         
         if (_empty) return sb.toString();
 
-        String featsToShow = grammar.featsToShow;
-
         sb.append('{');
 
         List<String> filteredKeys = new ArrayList<String>(size());
-        if (featsToShow.length() == 0) {
-            filteredKeys.addAll(keySet());
-        }
-        else {
-            for (Iterator<String> it = keySet().iterator(); it.hasNext(); ) {
-                String key = it.next();
-                if (featsToShow.indexOf(key) != -1) 
-                    filteredKeys.add(key);
-            }
-        }
+        filteredKeys.addAll(keySet());
+      
         String[] keys = new String[filteredKeys.size()];
         filteredKeys.toArray(keys);
         Arrays.sort(keys);
@@ -389,7 +375,7 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
         StringBuffer sb = new StringBuffer();
         ArrayList<String> attrs = new ArrayList<String>(getAttributes());
         Collections.sort(attrs);
-        Set<String> supertagFeatures = grammar.supertagFeatures;
+        Set<String> supertagFeatures = grammar.getSuperTagFeatures();
         for (int i = 0; i < attrs.size(); i++) {
             String attr = attrs.get(i);
             if (!supertagFeatures.contains(attr)) continue;
@@ -437,22 +423,13 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
             sb.append(" \\subsf{ < "); sb.append(_index); sb.append(" > } ");
         }
         if (_empty) return sb.toString();
-        String featsToShow = grammar.featsToShow;
+
         sb.append(" \\subsf{ ");
         if ((_index > 0)) {
             sb.append("  < "); sb.append(_index); sb.append(" > ");
         }
-        List<String> filteredKeys = new ArrayList<String>(size());
-        if (featsToShow.length() == 0) {
-            filteredKeys.addAll(keySet());
-        }
-        else {
-            for (Iterator<String> it = keySet().iterator(); it.hasNext(); ) {
-                String key = it.next();
-                if (featsToShow.indexOf(key) != -1) 
-                    filteredKeys.add(key);
-            }
-        }
+        List<String> filteredKeys = new ArrayList<String>(size());       
+        
         String[] keys = new String[filteredKeys.size()];
         filteredKeys.toArray(keys);
         Arrays.sort(keys);
@@ -469,28 +446,18 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
      * Returns a hash code using the given map from vars to ints, 
      * to allow for equivalence up to variable names.
      */
-    public int hashCode(TObjectIntHashMap varMap) {
-
+    public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) {
         int retval = 0;
-        
-        // nb: treat index as a regular var
-        if (_index != 0) {
-    		// see if index already in map
-    		if (varMap.containsKey(_index))
-    			retval = varMap.get(_index);
-    		// otherwise add it
-    		else {
-	    		int next = varMap.size() + 1;
-	    		varMap.put(_index, next);
-	    		retval = next;
-    		}
-        }
-        // otherwise treat missing index as unique, keyed to negative identity hash
-		else {
-    		int next = varMap.size() + 1;
-    		varMap.put(-1 * Math.abs(System.identityHashCode(this)), next);
-    		retval = next;
-		}
+        IndexHash ih = new IndexHash(_index);
+   
+    	if (varMap.containsKey(ih)) {
+    		retval = varMap.get(ih);
+    	}
+    	else {
+	    	int next = varMap.size() + 1;
+	    	varMap.put(ih, next);
+	    	retval = next;
+    	}
         
         if (_empty) { return retval; }
 
@@ -517,18 +484,21 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
      * Returns whether this feature structure equals the given object  
      * up to variable names, using the given maps from vars to ints.
      */
-    public boolean equals(Object obj, TObjectIntHashMap varMap, TObjectIntHashMap varMap2) {
+    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
         if (obj.getClass() != this.getClass()) { return false; }
         GFeatStruc fs = (GFeatStruc) obj;
         
-        int mappedIndex = (_index != 0) ? varMap.get(_index) : varMap.get(-1 * Math.abs(System.identityHashCode(this)));
-        int fsMappedIndex = (fs._index != 0) ? varMap2.get(fs._index) : varMap2.get(-1 * Math.abs(System.identityHashCode(fs)));
-        if (mappedIndex != fsMappedIndex) return false;
-        
-        if (size() != fs.size()) return false;
+        IndexHash ih = new IndexHash(_index);
+        IndexHash ih2 = new IndexHash(fs._index);
+
+        Integer mappedIndex = varMap.get(ih);
+        Integer fsMappedIndex = varMap2.get(ih2);
         Set<String> atts1 = getAttributes();
         Set<String> atts2 = fs.getAttributes();
-        if (!atts1.containsAll(atts2)) return false;
+        //easy pre-reject
+        if (mappedIndex != fsMappedIndex || size() != fs.size() || !atts1.containsAll(atts2)) {
+        	return false;
+        }
         
         for (Iterator<String> it = atts1.iterator(); it.hasNext(); ) {
             String att = it.next();
@@ -543,5 +513,46 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
         }
         
         return true;
+    }
+    class IndexHash implements Unifiable {
+		private Integer index;
+    	
+		public IndexHash(int index) {
+			this.index = index == 0 ?  -1 * System.identityHashCode(GFeatStruc.this) : index;
+		}
+		@Override
+		public int hashCode() {
+			return index.hashCode();
+		}
+		@Override
+		public boolean equals(Object other) {
+			if (other.getClass() != this.getClass()) {
+				return false;
+			}
+			IndexHash otherIH = (IndexHash) other;
+			return this.index == otherIH.index;
+		}
+		
+    	@Override
+		public boolean occurs(Variable v) {
+			throw new NotImplementedException();
+		}
+
+		@Override
+		public Object unify(Object u, Substitution s, UnifyControl uc) throws UnifyFailure {
+			throw new NotImplementedException();
+		}
+
+		@Override
+		public void unifyCheck(Object u) throws UnifyFailure {
+			throw new NotImplementedException();
+		}
+
+		@Override
+		public Object fill(Substitution s) throws UnifyFailure {
+			throw new NotImplementedException();
+		}
+		
+    	
     }
 }

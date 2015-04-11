@@ -32,7 +32,7 @@ import synsem.LF;
 import unify.FeatureStructure;
 import unify.ModFcn;
 import unify.Mutable;
-import util.IntHashSetMap;
+import util.GroupMap;
 
 /**
  * Adds the features from macros to a category.
@@ -44,15 +44,11 @@ import util.IntHashSetMap;
  */
 public class MacroAdder {
 
-    private IntHashSetMap _specificMacros;
+    private GroupMap<Integer, FeatureStructure> _specificMacros;
     private List<MacroItem> _macroItems; // for LF macros
     private final Grammar grammar;
     
-    public MacroAdder(IntHashSetMap sm, List<MacroItem> macroItems, Grammar grammar) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    public MacroAdder(GroupMap<Integer, FeatureStructure> sm, List<MacroItem> macroItems, Grammar grammar) {
         _specificMacros = sm;
         _macroItems = macroItems;
         this.grammar = grammar;

@@ -45,11 +45,8 @@ public class Compacter {
      * If there are any duplicate predications, an attempt 
      * is made to attach them in different locations.
      */
-    static LF compact(Grammar grammar, LF lf, Nominal root) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    public static LF compact(Grammar grammar, LF lf, Nominal root) {
+    	
         // get preds, make copies
         List<SatOp> preds = HyloHelper.getPreds(lf);
         for (int i=0; i < preds.size(); i++) {
@@ -261,10 +258,7 @@ public class Compacter {
     // where either both preds are elementary, 
     // or the first is the result of an earlier combination
     private static void combine(Grammar grammar, SatOp satOp1, SatOp satOp2) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         // get args
         LF arg1 = satOp1.getArg();
         LF arg2 = satOp2.getArg();
@@ -292,10 +286,7 @@ public class Compacter {
     // recursive implementation that tracks the current parent and 
     // returns whether the substitution has been made
     private static boolean subst(Grammar grammar, LF lf, Nominal currentParent, SatOp satOp2, Nominal nom2, Nominal requiredParent) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
         // recurse to nom2, then append if requiredParent constraint met
         if (lf instanceof SatOp) {
             SatOp satOp = (SatOp) lf;

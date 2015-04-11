@@ -18,10 +18,6 @@
 
 package realize;
 
-import gnu.trove.THashMap;
-import gnu.trove.THashSet;
-import gnu.trove.TObjectHashingStrategy;
-import gnu.trove.TObjectIdentityHashingStrategy;
 import hylo.Alt;
 
 import java.io.PrintWriter;
@@ -31,7 +27,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +37,7 @@ import runconfig.RealizationSettings;
 import synsem.Category;
 import synsem.DerivationHistory;
 import synsem.Sign;
+import util.Identity;
 
 /**
  * The chart manages the creation of edges.  Newly added edges are kept on an 
@@ -64,28 +61,14 @@ public class Chart
     private final List<Edge> agenda = new ArrayList<Edge>(); //edges not yet added
     private final List<Edge> edges = new ArrayList<Edge>(); //representative edges
     private final List<Edge> allEdges = new ArrayList<Edge>(); //all unpruned and unpacked edges
-    private final List<Edge> supercededEdgesPendingRemoval = new ArrayList<Edge>(); //edges to be removed because less complex derivation found
-    private final Map<Sign,Edge> signMap = new IdentityHashMap<Sign,Edge>(); //keeps track of the current edge for that sign
-    private final EdgeHash edgeHash = new EdgeHash(); //all edges that have been encountered
+    private final List<Edge> supercededEdgesPendingRemoval = new ArrayList<Edge>(); //edges to be removed because less complex  found
+    private final Map<Sign,Edge> signMap = new LinkedHashMap<Sign,Edge>(); //keeps track of the current edge for that sign
+    private final Map<EdgeSurfaceWords, Edge> edgeHash = new LinkedHashMap<EdgeSurfaceWords, Edge>(); //all edges that have been encountered
     
-
-    // maps edges to representative edges, according to their 
-    // coverage vectors and their cats, sans LFs
-    @SuppressWarnings("unchecked")
-    private Map<Edge, Edge> catMap = new THashMap(
-        new TObjectHashingStrategy() {
-			private static final long serialVersionUID = 1L;
-			public int computeHashCode(Object o) {
-                Edge edge = (Edge) o;
-                return edge.bitset.hashCode() + edge.sign.getCategory().hashCodeNoLF();
-            }
-            public boolean equals(Object o1, Object o2) {
-                Edge edge1 = (Edge) o1; Edge edge2 = (Edge) o2;
-                return edge1.bitset.equals(edge2.bitset) &&
-                    edge1.sign.getCategory().equalsNoLF(edge2.sign.getCategory());
-            }
-        }
-    );
+    //maps edges to an equivalence class that allows alternative edges to be added. Eventually should probably be
+    //replaced with something like a group map
+    //private Map<EdgeSemantics, Edge> catMap = new LinkedHashMap<EdgeSemantics, Edge>();
+    private Map<EdgeSemantics, Edge> catMap = new LinkedHashMap<EdgeSemantics, Edge>();
     
     // cell map: based on input coverage vectors
     private Map<BitSet,Integer> cellMap = new HashMap<BitSet,Integer>();
@@ -200,7 +183,7 @@ public class Chart
     	// when collecting combos ...
         if (rSet.collectingCombos()) {
             // existing rep case: just make alt edges from collected combos
-            Edge nextRep = catMap.get(next);
+            Edge nextRep = catMap.get(next.getSemantics());//catMap.get(next.getSemantics());
             if (next != nextRep) {
                 addNewEdges(edgeFactory.createAltEdges(next, nextRep));
                 // and prune any superceded edges before returning
@@ -283,8 +266,7 @@ public class Chart
     
     /** Unpack complete edges, if any; otherwise unpack all. */
 	protected void doUnpacking() {
-	    @SuppressWarnings("unchecked")
-        Set<Edge> unpacked = new THashSet(new TObjectIdentityHashingStrategy());
+        Map<Identity, Edge> unpacked = new LinkedHashMap<Identity, Edge>();
 	    boolean foundComplete = bestEdge.complete();
         // unpack each relevant edge, updating best edge 
         for (Edge edge : edges) {
@@ -295,12 +277,15 @@ public class Chart
     }
     
     // recursively unpack and prune edge, unless already visited
-    private void unpack(Edge edge, Set<Edge> unpacked) {
-        if (unpacked.contains(edge)) return;
+    private void unpack(Edge edge, Map<Identity, Edge> unpacked) {
+    	Identity ei = new Identity(edge);
+    	if (unpacked.containsKey(ei)) {
+        	return;
+        }
         // add to unpacked set
-        unpacked.add(edge);
+        unpacked.put(ei, edge);
         // OR: recursively unpack alts, merging resulting alts
-        EdgeHash merged = new EdgeHash();
+        Map<EdgeSurfaceWords, Edge> merged = new LinkedHashMap<EdgeSurfaceWords, Edge>();
 	    if (edge.altEdges == null) {
 	    	throw new RuntimeException("No alts for: " + edge);
 	    }
@@ -309,7 +294,7 @@ public class Chart
             unpackAlt(alt, unpacked, merged);
         }
         // sort, rescore and prune
-        List<Edge> mergedList = new ArrayList<Edge>(merged.asEdgeSet());
+        List<Edge> mergedList = new ArrayList<Edge>(merged.values());
         Collections.sort(mergedList, edgeComparator);
         List<Edge> prunedEdges = pruningStrategy.pruneEdges(mergedList);
         prunedEdges.size();
@@ -324,7 +309,7 @@ public class Chart
     }
     
     // recursively unpack inputs, make alt combos and add to merged
-    private void unpackAlt(Edge alt, Set<Edge> unpacked, EdgeHash merged) {
+    private void unpackAlt(Edge alt, Map<Identity, Edge> unpacked, Map<EdgeSurfaceWords, Edge> merged) {
         // first check for opt completed edge
         if (alt.optCompletes != null) {
             // recursively unpack input edge
@@ -335,7 +320,7 @@ public class Chart
                 Edge edgeToAdd = (inputAlt.sign == alt.sign)
                     ? alt // use this alt for same sign
                     : edgeFactory.makeAltEdge(inputAlt.sign, alt); // otherwise make edge for new alt
-                merged.insert(edgeToAdd);
+                Chart.insertEdge(edgeToAdd, merged);
             }
             return;
         }
@@ -344,7 +329,7 @@ public class Chart
         Sign[] inputSigns = history.getInputs();
         // base case: no inputs
         if (inputSigns == null) {
-            merged.insert(alt); return;
+            Chart.insertEdge(alt, merged); return;
         }
         // otherwise recursively unpack
         Edge[] inputEdges = new Edge[inputSigns.length];
@@ -362,7 +347,7 @@ public class Chart
             Edge edgeToAdd = (sign.equals(alt.sign))
                 ? alt // use this alt for equiv sign
                 : edgeFactory.makeAltEdge(sign, alt); // otherwise make edge for new alt
-            merged.insert(edgeToAdd);
+            Chart.insertEdge(edgeToAdd, merged);
         }
     }
 
@@ -459,23 +444,22 @@ public class Chart
     	numEdges++;
     	if (!rSet.usingPacking()) {
 	    	// update edgeHash, checking for equivalent edge of equal or lower complexity
-    		Edge retEdge = edgeHash.insert(edge);
-    		boolean actuallyInserted = (retEdge != null);
-	    	if (!actuallyInserted) { return; } // just drop it
-	    	// remove old edge, if apropos
-	    	Edge oldEdge = (retEdge != edge) ? retEdge : null; 
-	    	if (oldEdge != null) {
-	    		// check agenda first
-	    		boolean onAgenda = agenda.remove(oldEdge);
-	    		// if not on agenda, remove from equiv class, if present, and add to list of superceded edges pending removal
-	    		if (!onAgenda) {
-	    	        Edge repEdge = catMap.get(oldEdge);
+    		
+    		Edge ret = Chart.insertEdge(edge, this.edgeHash);
+    		if (ret == null) {
+    			return; //nothing was inserted, just leave.
+    		}
+    		Edge old = ret != edge ? ret : null; //let's find out if we need to remove it!
+    		if (old != null) {
+    			boolean onAgenda = agenda.remove(old);
+    			if (!onAgenda) {
+	    	        Edge repEdge = catMap.get(edge.getSemantics());//catMap.get(curEdge.getSemantics());
 	    	        if (repEdge != null) {
-	    	        	boolean inChart = repEdge.altEdges.remove(oldEdge);
-	    	        	if (inChart) supercededEdgesPendingRemoval.add(oldEdge);
+	    	        	boolean inChart = repEdge.altEdges.remove(old);
+	    	        	if (inChart) supercededEdgesPendingRemoval.add(old);
 	    	        }
 	    		}
-	    	}
+    		}
     	}
         addSorted(agenda, edge);
         updateBestEdge(edge);
@@ -509,7 +493,7 @@ public class Chart
     	// inc cell count
     	incCellCount(edge);
         // get representative edge for this edge
-        Edge repEdge = catMap.get(edge);
+        Edge repEdge = catMap.get(edge.getSemantics());//catMap.get(edge.getSemantics());
         // check for same edge already in chart; pretend it's been added
         if (edge == repEdge) { 
         	return true;
@@ -520,7 +504,8 @@ public class Chart
             if (rSet.collectingCombos()) {
             	edge.initEdgeCombos();
             }
-            catMap.put(edge, edge);
+            //catMap.put(edge.getSemantics(), edge);
+            catMap.put(edge.getSemantics(),  edge);
             edges.add(edge);
         	signMap.put(edge.sign, edge);
             // anytime case: add to all edges list too
@@ -551,6 +536,28 @@ public class Chart
             return true;
         }
         return false;
+    }
+    private static Edge insertEdge(Edge e, Map<EdgeSurfaceWords, Edge> map) {
+    	EdgeSurfaceWords key = e.getSW();
+    	Edge old = map.get(key);
+    	if (old == null) {
+    		map.put(key, e);
+    		return e;
+    	}
+    	if (old == e) {
+    		 return null;
+    	}
+    	if (e.score > old.score) {
+    		map.put(key, e);
+    		return old;
+    	}
+    	int complexity = e.sign.getDerivationHistory().complexity();
+    	int oldComplexity = old.sign.getDerivationHistory().complexity();
+        if (complexity < oldComplexity) {
+             map.put(key, e);
+             return old;
+        }     
+        return null;
     }
     
     // cell count

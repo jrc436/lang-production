@@ -19,16 +19,13 @@
 package util;
 
 //JAXP packages
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.List;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
-import org.jdom.Attribute;
 // jdom
 import org.jdom.Element;
 import org.xml.sax.Attributes;
@@ -155,39 +152,4 @@ public abstract class XmlScanner extends DefaultHandler {
         if (parent == null) handleElement(current);
         current = parent;
     } 
-
-    
-
-    /**
-     *  Example scanner: prints root, counts top- and second-level elements.
-     */
-    public static class MyScanner extends XmlScanner {
-        int count = 0; int second = 0;
-		public void handleRoot(Element e) {
-        	System.out.println("root name: " + e.getName());
-        	System.out.print("root attributes: ");
-            @SuppressWarnings("unchecked")
-        	List<Attribute> attrs = (List<Attribute>) e.getAttributes();
-        	for (Attribute attr : attrs) {
-        		System.out.print(attr.getName() + "=" + attr.getValue() + " ");
-        	}
-        	System.out.println();
-        }
-        public void handleElement(Element e) { 
-            count++; second += e.getContentSize();
-        }
-    }
-    
-    /**
-     * The main method shows an example of using a scanner, by 
-     * invoking an instance of <code>MyScanner</code> on the file 
-     * whose name is given by the first arg.
-     */
-    public static void main(String[] args) throws IOException {
-        String filename = args[0];
-        MyScanner myScanner = new MyScanner();
-        myScanner.parse(new File(filename).toURI().toURL());
-        System.out.println("top-level elements: " + myScanner.count);
-        System.out.println("second-level elements: " + myScanner.second);
-    }
 }

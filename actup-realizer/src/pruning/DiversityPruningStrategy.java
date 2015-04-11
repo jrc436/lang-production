@@ -18,12 +18,11 @@
 
 package pruning;
 
-import gnu.trove.THashSet;
-import gnu.trove.TObjectIdentityHashingStrategy;
-
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import realize.Edge;
 import runconfig.Consts;
@@ -52,7 +51,7 @@ abstract public class DiversityPruningStrategy extends NBestPruningStrategy
     public boolean singleBestPerGroup = false;
     
     /** Reusable set of edges to keep. */
-    protected THashSet keepers = new THashSet(new TObjectIdentityHashingStrategy());
+    protected Set<Edge> keepers = new LinkedHashSet<Edge>();
     
     /** Returns true iff the given signs are not compellingly different. */
     abstract public boolean notCompellinglyDifferent(Sign sign1, Sign sign2);

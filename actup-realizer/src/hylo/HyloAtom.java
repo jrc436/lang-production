@@ -18,9 +18,12 @@
 
 package hylo;
 
-import gnu.trove.TObjectIntHashMap;
 import grammar.Grammar;
+
+import java.util.LinkedHashMap;
+
 import unify.SimpleType;
+import unify.Unifiable;
 import unify.Variable;
 
 /**
@@ -93,13 +96,13 @@ public abstract class HyloAtom extends HyloFormula {
     /**
      * Returns a hash code using the given map from vars to ints.
      */
-    public int hashCode(TObjectIntHashMap varMap) { return hashCode(); }
+    public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) { return hashCode(); }
         
     /**
      * Returns whether this atom equals the given object  
      * up to variable names, using the given maps from vars to ints.
      */
-    public boolean equals(Object obj, TObjectIntHashMap varMap, TObjectIntHashMap varMap2) {
+    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
         return equals(obj);
     }
 }

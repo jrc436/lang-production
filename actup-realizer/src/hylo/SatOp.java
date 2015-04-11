@@ -18,10 +18,10 @@
 
 package hylo;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TObjectIntHashMap;
 import grammar.Grammar;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.jdom.Element;
@@ -30,7 +30,9 @@ import synsem.LF;
 import synsem.LexSemOrigin;
 import unify.ModFcn;
 import unify.Substitution;
+import unify.Unifiable;
 import unify.Unifier;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 import unify.Variable;
 
@@ -64,12 +66,12 @@ public class SatOp extends HyloFormula {
      * The opts are numbered starting with 0, 
      * and null represents no opts.
      */
-    protected TIntArrayList opts = null;
+    protected ArrayList<Integer> opts = null;
     
     /**
      * Gets the LF opts to which this LF belongs.
      */
-    public TIntArrayList getOpts() { return opts; }
+    public ArrayList<Integer> getOpts() { return opts; }
     
     /**
      * The sign or unary rule which introduced this predication.
@@ -148,16 +150,16 @@ public class SatOp extends HyloFormula {
         }
     }
     
-    public Object unify(Object u, Substitution sub) throws UnifyFailure {
+    public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
         if (u instanceof HyloFormula) {
             if (u instanceof SatOp) {
-                Nominal $nom = (Nominal) Unifier.unify(_nominal, ((SatOp)u)._nominal, sub);
-                LF $arg = (LF)Unifier.unify(_arg, ((SatOp)u)._arg,sub);
+                Nominal $nom = (Nominal) Unifier.unify(grammar.getUnifyControl(), _nominal, ((SatOp)u)._nominal, sub);
+                LF $arg = (LF)Unifier.unify(grammar.getUnifyControl(), _arg, ((SatOp)u)._arg,sub);
                 SatOp retval = new SatOp(grammar, $nom, $arg);
                 retval._origin = _origin;
                 return retval;
             }
-            else return super.unify(u, sub);
+            else return super.unify(u, sub, uc);
         } else {
             throw new UnifyFailure();
         }
@@ -209,7 +211,7 @@ public class SatOp extends HyloFormula {
     /**
      * Returns a hash code using the given map from vars to ints.
      */
-    public int hashCode(TObjectIntHashMap varMap) { 
+    public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) { 
         return _nominal.hashCode(varMap) + _arg.hashCode(varMap); 
     }
         
@@ -217,7 +219,7 @@ public class SatOp extends HyloFormula {
      * Returns whether this sat op equals the given object  
      * up to variable names, using the given maps from vars to ints.
      */
-    public boolean equals(Object obj, TObjectIntHashMap varMap, TObjectIntHashMap varMap2) {
+    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
         if (obj.getClass() != this.getClass()) { return false; }
         SatOp so = (SatOp) obj;
         return _nominal.equals(so._nominal, varMap, varMap2) && 

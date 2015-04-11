@@ -18,10 +18,21 @@
 
 package grammar;
 
-import unify.*;
-import synsem.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.*;
+import synsem.AtomCat;
+import synsem.BasicArg;
+import synsem.Category;
+import synsem.ComplexCat;
+import synsem.Dollar;
+import synsem.LF;
+import synsem.Slash;
+import synsem.TargetCat;
+import unify.GFeatStruc;
+import unify.GSubstitution;
+import unify.Substitution;
+import unify.UnifyFailure;
 
 /**
  * Type-raising, e.g. np => s/(s\np).
@@ -57,10 +68,11 @@ public abstract class AbstractTypeRaisingRule extends AbstractRule {
      * Creates a new type raising rule with the given name; upper and lower slashes; 
      * use dollar switch; arg category; and result category.  Defaults are used 
      * for the arg and result categories if null.
+     * @param rg TODO
      */
-    protected AbstractTypeRaisingRule(Grammar grammar, String name, Slash uslash, Slash eslash, boolean useDollar, Category arg, Category result) {
-        super(grammar);
-    	_name = name;
+    protected AbstractTypeRaisingRule(Grammar rg, String name, Slash uslash, Slash eslash, boolean useDollar, Category arg, Category result) {
+        super(rg);
+    	this.name = name;
         _upperSlash = uslash;
         _upperSlash.setAbility("active");
         _upperSlash.setModifier(true);
@@ -103,13 +115,13 @@ public abstract class AbstractTypeRaisingRule extends AbstractRule {
 
     /** Applies this rule to the given input. */
     protected List<Category> apply(Category input) throws UnifyFailure {
-        Substitution sub = new GSubstitution();
-        Category arg = (Category)_arg.unify(input, sub);
+        Substitution sub = new GSubstitution(grammar.getUnifyControl());
+        Category arg = (Category)_arg.unify(input, sub, grammar.getUnifyControl());
         ((GSubstitution)sub).condense();
         
         Category result = _result.copy();
         ComplexCat range;
-        UnifyControl.reindex(result);
+        grammar.getUnifyControl().reindex(result);
         if (result instanceof ComplexCat) {
             range = (ComplexCat)result.copy();
             range.add(new BasicArg(_embeddedSlash, arg));
@@ -123,7 +135,7 @@ public abstract class AbstractTypeRaisingRule extends AbstractRule {
         //     rule is created; with type raising, it is done here, so that 
         //     the arg need not have its distributive features yet, and since 
         //     the full result category doesn't exist beforehand
-        _ruleGroup.grammar.lexicon.propagateDistributiveAttrs(result);
+        grammar.lexicon.propagateDistributiveAttrs(result);
         
         LF inputLF = input.getLF();
         if (inputLF != null) {
@@ -131,9 +143,9 @@ public abstract class AbstractTypeRaisingRule extends AbstractRule {
         }
         
         List<Category> results = new ArrayList<Category>(1);
-        _headCats.clear();
+        headCats.clear();
         results.add(result);
-        _headCats.add(input);
+        headCats.add(input);
         return results;
     }
 }

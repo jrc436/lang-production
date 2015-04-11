@@ -18,11 +18,11 @@
 
 package hylo;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TObjectIntHashMap;
 import grammar.Grammar;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import org.jdom.Element;
 
@@ -31,6 +31,7 @@ import unify.ModFcn;
 import unify.SimpleType;
 import unify.Substitution;
 import unify.Unifiable;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 import unify.Variable;
 
@@ -46,10 +47,6 @@ public abstract class HyloFormula implements LF, Serializable {
 	
 	protected final Grammar grammar;
 	public HyloFormula(Grammar grammar) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
 		this.grammar = grammar;
 	}
     
@@ -58,7 +55,7 @@ public abstract class HyloFormula implements LF, Serializable {
 	/**
      * The LF chunks to which this LF belongs.
      */
-    protected TIntArrayList chunks = null;
+    protected ArrayList<Integer> chunks = null;
     
     /**
      * Sets the LF chunks to which this LF belongs.
@@ -69,12 +66,12 @@ public abstract class HyloFormula implements LF, Serializable {
      * The chunks are numbered starting with 0, 
      * and null represents no chunks.
      */
-    public void setChunks(TIntArrayList chunks) { this.chunks = chunks; }
+    public void setChunks(ArrayList<Integer> chunks) { this.chunks = chunks; }
     
     /**
      * Gets the LF chunks to which this LF belongs.
      */
-    public TIntArrayList getChunks() { return chunks; }
+    public ArrayList<Integer> getChunks() { return chunks; }
     
     
     /** Returns null as the default type. */
@@ -106,14 +103,13 @@ public abstract class HyloFormula implements LF, Serializable {
      * connected by an Op instance.
      * @param s Substitution containing the variable resolutions
      * @param o object to unify with
-     *
      * @exception UnifyFailure if this Unifiable cannot be unified with 
      *            the Object
      * @return an object which represents the unification of 
      *         this Unifiable with the Object
      */
-    public Object unify(Object u, Substitution s) throws UnifyFailure {
-        if (u instanceof Variable) return ((Unifiable)u).unify(this, s);
+    public Object unify(Object u, Substitution s, UnifyControl uc) throws UnifyFailure {
+        if (u instanceof Variable) return ((Unifiable)u).unify(this, s, uc);
         else throw new UnifyFailure(this.toString(), u.toString());
     }
 
@@ -154,13 +150,13 @@ public abstract class HyloFormula implements LF, Serializable {
     /**
      * Returns a hash code using the given map from vars to ints.
      */
-    public abstract int hashCode(TObjectIntHashMap varMap);
+    public abstract int hashCode(LinkedHashMap<Unifiable, Integer> varMap);
 
     /**
      * Returns whether this LF equals the given object  
      * up to variable names, using the given maps from vars to ints.
      */
-    public abstract boolean equals(Object obj, TObjectIntHashMap varMap, TObjectIntHashMap varMap2);
+    public abstract boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2);
     
     /**
      * Returns an XML representation of this LF.

@@ -25,6 +25,7 @@ import org.jdom.Element;
 import synsem.LF;
 import unify.Substitution;
 import unify.Unifier;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 
 /**
@@ -66,14 +67,14 @@ public final class Diamond extends ModalOp {
         }
     }
 
-    public Object unify(Object u, Substitution sub) throws UnifyFailure {
+    public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
         if (u instanceof HyloFormula) {
             if (u instanceof Diamond) {
-                Mode $mode = (Mode) Unifier.unify(_mode, ((Diamond)u)._mode, sub);
-                LF $arg = (LF) Unifier.unify(_arg, ((Diamond)u)._arg,sub);
+                Mode $mode = (Mode) Unifier.unify(grammar.getUnifyControl(), _mode, ((Diamond)u)._mode, sub);
+                LF $arg = (LF) Unifier.unify(grammar.getUnifyControl(), _arg, ((Diamond)u)._arg,sub);
                 return new Diamond(grammar, $mode, $arg);
             }
-            else return super.unify(u, sub);
+            else return super.unify(u, sub, uc);
         } else {
             throw new UnifyFailure();
         }

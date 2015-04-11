@@ -63,7 +63,7 @@ public class FeatureLicenser
     /** Constructor. */
     public FeatureLicenser(EdgeFactory edgeFactory) { 
         this.edgeFactory = edgeFactory; 
-        this.licensingFeatures = edgeFactory.grammar.lexicon.getLicensingFeatures();
+        this.licensingFeatures = edgeFactory.grammar.getLexicon().getLicensingFeatures();
     }
 
     /** Constructor with licensing features. */
@@ -303,10 +303,11 @@ public class FeatureLicenser
      * The licensing features are checked in priority order.
      * NB: Instantiation is limited to the case where there is a single 
      *     value for the operative licensing feature.
+     * @param uc TODO
      */
-    public void licenseEmptyCat(Category cat, Set<Category> instantiatedCats, Set<Category> uninstantiatedCats) {
+    public void licenseEmptyCat(UnifyControl uc, Category cat, Set<Category> instantiatedCats, Set<Category> uninstantiatedCats) {
         // reindex
-        UnifyControl.reindex(cat);
+        uc.reindex(cat);
         // return cat uninstantiated if no licensing features found
         if (!needsLicensing(cat)) {
             uninstantiatedCats.add(cat); return; 
@@ -349,7 +350,7 @@ public class FeatureLicenser
             FeatureStructure fs = ac.getFeatureStructure();
             if (fs.hasAttribute("lex") && !fs.hasAttribute("index")) {
                 fs.setFeature("index", new NominalVar(edgeFactory.grammar, "W"));
-                UnifyControl.reindex(ac);
+                uc.reindex(ac);
             }
             // unify with appropriate initial cats
             Collection<Category> initialCats = null; 
@@ -389,7 +390,7 @@ public class FeatureLicenser
                 // try unifying index ...
                 simpleSubst.clear(); 
                 try {
-                    Unifier.unify(ac.getFeatureStructure(), initialFS, simpleSubst);
+                    Unifier.unify(uc, ac.getFeatureStructure(), initialFS, simpleSubst);
                     // ensure substitution contains index
                     if (!simpleSubst.containsValue(index)) continue;
                     // get rid of other substitutions

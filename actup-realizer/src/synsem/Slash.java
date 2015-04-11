@@ -18,10 +18,10 @@
 
 package synsem;
 
-import gnu.trove.TObjectIntHashMap;
 import grammar.Grammar;
 
 import java.io.Serializable;
+import java.util.LinkedHashMap;
 
 import org.jdom.Element;
 
@@ -29,6 +29,7 @@ import unify.ModFcn;
 import unify.Mutable;
 import unify.Substitution;
 import unify.Unifiable;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 import unify.Variable;
 
@@ -69,10 +70,7 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 	private final Grammar grammar;
 	
 	public Slash(Grammar grammar, Element el) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+		
 		this.grammar = grammar;
 		String d = el.getAttributeValue("dir");
 		if (d == null)
@@ -109,40 +107,28 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 	}
 
 	public Slash(Grammar grammar, char sd) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+		
 		this.grammar = grammar;
 		_dir = encode(sd);
 		_modality = new SlashMode();
 	}
 
 	public Slash(Grammar grammar, char sd, String md) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+		
 		this.grammar = grammar;
 		_dir = encode(sd);
 		_modality = new SlashMode(md);
 	}
 
 	public Slash(Grammar grammar, char sd, Modality md) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+		
 		this.grammar = grammar;
 		_dir = encode(sd);
 		_modality = md;
 	}
 
 	private Slash(Grammar grammar, byte d, Modality m, byte a) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+		
 		this.grammar = grammar;
 		_dir = d;
 		_modality = m;
@@ -214,7 +200,7 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 		}
 	}
 
-	public Object unify(Object u, Substitution sub) throws UnifyFailure {
+	public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
 
 		if (u instanceof Slash) {
 			Slash s2 = (Slash) u;
@@ -236,7 +222,7 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 				throw new UnifyFailure();
 			}
 
-			Modality newModality = (Modality) _modality.unify(((Slash) u)._modality, sub);
+			Modality newModality = (Modality) _modality.unify(((Slash) u)._modality, sub, uc);
 			Slash retval = new Slash(grammar, newDir, newModality, newAbility);
 			retval._modifier = _modifier;
 			return retval;
@@ -309,7 +295,7 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 	/**
 	 * Returns a hash code using the given map from vars to ints.
 	 */
-	public int hashCode(TObjectIntHashMap varMap) {
+	public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) {
 		int retval = 31 * _dir + 7 * _ability;
 		if (_modality instanceof Variable) retval += ((Variable)_modality).hashCode(varMap);
 		else retval += _modality.hashCode();
@@ -320,7 +306,7 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 	 * Returns whether this slash equals the given object up to variable names,
 	 * using the given maps from vars to ints.
 	 */
-	public boolean equals(Object obj, TObjectIntHashMap varMap, TObjectIntHashMap varMap2) {
+	public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
 		if (this == obj) return true;
 		if (obj.getClass() != this.getClass()) return false;
 		Slash s = (Slash) obj;

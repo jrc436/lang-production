@@ -18,7 +18,8 @@
 
 package synsem;
 
-import gnu.trove.TObjectIntHashMap;
+import java.util.LinkedHashMap;
+
 import unify.Mutable;
 import unify.Unifiable;
 import unify.UnifyFailure;
@@ -46,13 +47,13 @@ public interface Arg extends Unifiable, Mutable {
      * Returns a hash code for this arg, 
      * using the given map from vars to ints.
      */
-    public int hashCode(TObjectIntHashMap varMap);
+    public int hashCode(LinkedHashMap<Unifiable, Integer> varMap);
     
     /**
      * Returns whether this arg equals the given object  
      * up to variable names, using the given maps from vars to ints.
      */
-    public boolean equals(Object obj, TObjectIntHashMap varMap, TObjectIntHashMap varMap2);
+    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2);
     
     /**
      * Returns the supertag for the arg.

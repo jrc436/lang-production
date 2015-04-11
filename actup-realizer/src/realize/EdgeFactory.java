@@ -18,20 +18,6 @@
 
 package realize;
 
-import gnu.trove.TIntArrayList;
-import gnu.trove.TObjectIntHashMap;
-
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import grammar.FragmentJoining;
 import grammar.Grammar;
 import grammar.Rule;
@@ -42,6 +28,19 @@ import hylo.HyloHelper;
 import hylo.Nominal;
 import hylo.NominalAtom;
 import hylo.SatOp;
+
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import lexicon.Lexicon;
 import lexicon.LicensingFeature;
 import lexicon.Word;
@@ -58,7 +57,6 @@ import unify.FeatureStructure;
 import unify.SimpleSubstitution;
 import unify.Substitution;
 import unify.Unifier;
-import unify.UnifyControl;
 import unify.UnifyFailure;
 import util.Pair;
 
@@ -124,10 +122,6 @@ public class EdgeFactory
     // a bitset for all preds
     private final BitSet allPreds;
     
-    
-    // the lexicon used to create edges    
-    private final Lexicon lexicon;
-    
     // general rules, ie the ones with no associated semantics
     private final RuleGroup generalRules;
     
@@ -145,7 +139,7 @@ public class EdgeFactory
     public final Set<Nominal> labeledNominals = new HashSet<Nominal>();
     
     /** Map from nominals to ints, for indexing edges. */
-    final TObjectIntHashMap nominals = new TObjectIntHashMap();
+    final Map<Nominal, Integer> nominals = new LinkedHashMap<Nominal, Integer>();
     
     // indexes the preds by their position, 
     // by mapping pred keys to a list of pred indices for that key
@@ -221,13 +215,12 @@ public class EdgeFactory
         this.preds = preds;
         this.signScorer = signScorer;
         
-        fragmentRule = new FragmentJoining(grammar);
-        
-        lexicon = grammar.lexicon;
         generalRules = new RuleGroup(grammar);
-        generalRules.borrowSupercatRuleCombos(grammar.rules);
+        generalRules.borrowSupercatRuleCombos(grammar.getRules());
         ruleInstancesGroup = new RuleGroup(grammar);
-        ruleInstancesGroup.borrowSupercatRuleCombos(grammar.rules);
+        ruleInstancesGroup.borrowSupercatRuleCombos(grammar.getRules());
+        
+        fragmentRule = new FragmentJoining(grammar); //not sure if this will work yet!!
         
         allPreds = new BitSet(preds.size());
         allPreds.set(0, preds.size());
@@ -246,7 +239,7 @@ public class EdgeFactory
             );
         }
             
-        UnifyControl.startUnifySequence();
+        grammar.getUnifyControl().startUnifySequence();
         extractLabeledNominals();
         indexPreds();
         listNominals();
@@ -631,13 +624,16 @@ public class EdgeFactory
         String rel = HyloHelper.getRel(pred);
         Nominal nom2 = HyloHelper.getSecondaryNominal(pred);
         List<String> keys = new ArrayList<String>(2);
-        if (nom instanceof NominalAtom && lexPred != null) 
+        if (nom instanceof NominalAtom && lexPred != null) {
             keys.add(nom.toString() + "(" + lexPred + ")");
-        if (nom instanceof NominalAtom && rel != null) 
+        }
+        if (nom instanceof NominalAtom && rel != null) {
             keys.add(nom.toString() + "<" + rel + ">");
-        if (nom2 instanceof NominalAtom && rel != null) 
+        }
+        if (nom2 instanceof NominalAtom && rel != null) {
             keys.add("<" + rel + ">" + nom2.toString());
-        return (String[]) keys.toArray(new String[keys.size()]);
+        }
+        return keys.toArray(new String[keys.size()]);
     }
     
     // fills in the LF chunks list with the chunks for each pred, 
@@ -646,7 +642,7 @@ public class EdgeFactory
         // for each pred, fill in chunks
         for (int i=0; i < preds.size(); i++) {
         	SatOp pred = preds.get(i);
-        	TIntArrayList chunks = pred.getChunks();
+        	ArrayList<Integer> chunks = pred.getChunks();
             if (chunks == null) continue;
             // for each chunk that this pred is part of
             for (int j = 0; j < chunks.size(); j++) {
@@ -756,7 +752,7 @@ public class EdgeFactory
         // for each pred
         for (int i=0; i < preds.size(); i++) {
             SatOp pred = preds.get(i);
-            TIntArrayList opts = pred.getOpts();
+            ArrayList<Integer> opts = pred.getOpts();
             if (opts == null) continue;
             // for each opt that this pred is part of
             for (int j = 0; j < opts.size(); j++) {
@@ -781,9 +777,11 @@ public class EdgeFactory
         List<String> retval = null;
         for (int i = predIndex+1; i < preds.size(); i++) {
         	SatOp relPred = preds.get(i);
-            if (!nom.equals(HyloHelper.getPrincipalNominal(relPred))) break;
+            if (!nom.equals(HyloHelper.getPrincipalNominal(relPred))) {
+            	break;
+            }
             String rel = HyloHelper.getRel(relPred);
-            if (rel != null && grammar.lexicon.isCoartRel(rel)) { 
+            if (rel != null && grammar.getLexicon().isCoartRel(rel)) { 
                 if (retval == null) retval = new ArrayList<String>(3);
                 retval.add(rel);
             }
@@ -824,17 +822,25 @@ public class EdgeFactory
             // add signs and rules for lex pred
             if (key != null) {
                 List<String> coartRels = getCoartRels(i);
-                Collection<Sign> lexPredSigns = lexicon.getSignsFromPred(key, coartRels);
-                if (lexPredSigns != null) { signs.addAll(lexPredSigns); }
-                Collection<TypeChangingRule> lexPredRules = grammar.rules.getRulesForPred(key);
-                if (lexPredRules != null) { typeChangingRules.addAll(lexPredRules); }
+                Collection<Sign> lexPredSigns = grammar.getLexicon().getSignsFromPred(key, coartRels);
+                if (lexPredSigns != null) { 
+                	signs.addAll(lexPredSigns);
+                }
+                Collection<TypeChangingRule> lexPredRules = grammar.getRules().getRulesForPred(key);
+                if (lexPredRules != null) { 
+                	typeChangingRules.addAll(lexPredRules); 
+                }
             }
             // add signs and rules for indexed rel
             if (rel != null) {
-                Collection<Sign> indexedRelSigns = lexicon.getSignsFromRel(rel);
-                if (indexedRelSigns != null) { signs.addAll(indexedRelSigns); }
-                Collection<TypeChangingRule> indexedRelRules = grammar.rules.getRulesForRel(rel);
-                if (indexedRelRules != null) { typeChangingRules.addAll(indexedRelRules); }
+                Collection<Sign> indexedRelSigns = grammar.getLexicon().getSignsFromRel(rel);
+                if (indexedRelSigns != null) {
+                	signs.addAll(indexedRelSigns);
+                }
+                Collection<TypeChangingRule> indexedRelRules = grammar.getRules().getRulesForRel(rel);
+                if (indexedRelRules != null) {
+                	typeChangingRules.addAll(indexedRelRules);
+                }
             }
             // create initial and marked edges for each sign, updating feature map
             for (Sign sign : signs) {
@@ -989,7 +995,7 @@ public class EdgeFactory
     private List<Pair<Substitution,BitSet>> instantiate(Category cat, Category cat2, int predIndex) {
 
         // unify with indexed pred
-        UnifyControl.reindex(cat, cat2); 
+        grammar.getUnifyControl().reindex(cat, cat2); 
         List<SatOp> lfPreds = HyloHelper.getPreds(cat.getLF());
         Substitution subst = null;
         SatOp indexedPred = preds.get(predIndex);
@@ -998,7 +1004,7 @@ public class EdgeFactory
             LF lfPred = lfPreds.get(i);
             subst = new SimpleSubstitution();
             try {
-                Unifier.unify(lfPred, indexedPred, subst);
+                Unifier.unify(grammar.getUnifyControl(), lfPred, indexedPred, subst);
                 lfPredIndex = i;
                 break;
             } catch (UnifyFailure uf) {}
@@ -1062,7 +1068,7 @@ public class EdgeFactory
                         if (checkAlts(b)) {
                             try { // unify
                             	SatOp matchingPred = preds.get(matchingPredIndex);
-                                Unifier.unify(lfPred, matchingPred, s);
+                                Unifier.unify(grammar.getUnifyControl(), lfPred, matchingPred, s);
                                 retval.add(inst);
                             } catch (UnifyFailure uf) {}
                         }
@@ -1075,7 +1081,7 @@ public class EdgeFactory
                             if (checkAlts(b2)) {
                                 try { // unify
                                 	SatOp matchingPred = preds.get(matchingPredIndex);
-                                    Unifier.unify(lfPred, matchingPred, s2);
+                                    Unifier.unify(grammar.getUnifyControl(), lfPred, matchingPred, s2);
                                     Pair<Substitution,BitSet> inst2 = new Pair<Substitution, BitSet>(s2, b2);
                                     retval.add(inst2);
                                 } catch (UnifyFailure uf) {}
@@ -1515,11 +1521,11 @@ public class EdgeFactory
     // nb: could consider adding feature licensing for type changing rules with no semantics
     private void initGeneralRules() {
         // add all binary rules to general rules
-        for (Rule r : grammar.rules.getBinaryRules()) {
+        for (Rule r : grammar.getRules().getBinaryRules()) {
             generalRules.addRule(r);
         }
         // add type raising rules, and type changing ones with no semantics too
-        for (Rule r : grammar.rules.getUnaryRules()) {
+        for (Rule r : grammar.getRules().getUnaryRules()) {
             // skip type changing rules with semantics
             if (r instanceof TypeChangingRule) {
                 TypeChangingRule rule = (TypeChangingRule) r;
@@ -1539,7 +1545,7 @@ public class EdgeFactory
     // and with appropriate licensing values in the initial edges
     private void initNoSemEdges() {
         // lookup signs by special index rel constant NO_SEM_FLAG
-        Collection<Sign> noSemSigns = lexicon.getSignsFromRel(Lexicon.NO_SEM_FLAG);
+        Collection<Sign> noSemSigns = grammar.getLexicon().getSignsFromRel(Lexicon.NO_SEM_FLAG);
         if (noSemSigns == null) return;
         // sets for accumulating no sem edges
         Set<Edge> instEdges = new HashSet<Edge>();
@@ -1557,7 +1563,7 @@ public class EdgeFactory
 	            // get licensed, potentially instantiated cats
 	            instantiatedCats.clear();
 	            uninstantiatedCats.clear();
-	            featureLicenser.licenseEmptyCat(cat, instantiatedCats, uninstantiatedCats);
+	            featureLicenser.licenseEmptyCat(grammar.getUnifyControl(), cat, instantiatedCats, uninstantiatedCats);
 	            // add edges for instantiated cats to initial edges, updating
 				// feature map
 	            for (Category instCat : instantiatedCats) {

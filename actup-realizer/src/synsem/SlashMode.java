@@ -23,6 +23,7 @@ import java.io.Serializable;
 import org.jdom.Element;
 
 import unify.Substitution;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 import unify.Variable;
 
@@ -107,9 +108,9 @@ public final class SlashMode implements Modality, Serializable {
 		}
 	}
 
-	public Object unify(Object o, Substitution sub) throws UnifyFailure {
+	public Object unify(Object o, Substitution sub, UnifyControl uc) throws UnifyFailure {
 		if (o instanceof VarModality) {
-			return ((VarModality) o).unify(this, sub);
+			return ((VarModality) o).unify(this, sub, uc);
 		} else if (o instanceof SlashMode) {
 			if (modesMatch(_mode, ((SlashMode) o)._mode)) {
 				return copy();

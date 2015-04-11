@@ -19,19 +19,19 @@
 package hylo;
 
 
-import gnu.trove.TIntArrayList;
 import grammar.Grammar;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import synsem.LF;
-import util.ListMap;
+import util.GroupMap;
 
 /**
  * A class for performing flattening operations on LFs.
@@ -55,16 +55,16 @@ public class Flattener {
 	
 	// map from preds to children from original expression (identity keys);
 	// includes dummy parents to preserve structure 
-	private ListMap<SatOp,SatOp> childMap = new ListMap<SatOp,SatOp>(true);
+	private GroupMap<SatOp,SatOp> childMap = new GroupMap<SatOp, SatOp>();
     
     // map from nominals to highest pred for that nominal from original expression
-	private Map<Nominal,SatOp> nomMap = new HashMap<Nominal,SatOp>();
+	private Map<Nominal,SatOp> nomMap = new LinkedHashMap<Nominal,SatOp>();
     
     // map from pred to depth in original expression
-	private Map<Nominal,Integer> depthMap = new HashMap<Nominal,Integer>(); 
+	private Map<Nominal,Integer> depthMap = new LinkedHashMap<Nominal,Integer>(); 
 	
 	// map from nominal to highest parent nominal in original expression, or null if a root
-	private Map<Nominal,Nominal> parentMap = new HashMap<Nominal,Nominal>();
+	private Map<Nominal,Nominal> parentMap = new LinkedHashMap<Nominal,Nominal>();
 	
 //	// null nominal for use in dummy parents during flattening
 	private Nominal nullNom;
@@ -82,10 +82,7 @@ public class Flattener {
 		return parentMap;
 	}
 	public Flattener(Grammar grammar) {
-		if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+		
 		this.nullNom =  new NominalAtom(grammar, "null"); 
 		this.grammar = grammar;
 		this.nullProp = new Proposition(grammar, "null");
@@ -99,13 +96,14 @@ public class Flattener {
      * A runtime exception is thrown if the LF cannot be flattened.
      */
     public List<SatOp> flatten(LF lf) {
-        flatten(lf, null, null, 0, new Stack<Alt>(), new TIntArrayList());
+        //lf is definitely an instance of satop here!!
+    	flatten(lf, null, null, 0, new Stack<Alt>(), new ArrayList<Integer>());
         if (altCount > 0 || optCount > 0) propAltsOptsChunks();
         return preds;
     }
 
     // recursive flattening, with conversion of alts and opts
-    private void flatten(LF lf, Nominal currentNominal, SatOp parent, int depth, Stack<Alt> alts,  TIntArrayList opts) {
+    private void flatten(LF lf, Nominal currentNominal, SatOp parent, int depth, Stack<Alt> alts,  ArrayList<Integer> opts) {
         if (lf instanceof SatOp) {
             // flatten arg with new current nominal
             SatOp satOp = (SatOp) lf;
@@ -238,13 +236,18 @@ public class Flattener {
     }
 
     // handles new preds
-    private void addSatOp(SatOp satOp, SatOp parent, int depth, Stack<Alt> alts, TIntArrayList opts, LF lf) {
+    private void addSatOp(SatOp satOp, SatOp parent, int depth, Stack<Alt> alts, ArrayList<Integer> opts, LF lf) {
     	// add non-dummy satops to result
-    	if ( nullNom == null) {}
-    	if (satOp._arg != nullProp) preds.add(satOp);
+    	if (satOp._arg != nullProp) { 
+    		preds.add(satOp);
+    	}
         // update roots, maps
-        if (parent == null) roots.add(satOp);
-        else childMap.put(parent, satOp);
+        if (parent == null) { 
+        	roots.add(satOp);
+        }
+        else {
+        	childMap.put(parent, satOp);
+        }
         Nominal nom = satOp._nominal;
         if (!nom.isShared()) {
 	        if (!nomMap.containsKey(nom) || depth < depthMap.get(nom)) {
@@ -257,7 +260,7 @@ public class Flattener {
         }
         // set alts, opts, chunks
         if (!alts.empty()) satOp.alts = new ArrayList<Alt>(alts);
-        if (opts.size() > 0) satOp.opts = new TIntArrayList(opts.toNativeArray());
+        if (opts.size() > 0) satOp.opts = new ArrayList<Integer>(opts);
         satOp.setChunks(lf.getChunks());
     }
     
@@ -265,15 +268,15 @@ public class Flattener {
     private void propAltsOptsChunks() {
         // propagate for each root nom
         List<Alt> alts = Collections.emptyList(); 
-        TIntArrayList opts = new TIntArrayList(0);
-        TIntArrayList chunks = new TIntArrayList(0);
+        ArrayList<Integer> opts = new ArrayList<Integer>(0);
+        ArrayList<Integer> chunks = new ArrayList<Integer>(0);
         for (SatOp root : roots) {
         	propAltsOptsChunks(root, alts, opts, chunks);
         }
     }
     
     // prop alts, opts & chunks, recursing through preds in child map and shared nom refs in nomMap
-	private void propAltsOptsChunks(SatOp satOp, List<Alt> alts, TIntArrayList opts, TIntArrayList chunks) { 
+	private void propAltsOptsChunks(SatOp satOp, List<Alt> alts, ArrayList<Integer> opts, ArrayList<Integer> chunks) { 
         // prop alts and opts
         if (!alts.isEmpty()) {
             if (satOp.alts == null) satOp.alts = new ArrayList<Alt>(3);
@@ -283,27 +286,27 @@ public class Flattener {
             Collections.sort(satOp.alts); 
         }
         if (!opts.isEmpty()) {
-            if (satOp.opts == null) satOp.opts = new TIntArrayList(3);
+            if (satOp.opts == null) satOp.opts = new ArrayList<Integer>(3);
             for (int i=0; i < opts.size(); i++) {
                 int opt = opts.get(i);
                 if (!satOp.opts.contains(opt)) satOp.opts.add(opt);
             }
-            satOp.opts.sort();
+            Collections.sort(satOp.opts);
         }
         if (!chunks.isEmpty()) {
-            if (satOp.chunks == null) satOp.chunks = new TIntArrayList(3);
+            if (satOp.chunks == null) satOp.chunks = new ArrayList<Integer>(3);
             for (int i=0; i < chunks.size(); i++) {
                 int chunk = chunks.get(i);
                 if (!satOp.chunks.contains(chunk)) satOp.chunks.add(chunk);
             }
-            satOp.chunks.sort();
+            Collections.sort(satOp.chunks);
         }
         // gather alts, opts & chunks for recursion
         List<Alt> alts2 = (satOp.alts != null) ? satOp.alts : alts;
-        TIntArrayList opts2 = (satOp.opts != null) ? satOp.opts : opts;
-        TIntArrayList chunks2 = (satOp.chunks != null) ? satOp.chunks : chunks;
+        ArrayList<Integer> opts2 = (satOp.opts != null) ? satOp.opts : opts;
+        ArrayList<Integer> chunks2 = (satOp.chunks != null) ? satOp.chunks : chunks;
         // recurse through children, if any
-        List<SatOp> children = childMap.get(satOp);
+        Set<SatOp> children = childMap.get(satOp);
         if (children != null) {
             for (SatOp child : children) 
             	propAltsOptsChunks(child, alts2, opts2, chunks2);

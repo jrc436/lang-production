@@ -19,12 +19,29 @@
 package lexicon;
 
 import grammar.Grammar;
-import util.*;
 
-import java.text.*;
-import java.util.*;
-import javax.xml.datatype.*;
-import gnu.trove.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.ParsePosition;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Currency;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.StringTokenizer;
+
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.Duration;
+
+import util.Pair;
 
 /**
  * DefaultTokenizer provides a default implementation of the 
@@ -59,9 +76,7 @@ public class DefaultTokenizer implements Tokenizer {
      * A set containing semantic classes to replace words with for language models.
      * Equality is checked with identity, for use with interned strings.
      */
-    @SuppressWarnings("unchecked")
-	protected Set<String> replacementSemClasses = new THashSet(new TObjectIdentityHashingStrategy());
-
+	protected Set<String> replacementSemClasses = new LinkedHashSet<String>();
 
     /**
      * Constructor.
@@ -114,7 +129,7 @@ public class DefaultTokenizer implements Tokenizer {
      * Tokens are parsed into words using parseToken with the strictFactors
      * flag set to false.
      */
-    public List<Word> tokenize(String s) { return tokenize(s, false); }
+    public List<Word> tokenize(Grammar grammar, String s) { return tokenize(grammar, s, false); }
 
     /**
      * Parses an input string into a list of words, 
@@ -124,10 +139,10 @@ public class DefaultTokenizer implements Tokenizer {
      * flag for whether to parse factors strictly.
      * The string is assumed to have white-space delimited tokens.
      */
-    public List<Word> tokenize(String s, boolean strictFactors) {
+    public List<Word> tokenize(Grammar grammar, String s, boolean strictFactors) {
         List<Word> retval = new ArrayList<Word>();
         StringTokenizer st = new StringTokenizer(s);
-        while (st.hasMoreTokens()) { retval.add(parseToken(st.nextToken(), strictFactors)); }
+        while (st.hasMoreTokens()) { retval.add(parseToken(grammar, st.nextToken(), strictFactors)); }
         return retval;
     }
 
@@ -138,7 +153,7 @@ public class DefaultTokenizer implements Tokenizer {
      * Parsing is performed using parseToken with the strictFactors
      * flag set to false.
      */
-    public Word parseToken(String token) { return parseToken(token, false); }
+    public Word parseToken(Grammar grammar, String token) { return parseToken(grammar, token, false); }
     
     /** 
      * Parses a token into a word, including any explicitly given factors 
@@ -156,7 +171,7 @@ public class DefaultTokenizer implements Tokenizer {
      * appear without escaping in the word form.
      * After splitting the token into factors, it is unescaped.
      */
-    public Word parseToken(String token, boolean strictFactors) {
+    public Word parseToken(Grammar grammar, String token, boolean strictFactors) {
         // init
         String form = token;
         String pitchAccent = null;
@@ -219,7 +234,7 @@ public class DefaultTokenizer implements Tokenizer {
         String specialTokenClass = isSpecialToken(form);
         if (specialTokenClass != null) semClass = specialTokenClass;
         // done
-        return Word.createWord(form,pitchAccent,attrValPairs,stem,POS,supertag,semClass);
+        return Word.createWord(grammar.getWordFactory(),form,pitchAccent,attrValPairs,stem,POS,supertag, semClass);
     }
     
     
@@ -673,30 +688,5 @@ public class DefaultTokenizer implements Tokenizer {
         return Arrays.asList(words);
     }
     
-    /** Test: tokenize args[0], expand each token; and optionally do parseToken(args[1],true). */
-    public static void main(String[] args) {
-        Tokenizer tk = new DefaultTokenizer();
-        String s = args[0];
-        List<Word> words = tk.tokenize(s);
-        String expw = "";
-        System.out.println("words: ");
-        for (int i = 0; i < words.size(); i++) {
-            Word word = words.get(i);
-            System.out.print(word + " ");
-            List<String> orthWords = tk.expandWord(word);
-            for (int j = 0; j < orthWords.size(); j++) {
-                expw += orthWords.get(j) + " ";
-            }
-        }
-        System.out.println();
-        System.out.println("expanded: " + expw);
-        System.out.println("formatted: " + tk.format(words));
-        if (args.length > 1) {
-            System.out.println();
-            Word strictlyParsed = tk.parseToken(args[1], true);
-            System.out.println("strictly parsed word: " + strictlyParsed);
-            System.out.println("formatted: " + tk.format(strictlyParsed));
-        }
-    }
 }
 

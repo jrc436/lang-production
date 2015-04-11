@@ -33,9 +33,9 @@ public class BackwardApplication extends AbstractApplicationRule {
 
 	private static final long serialVersionUID = 6981288425455531650L;
 
-	public BackwardApplication (Grammar grammar) {
-		super(grammar);
-		_name = "<";
+	public BackwardApplication(Grammar rg) {
+		super(rg);
+		name = "<";
 		_functorSlash = new Slash(grammar, '\\');
 		_functorSlash.setAbility("active");
     }

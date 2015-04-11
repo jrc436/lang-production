@@ -47,10 +47,7 @@ public class Family {
 
     @SuppressWarnings("unchecked")
 	public Family(Grammar grammar, Element famel) {
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
+    	
     	//this.grammar = grammar;
         setName(famel.getAttributeValue("name"));
         pos = famel.getAttributeValue("pos");
@@ -80,11 +77,6 @@ public class Family {
     }
 
     public Family(String s) {
-//    	if (grammar == null ) {
-//    		System.err.println("Someone's tricksing you");
-//    		System.exit(1);
-//    	}
-    	//this.grammar = grammar;
     	setName(s); 
     }
 

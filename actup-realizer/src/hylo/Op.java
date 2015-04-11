@@ -18,16 +18,23 @@
 
 package hylo;
 
-import synsem.*;
-import unify.*;
 import grammar.Grammar;
 
-import org.jdom.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
 
-import java.util.*;
+import org.jdom.Element;
 
-import gnu.trove.*;
-
+import synsem.LF;
+import unify.ModFcn;
+import unify.Substitution;
+import unify.Unifiable;
+import unify.UnifyControl;
+import unify.UnifyFailure;
+import unify.Variable;
+	
 /**
  * A generic operator, such as conjunction, disjunction, exclusive-or, 
  * negation or optionality (^, v, v_, ~, ?).
@@ -160,7 +167,7 @@ public class Op extends HyloFormula {
     }
 
     /** Unification is not attempted for Ops. */
-    public Object unify(Object u, Substitution s) throws UnifyFailure {
+    public Object unify(Object u, Substitution s, UnifyControl uc) throws UnifyFailure {
         throw new UnifyFailure();
     }
     
@@ -180,7 +187,7 @@ public class Op extends HyloFormula {
             sb.append(_args.get(0).toString());
         } else {
             sb.append('(');
-            Iterator<LF> argsIt = filteredArgs().iterator();
+            Iterator<LF> argsIt = _args.iterator();
             for (; argsIt.hasNext(); ) {
                 sb.append(argsIt.next().toString());
                 if (argsIt.hasNext()) sb.append(' ').append(opString).append(' ');
@@ -202,7 +209,7 @@ public class Op extends HyloFormula {
             sb.append(((LF)_args.get(0)).prettyPrint(indent));
         } else {
             sb.append('(');
-            Iterator<LF> argsIt = filteredArgs().iterator();
+            Iterator<LF> argsIt = _args.iterator();
             for (; argsIt.hasNext(); ) {
                 sb.append(argsIt.next().prettyPrint(indent));
                 if (argsIt.hasNext()) sb.append(' ').append(opString).append(' ');
@@ -221,24 +228,6 @@ public class Op extends HyloFormula {
         else                     return o;
     }
     
-    // filters out semantic features if apropos
-    private List<LF> filteredArgs() {
-        String featsToShow = grammar.featsToShow;
-        if (featsToShow.length() == 0) return _args;
-        List<LF> retval = new ArrayList<LF>(_args.size());
-        for (Iterator<LF> it = _args.iterator(); it.hasNext(); ) {
-            LF arg = it.next();
-            String attr = null;
-            if (arg instanceof SatOp && HyloHelper.isAttrPred(arg)) 
-                attr = HyloHelper.getRel(arg);
-            else if (arg instanceof Diamond && HyloHelper.isAttr(arg))
-                attr = ((Diamond)arg).getMode().toString();
-            if (attr == null || featsToShow.indexOf(attr) != -1)
-                retval.add(arg);
-        }
-        return retval;
-    }
-
     /** Returns a hash code. */
     public int hashCode() {
         int retval = _name.hashCode();
@@ -251,7 +240,7 @@ public class Op extends HyloFormula {
     /**
      * Returns a hash code using the given map from vars to ints.
      */
-    public int hashCode(TObjectIntHashMap varMap) { 
+    public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) { 
         int retval = _name.hashCode();
         for (Iterator<LF> it = _args.iterator(); it.hasNext(); ) {
             LF arg = it.next();
@@ -265,7 +254,7 @@ public class Op extends HyloFormula {
      * up to variable names, using the given maps from vars to ints
      * (where args must be in the same order).
      */
-    public boolean equals(Object obj, TObjectIntHashMap varMap, TObjectIntHashMap varMap2) {
+    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
         if (obj.getClass() != this.getClass()) { return false; }
         Op op = (Op) obj;
         if (!_name.equals(op._name)) return false;

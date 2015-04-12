@@ -27,11 +27,10 @@ public class Client {
 			Files.createDirectory(Paths.get(Consts.trialOutputPath));
 		}
 		catch (FileAlreadyExistsException ex) {
-			System.err.println("You are overwriting a run!!!");
+			System.err.println("You are potentially overwriting a run!!!");
 		}
 		String logRealizations = IOSettings.logRealizations ? Consts.trialRealizationSetPath : null;
-		String goldPath = IOSettings.loadGoldFromFile ? Consts.goldPath : null;
-		ValleyClimber hc = new ValleyClimber(s, rs, Consts.grammarPath, Consts.inputPath, logRealizations, Consts.trialOutputPath, goldPath);
+		ValleyClimber hc = new ValleyClimber(s, rs, Consts.grammarPath, Consts.inputPath, Consts.trialOutputPath, logRealizations, IOSettings.percentInput);
 		
 		for (int j = 0; j <= IOSettings.NumRandomRestarts; j++) {
 			ExecutorService es = Executors.newCachedThreadPool();

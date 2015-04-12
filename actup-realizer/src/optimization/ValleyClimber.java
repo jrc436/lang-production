@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Random;
 
 import ngrams.ACTRNgramModel;
 import realize.Realization;
@@ -19,7 +20,7 @@ import evaluation.Rouge;
 
 //a hillclimber... that likes valleys
 public class ValleyClimber implements Optimizer {
-	private String inputFileDir;
+	private File[] inputFiles;
 	private String realizationLogPath;
 	private String goldRealizationDir;
 	private String resultsLogPath;
@@ -27,11 +28,14 @@ public class ValleyClimber implements Optimizer {
 	private RealizationSettings rs;
 	private Evaluator eval;
 	private String grammarFile;
-	public ValleyClimber(IOSettings s, RealizationSettings rs, String grammarFile, String inputFileDir, String realizationLogPath, String resultsLogPath, String goldRealizationDir) {
-		this.goldRealizationDir = goldRealizationDir;
-		//this.opt = opt;
+	
+	public ValleyClimber(IOSettings s, RealizationSettings rs, String grammarFile, String inputFileDir, String resultsLogPath) {
+		this(s, rs, grammarFile, inputFileDir, resultsLogPath, null, 1.0);
+	}
+	public ValleyClimber(IOSettings s, RealizationSettings rs, String grammarFile, String inputFileDir, String resultsLogPath, String realizationLogPath, double percentFiles) {
 		this.rs = rs;
-		this.inputFileDir = inputFileDir;
+		inputFiles = this.getInputFiles(inputFileDir, percentFiles);
+		
 		this.realizationLogPath = realizationLogPath;
 		this.resultsLogPath = resultsLogPath;
 		this.runSettings = s;
@@ -47,6 +51,16 @@ public class ValleyClimber implements Optimizer {
 				eval = new Rouge(s.getScoringStrategy(), s.getEvaluationType().extPath());
 				break;
 		}
+	}
+	private File[] getInputFiles(String dir, double percentToUse) {
+		File[] allInput = new File(dir).listFiles();
+		int numFilesToUse = Math.max(1, (int) Math.round((double)allInput.length * percentToUse));
+		File[] out = new File[numFilesToUse];
+		Random r = new Random();
+		for (int i = 0; i < numFilesToUse; i++) {
+			out[i] = allInput[r.nextInt(allInput.length)];
+		}
+		return out;
 	}
 	
 	//experiment name should be a specific run of an experiment... which should be independent of the settings
@@ -73,6 +87,7 @@ public class ValleyClimber implements Optimizer {
 			if (currentIter > maxIter) {
 				break;
 			}
+			System.out.println("Iteration "+currentIter+"/"+maxIter);
 			iterName = experimentName+"-i"+String.format("%04d", currentIter);
 			lastScore = currentScore;
 			
@@ -129,9 +144,8 @@ public class ValleyClimber implements Optimizer {
 	private double performRun(String runName, VariableSet opt, RealizeMain r, FileWriter fw)  {	
 		//String num = in.getName().split("-")[1];
 		System.out.println("This realization is a: " + runSettings.toString());
-		File[] list = new File(this.inputFileDir).listFiles();
 		Realization[] rOut = null;
-		for (File in : list) {
+		for (File in : inputFiles) {
 			String num = parseRunNum(in.toPath());
 			String iterName = runName + "-f" + num;
 			

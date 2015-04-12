@@ -51,8 +51,9 @@ public class RealizeMain
     private Realizer realizer;
     private AbstractStandardNgramModel ngramScorer; 
     
-    private HashMap<String, List<Element>> cachedInputs;
+    //private HashMap<String, List<Element>> cachedInputs;
     private HashMap<String, AbstractStandardNgramModel> cachedScorers;
+    private HashMap<String, InputStruct[]> cachedInputs;
     
     public RealizeMain(RealizationSettings rs, String grammarfile) {
          System.out.println("Loading grammar from URL: " + grammarfile);
@@ -65,7 +66,7 @@ public class RealizeMain
         	 System.exit(1);
          }
          //maintains a mapping of input files to their elements, to save a bit of time (about 1 second per run)!
-         cachedInputs = new HashMap<String, List<Element>>();
+         cachedInputs = new HashMap<String, InputStruct[]>();
          //saves more time! maybe ~15 seconds per run!
          cachedScorers = new HashMap<String, AbstractStandardNgramModel>();
     }
@@ -116,7 +117,8 @@ public class RealizeMain
     			break;
     	}
     	if (cachedScorers.containsKey(modelFile)) {
-    		AbstractStandardNgramModel score = cachedScorers.get(modelFile); //need to fix this later 
+    		System.out.println("Loading scorer from cache");
+    		AbstractStandardNgramModel score = cachedScorers.get(modelFile); 
     		score.resetVars(v.getDoubleArray());
     		this.ngramScorer = score;
     		ngramScorer.clean();
@@ -135,11 +137,26 @@ public class RealizeMain
     	System.out.println(ngramScorer.getClass());   
    }
     
- 
-   private List<Element> prepareInput(String inputfile) {
-	     if (cachedInputs.containsKey(inputfile)) {
+   private InputStruct[] getInputStruct(String inputfile) {
+	   if (cachedInputs.containsKey(inputfile)) {
+		   System.out.println("Loading input from cache");
 	    	 return cachedInputs.get(inputfile);
-	     }
+	   }
+	   List<Element> items = prepareInput(inputfile);
+	   String[] goals = getGoals(items);
+	   InputStruct[] inp = new InputStruct[items.size()];
+	   for (int i = 0; i < items.size(); i++) {
+       		Element item = items.get(i);
+       		Element lfelt = item.getChild("lf");
+	        LF lf = realizer.getLfFromElt(lfelt);
+	        inp[i] = new InputStruct(lf, goals[i]);
+	   }
+	   cachedInputs.put(inputfile, inp);
+	   return inp;
+   }
+    
+ 
+   private List<Element> prepareInput(String inputfile) {    
 	     Document doc = null;
 	     try {
 	    	 doc = loadInput(inputfile);
@@ -162,7 +179,6 @@ public class RealizeMain
          for (Element remove : toRemove) {
          	items.remove(remove);
          }
-         cachedInputs.put(inputfile, items);
          return items;
     }
     //extracts the targets from the xml sheet
@@ -177,7 +193,6 @@ public class RealizeMain
     private synchronized FileWriter fw(String outputfile) throws IOException {
     	return new FileWriter(outputfile);
     }
-    
 	public Realization[] realize(String inputfile, String outputfile) {              
 		FileWriter out = null;
 		if (outputfile != null) {
@@ -191,22 +206,15 @@ public class RealizeMain
 	    		System.exit(1);
 			}
 		}
-         
-        List<Element> items = this.prepareInput(inputfile);
-        String[] goals = this.getGoals(items);  
+		
+		InputStruct[] items = this.getInputStruct(inputfile);
+        Realization[] r = new Realization[items.length];
         
-        Realization[] r = new Realization[goals.length];
-        
-        for (int i = 0; i < items.size(); i++) {
-        	Element item = items.get(i);
-        	
-        	Element lfelt = item.getChild("lf");
-	        LF lf = realizer.getLfFromElt(lfelt);
+        for (int i = 0; i < items.length; i++) {
 	        
-	        realizer.realize(lf, ngramScorer);	        
-	        Chart chart = realizer.getChart();
-	        
-	        r[i] = chart.getBestRealization(goals[i]);      
+	        realizer.realize(items[i].lf, ngramScorer);	        
+	        Chart chart = realizer.getChart();       
+	        r[i] = chart.getBestRealization(items[i].goal);      
 	        
 	        if (out != null) {
 	        	try {
@@ -223,7 +231,7 @@ public class RealizeMain
 	        	System.out.println(r[i]);
 	        }
 	    
-	        ngramScorer.updateAfterRealization(goals[i]);
+	        ngramScorer.updateAfterRealization(items[i].goal);
         }
         if (out != null) {
         	try {
@@ -237,4 +245,14 @@ public class RealizeMain
         }
         return r;
     }
+	//given an input file, we want to be able to get:
+	//
+	private class InputStruct {
+		private final LF lf;
+		private final String goal;
+		private InputStruct(LF lf, String goal) {
+			this.lf = lf;
+			this.goal = goal;
+		}
+	}
 }

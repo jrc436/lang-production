@@ -10,15 +10,17 @@ public class IOSettings {
 	//I/O Settings
 	protected static final String basePath = "/Users/jrc/Public/jrc-research/";
 	//protected static final String basePath = "/work/research/"; //basepath refers to where the research dir is located
-	protected static final String trialSet = "concurrent-climb"; //trialset refers to a single optimization run's name
-	protected static final int iterCap = 100000; //number of iterations before it terminates
+	protected static final String trialSet = "concurrent-climb-test"; //trialset refers to a single optimization run's name
+	protected static final int iterCap = 5; //number of iterations before it terminates
 	protected static final int NumConcurrentStarts = 8; //should be roughly equal to number of processors
-	protected static final int NumRandomRestarts = 100;
+	protected static final int NumRandomRestarts = 1;
 	private static final int startIndex = ACTRNgramModel.ey_index;
 	protected static final ModelType mType = ModelType.ACTR;
 	protected static final TrainingSet trSet = TrainingSet.SWBD;
 	protected static final EvaluationType eval = EvaluationType.EditDistanceWord;
 	protected static final ScoringStrategy strat = ScoringStrategy.ScoreComplete;
+	protected static final double percentInput = 0.01;
+	
 	protected static final boolean logRealizations = false;
 	protected static final boolean loadGoldFromFile = false;
 	

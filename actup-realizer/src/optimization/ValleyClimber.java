@@ -4,14 +4,16 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Random;
 
 import ngrams.ACTRNgramModel;
 import realize.Realization;
 import realize.RealizeMain;
+import realize.Realizer;
 import runconfig.IOSettings;
 import runconfig.ModelType;
-import runconfig.RealizationSettings;
 import evaluation.Evaluator;
 import evaluation.LevenshteinDistance;
 import evaluation.LevenshteinDistanceWord;
@@ -20,26 +22,20 @@ import evaluation.Rouge;
 
 //a hillclimber... that likes valleys
 public class ValleyClimber implements Optimizer {
-	private File[] inputFiles;
+	private Queue<File> inputFiles;
 	private String realizationLogPath;
-	private String goldRealizationDir;
 	private String resultsLogPath;
 	private IOSettings runSettings;
-	private RealizationSettings rs;
 	private Evaluator eval;
-	private String grammarFile;
+	private RealizeMain r;
 	
-	public ValleyClimber(IOSettings s, RealizationSettings rs, String grammarFile, String inputFileDir, String resultsLogPath) {
-		this(s, rs, grammarFile, inputFileDir, resultsLogPath, null, 1.0);
-	}
-	public ValleyClimber(IOSettings s, RealizationSettings rs, String grammarFile, String inputFileDir, String resultsLogPath, String realizationLogPath, double percentFiles) {
-		this.rs = rs;
+	public ValleyClimber(IOSettings s, RealizeMain r, String inputFileDir, String resultsLogPath, double percentFiles, String realizationLogPath) {
 		inputFiles = this.getInputFiles(inputFileDir, percentFiles);
 		
 		this.realizationLogPath = realizationLogPath;
 		this.resultsLogPath = resultsLogPath;
 		this.runSettings = s;
-		this.grammarFile = grammarFile;
+		this.r = r;
 		switch (s.getEvaluationType()) {
 			case EditDistanceChar:
 				eval = new LevenshteinDistance(s.getScoringStrategy());
@@ -52,13 +48,13 @@ public class ValleyClimber implements Optimizer {
 				break;
 		}
 	}
-	private File[] getInputFiles(String dir, double percentToUse) {
+	private Queue<File> getInputFiles(String dir, double percentToUse) {
 		File[] allInput = new File(dir).listFiles();
 		int numFilesToUse = Math.max(1, (int) Math.round((double)allInput.length * percentToUse));
-		File[] out = new File[numFilesToUse];
+		Queue<File> out = new LinkedList<File>();
 		Random r = new Random();
 		for (int i = 0; i < numFilesToUse; i++) {
-			out[i] = allInput[r.nextInt(allInput.length)];
+			out.offer(allInput[r.nextInt(allInput.length)]);
 		}
 		return out;
 	}
@@ -66,11 +62,10 @@ public class ValleyClimber implements Optimizer {
 	//experiment name should be a specific run of an experiment... which should be independent of the settings
 	//and only dependent on opt
 	public VariableSet optimizeVariables(String experimentName, VariableSet opt, int maxIter) {
-		RealizeMain r = null;
+		Realizer real = r.createNewRealizer();
 		FileWriter fw = null;
 		try {
 			//it's for obvious reasons very important that no one holds the same experiment name in a concurrent setup!!!
-			r = new RealizeMain(this.rs, this.grammarFile);
 			fw = new FileWriter(resultsLogPath+experimentName, true);
 			fw.write(this.runSettings.toString()+"\n");
 		}
@@ -91,7 +86,7 @@ public class ValleyClimber implements Optimizer {
 			iterName = experimentName+"-i"+String.format("%04d", currentIter);
 			lastScore = currentScore;
 			
-			currentScore = performRun(iterName, opt, r, fw);
+			currentScore = performRun(real, iterName, opt, fw);
 
 			//making strictly less will let it terminate a bit faster, but will explore less values
 			boolean goodStep = currentScore < lastScore;
@@ -141,41 +136,43 @@ public class ValleyClimber implements Optimizer {
 		
 	}
 	
-	private double performRun(String runName, VariableSet opt, RealizeMain r, FileWriter fw)  {	
+	private synchronized Queue<File> copyInput() {
+		return new LinkedList<File>(inputFiles);
+	}
+	
+	private double performRun(Realizer real, String runName, VariableSet opt, FileWriter fw)  {	
 		//String num = in.getName().split("-")[1];
 		System.out.println("This realization is a: " + runSettings.toString());
 		Realization[] rOut = null;
-		for (File in : inputFiles) {
+		//locking mechanism means no thread should ever be trying to realize the same
+
+		Queue<File> localInput = this.copyInput(); //deepcopy
+		
+		while (!localInput.isEmpty()) { 
+			File in = localInput.peek(); 
 			String num = parseRunNum(in.toPath());
-			String iterName = runName + "-f" + num;
+			if (!r.attemptAcquireLock(num)) {
+				localInput.offer(localInput.poll());
+				continue;
+			}
+			System.out.println("Beginning run on file: "+num);
+			localInput.poll();
 			
+			String iterName = runName + "-f" + num;
 			System.out.println("Beginning to realize: "+iterName);
-			r.setLM(runSettings, opt, num);
 			try {
 				String realizationLogPath = this.realizationLogPath == null ? null : this.realizationLogPath+iterName+".spl";
-				rOut = r.realize(in.getPath().toString(), realizationLogPath);
+				rOut = r.realize(r.setLM(real.getGrammar(), runSettings, opt, num), real, in.getPath().toString(), realizationLogPath);
 			}
 			catch (Exception e) {
 				e.printStackTrace();
 				System.err.println("Error while realizing");
 				System.exit(1);
 			}
-		}
-		if (goldRealizationDir != null) {
-			//this should only generally be used if storing things in RAM is impractical for some reason.
-			//not really thread safe as is.
-			try {
-				eval.loadFiles(goldRealizationDir, realizationLogPath);
-			}
-			catch (IOException io) {
-				io.printStackTrace();
-				System.err.println("Error loading from gold direcotry");
-				System.exit(1);
-			}
-		}
-		else {
-			eval.loadData(rOut);
-		}
+			r.releaseLock(num);
+		}		
+		
+		eval.loadData(rOut);	
 		double score = eval.scoreAll().getScore();
 		try {
 			writeout(fw, runName, score, opt);

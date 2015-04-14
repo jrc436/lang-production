@@ -43,17 +43,16 @@ import synsem.SignScorer;
 public class Realizer
 {	
     /** The grammar used for realization. */
-    private final Grammar grammar;  
+    private final Grammar grammar;
+    public Grammar getGrammar() {
+    	return this.grammar;
+    }
     private Chart chart;
     private PruningStrategy pruningStrategy;
     private final RealizationSettings rSet;
     
     /** Constructor. */
     public Realizer(RealizationSettings rs, Grammar grammar) { 
-    	if (grammar == null ) {
-    		System.err.println("Someone's tricksing you");
-    		System.exit(1);
-    	}
     	this.rSet = rs;
         this.grammar = grammar;
         this.pruningStrategy = new NBestPruningStrategy(rSet.getEdgePruningValue());
@@ -66,7 +65,7 @@ public class Realizer
      * Retrieves an input LF from the given XML element, processing any 
      * LF chunks along the way.
      */
-    public LF getLfFromElt(Element lfElt) {
+    public static LF getLfFromElt(Grammar grammar, Element lfElt) {
         HyloHelper.processChunks(lfElt);
         LF lf = HyloHelper.getLF(grammar, lfElt);
         return lf;

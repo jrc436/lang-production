@@ -10,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import optimization.ValleyClimber;
 import optimization.Variable;
 import optimization.VariableSet;
+import realize.RealizeMain;
 
 public class Client {	
 	
@@ -30,7 +31,7 @@ public class Client {
 			System.err.println("You are potentially overwriting a run!!!");
 		}
 		String logRealizations = IOSettings.logRealizations ? Consts.trialRealizationSetPath : null;
-		ValleyClimber hc = new ValleyClimber(s, rs, Consts.grammarPath, Consts.inputPath, Consts.trialOutputPath, logRealizations, IOSettings.percentInput);
+		ValleyClimber hc = new ValleyClimber(s, new RealizeMain(rs, Consts.grammarPath), Consts.inputPath, Consts.trialOutputPath, IOSettings.percentInput, logRealizations);
 		
 		for (int j = 0; j <= IOSettings.NumRandomRestarts; j++) {
 			ExecutorService es = Executors.newCachedThreadPool();
@@ -53,7 +54,9 @@ class optThread implements Runnable {
 		this.threadNum = threadNum;
 	}
 	public void run() {
-		opt.randomAll();
-		hc.optimizeVariables("e"+String.format("%02d", threadNum), opt, IOSettings.iterCap);		
+		for (int i = 0; i <= IOSettings.NumRandomRestarts; i++) {
+			opt.randomAll();
+			hc.optimizeVariables("e"+String.format("%02d", i*IOSettings.NumConcurrentStarts+threadNum), opt, IOSettings.iterCap);
+		}
 	}
 }

@@ -23,6 +23,7 @@ public abstract class Evaluator implements TextScorer {
 	public Evaluator(ScoringStrategy strat) {
 		this.strat = strat;
 	}
+	//if for whatever reason, it's better to load from files, then do that. Generally should not be used.
 	public synchronized void loadFiles(String goldDirPath, String testDirPath) throws IOException {
 		realizations = new ArrayList<Realization>();
 		File[] evalFiles = new File(testDirPath).listFiles();

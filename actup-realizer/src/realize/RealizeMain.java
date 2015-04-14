@@ -47,32 +47,31 @@ public class RealizeMain
 		iolock = new Object();
 	}
 
-	private Grammar grammar;
-	private Realizer realizer;
-	private AbstractStandardNgramModel ngramScorer; 
+	private final String grammarfile;
+	private final RealizationSettings rs;
+	//private AbstractStandardNgramModel ngramScorer; 
 
 	private HashMap<String, AbstractStandardNgramModel> cachedScorers;
 	private HashMap<String, InputStruct[]> cachedInputs;
 	private HashMap<String, Boolean> locks;
 
 
+	//should only need one realizemain, generally, as it is generally threadsafe
+	//with the locking mechanisms in valleyclimber
 	public RealizeMain(RealizationSettings rs, String grammarfile) {
+		this.rs = rs;
+		this.grammarfile = grammarfile;
 		System.out.println("Loading grammar from URL: " + grammarfile);
-		try {
-			loadGrammar(grammarfile, rs);
-		}
-		catch (IOException e) {
-			e.printStackTrace();
-			System.err.println("Error loading grammar");
-			System.exit(1);
-		}
+		
+		
+			
 		//maintains a mapping of input files to their elements, to save a bit of time (about 1 second per run)!
 		cachedInputs = new HashMap<String, InputStruct[]>();
 		//saves more time! maybe ~15 seconds per run!
 		cachedScorers = new HashMap<String, AbstractStandardNgramModel>();
-		locks = new HashMap<Integer, Boolean>();
+		locks = new HashMap<String, Boolean>();
 	}
-	private Document loadInput(String inputfile) throws IOException {
+	private Document loadInput(Grammar grammar, String inputfile) throws IOException {
 		Document d = null;
 		synchronized(iolock) {
 			d = grammar.loadFromXml(inputfile);
@@ -80,33 +79,38 @@ public class RealizeMain
 		return d;
 	}
 
-	private synchronized void loadGrammar(String grammarFile, RealizationSettings rs) throws IOException {  	
+	private synchronized Grammar loadGrammar() {  	
 		synchronized(iolock) {
-			this.grammar = new Grammar(grammarFile, new UnifyControl());
-			this.realizer = new Realizer(rs, this.grammar);
+			try {
+				return new Grammar(grammarfile, new UnifyControl());
+			}
+			catch (IOException e) {
+				e.printStackTrace();
+				System.err.println("Error loading grammar");
+				System.exit(1);
+			}
+			return null;
 		}
 	}
     
-	private void loadLM(IOSettings s, VariableSet v, String modelFile, int order) throws IOException {
+	private AbstractStandardNgramModel loadLM(Grammar grammar, IOSettings s, VariableSet v, String modelFile, int order) throws IOException {
 		synchronized(iolock) {
 			switch (s.getModelType()) {
 				case ACTR:
-					this.ngramScorer = new ACTRNgramModel(v.getDoubleArray(), order, modelFile, this.grammar);
-					break;
-		    		case Ngram:
-		    			this.ngramScorer = new StandardNgramModel(order, modelFile, this.grammar);
-		    			break;
+					return new ACTRNgramModel(v.getDoubleArray(), order, modelFile, grammar);
+				case Ngram:
+						return new StandardNgramModel(order, modelFile, grammar);
 				case Random:
-					this.ngramScorer = new RandomModel(order, this.grammar);
-					break;
+					return new RandomModel(order, grammar);
 				default:
-					break;
+					return null;
 			}
 		}
 	}
 
-	public void setLM(IOSettings s, VariableSet v, String lmNum) {
+	public AbstractStandardNgramModel setLM(Grammar grammar, IOSettings s, VariableSet v, String lmNum) {
 		String modelFile = s.getTrainingSet().getLMDirPath();
+		AbstractStandardNgramModel score = null;
 		switch (s.getTrainingSet()) {
 			case WSJ:
 				modelFile += "wsj-lm";
@@ -118,48 +122,56 @@ public class RealizeMain
 				modelFile = "";
 				break;
 		}
-		if (cachedScorers.containsKey(modelFile)) {
-			System.out.println("Loading scorer from cache");
-			AbstractStandardNgramModel score = cachedScorers.get(modelFile); 
-			score.resetVars(v.getDoubleArray());
-			this.ngramScorer = score;
-			ngramScorer.clean();
-			return;
+		synchronized(cachedScorers) {
+			if (cachedScorers.containsKey(modelFile)) {
+				System.out.println("Loading scorer from cache");
+				score = cachedScorers.get(modelFile); 
+				score.resetVars(v.getDoubleArray());
+				score.clean();
+				return score;
+			}
 		}
 		int order = s.getModelType().getOrder();
 		try {
-			loadLM(s, v, modelFile, order);
+			score = loadLM(grammar, s, v, modelFile, order);
 		}
 		catch (IOException io) {
 			io.printStackTrace();
 			System.err.println("Error loading LM");
 			System.exit(1);
 		}
-		cachedScorers.put(modelFile, this.ngramScorer);
-		System.out.println(ngramScorer.getClass());
-	}
-	private InputStruct[] getInputStruct(String inputfile) {
-		if (cachedInputs.containsKey(inputfile)) {
-			System.out.println("Loading input from cache");
-			return cachedInputs.get(inputfile);
+		synchronized(cachedScorers) {
+			cachedScorers.put(modelFile, score);
 		}
-		List<Element> items = prepareInput(inputfile);
+		System.out.println(score.getClass());
+		return score;
+	}
+	private InputStruct[] getInputStruct(Grammar grammar, String inputfile) {
+		synchronized(cachedInputs) {
+			if (cachedInputs.containsKey(inputfile)) {
+				System.out.println("Loading input from cache");
+				return cachedInputs.get(inputfile);
+			}
+		}
+		List<Element> items = prepareInput(grammar, inputfile);
 		String[] goals = getGoals(items);
 		InputStruct[] inp = new InputStruct[items.size()];
 		for (int i = 0; i < items.size(); i++) {
 			Element item = items.get(i);
 			Element lfelt = item.getChild("lf");
-			LF lf = realizer.getLfFromElt(lfelt);
+			LF lf = Realizer.getLfFromElt(grammar, lfelt);
 			inp[i] = new InputStruct(lf, goals[i]);
 		}
-		cachedInputs.put(inputfile, inp);
+		synchronized(cachedInputs) {
+			cachedInputs.put(inputfile, inp);
+		}
 		return inp;
 	}
 
-	private List<Element> prepareInput(String inputfile) {
+	private List<Element> prepareInput(Grammar grammar, String inputfile) {
 		Document doc = null;
 		try {
-			doc = loadInput(inputfile);
+			doc = loadInput(grammar, inputfile);
 		}
 		catch (IOException io) {
 			io.printStackTrace();
@@ -194,7 +206,12 @@ public class RealizeMain
 		return new FileWriter(outputfile);
 	}
 	
-	public Realization[] realize(String inputfile, String outputfile) {              
+	public Realizer createNewRealizer() {
+		return new Realizer(this.rs, this.loadGrammar());
+	}
+	
+	//each one of these calls needs its own realizer to make it threadsafe.
+	public Realization[] realize(AbstractStandardNgramModel ngramScorer, Realizer realizer, String inputfile, String outputfile) {              
 		FileWriter out = null;
 		if (outputfile != null) {
 			try {				
@@ -208,9 +225,9 @@ public class RealizeMain
 			}
 		}
 		
-		InputStruct[] items = this.getInputStruct(inputfile);
+		InputStruct[] items = this.getInputStruct(realizer.getGrammar(), inputfile);
 		Realization[] r = new Realization[items.length];
-
+		
 		for (int i = 0; i < items.length; i++) {
 			realizer.realize(items[i].lf, ngramScorer);
 			Chart chart = realizer.getChart();
@@ -242,6 +259,17 @@ public class RealizeMain
 			}
 		}
 		return r;
+	}
+	public synchronized boolean attemptAcquireLock(String num) {
+		//if it doesn't have an entry for it yet, or if the entry is that it's unlocked
+		if (!locks.containsKey(num) || locks.get(num) == false) {
+			locks.put(num, true);
+			return true;
+		}
+		return false;
+	}
+	public synchronized void releaseLock(String num) {
+		locks.put(num, false);
 	}
 	//given an input file, we want to be able to get:
 	//

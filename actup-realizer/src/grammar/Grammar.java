@@ -82,6 +82,8 @@ import util.Interner;
  * @author  Gunes Erkan
  * @version $Revision: 1.45 $, $Date: 2010/12/06 02:39:35 $ 
  */
+
+//grammars should generally be read only, meaning that they can be concurrently accessed with no problems
 public class Grammar {
 	 /** The boundary tones recognized as separate tokens for translation to APML. */
     private static final String[] boundaryTones = { 

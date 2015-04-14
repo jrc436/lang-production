@@ -129,8 +129,8 @@ public class ValleyClimber implements Optimizer {
 		if (runSettings.getModelType() == ModelType.ACTR) {
 			s += ("negD: " + d[ACTRNgramModel.negD_index]+"; ");
 			s += ("exp_year: "+d[ACTRNgramModel.ey_index]+"; ");
-			s += ("pc_speaking: "+d[ACTRNgramModel.psp_index]+";");
-			s += ("k: "+d[ACTRNgramModel.k_index]+";");
+			s += ("pc_speaking: "+d[ACTRNgramModel.psp_index]+"; ");
+			s += ("k: "+d[ACTRNgramModel.k_index]+"; ");
 		}
 		return s;
 		
@@ -175,7 +175,7 @@ public class ValleyClimber implements Optimizer {
 		eval.loadData(rOut);	
 		double score = eval.scoreAll().getScore();
 		try {
-			writeout(fw, runName, score, opt);
+			writeout(fw, runName, score, eval.getCompleteness(), opt);
 		}
 		catch (IOException io) {
 			io.printStackTrace();
@@ -186,8 +186,8 @@ public class ValleyClimber implements Optimizer {
 		return score;
 	}
 	//this shouldn't need to be synchronized because every name that's being written to should be separate... but be careful!!
-	private void writeout(FileWriter fw, String runName, double score, VariableSet opt) throws IOException {
-		fw.write(runName+":: "+"score: "+score+"; "+actrVarToString(opt)+"\n");
+	private void writeout(FileWriter fw, String runName, double score, double completeness, VariableSet opt) throws IOException {
+		fw.write(runName+":: "+"score: "+score+"; "+completeness+"; "+actrVarToString(opt)+"\n");
 		fw.flush();
 	}
 }

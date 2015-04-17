@@ -7,6 +7,9 @@ import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Random;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Arrays;
 
 import ngrams.ACTRNgramModel;
 import realize.Realization;
@@ -18,7 +21,7 @@ import evaluation.Evaluator;
 import evaluation.LevenshteinDistance;
 import evaluation.LevenshteinDistanceWord;
 import evaluation.Rouge;
-
+import evaluation.Evaluation;
 
 //a hillclimber... that likes valleys
 public class ValleyClimber implements Optimizer {
@@ -68,13 +71,17 @@ public class ValleyClimber implements Optimizer {
 			//it's for obvious reasons very important that no one holds the same experiment name in a concurrent setup!!!
 			fw = new FileWriter(resultsLogPath+experimentName, true);
 			fw.write(this.runSettings.toString()+"\n");
+			for (File f : inputFiles) {
+				fw.write(this.parseRunNum(f.toPath())+",");
+			}
+			fw.write("\n");
 		}
 		catch (IOException io) {
 			io.printStackTrace();
 			System.err.println("Unable to initialize realizer!");
 			System.exit(1);
 		}
-		double currentScore = 0.0;
+		double currentScore = Double.MAX_VALUE; //the first run has to be an improvement!
 		double lastScore = currentScore;
 		int currentIter = 1; 
 		String iterName;
@@ -89,17 +96,15 @@ public class ValleyClimber implements Optimizer {
 			currentScore = performRun(real, iterName, opt, fw);
 
 			//making strictly less will let it terminate a bit faster, but will explore less values
-			boolean goodStep = currentScore < lastScore;
+			boolean goodStep = currentScore < lastScore; 
 			if (goodStep) { opt.acknowledgeImprovement(); }
-			boolean stillMoving = opt.step(goodStep); //this checks if the variable itself is still improving
+			boolean stillMoving = opt.step(goodStep); //this checks if the variable itself is still improving, always true if first run
 			if (!opt.updateIndex(stillMoving)) {
 				break;
 			}
 			currentIter++;
-//			//if it returns true, we just proceed with the incremented variable!
+			System.out.println("Experiment: "+experimentName+"; iter: "+currentIter+"Score: "+currentScore);
 		}
-		System.out.println("Score: "+currentScore);
-		System.out.println("Completeness: "+eval.getCompleteness());
 		try {
 			fw.close();
 		} catch (IOException e) {
@@ -143,11 +148,11 @@ public class ValleyClimber implements Optimizer {
 	private double performRun(Realizer real, String runName, VariableSet opt, FileWriter fw)  {	
 		//String num = in.getName().split("-")[1];
 		System.out.println("This realization is a: " + runSettings.toString());
-		Realization[] rOut = null;
-		//locking mechanism means no thread should ever be trying to realize the same
-
-		Queue<File> localInput = this.copyInput(); //deepcopy
 		
+
+		//locking mechanism means no thread should ever be trying to realize the same
+		Queue<File> localInput = this.copyInput(); //deepcopy
+		List<Realization> realizations = new ArrayList<Realization>();
 		while (!localInput.isEmpty()) { 
 			File in = localInput.peek(); 
 			String num = parseRunNum(in.toPath());
@@ -162,7 +167,7 @@ public class ValleyClimber implements Optimizer {
 			System.out.println("Beginning to realize: "+iterName);
 			try {
 				String realizationLogPath = this.realizationLogPath == null ? null : this.realizationLogPath+iterName+".spl";
-				rOut = r.realize(r.setLM(real.getGrammar(), runSettings, opt, num), real, in.getPath().toString(), realizationLogPath);
+				realizations.addAll(Arrays.asList(r.realize(r.setLM(real.getGrammar(), runSettings, opt, num), real, in.getPath().toString(), realizationLogPath)));
 			}
 			catch (Exception e) {
 				e.printStackTrace();
@@ -170,12 +175,11 @@ public class ValleyClimber implements Optimizer {
 				System.exit(1);
 			}
 			r.releaseLock(num);
-		}		
-		
-		eval.loadData(rOut);	
-		double score = eval.scoreAll().getScore();
+		}
+		eval.loadData(realizations);
+		Evaluation e = eval.scoreAll();
 		try {
-			writeout(fw, runName, score, eval.getCompleteness(), opt);
+			writeout(fw, runName, e.getScore(), e.getCompleteness(), opt);
 		}
 		catch (IOException io) {
 			io.printStackTrace();
@@ -183,11 +187,11 @@ public class ValleyClimber implements Optimizer {
 			System.exit(1);
 		}
 		
-		return score;
+		return e.getScore();
 	}
 	//this shouldn't need to be synchronized because every name that's being written to should be separate... but be careful!!
 	private void writeout(FileWriter fw, String runName, double score, double completeness, VariableSet opt) throws IOException {
-		fw.write(runName+":: "+"score: "+score+"; "+completeness+"; "+actrVarToString(opt)+"\n");
+		fw.write(runName+":: "+"score: "+score+"; completeness: "+completeness+"; "+actrVarToString(opt)+"\n");
 		fw.flush();
 	}
 }

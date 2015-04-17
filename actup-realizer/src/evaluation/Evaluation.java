@@ -3,9 +3,9 @@ package evaluation;
 import runconfig.ScoringStrategy;
 
 public class Evaluation {
-	public final double completeness;
-	public final double avgScore;
-	public final double avgCompleteScore;
+	private final double completeness;
+	private final double avgScore;
+	private final double avgCompleteScore;
 	private ScoringStrategy strat;
 	public Evaluation(double completeness, double score, double complScore, ScoringStrategy strat) {
 		this.completeness = completeness;
@@ -26,5 +26,8 @@ public class Evaluation {
 			default:
 				return avgScore;
 		}
+	}
+	public double getCompleteness() {
+		return completeness;
 	}
 }

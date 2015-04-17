@@ -38,11 +38,16 @@ public class Variable {
 	}
 	protected void forceCurrentValue(double newValue) {
 		this.currentValue = newValue;
+		//this makes last value irrelevant
+		this.firstRun = true;
 	}
 	protected void resetValueRandom() {
 		this.currentValue = new Random().nextDouble() * (this.upperBound - this.lowerBound) + this.lowerBound;
+		this.firstRun = true; //last value is made irrelevant
 	}
 	//if lastvalue is not set, then goodincr doesn't matter, we'll use whatever direction (typo caught by jamie) was initially set to
+	//there are two reasons for the "first run" parameter. One is that if it is the true first run of the variable, there is no previous value.
+	//This can be because every variable is still its initial value (very first run), or because step was called from updateindex
 	public boolean step(boolean goodIncr) throws Exception{
 		if (this.firstRun) {
 			this.firstRun = false;
@@ -96,11 +101,14 @@ public class Variable {
 		if (!inBounds(this.currentValue + (direction * increment))) {
 			changeDirection();
 		}
+		this.firstRun = true; //this is after a superiter... so we'll increment it right away so we don't run the same thing twice	
 	}
 	//after checkbounds returns true, settled should also return true in either case... (in one case, we had settled the other side because we were advancing,
 	//in the other case, we settled the other side because it caused a bad incr.
 	//the only time this isn't true is if it settles on the maximum, and unsettle is called to try to gain further improvements
 	//this case will be handled in unsettle
+	//if this is called in the first run (which should generally always return true), it will always return true because it's impossible that either
+	//settledP or settledN is true yet, though one could be set to be true if it's at the max
 	private boolean checkBounds() {
 		if (this.currentValue > this.upperBound && direction > 0.0) {
 			this.currentValue = this.lastValue;

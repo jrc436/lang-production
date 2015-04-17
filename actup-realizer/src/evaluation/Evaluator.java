@@ -3,9 +3,9 @@ package evaluation;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 
 import runconfig.ScoringStrategy;
 import realize.Realization;
@@ -16,9 +16,7 @@ import realize.Realization;
  * @author jrc
  */
 public abstract class Evaluator implements TextScorer {	
-	ArrayList<Realization> realizations;
-	private double completeNum = 0.0;
-	private double incompleteNum = 0.0;
+	List<Realization> realizations;
 	private ScoringStrategy strat;
 	public Evaluator(ScoringStrategy strat) {
 		this.strat = strat;
@@ -48,28 +46,23 @@ public abstract class Evaluator implements TextScorer {
 	public void loadData(Realization[] realize) {
 		realizations = new ArrayList<Realization>(Arrays.asList(realize));		
 	}
+	public void loadData(List<Realization> realize) {
+		realizations = realize;
+	}
 	public Evaluation scoreAll() {
-		completeNum = 0.0;
-		incompleteNum = 0.0;
+		double completeNum = 0.0;
+		double totalNum = 0.0;
 		double totalScore = 0.0;
 		double completeScore = 0.0;
 		for (int i = 0; i < realizations.size(); i++) {
 			double score =  this.score(realizations.get(i).str, realizations.get(i).goal);
 			totalScore += score;
+			totalNum++;
 			if (realizations.get(i).complete) {
 				completeNum++;
 				completeScore += score;
 			}
-			else {
-				incompleteNum++;
-			}
 		}
-		return new Evaluation(completeNum/(completeNum+incompleteNum), totalScore/(completeNum+incompleteNum), completeScore/completeNum, this.strat);
-	}
-	public double getCompleteness() {
-		if (incompleteNum+completeNum == 0.0) {
-			return -1.0;
-		}
-		return completeNum / (completeNum + incompleteNum);
+		return new Evaluation(completeNum/totalNum, totalScore/totalNum, completeScore/completeNum, this.strat);
 	}
 }

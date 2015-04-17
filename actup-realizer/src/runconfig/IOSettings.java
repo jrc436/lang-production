@@ -10,7 +10,7 @@ public class IOSettings {
 	//I/O Settings
 	protected static final String basePath = "/Users/jrc/Public/jrc-research/";
 	//protected static final String basePath = "/work/research/"; //basepath refers to where the research dir is located
-	protected static final String trialSet = "memshare-climb"; //trialset refers to a single optimization run's name
+	protected static final String trialSet = "memshare-climb-round3"; //trialset refers to a single optimization run's name
 	protected static final int iterCap = 10000; //number of iterations before it terminates
 	protected static final int NumConcurrentStarts = 8; //should be roughly equal to number of processors
 	protected static final int NumRandomRestarts = 100;
@@ -19,7 +19,7 @@ public class IOSettings {
 	protected static final TrainingSet trSet = TrainingSet.SWBD;
 	protected static final EvaluationType eval = EvaluationType.EditDistanceWord;
 	protected static final ScoringStrategy strat = ScoringStrategy.ScoreComplete;
-	protected static final double percentInput = 0.05;
+	protected static final double percentInput = 0.02;
 	
 	protected static final boolean logRealizations = false;
 	protected static final boolean loadGoldFromFile = false;

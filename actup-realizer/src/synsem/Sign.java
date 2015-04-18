@@ -25,11 +25,7 @@ import grammar.TypeChangingRule;
 import hylo.HyloHelper;
 import hylo.Nominal;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -521,25 +517,25 @@ public class Sign implements LexSemOrigin, Serializable, Comparable<Sign> {
     	return null;
     }
 	
-    /** Tests serialization of simple types, including resolution. */
-    public void debugSerialization() throws IOException, ClassNotFoundException {
-        // test serialization
-    	String filename = "tmp.ser";
-    	ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename));
-    	System.out.println("Writing this: " + this);
-    	System.out.println(this.getDerivationHistory());
-    	out.writeObject(this);
-    	out.close();
-    	ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename));
-    	System.out.print("Reading sign: ");
-    	Sign sign = (Sign) in.readObject();
-    	System.out.println(sign);
-    	System.out.println(sign.getDerivationHistory());
-    	in.close();
-    	// test identity and equality
-    	System.out.println("this == sign?: " + (this == sign));
-    	System.out.println("this.equals(sign)?: " + (this.equals(sign)));
-    }
+//    /** Tests serialization of simple types, including resolution. */
+//    public void debugSerialization() throws IOException, ClassNotFoundException {
+//        // test serialization
+//    	String filename = "tmp.ser";
+//    	ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename));
+//    	System.out.println("Writing this: " + this);
+//    	System.out.println(this.getDerivationHistory());
+//    	out.writeObject(this);
+//    	out.close();
+//    	ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename));
+//    	System.out.print("Reading sign: ");
+//    	Sign sign = (Sign) in.readObject();
+//    	System.out.println(sign);
+//    	System.out.println(sign.getDerivationHistory());
+//    	in.close();
+//    	// test identity and equality
+//    	System.out.println("this == sign?: " + (this == sign));
+//    	System.out.println("this.equals(sign)?: " + (this.equals(sign)));
+//    }
 
 	@Override
 	public int compareTo(Sign o) {

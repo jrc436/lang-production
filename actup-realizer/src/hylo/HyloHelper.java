@@ -92,7 +92,7 @@ public class HyloHelper {
         } else if (type.equals("lf")) {
             retval = getLF_FromChildren(grammar, e);
         } else {
-            System.out.println("Invalid hybrid logic LF type: " + type);
+            System.err.println("Invalid hybrid logic LF type: " + type);
         }
         // assign chunks
         if (retval != null) {

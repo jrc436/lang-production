@@ -133,16 +133,16 @@ public abstract class AbstractStandardNgramModel extends NgramScorer {
         for (int j = i; j < i+order; j++) {
             keysList.add(stringsToScore.get(j));
         }
-        if (debugScore) {
-            System.out.print("logp( " + keysList.get(order-1) + " | ");
-            if (order > 1) { 
-                System.out.print(keysList.get(order-2) + " ... ");
-            }
-            System.out.print(") = ");
-        }
+//        if (debugScore) {
+//            System.out.print("logp( " + keysList.get(order-1) + " | ");
+//            if (order > 1) { 
+//                System.out.print(keysList.get(order-2) + " ... ");
+//            }
+//            System.out.print(") = ");
+//        }
         // calc log prob
         float retval = logProb(0, order);
-        if (debugScore) System.out.println("" + retval);
+        //if (debugScore) System.out.println("" + retval);
         return retval;
     }
 

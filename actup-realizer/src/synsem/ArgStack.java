@@ -112,7 +112,7 @@ public class ArgStack implements Serializable {
 					args.add(new BasicArg(s, CatReader.getCat(grammar, argEl)));
 				}
 			} else {
-				System.out.println("Invalid element for creating ArgStack: "
+				System.err.println("Invalid element for creating ArgStack: "
 						+ elName);
 			}
 		}
@@ -211,7 +211,7 @@ public class ArgStack implements Serializable {
 		} else if (insertInto instanceof SetArg) {
 			((SetArg) insertInto).add(cl);
 		} else {
-			System.out.println("Problem inserting arg stack: " + cl);
+			System.err.println("Problem inserting arg stack: " + cl);
 		}
 	}
 
@@ -266,7 +266,7 @@ public class ArgStack implements Serializable {
 	public ArgStack copyWithout(int indexToRemove) {
 		Arg[] $list = new Arg[_list.length - 1];
 		if ($list.length < 1) {
-			System.out.println("Removing last item from an argument stack!");
+			System.err.println("Removing last item from an argument stack!");
 		}
 		int index = 0;
 		for (int i = 0; i < _list.length; i++) {

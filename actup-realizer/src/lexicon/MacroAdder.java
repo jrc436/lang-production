@@ -65,7 +65,7 @@ public class MacroAdder {
             for (int j=0; j < preds.length; j++) {
                 LF pred = (LF) preds[j].copy();
                 if (!HyloHelper.isElementaryPredication(pred)) {
-                    System.out.println(
+                    System.err.println(
                         "Warning: ignoring LF macro pred, which is not an elementary predication: " +
                         pred
                     );

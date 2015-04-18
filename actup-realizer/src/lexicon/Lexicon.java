@@ -228,8 +228,8 @@ public class Lexicon {
                     Collection<Word> words = (Collection<Word>) _predToWords.get(dItem.getStem());
                     if (words == null) {
                     	if (!openlex) {
-	                        System.out.print("Warning: couldn't find words for pred '");
-	                        System.out.println(dItem.getPred() + "' with stem '" + dItem.getStem() + "'");
+	                        System.err.print("Warning: couldn't find words for pred '");
+	                        System.err.println(dItem.getPred() + "' with stem '" + dItem.getStem() + "'");
                     	}
                     }
                     else {

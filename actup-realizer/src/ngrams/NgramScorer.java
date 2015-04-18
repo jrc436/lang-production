@@ -98,10 +98,10 @@ public abstract class NgramScorer implements SignScorer, Reversible
     protected boolean openVocab = false;
     
     /** Flag for whether to show scoring breakdown. */
-    protected boolean debugScore = false;
-    
-    /** Sets the debug score flag. */
-    public void setDebug(boolean debugScore) { this.debugScore = debugScore; }  
+    //protected boolean debugScore = false;
+//    
+//    /** Sets the debug score flag. */
+//    public void setDebug(boolean debugScore) { this.debugScore = debugScore; }  
     
     /** Weak hash map for cached log probs, keyed from a sign's words. */
     protected Map<List<Word>,Float> cachedLogProbs = null;
@@ -380,7 +380,7 @@ public abstract class NgramScorer implements SignScorer, Reversible
         if (node != null && node.data != null) return node.data.logprob;
         if (len == 1) return -99;
         float retval = logProb(pos+1, len-1);
-        if (debugScore) System.out.print("(" + (len-1) + "-gram: " + retval + ") ");
+      //  if (debugScore) System.out.print("(" + (len-1) + "-gram: " + retval + ") ");
         if (retval > -99) retval += backoffWeight(pos, len-1);
         return retval;
     }

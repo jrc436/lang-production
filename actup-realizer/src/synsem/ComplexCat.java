@@ -64,7 +64,7 @@ public final class ComplexCat extends AbstractCat {
 		super(grammar, lf);
 		_target = target;
 		if (args.size() < 1) {
-			System.out.println("WARNING!!! Creating a ComplexCat with"
+			System.err.println("WARNING!!! Creating a ComplexCat with"
 					+ " empty argument stack!");
 		}
 		_args = args;

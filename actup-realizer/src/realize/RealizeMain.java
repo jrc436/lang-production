@@ -63,7 +63,7 @@ public class RealizeMain
 		this.rs = rs;
 		this.grammarfile = grammarfile;
 		this.useCache = useCache;
-		System.out.println("Loading grammar from URL: " + grammarfile);
+		System.out.println("%%%Loading grammar from URL: " + grammarfile+"%%%");
 		
 		
 			
@@ -127,7 +127,7 @@ public class RealizeMain
 		if (useCache) {
 			synchronized(cachedScorers) {
 				if (cachedScorers.containsKey(modelFile)) {
-					System.out.println("Loading scorer from cache");
+					System.out.println("%%%Loading scorer from cache%%%");
 					score = cachedScorers.get(modelFile); 
 					score.resetVars(v.getDoubleArray());
 					score.clean();
@@ -149,7 +149,6 @@ public class RealizeMain
 				cachedScorers.put(modelFile, score);
 			}
 		}
-		System.out.println(score.getClass());
 		return score;
 	}
 	private InputStruct[] getInputStruct(Grammar grammar, String inputfile) {

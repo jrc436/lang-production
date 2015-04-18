@@ -412,7 +412,7 @@ public class GFeatStruc extends HashMap<String,Object> implements FeatureStructu
             str = str.replaceAll("\\^", "  \\\\\\hat\\{\\} ");
         }
         catch (Exception e) {
-            System.out.println("Error while evaluating RegExp: " + e.toString());
+            System.err.println("Error while evaluating RegExp: " + e.toString());
         }
         return str;
     }

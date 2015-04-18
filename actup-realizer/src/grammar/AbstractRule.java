@@ -146,23 +146,23 @@ public abstract class AbstractRule implements Rule, Serializable {
     public abstract List<Category> applyRule(Category[] inputs) throws UnifyFailure;
 
     
-    /** Prints an apply instance for the given categories to System.out. */
-    protected void showApplyInstance(Category[] inputs) {
-        StringBuffer sb = new StringBuffer();  
-        sb.append(name).append(": ");
-        
-        for (int i=0; i < inputs.length; i++) {
-            sb.append(inputs[i]).append(' ');
-        }
-
-        System.out.println(sb);
-    }
-
-    /** Prints an apply instance for the given categories to System.out. */
-    protected void showApplyInstance(Category first, Category second) {
-        Category[] ca = {first,second};
-        showApplyInstance(ca);
-    }
+//    /** Prints an apply instance for the given categories to System.out. */
+//    protected void showApplyInstance(Category[] inputs) {
+//        StringBuffer sb = new StringBuffer();  
+//        sb.append(name).append(": ");
+//        
+//        for (int i=0; i < inputs.length; i++) {
+//            sb.append(inputs[i]).append(' ');
+//        }
+//
+//        System.out.println(sb);
+//    }
+//
+//    /** Prints an apply instance for the given categories to System.out. */
+//    protected void showApplyInstance(Category first, Category second) {
+//        Category[] ca = {first,second};
+//        showApplyInstance(ca);
+//    }
 
     
     /**

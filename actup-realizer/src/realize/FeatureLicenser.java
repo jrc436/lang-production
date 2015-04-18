@@ -370,7 +370,7 @@ public class FeatureLicenser
                 }
             }
             if (initialCats == null) {
-                System.out.println("Warning, unable to find initial cats for feature " + attr + "=" + val); 
+                System.err.println("Warning, unable to find initial cats for feature " + attr + "=" + val); 
                 uninstantiatedCats.add(cat); return; 
             }
             // for each initial cat

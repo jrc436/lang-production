@@ -18,11 +18,7 @@
 
 package grammar;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -242,34 +238,34 @@ public class Types {
         }
         maxTypeIndex = typesVisited.size();
     }
-    
-    /**
-     * Prints the types and their subtypes to System.out.
-     */
-    public void printTypes() {
-        System.out.println("types:");
-        for (int i=0; i < indexToType.size(); i++) {
-            SimpleType st = indexToType.get(i); 
-            System.out.println(i + ": " + st.getName() + " subtypes: " + st.getBitSet());
-        }
-        System.out.println();
-    }
-    
-    /** Tests serialization of simple types, including resolution. */
-    public void debugSerialization() throws IOException, ClassNotFoundException {
-        // test serialization
-        SimpleType st = indexToType.get(1);
-    	String filename = "tmp.ser";
-    	ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename));
-    	System.out.println("Writing st: " + st.getIndex() + ": " + st + " " + st.getBitSet());
-    	out.writeObject(st);
-    	out.close();
-    	ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename));
-    	System.out.print("Reading st2: ");
-    	SimpleType st2 = (SimpleType) in.readObject();
-    	System.out.println(st2.getIndex() + ": " + st2 + " " + st2.getBitSet());
-    	in.close();
-    	// test identity (and thus readResolve)
-    	System.out.println("st == st2?: " + (st == st2));
-    }
+//    
+//    /**
+//     * Prints the types and their subtypes to System.out.
+//     */
+//    public void printTypes() {
+//        System.out.println("types:");
+//        for (int i=0; i < indexToType.size(); i++) {
+//            SimpleType st = indexToType.get(i); 
+//            System.out.println(i + ": " + st.getName() + " subtypes: " + st.getBitSet());
+//        }
+//        System.out.println();
+//    }
+//    
+//    /** Tests serialization of simple types, including resolution. */
+//    public void debugSerialization() throws IOException, ClassNotFoundException {
+//        // test serialization
+//        SimpleType st = indexToType.get(1);
+//    	String filename = "tmp.ser";
+//    	ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(filename));
+//    	System.out.println("Writing st: " + st.getIndex() + ": " + st + " " + st.getBitSet());
+//    	out.writeObject(st);
+//    	out.close();
+//    	ObjectInputStream in = new ObjectInputStream(new FileInputStream(filename));
+//    	System.out.print("Reading st2: ");
+//    	SimpleType st2 = (SimpleType) in.readObject();
+//    	System.out.println(st2.getIndex() + ": " + st2 + " " + st2.getBitSet());
+//    	in.close();
+//    	// test identity (and thus readResolve)
+//    	System.out.println("st == st2?: " + (st == st2));
+//    }
 }

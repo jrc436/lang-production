@@ -80,14 +80,16 @@ public class ValleyClimber implements Optimizer {
 		}
 		fw.write("\n");
 		
-		int currentIter = 0; 
+		int currentIter = 1;
 		String iterName;
 		RunData bestRun = new RunData(opt);
+		System.out.println("%%% "+experimentName+":: is a "+runSettings.toString()+"%%%");
 		while (true) {
 			if (currentIter > maxIter) {
+				fw.write("Reached iter limit");
 				break;
 			}
-			System.out.println("Iteration "+currentIter+"/"+maxIter);
+			System.out.println("%%% "+experimentName+":: Iteration "+currentIter+"/"+maxIter+"%%%");
 			iterName = experimentName+"-i"+String.format("%04d", currentIter);
 			
 			//lastScore = currentScore;
@@ -102,7 +104,9 @@ public class ValleyClimber implements Optimizer {
 			}
 			fw.write(newRun.toString() + "\n");
 			fw.flush();
-
+			
+			System.out.println("%%%"+newRun.toString()+"%%%");
+			
 			boolean goodStep = false;
 			if (newRun.improvement(bestRun)) {
 				bestRun = newRun;
@@ -116,7 +120,6 @@ public class ValleyClimber implements Optimizer {
 				break;
 			}
 			currentIter++;
-			System.out.println("Experiment: "+experimentName+"; iter: "+currentIter);
 		}
 		fw.close();
 		return opt;
@@ -150,7 +153,7 @@ public class ValleyClimber implements Optimizer {
 	
 	private Evaluation performRun(Realizer real, String runName, VariableSet opt)  {	
 		//String num = in.getName().split("-")[1];
-		System.out.println("This realization is a: " + runSettings.toString());
+		
 		
 		//locking mechanism means no thread should ever be trying to realize the same
 		Queue<File> localInput = this.copyInput(); //deepcopy
@@ -162,7 +165,7 @@ public class ValleyClimber implements Optimizer {
 				localInput.offer(localInput.poll());
 				continue;
 			}
-			System.out.println("Beginning run on file: "+num);
+			System.out.println("%%% "+runName+" is beginning run on file: "+num+"%%%");
 			localInput.poll();
 			
 			String iterName = runName + "-f" + num;

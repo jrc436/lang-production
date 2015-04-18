@@ -31,18 +31,7 @@ public class VariableSet {
 		this.lastSuperIterImproved = true;
 	}
 	public boolean step(boolean lastStepGood) {
-		boolean toReturn = false;
-		if (vars.length != 0) {
-			try {
-				toReturn = vars[currentIndex].step(lastStepGood);
-			}
-			catch (Exception e) {
-				e.printStackTrace();
-				System.err.println("Inconsistent settlement!!");
-				System.exit(1);
-			}
-		}
-		return toReturn; 
+		return vars.length != 0 ? vars[currentIndex].step(lastStepGood) : false; 
 	}
 	protected Variable[] getVarArray() {
 		return this.vars;
@@ -57,10 +46,7 @@ public class VariableSet {
 	
 	//return true if we've successfully incremented the index.
 	//return false if the loop should break.
-	protected boolean updateIndex(boolean curVarImproving) {
-		if (curVarImproving) {
-			return true; //don't need to update index!
-		}
+	protected boolean updateIndex() {
 		//need to update index, we also might need to start a new superIter!
 		boolean retval = false;
 		if (currentIndex + 1 == initIndex || (initIndex == 0 && currentIndex == vars.length-1)) {
@@ -96,9 +82,31 @@ public class VariableSet {
 		this.lastSuperIterImproved = true;
 		this.startNewSuperIter();
 	}
-	protected void forceAll(double[] vals) {
-		for (int i = 0; i < vars.length; i++) {
-			vars[i].forceCurrentValue(vals[i]);
+	
+	public int hashCode() {
+		int hash = 0;
+		for (Variable v : vars) {
+			hash += v.hashCode();
 		}
+		return hash;
+	}
+	public boolean equals(Object o) {
+		if (o == null || o.getClass() != this.getClass()) { return false; }
+		VariableSet vs = (VariableSet) o;
+		if (vars.length != vs.vars.length) {
+			return false;
+		}
+		boolean equals = true;
+		for (int i = 0; i < vars.length; i++) {
+			equals = equals && vars[i].equals(vs.vars[i]);
+		}
+		return equals;
+	}
+	public String toString() {
+		String retval = "";
+		for (Variable v : vars) {
+			retval += v.toString() + " ";
+		}
+		return retval;
 	}
 }

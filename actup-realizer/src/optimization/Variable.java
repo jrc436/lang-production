@@ -1,5 +1,7 @@
 package optimization;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Random;
 
 //a variable to be used for simple hill climbing
@@ -16,39 +18,68 @@ public class Variable {
 	protected double getLower() {
 		return lowerBound;
 	}
-	private double currentValue;
+	private BigDecimal currentValue;
 	private double lastValue;
 	private boolean settledP; //no more improvements in the P direction
 	private boolean settledN; //no more improvements in the N direction
 	private double direction; //1 means moving in the pos direction, -1 means moving in the negative direction
 	private boolean firstRun;
-	public Variable(double initialValue, double lowerBound, double upperBound, double increment) {
+	private final String name;
+	public Variable(String name, double initialValue, double lowerBound, double upperBound, double increment) {
+		this.name = name;
 		this.upperBound = upperBound;
 		this.increment = increment;
 		this.lowerBound = lowerBound;
-		this.currentValue = initialValue;
+		setCurrentValue(initialValue);
 		this.lastValue = 0.0;
 		this.firstRun = true;
 		this.settledP = false;
 		this.settledN = false;
 		this.direction = new Random().nextBoolean() ? 1.0 : -1.0;
 	}
-	public double getCurrentValue() {
-		return this.currentValue;
+	public String toString() {
+		String retval = "";
+		if (name != null) {
+			retval += this.name+": ";
+		}
+		retval+=this.currentValue+";";
+		return retval;
 	}
-	protected void forceCurrentValue(double newValue) {
-		this.currentValue = newValue;
-		//this makes last value irrelevant
+	public Variable(double initialValue, double lowerBound, double upperBound, double increment) {
+		this(null, initialValue, lowerBound, upperBound, increment);
+	}
+	public double getCurrentValue() {
+		return this.currentValue.doubleValue();
+	}
+	//should probably never be made public. Consider making forceCurrentValue public if needed.
+	private void setCurrentValue(double val) {
+		this.currentValue = new BigDecimal(val);
+		this.currentValue.setScale(4, RoundingMode.HALF_UP);
+	}
+	private void forceCurrentValue(double newValue) {
+		//we want to "snap" the currentValue to something that's a valid increment to reduce the search space
+		double newV = this.lowerBound;
+		while (newValue > newV) {
+			newV += this.increment;
+		}
+		//now newValue is between newV - increment and newV, so check which it's closer to
+		if (newValue - (newV - increment) < newValue - newV) {
+			//closer to newV - increment
+			setCurrentValue(newV - increment);
+		}
+		else {
+			setCurrentValue(newV);
+		}
+		//lastvalue is made irrelevant by this, so
 		this.firstRun = true;
 	}
 	protected void resetValueRandom() {
-		this.currentValue = new Random().nextDouble() * (this.upperBound - this.lowerBound) + this.lowerBound;
-		this.firstRun = true; //last value is made irrelevant
+		this.forceCurrentValue(new Random().nextDouble() * (this.upperBound - this.lowerBound) + this.lowerBound);
 	}
 	//if lastvalue is not set, then goodincr doesn't matter, we'll use whatever direction (typo caught by jamie) was initially set to
 	//there are two reasons for the "first run" parameter. One is that if it is the true first run of the variable, there is no previous value.
 	//This can be because every variable is still its initial value (very first run), or because step was called from updateindex
-	public boolean step(boolean goodIncr) throws Exception{
+	public boolean step(boolean goodIncr) {
 		if (this.firstRun) {
 			this.firstRun = false;
 			increment();
@@ -65,13 +96,12 @@ public class Variable {
 		}		
 		else {
 			//reset since we had a decrease
-			this.currentValue = this.lastValue;
+			setCurrentValue(this.lastValue);
 			settleCurrentDirection();
 			if (settled()) {
 				return false;
 			}		
-			//otherwise, changedirection and keep going
-			
+			//otherwise, changedirection and keep going		
 			changeDirection();
 			increment();
 			return checkBounds();
@@ -98,7 +128,7 @@ public class Variable {
 		settledN = false;
 		settledP = false;
 		//see checkbounds explanation
-		if (!inBounds(this.currentValue + (direction * increment))) {
+		if (!inBounds(this.getCurrentValue() + (direction * increment))) {
 			changeDirection();
 		}
 		this.firstRun = true; //this is after a superiter... so we'll increment it right away so we don't run the same thing twice	
@@ -110,8 +140,8 @@ public class Variable {
 	//if this is called in the first run (which should generally always return true), it will always return true because it's impossible that either
 	//settledP or settledN is true yet, though one could be set to be true if it's at the max
 	private boolean checkBounds() {
-		if (this.currentValue > this.upperBound && direction > 0.0) {
-			this.currentValue = this.lastValue;
+		if (this.getCurrentValue() > this.upperBound && direction > 0.0) {
+			setCurrentValue(this.lastValue);
 			settledP = true;
 			if (!this.settled()) {
 				changeDirection();
@@ -119,8 +149,8 @@ public class Variable {
 			}
 			return false;
 		}
-		else if (this.currentValue < this.lowerBound && direction < 0.0) {
-			this.currentValue = this.lastValue;
+		else if (this.getCurrentValue() < this.lowerBound && direction < 0.0) {
+			setCurrentValue(this.lastValue);
 			settledN = true;
 			if (!this.settled()) {
 				changeDirection();
@@ -134,8 +164,8 @@ public class Variable {
 		return val <= this.upperBound && val >= this.lowerBound;
 	}
 	private void increment() {
-		this.lastValue = this.currentValue;
-		this.currentValue += increment * direction;
+		this.lastValue = getCurrentValue();
+		setCurrentValue(getCurrentValue() + increment * direction);
 	}
 	private void changeDirection() {
 		if (this.direction < 0.0) {
@@ -144,6 +174,15 @@ public class Variable {
 		else {
 			this.direction = -1.0;
 		}
+	}
+	
+	public int hashCode() {
+		return (int) (Math.pow(29, 1) * getCurrentValue()) + (int) (Math.pow(29, 2) * this.increment) + (int) (Math.pow(29,  3) * this.upperBound) + (int) (Math.pow(29, 4) * this.lowerBound);
+	}
+	public boolean equals(Object o) {
+		if (o == null || o.getClass() != this.getClass()) { return false; }
+		Variable v = (Variable) o;
+		return this.currentValue == v.currentValue && this.increment == v.increment && this.upperBound == v.upperBound && this.lowerBound == v.lowerBound;
 	}
 }
 

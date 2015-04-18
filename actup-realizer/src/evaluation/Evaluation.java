@@ -30,4 +30,15 @@ public class Evaluation {
 	public double getCompleteness() {
 		return completeness;
 	}
+	public int hashCode() {
+		return (int) (Math.pow(47, 1) * completeness) + (int) (Math.pow(47, 2) * avgScore) + (int) (Math.pow(47,  3) * avgCompleteScore); 
+	}
+	public boolean equals(Object o) {
+		if (o == null || o.getClass() != this.getClass()) { return false; }
+		Evaluation e = (Evaluation) o;
+		return e.completeness == this.completeness && this.avgScore == e.avgScore && this.avgCompleteScore == e.avgCompleteScore;
+	}
+	public String toString() {
+		return "score: "+this.getScore()+"; "+"completeness: "+this.completeness+";";
+	}
 }

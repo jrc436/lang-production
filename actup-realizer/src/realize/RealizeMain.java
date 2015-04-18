@@ -49,6 +49,7 @@ public class RealizeMain
 
 	private final String grammarfile;
 	private final RealizationSettings rs;
+	private final boolean useCache;
 	//private AbstractStandardNgramModel ngramScorer; 
 
 	private HashMap<String, AbstractStandardNgramModel> cachedScorers;
@@ -58,9 +59,10 @@ public class RealizeMain
 
 	//should only need one realizemain, generally, as it is generally threadsafe
 	//with the locking mechanisms in valleyclimber
-	public RealizeMain(RealizationSettings rs, String grammarfile) {
+	public RealizeMain(RealizationSettings rs, String grammarfile, boolean useCache) {
 		this.rs = rs;
 		this.grammarfile = grammarfile;
+		this.useCache = useCache;
 		System.out.println("Loading grammar from URL: " + grammarfile);
 		
 		
@@ -122,13 +124,15 @@ public class RealizeMain
 				modelFile = "";
 				break;
 		}
-		synchronized(cachedScorers) {
-			if (cachedScorers.containsKey(modelFile)) {
-				System.out.println("Loading scorer from cache");
-				score = cachedScorers.get(modelFile); 
-				score.resetVars(v.getDoubleArray());
-				score.clean();
-				return score;
+		if (useCache) {
+			synchronized(cachedScorers) {
+				if (cachedScorers.containsKey(modelFile)) {
+					System.out.println("Loading scorer from cache");
+					score = cachedScorers.get(modelFile); 
+					score.resetVars(v.getDoubleArray());
+					score.clean();
+					return score;
+				}
 			}
 		}
 		int order = s.getModelType().getOrder();
@@ -140,17 +144,21 @@ public class RealizeMain
 			System.err.println("Error loading LM");
 			System.exit(1);
 		}
-		synchronized(cachedScorers) {
-			cachedScorers.put(modelFile, score);
+		if (useCache) {
+			synchronized(cachedScorers) {
+				cachedScorers.put(modelFile, score);
+			}
 		}
 		System.out.println(score.getClass());
 		return score;
 	}
 	private InputStruct[] getInputStruct(Grammar grammar, String inputfile) {
-		synchronized(cachedInputs) {
-			if (cachedInputs.containsKey(inputfile)) {
-				System.out.println("Loading input from cache");
-				return cachedInputs.get(inputfile);
+		if (useCache) {
+			synchronized(cachedInputs) {
+				if (cachedInputs.containsKey(inputfile)) {
+					System.out.println("Loading input from cache");
+					return cachedInputs.get(inputfile);
+				}
 			}
 		}
 		List<Element> items = prepareInput(grammar, inputfile);
@@ -162,8 +170,10 @@ public class RealizeMain
 			LF lf = Realizer.getLfFromElt(grammar, lfelt);
 			inp[i] = new InputStruct(lf, goals[i]);
 		}
-		synchronized(cachedInputs) {
-			cachedInputs.put(inputfile, inp);
+		if (useCache) {
+			synchronized(cachedInputs) {
+				cachedInputs.put(inputfile, inp);
+			}
 		}
 		return inp;
 	}
@@ -262,6 +272,9 @@ public class RealizeMain
 	}
 	public synchronized boolean attemptAcquireLock(String num) {
 		//if it doesn't have an entry for it yet, or if the entry is that it's unlocked
+		if (!useCache) {
+			return true; //this is only to prevent concurrent usage of the same element in the dictionary, mostly because they can be modified!
+		}
 		if (!locks.containsKey(num) || locks.get(num) == false) {
 			locks.put(num, true);
 			return true;
@@ -269,7 +282,9 @@ public class RealizeMain
 		return false;
 	}
 	public synchronized void releaseLock(String num) {
-		locks.put(num, false);
+		if (useCache) {
+			locks.put(num, false);	
+		}
 	}
 	//given an input file, we want to be able to get:
 	//

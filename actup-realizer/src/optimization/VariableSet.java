@@ -15,7 +15,7 @@ public class VariableSet {
 		this.currentIndex = deepCopy.currentIndex;
 		this.vars = new Variable[deepCopy.vars.length];
 		for (int i = 0; i < vars.length; i++) {
-			vars[i] = new Variable(deepCopy.vars[i].getCurrentValue(), deepCopy.vars[i].getLower(), deepCopy.vars[i].getUpper(), deepCopy.vars[i].getIncrement());
+			vars[i] = new Variable(deepCopy.vars[i].getName(), deepCopy.vars[i].getCurrentValue(), deepCopy.vars[i].getLower(), deepCopy.vars[i].getUpper(), deepCopy.vars[i].getIncrement());
 		}
 		this.lastSuperIterImproved = true;
 		this.startNewSuperIter();
@@ -43,7 +43,15 @@ public class VariableSet {
 		}
 		return d;
 	}
-	
+	public void setWithDoubleArray(double[] newCurrentValues) {
+		if (newCurrentValues.length != vars.length) {
+			System.err.println("Can't set a variable set partially with this method. Please specify with the correct number of values");
+			System.exit(1);
+		}
+		for (int i = 0; i < newCurrentValues.length; i++) {
+			vars[i].forceCurrentValue(newCurrentValues[i]);
+		}
+	}
 	//return true if we've successfully incremented the index.
 	//return false if the loop should break.
 	protected boolean updateIndex() {

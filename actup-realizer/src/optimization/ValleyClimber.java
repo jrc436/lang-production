@@ -74,6 +74,7 @@ public class ValleyClimber implements Optimizer {
 		FileWriter fw = null;
 			//it's for obvious reasons very important that no one holds the same experiment name in a concurrent setup!!!
 		fw = new FileWriter(resultsLogPath+experimentName, true);
+		long timeNS = System.nanoTime();
 		fw.write(this.runSettings.toString()+"\n");
 		for (File f : inputFiles) {
 			fw.write(this.parseRunNum(f.toPath())+",");
@@ -86,7 +87,8 @@ public class ValleyClimber implements Optimizer {
 		System.out.println("%%% "+experimentName+":: is a "+runSettings.toString()+"%%%");
 		while (true) {
 			if (currentIter > maxIter) {
-				fw.write("Reached iter limit");
+				fw.write("Reached iter limit\n");
+				fw.write("Best: " + bestRun.toString());
 				break;
 			}
 			System.out.println("%%% "+experimentName+":: Iteration "+currentIter+"/"+maxIter+"%%%");
@@ -100,6 +102,7 @@ public class ValleyClimber implements Optimizer {
 				addRunToRuns(newRun);
 			}
 			else {
+				System.out.println("%%% This run has been done before. Loading! %%%");
 				newRun = new RunData(opt, done, iterName);
 			}
 			fw.write(newRun.toString() + "\n");
@@ -117,6 +120,8 @@ public class ValleyClimber implements Optimizer {
 			boolean stillMoving = opt.step(goodStep); 
 			if (!stillMoving && !opt.updateIndex()) { //note that updateIndex will only be called if stillmoving is false
 				fw.write("Breaking early as all variables have been optimized.");
+				fw.write("Best: " + bestRun.toString());
+				fw.write("Elapsed Time: " + (System.nanoTime() - timeNS));
 				break;
 			}
 			currentIter++;
@@ -158,27 +163,43 @@ public class ValleyClimber implements Optimizer {
 		//locking mechanism means no thread should ever be trying to realize the same
 		Queue<File> localInput = this.copyInput(); //deepcopy
 		List<Realization> realizations = new ArrayList<Realization>();
+		int attempts = 0;
+		boolean bypassCache = false;
 		while (!localInput.isEmpty()) { 
 			File in = localInput.peek(); 
 			String num = parseRunNum(in.toPath());
 			if (!r.attemptAcquireLock(num)) {
-				localInput.offer(localInput.poll());
-				continue;
+				attempts++;
+				if (attempts > localInput.size()) {
+					//most likely, two tasks both need the same lock, and it's probably faster to have one recreate the scorer then wait.
+					System.err.println("Forcibly acquiring lock: "+num);
+					bypassCache = true;
+				}
+				else {
+					localInput.offer(localInput.poll());
+					continue;
+				}
 			}
+			attempts = 0;
 			System.out.println("%%% "+runName+" is beginning run on file: "+num+"%%%");
 			localInput.poll();
 			
 			String iterName = runName + "-f" + num;
 			try {
 				String realizationLogPath = this.realizationLogPath == null ? null : this.realizationLogPath+iterName+".spl";
-				realizations.addAll(Arrays.asList(r.realize(r.setLM(real.getGrammar(), runSettings, opt, num), real, in.getPath().toString(), realizationLogPath)));
+				realizations.addAll(Arrays.asList(r.realize(r.setLM(real.getGrammar(), runSettings, opt, num, bypassCache), real, in.getPath().toString(), realizationLogPath, bypassCache)));
 			}
 			catch (Exception e) {
 				e.printStackTrace();
 				System.err.println("Error while realizing");
 				System.exit(1);
 			}
-			r.releaseLock(num);
+			if (!bypassCache) {
+				r.releaseLock(num);
+			}
+			else {
+				bypassCache = false; 
+			}
 		}
 		Evaluation e = null;
 		synchronized(eval) {

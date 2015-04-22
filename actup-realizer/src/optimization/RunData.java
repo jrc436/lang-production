@@ -18,12 +18,13 @@ public class RunData {
 	}
 	public boolean improvement(RunData other) {
 		if (this.eval == null) {
-			return true;
-		}
-		else if (other.eval == null) {
 			return false;
 		}
-		return this.eval.getScore() > other.eval.getScore();
+		else if (other.eval == null) {
+			return true;
+		}
+		//low scores are good, remember! so it's an improvement if it's lower than other
+		return this.eval.getScore() < other.eval.getScore();
 	}
 	protected Evaluation getEval() {
 		return this.eval;
@@ -34,7 +35,7 @@ public class RunData {
 		}
 		String retval = "";
 		retval += (runName + " :: ");
-		retval += eval.toString();
+		retval += eval.toString()+" ";
 		retval += varVals.toString();
 		return retval;
 	}

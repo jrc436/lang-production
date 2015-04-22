@@ -110,7 +110,7 @@ public class RealizeMain
 		}
 	}
 
-	public AbstractStandardNgramModel setLM(Grammar grammar, IOSettings s, VariableSet v, String lmNum) {
+	public AbstractStandardNgramModel setLM(Grammar grammar, IOSettings s, VariableSet v, String lmNum, boolean bypassCache) {
 		String modelFile = s.getTrainingSet().getLMDirPath();
 		AbstractStandardNgramModel score = null;
 		switch (s.getTrainingSet()) {
@@ -124,7 +124,7 @@ public class RealizeMain
 				modelFile = "";
 				break;
 		}
-		if (useCache) {
+		if (useCache && !bypassCache) {
 			synchronized(cachedScorers) {
 				if (cachedScorers.containsKey(modelFile)) {
 					System.out.println("%%%Loading scorer from cache%%%");
@@ -144,15 +144,15 @@ public class RealizeMain
 			System.err.println("Error loading LM");
 			System.exit(1);
 		}
-		if (useCache) {
+		if (useCache && !bypassCache) {
 			synchronized(cachedScorers) {
 				cachedScorers.put(modelFile, score);
 			}
 		}
 		return score;
 	}
-	private InputStruct[] getInputStruct(Grammar grammar, String inputfile) {
-		if (useCache) {
+	private InputStruct[] getInputStruct(Grammar grammar, String inputfile, boolean bypassCache) {
+		if (useCache && !bypassCache) {
 			synchronized(cachedInputs) {
 				if (cachedInputs.containsKey(inputfile)) {
 					System.out.println("Loading input from cache");
@@ -169,7 +169,7 @@ public class RealizeMain
 			LF lf = Realizer.getLfFromElt(grammar, lfelt);
 			inp[i] = new InputStruct(lf, goals[i]);
 		}
-		if (useCache) {
+		if (useCache && !bypassCache) {
 			synchronized(cachedInputs) {
 				cachedInputs.put(inputfile, inp);
 			}
@@ -220,7 +220,7 @@ public class RealizeMain
 	}
 	
 	//each one of these calls needs its own realizer to make it threadsafe.
-	public Realization[] realize(AbstractStandardNgramModel ngramScorer, Realizer realizer, String inputfile, String outputfile) {              
+	public Realization[] realize(AbstractStandardNgramModel ngramScorer, Realizer realizer, String inputfile, String outputfile, boolean bypassCache) {              
 		FileWriter out = null;
 		if (outputfile != null) {
 			try {				
@@ -234,7 +234,7 @@ public class RealizeMain
 			}
 		}
 		
-		InputStruct[] items = this.getInputStruct(realizer.getGrammar(), inputfile);
+		InputStruct[] items = this.getInputStruct(realizer.getGrammar(), inputfile, bypassCache);
 		Realization[] r = new Realization[items.length];
 		
 		for (int i = 0; i < items.length; i++) {

@@ -39,6 +39,6 @@ public class Evaluation {
 		return e.completeness == this.completeness && this.avgScore == e.avgScore && this.avgCompleteScore == e.avgCompleteScore;
 	}
 	public String toString() {
-		return "score: "+this.getScore()+"; "+"completeness: "+this.completeness+";";
+		return "score: "+String.format("%.5f", this.getScore())+"; "+"completeness: "+String.format("%.5f", this.completeness)+";";
 	}
 }

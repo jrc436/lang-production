@@ -25,6 +25,9 @@ public class Variable {
 	private double direction; //1 means moving in the pos direction, -1 means moving in the negative direction
 	private boolean firstRun;
 	private final String name;
+	protected String getName() {
+		return this.name;
+	}
 	public Variable(String name, double initialValue, double lowerBound, double upperBound, double increment) {
 		this.name = name;
 		this.upperBound = upperBound;
@@ -53,10 +56,10 @@ public class Variable {
 	}
 	//should probably never be made public. Consider making forceCurrentValue public if needed.
 	private void setCurrentValue(double val) {
-		this.currentValue = new BigDecimal(val);
-		this.currentValue.setScale(4, RoundingMode.HALF_UP);
+		this.currentValue = new BigDecimal(val).setScale(4, RoundingMode.HALF_UP);
 	}
-	private void forceCurrentValue(double newValue) {
+	//variables should generally be controlled through their varset.
+	protected void forceCurrentValue(double newValue) {
 		//we want to "snap" the currentValue to something that's a valid increment to reduce the search space
 		double newV = this.lowerBound;
 		while (newValue > newV) {
@@ -76,17 +79,18 @@ public class Variable {
 	protected void resetValueRandom() {
 		this.forceCurrentValue(new Random().nextDouble() * (this.upperBound - this.lowerBound) + this.lowerBound);
 	}
+	
 	//if lastvalue is not set, then goodincr doesn't matter, we'll use whatever direction (typo caught by jamie) was initially set to
 	//there are two reasons for the "first run" parameter. One is that if it is the true first run of the variable, there is no previous value.
 	//This can be because every variable is still its initial value (very first run), or because step was called from updateindex
-	public boolean step(boolean goodIncr) {
+	public boolean step(boolean sameWay) {
 		if (this.firstRun) {
 			this.firstRun = false;
 			increment();
 			return checkBounds();
 		}
 		//if the increment is good, do it again!
-		if (goodIncr) {
+		if (sameWay) {
 			//if it's good, then we can "settle" the other way now, to be simple. It's possible (but unlikely) that we're in a minima,
 			//which would make this strategy not work.
 			settleOppositeDirection();

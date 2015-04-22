@@ -14,7 +14,7 @@ public class IOSettings {
 	protected static final String basePath = "/Users/jrc/Public/jrc-research/";
 	//protected static final String basePath = "/work/research/"; //basepath refers to where the research dir is located
 	protected static final String trialSet = "interesting-actr3"; //trialset refers to a single optimization run's name
-	protected static final int iterCap = 1000; //number of iterations before it terminates
+	protected static final int iterCap = 100; //number of iterations before it terminates
 	protected static final int NumConcurrentStarts = 4; //should be roughly equal to number of processors
 	protected static final int RunsPerThread = 2;
 	private static final int startIndex = ACTRNgramModel.ey_index;

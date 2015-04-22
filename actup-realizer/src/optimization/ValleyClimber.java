@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -56,15 +57,16 @@ public class ValleyClimber implements Optimizer {
 	private Queue<File> getInputFiles(String dir, double percentToUse) {
 		List<File> allInput = new ArrayList<File>(Arrays.asList(new File(dir).listFiles()));
 		int numFilesToUse = Math.max(1, (int) Math.round((double)allInput.size() * percentToUse));
-		Queue<File> out = new LinkedList<File>();
+		List<File> out = new ArrayList<File>();
 		Random r = new Random();
 		for (int i = 0; i < numFilesToUse; i++) {
 			//no repeats!
 			int fileIndex = r.nextInt(allInput.size());
-			out.offer(allInput.get(fileIndex));
+			out.add(allInput.get(fileIndex));
 			allInput.remove(fileIndex);
 		}
-		return out;
+		Collections.sort(out);
+		return new LinkedList<File>(out);
 	}
 	
 	//experiment name should be a specific run of an experiment... which should be independent of the settings

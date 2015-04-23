@@ -80,6 +80,7 @@ public class ValleyClimber implements Optimizer {
 		fw.write(this.runSettings.toString()+"\n");
 		for (File f : inputFiles) {
 			fw.write(this.parseRunNum(f.toPath())+",");
+			fw.flush();
 		}
 		fw.write("\n");
 		
@@ -91,6 +92,8 @@ public class ValleyClimber implements Optimizer {
 			if (currentIter > maxIter) {
 				fw.write("Reached iter limit\n");
 				fw.write("Best: " + bestRun.toString());
+				fw.write("Elapsed Time: " + (System.nanoTime() - timeNS));
+				fw.flush();
 				break;
 			}
 			System.out.println("%%% "+experimentName+":: Iteration "+currentIter+"/"+maxIter+"%%%");
@@ -124,6 +127,7 @@ public class ValleyClimber implements Optimizer {
 				fw.write("Breaking early as all variables have been optimized.");
 				fw.write("Best: " + bestRun.toString());
 				fw.write("Elapsed Time: " + (System.nanoTime() - timeNS));
+				fw.flush();
 				break;
 			}
 			currentIter++;

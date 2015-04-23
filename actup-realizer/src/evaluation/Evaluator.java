@@ -63,6 +63,19 @@ public abstract class Evaluator implements TextScorer {
 				completeScore += score;
 			}
 		}
-		return new Evaluation(completeNum/totalNum, totalScore/totalNum, completeScore/completeNum, this.strat);
+		double totScore = totalScore / totalNum;
+		double complScore = completeScore / completeNum;
+		double totstddev = 0.0;
+		double complstddev = 0.0;
+		for (int i = 0; i < realizations.size(); i++) {
+			double score =  this.score(realizations.get(i).str, realizations.get(i).goal);
+			totstddev += Math.pow((score - totScore), 2);
+			if (realizations.get(i).complete) {
+				complstddev += Math.pow((score - complScore), 2);
+			}
+		}
+		totstddev /= totalNum;
+		complstddev /= completeNum;
+		return new Evaluation(completeNum/totalNum, totScore, complScore, totstddev, complstddev, this.strat);
 	}
 }

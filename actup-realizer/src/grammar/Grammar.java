@@ -71,7 +71,6 @@ import org.xml.sax.XMLReader;
 
 import synsem.LF;
 import unify.UnifyControl;
-import util.Interner;
 
 /**
  * A CCG grammar is essentially a lexicon plus a rule group.
@@ -102,7 +101,6 @@ public class Grammar {
     public static final String featsToShow = "";
 		
     protected final IWordFactory wordFactory;
-    protected final Interner<Object> internStore;
     protected final Lexicon lexicon; 
     private final UnifyControl unifyController;
     protected final RuleGroup rules;
@@ -120,9 +118,6 @@ public class Grammar {
     }
     public IWordFactory getWordFactory() {
     	return wordFactory;
-    }
-    public Interner<Object> getIntern() {
-    	return internStore;
     }
     public Set<String> getSuperTagFeatures() {
     	return supertagFeatures;
@@ -158,8 +153,7 @@ public class Grammar {
     /** Loads a grammar from the given URL, with the given flag for whether to ignore rule combos. **/
 	public Grammar(URL url, UnifyControl uc, boolean ignoreCombos) throws IOException {
     	this.unifyController = uc;
-    	this.internStore = new Interner<Object>();
-    	this.wordFactory = new FullWordFactory(internStore);
+    	this.wordFactory = new FullWordFactory();
     	
         SAXBuilder builder = new SAXBuilder();
         Document doc;

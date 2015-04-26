@@ -83,10 +83,9 @@ public class Sign implements LexSemOrigin, Serializable, Comparable<Sign> {
     }
     
     /** Constructor with derivation history. */
-    @SuppressWarnings("unchecked")
 	protected Sign(Grammar grammar, List<Word> words, Category cat, DerivationHistory dh, Sign lexHead) {
         this(grammar);
-    	_words = (List<Word>) grammar.getIntern().intern(words); 
+    	_words = words; 
         _cat = cat;
         _history = dh;
         _lexHead = lexHead;
@@ -104,13 +103,6 @@ public class Sign implements LexSemOrigin, Serializable, Comparable<Sign> {
     	this(grammar, new ArrayList<Word>(Arrays.asList(word)), cat);
     }
     
-    
-    // during deserialization, interns words
-    @SuppressWarnings("unchecked")
-	private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-    	in.defaultReadObject();
-        _words = (List<Word>) grammar.getIntern().intern(_words); 
-    }
     
     // during serialization, skips non-serializable data objects
     private void writeObject(java.io.ObjectOutputStream stream) throws IOException {

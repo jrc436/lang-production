@@ -3,7 +3,6 @@ package lexicon;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.Interner;
 import util.Pair;
 
 public class FullWordFactory implements IWordFactory {
@@ -11,10 +10,6 @@ public class FullWordFactory implements IWordFactory {
     // reusable word, for looking up already interned ones
     private FullWord w = new FullWord(null, null, null, null, null, null, null);
 
-    private final Interner<Object> intern;
-    public FullWordFactory(Interner<Object> intern) {
-    	this.intern = intern;
-    }
     // sets the form and factors of the reusable word w 
     private void setW(
         String form, String pitchAccent, List<Pair<String,String>> attrValPairs, 
@@ -27,14 +22,17 @@ public class FullWordFactory implements IWordFactory {
     
     // looks up the word equivalent to w, or if none, returns a new one based on it
     private Word getOrCreateFromW() {
-        Word retval = (Word) intern.getInterned(w);
-        if (retval != null) return retval;
+       // Word retval = (Word) intern.getInterned(w);
+        Word retval = null;
+    	//if (retval != null) return retval;
         if (w.isSurfaceWord() && w.attrValPairs == null) {
-            if (w.pitchAccent == null) retval = new SimpleWord(w.form);
-            else retval = new WordWithPitchAccent(w.form, w.pitchAccent);
+            retval = w.pitchAccent == null ? new SimpleWord(w.form) : new WordWithPitchAccent(w.form, w.pitchAccent);
         }
-        else retval = new FullWord(w.form, w.pitchAccent, w.attrValPairs, w.stem, w.POS, w.supertag, w.semClass);
-        return (Word) intern.intern(retval);
+        else {
+        	retval = new FullWord(w.form, w.pitchAccent, w.attrValPairs, w.stem, w.POS, w.supertag, w.semClass);
+        }
+        return retval;
+        //return (Word) intern.intern(retval);
     }
     
     /** Creates a surface word with the given interned form. */

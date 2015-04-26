@@ -55,7 +55,6 @@ import unify.Mutable;
 import unify.SimpleType;
 import unify.UnifyFailure;
 import util.GroupMap;
-import util.Interner;
 import util.Pair;
 import util.XmlScanner;
 
@@ -102,7 +101,7 @@ public class Lexicon {
     private String[] _distributiveAttrs = null;
     private LicensingFeature[] _licensingFeatures = null;
     private HashMap<String,Integer> _relationIndexMap = new HashMap<String,Integer>();
-    private Interner<Object> lookupCache = new Interner<Object>(true);
+    //private Interner<Object> lookupCache = new Interner<Object>(true);
     
     /** The grammar that this lexicon is part of. */
     private final Grammar grammar;
@@ -414,20 +413,11 @@ public class Lexicon {
      * Returns the lexical signs indexed by the given rel, or null if none. 
      */
     public Collection<Sign> getSignsFromRel(String rel) {
-        // check cache (if not doing supertagging)
-
-        RelLookup lookup = new RelLookup(rel);
-        RelLookup retLookup = (RelLookup) lookupCache.getInterned(lookup);
-        if (retLookup != null) return retLookup.signs;
-    	
         // lookup signs via preds
         Collection<String> preds = (Collection<String>) _relsToPreds.get(rel);
         if (preds == null) return null;
         Collection<Sign> retval = getSignsFromRelAndPreds(rel, preds);
         // cache non-null result (if not doing supertagging)
-
-    	lookup = new RelLookup(rel);
-        lookup.signs = retval; lookupCache.intern(lookup);
         
         return retval;
     }
@@ -452,21 +442,12 @@ public class Lexicon {
      * otherwise, null is returned.
      * Coarticulations are applied for the given rels, if non-null.
      */
-    public Collection<Sign> getSignsFromPred(String pred, List<String> coartRels) {
-        // check cache (if not doing supertagging)
-        PredLookup lookup = new PredLookup(pred, coartRels);
-        PredLookup retLookup = (PredLookup) lookupCache.getInterned(lookup);
-        if (retLookup != null) return retLookup.signs;
-    	
+    public Collection<Sign> getSignsFromPred(String pred, List<String> coartRels) { 	
         // lookup pred
         Collection<Sign> result = getSignsFromPredAndTargetRel(pred, null);
         if (result == null) return null;
         // apply coarts for rels
         if (coartRels != null) applyCoarts(coartRels, result);
-        // cache result (if not doing supertagging)
-        lookup = new PredLookup(pred, coartRels);
-		lookup.signs = result; lookupCache.intern(lookup);
-    	
         // and return
         return result;
     }
@@ -1095,43 +1076,6 @@ public class Lexicon {
         return _coartRelsToPreds.containsKey(rel);
     }
     
-    
-    //
-    // classes for caching lex lookups during realization
-    //
-
-    // a class for caching lookups of signs from rels
-    // nb: equality is checked just on the rel, to check for a cached lookup
-    private static class RelLookup {
-        String rel; Collection<Sign> signs;
-        RelLookup(String s) { rel = s; }
-        public int hashCode() { return rel.hashCode(); }
-        public boolean equals(Object obj) { 
-            return (obj instanceof RelLookup) && rel.equals(((RelLookup)obj).rel);
-        }
-    }
-    
-    // a class for caching lookups of signs from preds and coart rels
-    // nb: equality is checked just on the pred and coart rels, to check for a cached lookup
-    private static class PredLookup {
-        String pred; List<String> coartRels; Collection<Sign> signs;
-        PredLookup(String s, List<String> l) { pred = s; coartRels = l; }
-        public int hashCode() { 
-            return pred.hashCode() + ((coartRels != null) ? coartRels.hashCode() : 0); 
-        }
-        public boolean equals(Object obj) { 
-            if (!(obj instanceof PredLookup)) return false;
-            PredLookup pLook = (PredLookup) obj;
-            if (!pred.equals(pLook.pred)) return false;
-            if (coartRels == null) return (pLook.coartRels == null);
-            return coartRels.equals(pLook.coartRels);
-        }
-    }
-
-    
-    //
-    // XML loading routines
-    //
     
 	private class MorphScanner extends XmlScanner {
     	List<MorphItem> morphItems = new ArrayList<MorphItem>();

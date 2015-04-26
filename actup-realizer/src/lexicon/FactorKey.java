@@ -18,7 +18,6 @@
 
 package lexicon;
 
-import util.*;
 // import java.util.*;
 
 /** 
@@ -45,7 +44,7 @@ public class FactorKey {
     /** Makes/retrieves an interned factor key for the given interned attr and val; 
         for the word form, the string itself is returned. 
         Null vals are replaced with &lt;NULL&gt;. */
-    public static Object getKey(Interner<Object> intern, String attr, String val) {
+    public static Object getKey(String attr, String val) {
         if (val == null) {
         	val = "<NULL>";
         }
@@ -53,7 +52,7 @@ public class FactorKey {
         	return val;
         }
         else{
-        	return intern.intern(new FactorKey(attr, val));
+        	return new FactorKey(attr, val);
         }
     }
 

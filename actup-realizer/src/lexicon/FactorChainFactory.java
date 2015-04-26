@@ -2,7 +2,6 @@ package lexicon;
 
 import java.util.List;
 
-import util.Interner;
 import util.Pair;
 import util.TrieMap;
 
@@ -23,15 +22,9 @@ public class FactorChainFactory implements IWordFactory {
         return create(factorChainRoot, attr, val);
     }
     
-    private final Interner<Object> intern;
-    public FactorChainFactory(Interner<Object> intern) {
-    	this.intern = intern;
-    }
-   
-    
     /** Creates a (surface or full) word from the given normalized factors. 
         Returns null if no non-null vals. */
-    public Word create(Interner<Object> in,
+    public Word create(
         String form, String pitchAccent, List<Pair<String,String>> attrValPairs, 
         String stem, String POS, String supertag, String semClass 
     ) {
@@ -53,9 +46,6 @@ public class FactorChainFactory implements IWordFactory {
         }
         return currentNode.data;
     }
-    public Word create(String form, String pitchAccent, List<Pair<String,String>> attrValPairs, String stem, String POS, String supertag, String semClass) {
-    	return create(null, form, pitchAccent, attrValPairs, stem, POS, supertag, semClass);
-    }
     
     /** Creates a word from the given node, adding the given interned attr 
         and non-null val. */
@@ -66,7 +56,7 @@ public class FactorChainFactory implements IWordFactory {
     
     /** Gets or makes a child node from the given node. */
     protected TrieMap<Object,FactorChainWord> findChild(TrieMap<Object,FactorChainWord> currentNode, String attr, String val) {
-        Object key = FactorKey.getKey(this.intern, attr, val);
+        Object key = FactorKey.getKey(attr, val);
         TrieMap<Object,FactorChainWord> child = currentNode.findChild(key);
         if (child.data == null) {
             FactorChainWord parent = currentNode.data;

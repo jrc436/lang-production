@@ -13,20 +13,20 @@ public class IOSettings {
 	//I/O Settings
 	//protected static final String basePath = "/Users/jrc/Public/jrc-research/";
 	protected static final String basePath = "/work/research/"; //basepath refers to where the research dir is located
-	protected static final String trialSet = "short-acl"; //trialset refers to a single optimization run's name
+	protected static final String trialSet = "short-acl4"; //trialset refers to a single optimization run's name
 	protected static final int iterCap = 1; //number of iterations before it terminates
-	protected static final int NumConcurrentStarts = 2; //should be roughly equal to number of processors
-	protected static final int RunsPerThread = 4;
+	protected static final int NumConcurrentStarts = 1; //should be roughly equal to number of processors
+	protected static final int RunsPerThread = 8;
 	private static final int startIndex = ACTRNgramModel.ey_index;
 	protected static final ModelType mType = ModelType.ACTR;
 	protected static final TrainingSet trSet = TrainingSet.SWBD;
 	protected static final EvaluationType eval = EvaluationType.EditDistanceWord;
 	protected static final ScoringStrategy strat = ScoringStrategy.ScoreComplete;
-	protected static final double percentInput = 1.0;
+	protected static final double percentInput = 0.2;
 	
 	protected static final boolean logRealizations = false;
 	protected static final boolean loadGoldFromFile = false;
-	protected static final boolean useCache = false;
+	protected static final boolean useCache = true;
 	
 	//values that should started at in any run. Set in the static block
 	protected static final Queue<double[]> interestingValues = new LinkedList<double[]>(); 	

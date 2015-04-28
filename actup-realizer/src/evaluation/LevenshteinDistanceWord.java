@@ -8,9 +8,9 @@ public class LevenshteinDistanceWord extends Evaluator {
 		super(strat);
 	}
 
-	public double score(String str1,String str2) {
-		String[] strm1 = str1.split(" ");
-		String[] strm2 = str2.split(" ");
+	public double score(String realization, String goal) {
+		String[] strm1 = realization.split(" ");
+		String[] strm2 = goal.split(" ");
 		int[][] distance = new int[strm1.length + 1][strm2.length + 1];        
  
 		for (int i = 0; i <= strm1.length; i++) {       
@@ -28,6 +28,6 @@ public class LevenshteinDistanceWord extends Evaluator {
         		distance[i][j] = distance[i][j] = Math.min(Math.min(term1, term2), term3);       
             }
         }
-        return distance[strm1.length][strm2.length];                           
+        return ((double) distance[strm1.length][strm2.length]) / ((double) strm1.length);                           
     }           
 }

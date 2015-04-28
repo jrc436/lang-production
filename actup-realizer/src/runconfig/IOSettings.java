@@ -19,7 +19,7 @@ public class IOSettings {
 	protected static final int RunsPerThread = 8;
 	private static final int startIndex = ACTRNgramModel.ey_index;
 	protected static final ModelType mType = ModelType.ACTR;
-	protected static final TrainingSet trSet = TrainingSet.SWBD;
+	protected static final TrainingSet trSet = TrainingSet.SWBDM1;
 	protected static final EvaluationType eval = EvaluationType.EditDistanceWord;
 	protected static final ScoringStrategy strat = ScoringStrategy.ScoreComplete;
 	protected static final double percentInput = 0.2;

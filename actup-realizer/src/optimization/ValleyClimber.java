@@ -174,7 +174,7 @@ public class ValleyClimber implements Optimizer {
 		while (!localInput.isEmpty()) { 
 			File in = localInput.peek(); 
 			String num = parseRunNum(in.toPath());
-			if (!r.attemptAcquireLock(num)) {
+			if (!r.attemptAcquireLock(this.runSettings, num)) {
 				attempts++;
 				if (attempts > localInput.size()) {
 					//most likely, two tasks both need the same lock, and it's probably faster to have one recreate the scorer then wait.
@@ -201,7 +201,7 @@ public class ValleyClimber implements Optimizer {
 				System.exit(1);
 			}
 			if (!bypassCache) {
-				r.releaseLock(num);
+				r.releaseLock(this.runSettings, num);
 			}
 			else {
 				bypassCache = false; 

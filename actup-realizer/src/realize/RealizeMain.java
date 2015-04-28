@@ -54,7 +54,8 @@ public class RealizeMain
 
 	private HashMap<String, AbstractStandardNgramModel> cachedScorers;
 	private HashMap<String, InputStruct[]> cachedInputs;
-	private HashMap<String, Boolean> locks;
+	private HashMap<String, Boolean> inputLocks;
+	private HashMap<String, Boolean> lmLocks;
 
 
 	//should only need one realizemain, generally, as it is generally threadsafe
@@ -71,7 +72,8 @@ public class RealizeMain
 		cachedInputs = new HashMap<String, InputStruct[]>();
 		//saves more time! maybe ~15 seconds per run!
 		cachedScorers = new HashMap<String, AbstractStandardNgramModel>();
-		locks = new HashMap<String, Boolean>();
+		inputLocks = new HashMap<String, Boolean>();
+		lmLocks = new HashMap<String, Boolean>();
 	}
 	private Document loadInput(Grammar grammar, String inputfile) throws IOException {
 		Document d = null;
@@ -109,17 +111,30 @@ public class RealizeMain
 			}
 		}
 	}
+	private String getLMNumFromFileNum(IOSettings s, String fileNum) {
+		switch (s.getTrainingSet()) {
+			case SWBD10FOLD:
+				return ""+(Integer.parseInt(fileNum) / 10);
+			case SWBDM1:
+				return fileNum;
+			default:
+				return "";
+			}
+	}
 
-	public AbstractStandardNgramModel setLM(Grammar grammar, IOSettings s, VariableSet v, String lmNum, boolean bypassCache) {
+	public AbstractStandardNgramModel setLM(Grammar grammar, IOSettings s, VariableSet v, String fileNum, boolean bypassCache) {
 		String modelFile = s.getTrainingSet().getLMDirPath();
 		AbstractStandardNgramModel score = null;
+		String lmNum = getLMNumFromFileNum(s, fileNum);
 		switch (s.getTrainingSet()) {
 			case WSJ:
 				modelFile += "wsj-lm";
 				break;
-			case SWBD:
+			case SWBDM1:
 				modelFile += ("sw-" + lmNum + ".lm");
 				break;
+			case SWBD10FOLD:
+				modelFile += ("sw-" + lmNum + ".lm");
 			default:
 				modelFile = "";
 				break;
@@ -269,20 +284,23 @@ public class RealizeMain
 		}
 		return r;
 	}
-	public synchronized boolean attemptAcquireLock(String num) {
+	public synchronized boolean attemptAcquireLock(IOSettings s, String num) {
 		//if it doesn't have an entry for it yet, or if the entry is that it's unlocked
 		if (!useCache) {
 			return true; //this is only to prevent concurrent usage of the same element in the dictionary, mostly because they can be modified!
 		}
-		if (!locks.containsKey(num) || locks.get(num) == false) {
-			locks.put(num, true);
+		String lmnum = getLMNumFromFileNum(s, num);
+		if ((!inputLocks.containsKey(num) || inputLocks.get(num) == false) && (!lmLocks.containsKey(lmnum) || lmLocks.get(lmnum) == false)) {
+			inputLocks.put(num, true);
+			lmLocks.put(lmnum, true);
 			return true;
 		}
 		return false;
 	}
-	public synchronized void releaseLock(String num) {
+	public synchronized void releaseLock(IOSettings s, String num) {
 		if (useCache) {
-			locks.put(num, false);	
+			inputLocks.put(num, false);	
+			lmLocks.put(getLMNumFromFileNum(s, num), false);
 		}
 	}
 	//given an input file, we want to be able to get:

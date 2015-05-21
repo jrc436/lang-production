@@ -19,11 +19,7 @@
 
 package lexicon;
 
-import grammar.Grammar;
-import hylo.HyloVar;
-import hylo.NominalVar;
-import hylo.Proposition;
-import hylo.SatOp;
+import grammar.TypesData;
 
 import java.io.IOException;
 import java.net.URL;
@@ -34,6 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -42,35 +39,29 @@ import org.jdom.Element;
 
 import synsem.AtomCat;
 import synsem.Category;
-import synsem.CategoryFcn;
-import synsem.CategoryFcnAdapter;
 import synsem.LF;
-import synsem.Sign;
-import synsem.SignSurfaceWords;
 import unify.FeatureStructure;
-import unify.GFeatStruc;
-import unify.GFeatVar;
-import unify.ModFcn;
-import unify.Mutable;
-import unify.SimpleType;
-import unify.UnifyFailure;
+import util.CollectionContains;
 import util.GroupMap;
 import util.Pair;
 import util.XmlScanner;
 
 
 /**
- * Contains words and their associated categories and semantics.
- * Lookup can be filtered by plugging in a supertagger.
+ * A Lexicon is the IMMUTABLE, THREAD-SAFE read of the openCCG lexicon files. 
  * 
  *
  * @author      Gann Bierner
  * @author      Jason Baldridge
  * @author      Michael White
- * @version     $Revision: 1.78 $, $Date: 2011/10/31 02:01:06 $
+ * @author		Jeremy Cole
+ * @version     $Revision: 2.0 $, $Date: 2015/05/05 $
  */
 public class Lexicon { 
-    
+	 // default relation sort order
+    private final static String[] defaultRelationSortOrder = {
+        "BoundVar", "PairedWith", "Restr", "Body", "Scope", "*", "GenRel", "Coord", "Append"
+    };
     /** Flag used to indicate a purely syntactic edge, with no associated semantics. */
     public static final String NO_SEM_FLAG = "*NoSem*";
     
@@ -78,74 +69,119 @@ public class Lexicon {
     public static final String DEFAULT_VAL = "[*DEFAULT*]";
     
     // various maps
-    private GroupMap<Word,MorphItem> _words;
-    private GroupMap<String,Object> _stems;
+    private GroupMap<Word, MorphItem> _words;
+    public Set<MorphItem> getMorphItems(Word w) {
+    	return _words.get(w);
+    }
+    
+    private GroupMap<String, StemStruct> _stems;
+    public boolean stemsContains(String o) {
+    	return _stems.containsKey(o);
+    }
+    public Set<StemStruct> stemsGet(String s) {
+    	return _stems.get(s);
+    }
+    
     private GroupMap<String,FeatureStructure> _macros;
-    private HashMap<String,MacroItem> _macroItems;
+    public Set<FeatureStructure> getMacros(String name) {
+    	return _macros.get(name);
+    }
+    private Map<String,MacroItem> _macroItems;
+    public MacroItem getMacroItem(String name) {
+    	return _macroItems.get(name);
+    }
 
-    private GroupMap<String,EntriesItem[]> _posToEntries;
-    private GroupMap<String,EntriesItem> _stagToEntries;
-    private GroupMap<String,Word> _predToWords;
-    private GroupMap<String,String> _relsToPreds;
-    private GroupMap<String,String> _coartRelsToPreds;
+    private GroupMap<String, EntriesItem[]> _posToEntries;
+    public Set<EntriesItem[]> posToEntriesGet(String s) {
+    	return _posToEntries.get(s);
+    }
+    
+    private GroupMap<String, EntriesItem> _stagToEntries;
+    private GroupMap<String, Word> _predToWords;
+    public Set<Word> getWordsFromPred(String pred) {
+    	return _predToWords.get(pred);
+    }
+    
+    private GroupMap<String, String> _relsToPreds;
+    public Set<String> relsToPredsGet(String s) {
+    	return _relsToPreds.get(s);
+    }
+    
+    private GroupMap<String, String> _coartRelsToPreds;
+    public Set<String> coartRelsToPredsGet(String s) {
+    	return _coartRelsToPreds.get(s);
+    }
+    
+    private GroupMap<String, String> _catsToAttrs;
+    public Set<String> getCatsToAttrs(String s) {
+    	return _catsToAttrs.get(s);
+    }
+    
+    private Set<String> _lfAttrs;
+    public boolean lfattrsContains(String s) {
+    	return _lfAttrs.contains(s);
+    }
     
     // coarticulation attrs
     private Set<String> _coartAttrs;
+    public CollectionContains<String> coartAttrsContains() {
+    	return _coartAttrs::contains;
+    }
+    
     private Set<String> _indexedCoartAttrs;
+    public boolean indexedCoartAttrsContains(String s) {
+    	return _indexedCoartAttrs.contains(s);
+    }
     
-    // attrs per atomic category type, across all entries
-    private GroupMap<String,String> _catsToAttrs;
-    private Set<String> _lfAttrs;
+    private String[] _distributiveAttrs;
+    public int numDistrAttrs() {
+    	return _distributiveAttrs.length;
+    }
+    public String getDistrAttr(int index) {
+    	return _distributiveAttrs[index];
+    }
     
+    //licensing features are immutable!
+    private LicensingFeature[] _licensingFeatures;
+    public LicensingFeature[] copyFeatures() {
+    	return Arrays.copyOf(_licensingFeatures, _licensingFeatures.length);
+    }
+//    public LicensingFeature getLicensingFeature(int index) {
+//    	return _licensingFeatures[index];  
+//    }
+    
+    private Map<String,Integer> _relationIndexMap;
 
-    private String[] _distributiveAttrs = null;
-    private LicensingFeature[] _licensingFeatures = null;
-    private HashMap<String,Integer> _relationIndexMap = new HashMap<String,Integer>();
-    //private Interner<Object> lookupCache = new Interner<Object>(true);
+    
+    private final TypesData td;
+    private final Tokenizer t;
+    private final IWordFactory wf;
     
     /** The grammar that this lexicon is part of. */
-    private final Grammar grammar;
-
-    
-    /** The tokenizer.  (Defaults to DefaultTokenizer.) */
-    private final Tokenizer tokenizer;
-    public Tokenizer getTokenizer() {
-    	return tokenizer;
-    }
-    
-    /** Flag for whether the lexicon is open, ie complete lexical category mappings are not expected. (Defaults to false.) */
-    private final boolean openlex;
-    
-    /** Flag for whether to show warnings for failed sem class unification. (Defaults to false.) */
-    private final boolean debugSemClasses = false;
-    
-
-    public Lexicon(Grammar grammar) {
-    	this(grammar, false);
-    }
-    public Lexicon(Grammar grammar, boolean openlex) {
-    	this(grammar, new DefaultTokenizer(), openlex);
-    }
-
-    /** Constructor with tokenizer. */
-    public Lexicon(Grammar grammar, Tokenizer tokenizer, boolean openlex) {
-    	
-        this.grammar = grammar;
-        this.tokenizer = tokenizer;
-        this.openlex = openlex;
-    }
-
-    //------------------------------------------------------------- 
+   // private final Grammar grammar;   
     
     /** Loads the lexicon and morph files. */
-    public void init(URL lexiconUrl, URL morphUrl) throws IOException {
-        
-    	List<Family> lexicon = null;
-        List<MorphItem> morph = null;
-        List<MacroItem> macroModel = null;
+    public Lexicon(TypesData td, Tokenizer t, IWordFactory wf)  {
+    	this.td = td;
+    	this.t = t;
+    	this.wf = wf;
 
-        // load category families (lexicon), morph forms and macros
-        lexicon = getLexicon(lexiconUrl);
+       
+        _catsToAttrs = new GroupMap<String,String>();
+        _lfAttrs = new LinkedHashSet<String>();
+    }
+    public void init(boolean openlex, URL lexiconUrl, URL morphUrl) throws IOException {
+        
+        //HAVE TO LOOK AT LEXICON CREATION VS. INITIALIZING
+         List<MorphItem> morph;
+         List<MacroItem> macroModel;
+        LexiconScanner ls = new LexiconScanner(lexiconUrl);
+        _relationIndexMap = ls.loadRelationSortOrder(defaultRelationSortOrder);
+        _distributiveAttrs = ls.getDistrAttrs();
+        _licensingFeatures = ls.loadLicensingFeatures();
+        List<Family> lexicon = ls.loadFamilies(this, this.td);
+        
+        
         Pair<List<MorphItem>,List<MacroItem>> morphInfo = getMorph(morphUrl);
         morph = morphInfo.a; macroModel = morphInfo.b;
 
@@ -153,8 +189,8 @@ public class Lexicon {
         // store indexed coarticulation attrs too
         _words = new GroupMap<Word,MorphItem>();
         _predToWords = new GroupMap<String,Word>();
-        _coartAttrs = new HashSet<String>();
-        _indexedCoartAttrs = new HashSet<String>();
+        _coartAttrs = new LinkedHashSet<String>();
+        _indexedCoartAttrs = new LinkedHashSet<String>();
         for (MorphItem morphItem : morph) {
             Word surfaceWord = morphItem.getSurfaceWord();
             _words.put(surfaceWord, morphItem);
@@ -172,7 +208,7 @@ public class Lexicon {
         }
 
         // index entries based on stem+pos
-        _stems = new GroupMap<String,Object>();
+        _stems = new GroupMap<String, StemStruct>();
         _posToEntries = new GroupMap<String,EntriesItem[]>();
         // index entries by supertag+pos, for supertagging
         _stagToEntries = new GroupMap<String,EntriesItem>();
@@ -180,98 +216,14 @@ public class Lexicon {
         _relsToPreds = new GroupMap<String,String>();
         _coartRelsToPreds = new GroupMap<String,String>();
         // and gather list of attributes used per atomic category type 
-        _catsToAttrs = new GroupMap<String,String>();
-        _lfAttrs = new HashSet<String>();
-        // and remember family and ent, names, for checking excluded list on morph items
-        HashSet<String> familyAndEntryNames = new HashSet<String>();
+          
         
         // index each family
+        HashSet<String> familyAndEntryNames = new HashSet<String>();
         for (Family family : lexicon) {
-
-        	familyAndEntryNames.add(family.getName());
-            EntriesItem[] entries = family.getEntries();
-            DataItem[] data = family.getData();
-
-            // for generic use when we get an unknown stem
-            // from the morphological analyzer
-            if (!family.isClosed()) {
-                _posToEntries.put(family.getPOS(), entries);
-            }
-
-            // scan through entries
-            for (int j=0; j < entries.length; j++) {
-                // index
-                EntriesItem eItem = entries[j];
-            	_stagToEntries.put(eItem.getSupertag()+family.getPOS(), eItem);
-                if (eItem.getStem().length() > 0) {
-                    _stems.put(eItem.getStem()+family.getPOS(), eItem);
-                }
-                try {
-                    // gather features
-                    eItem.getCat().forall(gatherAttrs);
-                    // record names
-                    familyAndEntryNames.add(eItem.getName());
-                    familyAndEntryNames.add(eItem.getQualifiedName());
-                }
-                catch (RuntimeException exc) {
-                    System.err.println("exception for: " + family.getName() + ": " + exc);
-                }
-            }
-
-            // scan through data
-            for (int j=0; j < data.length; j++) {
-                DataItem dItem = data[j];
-                _stems.put(dItem.getStem()+family.getPOS(), new Pair<DataItem, EntriesItem[]>(dItem,entries));
-                // index non-default preds to words
-                if (!dItem.getStem().equals(dItem.getPred())) {
-                    Collection<Word> words = (Collection<Word>) _predToWords.get(dItem.getStem());
-                    if (words == null) {
-                    	if (!openlex) {
-	                        System.err.print("Warning: couldn't find words for pred '");
-	                        System.err.println(dItem.getPred() + "' with stem '" + dItem.getStem() + "'");
-                    	}
-                    }
-                    else {
-                        for (Iterator<Word> it = words.iterator(); it.hasNext(); ) {
-                            _predToWords.put(dItem.getPred(), it.next());
-                        }
-                    }
-                }
-            }
-
-            // index rels to preds
-            // nb: this covers relational (eg @x<GenRel>e) and featural (eg @e<tense>past) 
-            //     elementary predications
-            List<String> indexRels = new ArrayList<String>(3);
-            String familyIndexRel = family.getIndexRel();
-            if (familyIndexRel.length() > 0) { 
-                indexRels.add(familyIndexRel); 
-            }
-            for (int j=0; j < entries.length; j++) {
-                EntriesItem eItem = entries[j];
-                String indexRel = eItem.getIndexRel();
-                if (indexRel.length() > 0 && !indexRel.equals(familyIndexRel)) {
-                    indexRels.add(indexRel);
-                }
-            }
-            for (Iterator<String> it = indexRels.iterator(); it.hasNext(); ) {
-                String indexRel = it.next();
-                // nb: not indexing on entries items, b/c some stems are still defaults 
-                for (int j=0; j < data.length; j++) {
-                    DataItem dItem = data[j];
-                    _relsToPreds.put(indexRel, dItem.getPred());
-                }
-            }
-            
-            // index coart rels (features, really) to preds
-            String coartRel = family.getCoartRel();
-            if (coartRel.length() > 0) {
-                for (int j=0; j < data.length; j++) {
-                    _coartRelsToPreds.put(coartRel, data[j].getPred());
-                }
-            }
+        	indexFamily(family, openlex, familyAndEntryNames);
         }
-
+        
         // index the macros
         _macros = new GroupMap<String, FeatureStructure>();
         // nb: could just index MacroItem objects for feature structures too;
@@ -314,746 +266,116 @@ public class Lexicon {
                         "' not found for word '" + morphItem.getWord() + "'");
                 }
             }
+        }	
+    }
+    //modifies the familyAndEntryNames set
+    private void indexFamily(Family family, boolean openlex, Set<String> familyAndEntryNames) {
+    	// and remember family and ent, names, for checking excluded list on morph items
+        //HashSet<String> familyAndEntryNames = new HashSet<String>();
+    	familyAndEntryNames.add(family.getName());
+        EntriesItem[] entries = family.getEntries();
+        DataItem[] data = family.getData();
+
+        // for generic use when we get an unknown stem
+        // from the morphological analyzer
+        if (!family.isClosed()) {
+            _posToEntries.put(family.getPOS(), entries);
         }
-    }
-    
-    /** Expands inheritsFrom links to feature equations for those features not explicitly listed. */ 
-    public void expandInheritsFrom(Category cat) {
-        expandInheritsFrom(cat, null);
-    }
-    
-    /** Expands inheritsFrom links to feature equations for those features not explicitly listed. */ 
-    public void expandInheritsFrom(Category cat, Category cat2) {
-        // index feature structures
-        featStrucMap.clear();
-        cat.forall(indexFeatStrucs);
-        if (cat2 != null) { cat2.forall(indexFeatStrucs); }
-        // add feature eqs 
-        cat.forall(doInheritsFrom);
-        if (cat2 != null) { cat2.forall(doInheritsFrom); }
-    }
-    
-    // gathers attrs from a category
-    private CategoryFcn gatherAttrs = new CategoryFcnAdapter() {
-        public void forall(Category c) {
-            if (!(c instanceof AtomCat)) return;
-            String type = ((AtomCat)c).getType();
-            FeatureStructure fs = c.getFeatureStructure();
-            if (fs == null) return;
-            for (Iterator<String> it = fs.getAttributes().iterator(); it.hasNext(); ) {
-                String att = it.next();
-                _catsToAttrs.put(type, att);
-                if (fs.getValue(att) instanceof LF) {
-                    _lfAttrs.add(att);
-                }
+
+        // scan through entries
+        for (int j=0; j < entries.length; j++) {
+            // index
+            EntriesItem eItem = entries[j];
+        	_stagToEntries.put(eItem.getSupertag()+family.getPOS(), eItem);
+            if (eItem.getStem().length() > 0) {
+                _stems.put(eItem.getStem()+family.getPOS(), new StemStruct(eItem));
             }
-        }
-    };
-
-    // a map from indices to atomic categories, reset for each category
-    private Map<Integer, FeatureStructure> featStrucMap = new LinkedHashMap<Integer, FeatureStructure>();
-    
-    // fills in featStrucMap for a category
-    private CategoryFcn indexFeatStrucs = new CategoryFcnAdapter() {
-        public void forall(Category c) {
-            FeatureStructure fs = c.getFeatureStructure();
-            if (fs != null && fs.getIndex() != 0)
-                featStrucMap.put(fs.getIndex(), fs);
-        }
-    };
-
-    // adds feature equations to percolate attributes from inheritsFrom feature 
-    // structure, except for any attributes already present
-    private CategoryFcn doInheritsFrom = new CategoryFcnAdapter() {
-        public void forall(Category c) {
-            // get feature structures
-            if (!(c instanceof AtomCat)) return;
-            String type = ((AtomCat)c).getType();
-            FeatureStructure fs = c.getFeatureStructure();
-            GFeatStruc gfs = (GFeatStruc) fs;
-            if (gfs == null || gfs.getInheritsFrom() == 0) return;
-            int inhf = gfs.getInheritsFrom();
-            FeatureStructure inhfFS = featStrucMap.get(inhf);
-            if (inhfFS != null) {
-                // copy values of features from inhfFS not already present
-                for (Iterator<String> it = inhfFS.getAttributes().iterator(); it.hasNext(); ) {
-                    String att = it.next(); 
-                    if (gfs.hasAttribute(att)) continue;
-                    gfs.setFeature(att, grammar.getUnifyControl().copy(inhfFS.getValue(att)));
-                }
-                // for each possible attr used with this type and not already present, 
-                // add feature equation
-                Collection<String> attrs = (Collection<String>) _catsToAttrs.get(type);
-                if (attrs == null) return;
-                for (Iterator<String> it = attrs.iterator(); it.hasNext(); ) {
-                    String att = it.next(); 
-                    if (gfs.hasAttribute(att)) continue;
-                    String varName = att.toUpperCase() + inhf;
-                    if (_lfAttrs.contains(att)) {
-                        gfs.setFeature(att, new HyloVar(grammar, varName));
-                        inhfFS.setFeature(att, new HyloVar(grammar, varName));
-                    }
-                    else {
-                        gfs.setFeature(att, new GFeatVar(grammar, varName));
-                        inhfFS.setFeature(att, new GFeatVar(grammar, varName));
-                    }
-                }
-            }
-            else {
-                System.err.println(
-                    "Warning: no feature structure with inheritsFrom index of " + inhf + 
-                    " found in category " + c
-                );
-            }
-        }
-    };
-
-    
-    /**
-     * Returns the lexical signs indexed by the given rel, or null if none. 
-     */
-    public Collection<Sign> getSignsFromRel(String rel) {
-        // lookup signs via preds
-        Collection<String> preds = (Collection<String>) _relsToPreds.get(rel);
-        if (preds == null) return null;
-        Collection<Sign> retval = getSignsFromRelAndPreds(rel, preds);
-        // cache non-null result (if not doing supertagging)
-        
-        return retval;
-    }
-
-    // get signs for rel via preds, or null if none
-    private Collection<Sign> getSignsFromRelAndPreds(String rel, Collection<String> preds) {
-        List<Sign> retval = new ArrayList<Sign>();
-        for (Iterator<String> it = preds.iterator(); it.hasNext(); ) {
-            String pred = it.next();
-            Collection<Sign> signs = getSignsFromPredAndTargetRel(pred, rel);
-            if (signs != null) retval.addAll(signs);
-        }
-        // return null if none survive filter
-        if (retval.size() > 0) return retval;
-        else return null;
-    }
-
-    /**
-     * Returns the lexical signs indexed by the given pred.
-     * If the pred is not listed in the lexicon, the tokenizer is 
-     * consulted to see if it is a special token (date, time, etc.); 
-     * otherwise, null is returned.
-     * Coarticulations are applied for the given rels, if non-null.
-     */
-    public Collection<Sign> getSignsFromPred(String pred, List<String> coartRels) { 	
-        // lookup pred
-        Collection<Sign> result = getSignsFromPredAndTargetRel(pred, null);
-        if (result == null) return null;
-        // apply coarts for rels
-        if (coartRels != null) applyCoarts(coartRels, result);
-        // and return
-        return result;
-    }
-        
-    // get signs using an additional arg for a target rel
-    private Collection<Sign> getSignsFromPredAndTargetRel(String pred, String targetRel) {
-        
-        Collection<Word> words = (Collection<Word>) _predToWords.get(pred);
-        String specialTokenConst = null;
-        
-        if (words == null) {
-            specialTokenConst = tokenizer.getSpecialTokenConstant(tokenizer.isSpecialToken(pred));
-            if (specialTokenConst == null) return null;
-            // lookup words with pred = special token const
-            Collection<Word> specialTokenWords = (Collection<Word>) _predToWords.get(specialTokenConst);
-            // replace special token const with pred
-            if (specialTokenWords == null) return null;
-            words = new ArrayList<Word>(specialTokenWords.size());
-            for (Iterator<Word> it = specialTokenWords.iterator(); it.hasNext(); ) {
-                Word stw = it.next();
-                Word w = Word.createSurfaceWord(grammar.getWordFactory(), stw, pred);
-                words.add(w);
-            }
-        }
-        
-        List<Sign> retval = new ArrayList<Sign>();
-        for (Iterator<Word> it = words.iterator(); it.hasNext(); ) {
-            Word w = it.next();
             try {
-                Map<SignSurfaceWords, Sign> signs = getSignsFromWord(w, specialTokenConst, pred, targetRel);
-                retval.addAll(signs.values());
+                // gather features
+                eItem.getCat().applyToAll(this::gatherAttrs);
+                // record names
+                familyAndEntryNames.add(eItem.getName());
+                familyAndEntryNames.add(eItem.getQualifiedName());
             }
-            // shouldn't happen
-            catch (LexException exc) {
-                System.err.println("Unexpected lex exception for word " + w + ": " + exc);
+            catch (RuntimeException exc) {
+                System.err.println("exception for: " + family.getName() + ": " + exc);
             }
         }
-        return retval;
-    }
-    
-    // look up and apply coarts for given rels to each sign in result
-    private void applyCoarts(List<String> coartRels, Collection<Sign> result) {
-        List<Sign> inputSigns = new ArrayList<Sign>(result);
-        result.clear();
-        List<Sign> outputSigns = new ArrayList<Sign>(inputSigns.size());
-        // for each rel, lookup coarts and apply to input signs, storing results in output signs
-        for (Iterator<String> it = coartRels.iterator(); it.hasNext(); ) {
-            String rel = it.next();
-            Collection<String> preds = (Collection<String>) _coartRelsToPreds.get(rel);
-            if (preds == null) continue; // not expected
-            Collection<Sign> coartResult = getSignsFromRelAndPreds(rel, preds);
-            if (coartResult == null) continue;
-            for (Iterator<Sign> it2 = coartResult.iterator(); it2.hasNext(); ) {
-                Sign coartSign = it2.next();
-                // apply to each input
-                for (int j = 0; j < inputSigns.size(); j++) {
-                    Sign sign = inputSigns.get(j);
-                    grammar.getRules().applyCoart(sign, coartSign, outputSigns);
+
+        // scan through data
+        for (int j=0; j < data.length; j++) {
+            DataItem dItem = data[j];
+            _stems.put(dItem.getStem()+family.getPOS(), new StemStruct(entries, dItem));
+            // index non-default preds to words
+            if (!dItem.getStem().equals(dItem.getPred())) {
+                Collection<Word> words = (Collection<Word>) _predToWords.get(dItem.getStem());
+                if (words == null) {
+                	if (!openlex) {
+                        System.err.print("Warning: couldn't find words for pred '");
+                        System.err.println(dItem.getPred() + "' with stem '" + dItem.getStem() + "'");
+                	}
                 }
-            }
-            // switch output to input for next iteration
-            inputSigns.clear();
-            inputSigns.addAll(outputSigns);
-            outputSigns.clear();
-        }
-        // add results back
-        result.addAll(inputSigns);
-    }
-
-    
-    /**
-     * For a string of 1 or more surface words, return all of the lexical
-     * entries for each word as a list of sign hashes.
-     * Tokenization is performed using the configured tokenizer.
-     * @param w the words in string format
-     *
-     * @return a list of sign hashes
-     * @exception LexException thrown if word not found
-     */
-    public List<Map<SignSurfaceWords, Sign>> getEntriesFromWords(String s) throws LexException { 
-        List<Map<SignSurfaceWords, Sign>> entries = new ArrayList<Map<SignSurfaceWords, Sign>>();
-        List<Word> words = tokenizer.tokenize(grammar, s);
-        for (Iterator<Word> it = words.iterator(); it.hasNext(); ) {
-            Word w = it.next();
-            Map<SignSurfaceWords, Sign> signs = getSignsFromWord(w);
-            if (signs.size() == 0) {
-                throw new LexException("Word not in lexicon: \"" + w +"\"");
-            }
-            entries.add(signs);
-        }
-        return entries;
-    }
-    
-    /**
-     * For a given word, return all of its surface word's lexical entries.
-     * If the word is not listed in the lexicon, the tokenizer is 
-     * consulted to see if it is a special token (date, time, etc.); 
-     * otherwise an exception is thrown.
-     * If the word has coarticulations, all applicable coarticulation 
-     * entries are applied to the base word, in an arbitrary order.
-     * @param w the word
-     *
-     * @return a sign hash
-     * @exception LexException thrown if word not found
-     */
-    public Map<SignSurfaceWords, Sign> getSignsFromWord(Word w) throws LexException {
-        // reduce word to its core, removing coart attrs if any
-    	Word surfaceWord = Word.createSurfaceWord(grammar.getWordFactory(), w);
-        Word coreWord = (surfaceWord.attrsIntersect(_coartAttrs)) 
-            ? Word.createCoreSurfaceWord(grammar.getWordFactory(), surfaceWord, _coartAttrs) 
-            : surfaceWord;
-        // lookup core word
-            Map<SignSurfaceWords, Sign> result = getSignsFromWord(coreWord, null, null, null);
-        if (result.size() == 0) {
-            throw new LexException(coreWord + " not found in lexicon");
-        }
-        // return signs if no coart attrs
-        if (coreWord == surfaceWord) return result; 
-        // otherwise apply coarts for word
-        applyCoarts(surfaceWord, result);
-        return result; 
-    }
-    
-    // look up and apply coarts for w to each sign in result
-	private void applyCoarts(Word w, Map<SignSurfaceWords, Sign> result) throws LexException {
-        List<Sign> inputSigns = new ArrayList<Sign>(result.values());
-        result.clear();
-        List<Sign> outputSigns = new ArrayList<Sign>(inputSigns.size());
-        // for each surface attr, lookup coarts and apply to input signs, storing results in output signs
-        for (Iterator<Pair<String,String>> it = w.getSurfaceAttrValPairs(); it.hasNext(); ) {
-            Pair<String,String> p = it.next();
-            String attr = (String) p.a;
-            if (!_indexedCoartAttrs.contains(attr)) continue;
-            String val = (String) p.b;
-            Word coartWord = Word.createWord(grammar.getWordFactory(), attr, val);
-            Map<SignSurfaceWords, Sign> coartResult = getSignsFromWord(coartWord, null, null, null);
-            for (Iterator<Sign> it2 = coartResult.values().iterator(); it2.hasNext(); ) {
-                Sign coartSign = it2.next();
-                // apply to each input
-                for (int j = 0; j < inputSigns.size(); j++) {
-                    Sign sign = inputSigns.get(j);
-                    grammar.getRules().applyCoart(sign, coartSign, outputSigns);
-                }
-            }
-            // switch output to input for next iteration
-            inputSigns.clear();
-            inputSigns.addAll(outputSigns);
-            outputSigns.clear();
-        }
-        // add results back
-        for (Sign s : inputSigns) {
-        	result.put(new SignSurfaceWords(s), s);
-        }
-    }
-    
-    // get signs with additional args for a known special token const, target pred and target rel        
-    private Map<SignSurfaceWords, Sign> getSignsFromWord(Word w, String specialTokenConst, String targetPred, String targetRel) throws LexException {
-
-        Collection<MorphItem> morphItems = (specialTokenConst == null)
-            ? (Collection<MorphItem>) _words.get(w)
-            : null;
-
-        if (morphItems == null) {
-            // check for special tokens
-            if (specialTokenConst == null) {
-                specialTokenConst = tokenizer.getSpecialTokenConstant(tokenizer.isSpecialToken(w.getForm()));
-                targetPred = w.getForm();
-            }
-            if (specialTokenConst != null) {
-                Word key = Word.createSurfaceWord(grammar.getWordFactory(), w, specialTokenConst);
-                morphItems = (Collection<MorphItem>) _words.get(key);
-            }
-            // otherwise throw lex exception
-            if (morphItems == null)
-                throw new LexException(w + " not in lexicon");
-        }
-
-        Map<SignSurfaceWords, Sign> result = new LinkedHashMap<SignSurfaceWords, Sign>();
-
-        for (Iterator<MorphItem> MI = morphItems.iterator(); MI.hasNext();) {
-            getWithMorphItem(w, MI.next(), targetPred, targetRel, result);
-        }
-
-        return result;
-    }
-
-
-    // given MorphItem
-    private void getWithMorphItem(Word w, MorphItem mi, String targetPred, String targetRel, Map<SignSurfaceWords, Sign> result)
-        throws LexException 
-    {
-    	// get supertags for filtering, if a supertagger is installed
-    	Map<String,Double> supertags = null;
-    	Set<String> supertagsFound = null;
-    	
-        // get macro adder
-        MacroAdder macAdder = getMacAdder(mi);
-        
-        // if we have this stem in our lexicon
-        String stem = mi.getWord().getStem();
-        String pos = mi.getWord().getPOS();
-        Set<EntriesItem[]> explicitEntries = null; // for storing entries from explicitly listed family members
-        if (_stems.containsKey(stem+pos)) {
-            explicitEntries = new HashSet<EntriesItem[]>();
-            Collection<Object> stemItems = (Collection<Object>)_stems.get(stem+pos);
-            for (Iterator<Object> I=stemItems.iterator(); I.hasNext();) {
-                Object item = I.next();
-                // see if it's an EntriesItem
-                if (item instanceof EntriesItem) {
-                    EntriesItem entry = (EntriesItem) item;
-                    // do lookup
-                    getWithEntriesItem(w, mi, stem, stem, targetPred, targetRel, entry, macAdder, supertags, supertagsFound, result);
-                } 
-                // otherwise it has to be a Pair containing a DataItem and 
-                // an EntriesItem[]
                 else {
-                    @SuppressWarnings("rawtypes")
-					DataItem dItem = (DataItem)((Pair)item).a;
-                    @SuppressWarnings("rawtypes")
-					EntriesItem[] entries = (EntriesItem[])((Pair)item).b;
-                    // store entries
-                    explicitEntries.add(entries);
-                    // do lookup
-                    getWithDataItem(w, mi, dItem, entries, targetPred, targetRel, macAdder, supertags, supertagsFound, result);
-                }
-            }
-        }
-        
-        // for entries that are not explicitly in the lexicon file, we have to create
-        // Signs from the open class entries with the appropriate part-of-speech
-        Collection<EntriesItem[]> entrySets = (Collection<EntriesItem[]>)_posToEntries.get(pos);
-        if (entrySets != null) {
-	        for (Iterator<EntriesItem[]> E=entrySets.iterator(); E.hasNext(); ) {
-	            EntriesItem[] entries = E.next();  
-	            // skip if entries explicitly listed
-	            if (explicitEntries != null && explicitEntries.contains(entries)) continue;
-	            // otherwise get entries with pred = targetPred, or stem if null
-	            String pred = (targetPred != null) ? targetPred : stem;
-	            getWithDataItem(w, mi, new DataItem(stem, pred), entries, targetPred, targetRel, macAdder, supertags, supertagsFound, result);
-	        }
-        }
-      
-    }
-
-    
-    // given DataItem
-    private void getWithDataItem(Word w, MorphItem mi,  
-                                 DataItem item, EntriesItem[] entries, 
-                                 String targetPred, String targetRel, 
-                                 MacroAdder macAdder,
-                                 Map<String,Double> supertags,
-                                 Set<String> supertagsFound,
-                                 Map<SignSurfaceWords, Sign> result) 
-    {
-        for (int i=0; i < entries.length; i++) {
-            EntriesItem entry = entries[i];
-            if (entry.getStem().equals(DEFAULT_VAL)) {
-                getWithEntriesItem(w, mi, item.getStem(), item.getPred(), targetPred, targetRel, entry, macAdder, supertags, supertagsFound, result);
-            }
-        }
-    }
-
-    // given EntriesItem
-    private void getWithEntriesItem(Word w, MorphItem mi, 
-                                    String stem, String pred, 
-                                    String targetPred, String targetRel,
-                                    EntriesItem item,
-                                    MacroAdder macAdder,
-                                    Map<String,Double> supertags,
-                                    Set<String> supertagsFound,
-                                    Map<SignSurfaceWords, Sign> result) 
-    {
-        // ensure apropos
-        if (targetPred != null && !targetPred.equals(pred)) return; 
-        if (targetRel != null && !targetRel.equals(item.getIndexRel()) && !targetRel.equals(item.getCoartRel())) return; 
-        if (!item.getActive().booleanValue()) return;
-        if (mi.excluded(item)) return;
-        
-        try {
-	        // copy and add macros
-	        Category cat = item.getCat().copy();
-	        macAdder.addMacros(cat);
-	
-	        // replace DEFAULT_VAL with pred, after first 
-	        // unifying type of associated nom var(s) with sem class 
-	        unifySemClass(cat, mi.getWord().getSemClass());
-	        REPLACEMENT = pred; 
-	        cat.deepMap(defaultReplacer);
-	        
-	        // check supertag
-	        // TODO: think about earlier checks for efficiency, for grammars where macros and preds don't matter
-	        //Double lexprob = null; // nb: skipping lex log probs, don't seem to be helpful
-	        if (supertags != null) {
-	        	// skip if not found
-	        	String stag = cat.getSupertag();
-	        	if (!supertags.containsKey(stag)) return;
-	        	// otherwise update found supertags
-	        	supertagsFound.add(stag);
-	        	// get lex prob
-	        	//lexprob = supertags.get(stag);
-	        }
-	        
-	        // propagate types of nom vars
-	        propagateTypes(cat);
-	        
-	        // handle distrib attrs and inherits-from
-	        propagateDistributiveAttrs(cat);
-	        expandInheritsFrom(cat);
-	        
-	        // merge stem, pos, sem class from morph item, plus supertag from cat
-	        Word word = Word.createFullWord(grammar.getWordFactory(), w, mi.getWord(), cat.getSupertag());
-
-	        // set origin and lexprob
-	        Sign sign = new Sign(grammar, word, cat);
-	        sign.setOrigin();
-	        //if (lexprob != null) {
-	        //	sign.addData(new SupertaggerAdapter.LexLogProb((float) Math.log10(lexprob)));
-	        //}
-	        // return sign
-	        SignSurfaceWords sw = new SignSurfaceWords(sign);
-	        if (result.get(sw) == null || sign.getDerivationHistory().compareTo(result.get(sw).getDerivationHistory()) > 0) {
-	        	result.put(sw, sign);
-	        }
-        }
-        catch (RuntimeException exc) {
-        	System.err.println("Warning: ignoring entry: "+item.getName()+" of family: "+item.getFamilyName()+" for stem: "+stem + " b/c: " + exc.toString()
-        	);
-        }
-    }
-
-    // the sem class for defaultNomvarSetter
-    private SimpleType SEMCLASS = null;
-    
-    // unify sem class with default nom var(s)
-    private void unifySemClass(Category cat, String semClass) {
-        if (semClass == null || cat.getLF() == null) return;
-        SEMCLASS = grammar.getTypes().getSimpleType(semClass);
-        try {
-            cat.getLF().deepMap(defaultNomvarUnifier);
-        } catch (TypePropagationException tpe) {
-        	if (debugSemClasses) {
-	            System.err.println(
-	                "Warning: unable to unify types '" + tpe.st1 + "' and '" + tpe.st2 + 
-	                "' in unifying sem class in cat: \n" + cat
-	            );
-        	}
-        }
-    }
-    
-    // mod function to unify type of nom var for DEFAULT_VAL with SEMCLASS
-    private ModFcn defaultNomvarUnifier = new ModFcn() {
-        public void modify(Mutable m) {
-            if (!(m instanceof SatOp)) return;
-            SatOp satop = (SatOp) m;
-            if (!(satop.getArg() instanceof Proposition)) return; 
-            Proposition prop = (Proposition) satop.getArg();
-            if (!prop.getName().equals(DEFAULT_VAL)) return;
-            if (!(satop.getNominal() instanceof NominalVar)) return;
-            NominalVar nv = (NominalVar) satop.getNominal();
-            SimpleType st = nv.getType();
-            // check equality
-            if (st.equals(SEMCLASS)) return;
-            // otherwise unify types, update nv
-            try {
-                SimpleType stU = (SimpleType) st.unify(SEMCLASS, null, grammar.getUnifyControl());
-                nv.setType(stU);
-            } catch (UnifyFailure uf) {
-                throw new TypePropagationException(st, SEMCLASS);
-            }
-        }
-    };
-
-    // the replacement string for defaultReplacer
-    private String REPLACEMENT = "";
-    
-    // mod function to replace DEFAULT_VAL with REPLACEMENT
-    private ModFcn defaultReplacer = new ModFcn() {
-        public void modify(Mutable m) {
-            if (m instanceof Proposition) {
-                Proposition prop = (Proposition) m; 
-                if (prop.getName().equals(DEFAULT_VAL)) prop.setAtomName(REPLACEMENT);
-            }
-            else if (m instanceof FeatureStructure) {
-                FeatureStructure fs = (FeatureStructure) m;
-                for (Iterator<String> it = fs.getAttributes().iterator(); it.hasNext(); ) {
-                    String attr = it.next();
-                    Object val = fs.getValue(attr);
-                    if (val instanceof SimpleType && 
-                        ((SimpleType)val).getName().equals(DEFAULT_VAL))
-                    {
-                        fs.setFeature(attr, grammar.getTypes().getSimpleType(REPLACEMENT));
+                    for (Iterator<Word> it = words.iterator(); it.hasNext(); ) {
+                        _predToWords.put(dItem.getPred(), it.next());
                     }
                 }
             }
         }
-    };
 
-
-    // a cache for macro adders
-    private Map<MorphItem, MacroAdder> macAdderMap = new HashMap<MorphItem, MacroAdder>();
-    
-    // returns a macro adder for the given morph item
-    private MacroAdder getMacAdder(MorphItem mi) {
+        // index rels to preds
+        // nb: this covers relational (eg @x<GenRel>e) and featural (eg @e<tense>past) 
+        //     elementary predications
+        List<String> indexRels = new ArrayList<String>(3);
+        String familyIndexRel = family.getIndexRel();
+        if (familyIndexRel.length() > 0) { 
+            indexRels.add(familyIndexRel); 
+        }
+        for (int j=0; j < entries.length; j++) {
+            EntriesItem eItem = entries[j];
+            String indexRel = eItem.getIndexRel();
+            if (indexRel.length() > 0 && !indexRel.equals(familyIndexRel)) {
+                indexRels.add(indexRel);
+            }
+        }
+        for (Iterator<String> it = indexRels.iterator(); it.hasNext(); ) {
+            String indexRel = it.next();
+            // nb: not indexing on entries items, b/c some stems are still defaults 
+            for (int j=0; j < data.length; j++) {
+                DataItem dItem = data[j];
+                _relsToPreds.put(indexRel, dItem.getPred());
+            }
+        }
         
-        // check map
-        MacroAdder retval = macAdderMap.get(mi);
-        if (retval != null) return retval;
-        
-        // set up macro adder
-        GroupMap<Integer, FeatureStructure> macrosFromLex = new GroupMap<Integer, FeatureStructure>();
-        String[] newMacroNames = mi.getMacros();
-        List<MacroItem> macroItems = new ArrayList<MacroItem>();
-        for (int i=0; i < newMacroNames.length; i++) {
-            Set<FeatureStructure> featStrucs = _macros.get(newMacroNames[i]);
-            if (featStrucs != null) {
-                for (Iterator<FeatureStructure> fsIt = featStrucs.iterator(); fsIt.hasNext();) {
-                    FeatureStructure fs = fsIt.next();
-                    macrosFromLex.put(fs.getIndex(), fs);
-                }
-            }
-            MacroItem macroItem = _macroItems.get(newMacroNames[i]);
-            if (macroItem != null) { macroItems.add(macroItem); }
-            else { 
-                // should be checked earlier too
-                System.err.println("Warning: macro " + newMacroNames[i] + 
-                    " not found for word '" + mi.getWord() + "'");
+        // index coart rels (features, really) to preds
+        String coartRel = family.getCoartRel();
+        if (coartRel.length() > 0) {
+            for (int j=0; j < data.length; j++) {
+                _coartRelsToPreds.put(coartRel, data[j].getPred());
             }
         }
-        retval = new MacroAdder(macrosFromLex, macroItems, grammar);
-        
-        // update map and return
-        macAdderMap.put(mi, retval);
-        return retval; 
     }
-        
-    
-    //
-    // type propagation
-    //
 
-    /** Propagates types of nomvars in the given category. */
-    public void propagateTypes(Category cat) {
-        propagateTypes(cat, null);
-    }        
+   
     
-    /** Propagates types of nomvars in the given categories. */
-    public void propagateTypes(Category cat, Category cat2) {
-        try {
-            nomvarMap.clear();
-            cat.deepMap(nomvarTypePropagater);
-            if (cat2 != null) cat2.deepMap(nomvarTypePropagater);
-            cat.deepMap(nomvarTypePropagater);
-            if (cat2 != null) cat2.deepMap(nomvarTypePropagater);
-        } catch (TypePropagationException tpe) {
-        	if (debugSemClasses) {
-	            System.err.println(
-	                "Warning: unable to unify types '" + tpe.st1 + "' and '" + tpe.st2 + 
-	                "' in cat: \n" + cat
-	            );
-	            if (cat2 != null) System.err.println("and cat: \n" + cat2);
-        	}
-        }
-    }
-        
-    // a map from a cat's nomvars to types, 
-    // just using the var's name for equality
-  //  @SuppressWarnings("unchecked")
-	private Map<String,SimpleType> nomvarMap = new LinkedHashMap<String, SimpleType>();//new THashMap(
-//        new TObjectHashingStrategy() {
-//			private static final long serialVersionUID = 1L;
-//			public int computeHashCode(Object o) {
-//                return ((NominalVar)o).getName().hashCode();
-//            }
-//            public boolean equals(Object o1, Object o2) {
-//                return ((NominalVar)o1).getName().equals(((NominalVar)o2).getName());
-//            }
-//        }
-//    );
     
-    // exception for unification failures in propagating types
-    private class TypePropagationException extends RuntimeException {
-		private static final long serialVersionUID = 1L;
-		SimpleType st1; SimpleType st2;
-        TypePropagationException(SimpleType st1, SimpleType st2) {
-            this.st1 = st1; this.st2 = st2;
+ // gathers attrs from a category
+    private void gatherAttrs(Category c) {
+        if (!(c instanceof AtomCat)) return;
+        String type = ((AtomCat)c).getType();
+        FeatureStructure fs = c.getFeatureStructure();
+        if (fs == null) return;
+        for (Iterator<String> it = fs.getAttributes().iterator(); it.hasNext(); ) {
+            String att = it.next();
+            _catsToAttrs.put(type, att);
+            if (fs.getValue(att) instanceof LF) {
+                _lfAttrs.add(att);
+            }
         }
     }
     
-    // mod function to propagate nomvar types; 
-    // needs to be called twice after clearing nomvarMap
-    private ModFcn nomvarTypePropagater = new ModFcn() {
-        public void modify(Mutable m) {
-            if (m instanceof NominalVar) {
-                NominalVar nv = (NominalVar) m;
-                SimpleType st = nv.getType();
-                SimpleType st0 = nomvarMap.get(nv);
-                // add type to map if no type found
-                if (st0 == null) { nomvarMap.put(nv.getName(), st); return; }
-                // check equality
-                if (st.equals(st0)) return;
-                // otherwise unify types, update nv and map
-                try {
-                    SimpleType stU = (SimpleType) st.unify(st0, null, grammar.getUnifyControl());
-                    nv.setType(stU);
-                    nomvarMap.put(nv.getName(), stU);
-                } catch (UnifyFailure uf) {
-                    throw new TypePropagationException(st, st0);
-                }
-            }
-        }
-    };
-    
-
-    //
-    // distributive attribute propagation
-    //
-
-    /**
-     * Returns the list of distributive attributes, or null if none.
-     */
-    public String[] getDistributiveAttrs() { return _distributiveAttrs; }
-    
-    /**
-     * Gathers and propagates the unique values of each 
-     * distributive attribute.
-     */
-    public void propagateDistributiveAttrs(Category cat) {
-        propagateDistributiveAttrs(cat, null);
-    }
-    
-    /**
-     * Gathers and propagates the unique values of each 
-     * distributive attribute.
-     */
-    public void propagateDistributiveAttrs(Category cat, Category cat2) {
-        if (_distributiveAttrs == null) return;
-        resetDistrAttrVals();
-        cat.forall(gatherDistrAttrVals);
-        if (cat2 != null) { cat2.forall(gatherDistrAttrVals); }
-        cat.forall(propagateUniqueDistrAttrVals);
-        if (cat2 != null) { cat2.forall(propagateUniqueDistrAttrVals); }
-    }
-    
-    // an array of lists, one for each distributive attr    
-    @SuppressWarnings("rawtypes")
-	private List[] distrAttrVals = null;
-    @SuppressWarnings("rawtypes")
-	private void resetDistrAttrVals() {
-        if (distrAttrVals == null) { 
-            distrAttrVals = new List[_distributiveAttrs.length];
-            for (int i = 0; i < distrAttrVals.length; i++) {
-                distrAttrVals[i] = new ArrayList(3);
-            }
-            return;
-        }
-        for (int i = 0; i < distrAttrVals.length; i++) {
-            distrAttrVals[i].clear();
-        }
-    }
-    
-    // gathers distinct values for each distributive attr
-    private CategoryFcn gatherDistrAttrVals = new CategoryFcnAdapter() {
-        @SuppressWarnings("unchecked")
-		public void forall(Category c) {
-            if (!(c instanceof AtomCat)) return;
-            FeatureStructure fs = c.getFeatureStructure();
-            if (fs == null) return;
-            for (int i = 0; i < _distributiveAttrs.length; i++) {
-                String attr = _distributiveAttrs[i];
-                Object val = fs.getValue(attr);
-                if (val != null && !distrAttrVals[i].contains(val)) { 
-                    distrAttrVals[i].add(val); 
-                }
-            }
-        }
-    };
-
-    // propagates unique values for each distributive attr
-    private CategoryFcn propagateUniqueDistrAttrVals = new CategoryFcnAdapter() {
-        public void forall(Category c) {
-            if (!(c instanceof AtomCat)) return;
-            FeatureStructure fs = c.getFeatureStructure();
-            if (fs == null) return;
-            for (int i = 0; i < _distributiveAttrs.length; i++) {
-                if (distrAttrVals[i].size() != 1) continue;
-                Object distVal = distrAttrVals[i].get(0);
-                String attr = _distributiveAttrs[i];
-                Object val = fs.getValue(attr);
-                if (val == null) {
-                    fs.setFeature(attr, grammar.getUnifyControl().copy(distVal));
-                }
-            }
-        }
-    };
-
-    
-    //
-    // licensing features
-    //
-
-    /**
-     * Returns the list of licensing features.
-     */
-    public LicensingFeature[] getLicensingFeatures() { return _licensingFeatures; }
-    
-    
+    // get licensing features, with appropriate defaults
+	
     /**
      * Returns the index of the given relation in the relation sort order, 
      * or the index of "*" if the relation is not explicitly listed.
@@ -1083,15 +405,15 @@ public class Lexicon {
     	public void handleElement(Element e) {
             // create morph item
 			if (e.getName().equals("entry")) {
-                try { morphItems.add(new MorphItem(grammar, e)); }
+                try { morphItems.add(new MorphItem(t, wf, e)); }
                 catch (RuntimeException exc) {
                     System.err.println("Skipping morph item: " + e.getAttributeValue("word"));
-                    System.err.println(exc.toString());
+                    exc.printStackTrace();
                 }
             }
             // create macro item
 			else if (e.getName().equals("macro")) {
-                try { macroItems.add(new MacroItem(grammar, e)); }
+                try { macroItems.add(new MacroItem(Lexicon.this, td, e)); }
                 catch (RuntimeException exc) {
                     System.err.println("Skipping macro item: " + e.getAttributeValue("name"));
                     System.err.println(exc.toString());
@@ -1104,58 +426,73 @@ public class Lexicon {
     	// scan XML
     	MorphScanner morphScanner = new MorphScanner();
     	morphScanner.parse(url);
-        // return morph and macro items
         return new Pair<List<MorphItem>,List<MacroItem>>(morphScanner.morphItems, morphScanner.macroItems);
     }
-	private class LexiconScanner extends XmlScanner {
-    	List<Family> lexicon = new ArrayList<Family>();
-    	Element distrElt = null;
-    	Element licensingElt = null;
-    	Element relationSortingElt = null;
-    	public void handleElement(Element e) {
-            // create family
-			if (e.getName().equals("family")) {
-				try {
-					lexicon.add(new Family(grammar, e));
-				}
-                catch (RuntimeException exc) {
-                    System.err.println("Skipping family: " + e.getAttributeValue("name"));
-                    System.err.println(exc.toString());
-                }
-            }
-            // save distributive attributes
-			else if (e.getName().equals("distributive-features")) distrElt = e; 
-            // save licensing features
+}
+class LexiconScanner {
+	private class LexScan extends XmlScanner {
+		
+		public void handleElement(Element e) {
+	        // save distributive attributes
+			if (e.getName().equals("distributive-features")) distrElt = e; 
+	        // save licensing features
 			else if (e.getName().equals("licensing-features")) licensingElt = e; 
-            // save relation sort order
+	        // save relation sort order
 			else if (e.getName().equals("relation-sorting")) relationSortingElt = e; 
+			else if (e.getName().equals("family")) {
+				lexicon.add(e);
+            }
 		}
-	};
+	}
+	private Element distrElt = null;
+	private Element licensingElt = null;
+	private Element relationSortingElt = null;
+	private List<Element> lexicon = new ArrayList<Element>();
+	public LexiconScanner(URL url) throws IOException {
+		LexScan ls = new LexScan();
+		ls.parse(url);
+	}
+	public List<Family> loadFamilies(Lexicon l, TypesData td) {
+		List<Family> lex = new ArrayList<Family>();
+		for (Element e : lexicon) {
+			try {
+				lex.add(new Family(l, td, e));
+			}
+	        catch (RuntimeException exc) {
+	            System.err.println("Skipping family: " + e.getAttributeValue("name"));
+	            exc.printStackTrace();
+	        }			
+		}
+		return lex;
+	}
 	
-    private List<Family> getLexicon(URL url) throws IOException {
-    	// scan XML, creating families
-    	LexiconScanner lexiconScanner = new LexiconScanner();
-    	lexiconScanner.parse(url);
-        // get distributive attributes, if any
-        if (lexiconScanner.distrElt != null) {
-            String distrAttrs = lexiconScanner.distrElt.getAttributeValue("attrs");
-            _distributiveAttrs = distrAttrs.split("\\s+");
+	//These methods must be called AFTER parse to work correctly.
+	public Map<String, Integer> loadRelationSortOrder(String[] defaultRelationSortOrder) {
+		// use defaults if no order specified
+    	Map<String, Integer> relIndexMap = new LinkedHashMap<String, Integer>();
+        if (relationSortingElt == null) {
+            for (int i = 0; i < defaultRelationSortOrder.length; i++) {
+            	relIndexMap.put(defaultRelationSortOrder[i], new Integer(i));
+            }
+            return relIndexMap;
         }
-        // load licensing features
-        loadLicensingFeatures(lexiconScanner.licensingElt);
-        // load relation sort order
-        loadRelationSortOrder(lexiconScanner.relationSortingElt);
-        // return families
-        return lexiconScanner.lexicon;
-    }
-    
-    // get licensing features, with appropriate defaults
-    @SuppressWarnings("unchecked")
-	private void loadLicensingFeatures(Element licensingElt) {
+        // otherwise load from 'order' attribute
+        String orderAttr = relationSortingElt.getAttributeValue("order");
+        String[] relSortOrder = orderAttr.split("\\s+");
+        for (int i = 0; i < relSortOrder.length; i++) {
+        	relIndexMap.put(relSortOrder[i], new Integer(i));
+        }
+        return relIndexMap;
+	}
+	public String[] getDistrAttrs() {
+		return distrElt != null ? distrElt.getAttributeValue("attrs").split("\\s+") : new String[0];
+	}
+	public LicensingFeature[] loadLicensingFeatures() {
         List<LicensingFeature> licensingFeats = new ArrayList<LicensingFeature>();
         boolean containsLexFeat = false;
         if (licensingElt != null) {
-            for (Iterator<Element> it = licensingElt.getChildren("feat").iterator(); it.hasNext(); ) {
+            for (@SuppressWarnings("unchecked")
+			Iterator<Element> it = licensingElt.getChildren("feat").iterator(); it.hasNext(); ) {
                 Element featElt = it.next();
                 String attr = featElt.getAttributeValue("attr");
                 if (attr.equals("lex")) containsLexFeat = true;
@@ -1203,39 +540,8 @@ public class Lexicon {
         if (!containsLexFeat) {
             licensingFeats.add(LicensingFeature.defaultLexFeature);
         }
-        _licensingFeatures = new LicensingFeature[licensingFeats.size()];
-        licensingFeats.toArray(_licensingFeatures);
+        //_licensingFeatures = new LicensingFeature[licensingFeats.size()];
+        return licensingFeats.toArray(new LicensingFeature[licensingFeats.size()]);
     }
-    
-    
-    // default relation sort order
-    private static String[] defaultRelationSortOrder = {
-        "BoundVar", "PairedWith", 
-        "Restr", "Body", "Scope", 
-        "*", 
-        "GenRel", "Coord", "Append"
-    };
-    
-    // get relation sort order, or use defaults
-    private void loadRelationSortOrder(Element relationSortingElt) {
-        // use defaults if no order specified
-        if (relationSortingElt == null) {
-            for (int i = 0; i < defaultRelationSortOrder.length; i++) {
-                _relationIndexMap.put(defaultRelationSortOrder[i], new Integer(i));
-            }
-            return;
-        }
-        // otherwise load from 'order' attribute
-        String orderAttr = relationSortingElt.getAttributeValue("order");
-        String[] relSortOrder = orderAttr.split("\\s+");
-        for (int i = 0; i < relSortOrder.length; i++) {
-            _relationIndexMap.put(relSortOrder[i], new Integer(i));
-        }
-    }
-		/*
-		 * Accessor for words map
-		 */
-    public GroupMap<Word,MorphItem> getWords() {
-			return _words;
-		}
-}
+	
+};

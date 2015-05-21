@@ -21,6 +21,9 @@ package grammar;
 import java.util.ArrayList;
 import java.util.List;
 
+import lexicon.LexicalData;
+import lexicon.Lexicon;
+import lexicon.Tokenizer;
 import synsem.Arg;
 import synsem.BasicArg;
 import synsem.Category;
@@ -30,6 +33,7 @@ import synsem.Slash;
 import unify.GSubstitution;
 import unify.GUnifier;
 import unify.Substitution;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 
 /**
@@ -41,8 +45,9 @@ import unify.UnifyFailure;
  */
 public abstract class AbstractApplicationRule extends AbstractRule {
 	
-	protected AbstractApplicationRule(Grammar rg) {
-		super(rg);
+
+	protected AbstractApplicationRule(UnifyControl uc, LexicalData lex, Lexicon l, Tokenizer t) {
+		super(uc, lex, l, t);
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -66,11 +71,11 @@ public abstract class AbstractApplicationRule extends AbstractRule {
             if (xyOuter instanceof BasicArg) {
                 xyOuter.unifySlash(_functorSlash);
                 Category xyOuterCat = ((BasicArg)xyOuter).getCat();
-                Substitution sub = new GSubstitution(grammar.getUnifyControl());
-                GUnifier.unify(grammar.getUnifyControl(), xyOuterCat, yCat, sub);
+                Substitution sub = new GSubstitution(uc);
+                GUnifier.unify(uc, xyOuterCat, yCat, sub);
                 results = new ArrayList<Category>(1);
                 ((GSubstitution)sub).condense();
-                Category result = (Category) xyCurCat.getResult().fill(sub);
+                Category result = (Category) xyCurCat.getResult().fill(uc, sub);
                 appendLFs(xyCat, yCat, result, sub);
                 results.add(result);
                 Slash xyOuterSlash = ((BasicArg)xyOuter).getSlash();
@@ -82,12 +87,12 @@ public abstract class AbstractApplicationRule extends AbstractRule {
                     BasicArg argi = xyOuterSet.get(i);
                     try {
                         argi.unifySlash(_functorSlash);
-                        Substitution sub = new GSubstitution(grammar.getUnifyControl());
-                        GUnifier.unify(grammar.getUnifyControl(), argi.getCat(), yCat, sub);
+                        Substitution sub = new GSubstitution(uc);
+                        GUnifier.unify(uc, argi.getCat(), yCat, sub);
                         ComplexCat result = (ComplexCat)xyCurCat.copy();
                         result.setOuterArgument(xyOuterSet.copyWithout(i));
                         ((GSubstitution)sub).condense();
-                        result = (ComplexCat)result.fill(sub);
+                        result = (ComplexCat)result.fill(uc, sub);
                         appendLFs(xyCat, yCat, result, sub);
                         results.add(result);
                         Slash xyOuterSlash = argi.getSlash();

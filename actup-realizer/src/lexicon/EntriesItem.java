@@ -18,7 +18,7 @@
 //////////////////////////////////////////////////////////////////////////////
 package lexicon;
 
-import grammar.Grammar;
+import grammar.TypesData;
 
 import org.jdom.Element;
 
@@ -42,7 +42,7 @@ public class EntriesItem {
     private String indexRel;
     private Category cat;
 
-    public EntriesItem(Grammar grammar, Element el, Family family) {
+    public EntriesItem(Lexicon l, TypesData td, Element el, Family family) {
     	
         this.family = family;
         name = el.getAttributeValue("name");
@@ -58,7 +58,7 @@ public class EntriesItem {
         if (indexRelVal != null) indexRel = indexRelVal;
         else indexRel = family.getIndexRel();
 
-        cat = CatReader.getCat(grammar, (Element)el.getChildren().get(0));
+        cat = CatReader.getCat(l, td, (Element)el.getChildren().get(0));
     }
 
     public Boolean getActive() { return active; }

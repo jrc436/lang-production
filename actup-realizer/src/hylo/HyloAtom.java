@@ -18,10 +18,9 @@
 
 package hylo;
 
-import grammar.Grammar;
+import java.util.Map;
 
-import java.util.LinkedHashMap;
-
+import lexicon.Lexicon;
 import unify.SimpleType;
 import unify.Unifiable;
 import unify.Variable;
@@ -41,12 +40,12 @@ public abstract class HyloAtom extends HyloFormula {
 	protected String _name;
     protected SimpleType type;
 
-    protected HyloAtom(Grammar grammar, String name) {
-        this(grammar, name, null);
+    protected HyloAtom(Lexicon l, String name) {
+        this(l, name, null);
     }
     
-    protected HyloAtom(Grammar grammar, String name, SimpleType st) {
-        super(grammar);
+    protected HyloAtom(Lexicon l, String name, SimpleType st) {
+        super(l);
     	_name = name; type = st;
     }
     
@@ -96,13 +95,13 @@ public abstract class HyloAtom extends HyloFormula {
     /**
      * Returns a hash code using the given map from vars to ints.
      */
-    public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) { return hashCode(); }
+    public int hashCode(Map<Unifiable, Integer> varMap) { return hashCode(); }
         
     /**
      * Returns whether this atom equals the given object  
      * up to variable names, using the given maps from vars to ints.
      */
-    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
+    public boolean equals(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2) {
         return equals(obj);
     }
 }

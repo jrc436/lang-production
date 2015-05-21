@@ -18,8 +18,6 @@
 
 package ngrams;
 
-import grammar.Grammar;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -28,6 +26,8 @@ import java.io.StreamTokenizer;
 import java.util.ArrayList;
 import java.util.List;
 
+import lexicon.IWordFactory;
+import lexicon.Tokenizer;
 import util.TrieMap;
 
 /**
@@ -40,64 +40,36 @@ import util.TrieMap;
  */
 public class StandardNgramModel extends AbstractStandardNgramModel
 {
+	public StandardNgramModel(int order, String filename, IWordFactory wf, Tokenizer t) throws IOException {
+		this(order, filename, false, new double[0], wf, t);
+	 }
+	 public StandardNgramModel(int order, String filename, double[] varValues, IWordFactory wf, Tokenizer t) throws IOException {
+		 this(order, filename, false, varValues, wf, t);
+	 }
+	
 	/** 
      * Loads an n-gram model of the given order in ARPA (Doug Paul) format from
      * the given reader, with the given flag controlling whether words are
      * replaced by their semantic classes.
+	 * @param wf TODO
+	 * @param t TODO
      */
-    public StandardNgramModel(int order, Reader in, boolean useSemClasses, double[] varValues, Grammar grammar)
+    public StandardNgramModel(int order, String filename, boolean useSemClasses, double[] varValues, IWordFactory wf, Tokenizer t)
     		throws IOException {
-        super(order, useSemClasses, grammar, varValues);
-        this.numNgrams = new int[order];
-        readModel(in);
+        super(order, useSemClasses, wf, t, varValues);
+        openVocab = readModel(new BufferedReader(new FileReader(filename)));
     }
-
-    /** 
-     * Loads an n-gram model of the given order in ARPA (Doug Paul) format from
-     * the given reader. Words are not replaced by their semantic classes.
-     */
-	public StandardNgramModel(int order, Reader in, double[] varValues, Grammar grammar) throws IOException {
-		this(order, in, false, varValues, grammar);
-	}
-
-	/** 
-     * Loads an n-gram model of the given order in ARPA (Doug Paul) format from
-     * the given file, with the given flag controlling whether words are
-     * replaced by their semantic classes.
-     */
-	public StandardNgramModel(int order, String filename, boolean useSemClasses, double[] varValues, Grammar grammar)
-			throws IOException {
-		this(order, new BufferedReader(new FileReader(filename)),
-        		useSemClasses, varValues, grammar);
-	}
-	public StandardNgramModel(int order, String filename, double[] varValues, Grammar grammar) throws IOException {
-		this(order, filename, false, varValues, grammar); 
-	}
-	public StandardNgramModel(int order, String filename, boolean useSemClasses, Grammar grammar) throws IOException {
-		this(order, filename, useSemClasses, new double[0], grammar); 
-	}
-
-	/** 
-     * Loads an n-gram model of the given order in ARPA (Doug Paul) format from
-     * the given file. Words are not replaced by their semantic classes.
-     */
-	public StandardNgramModel(int order, String filename, Grammar grammar) throws IOException {
-		this(order, filename, false, new double[0], grammar); 
-	}
 	
 	// reads in model
-    private void readModel(Reader in) throws IOException {
-        // setup
-		//Tokenizer wordTokenizer = (Grammar.theGrammar != null)  
-		//    ? Grammar.theGrammar.lexicon.tokenizer
-		//    : new DefaultTokenizer();
+	//return whether or not the file was open
+    private boolean readModel(Reader in) throws IOException {
         StreamTokenizer tokenizer = initTokenizer(in); 
         String[] tokens = new String[order+2];
         boolean foundData = false;
         int currentOrder = 0;
-        List<Object> currentPrefix = new ArrayList<Object>();
-        List<Object> currentKeys = null;
-        List<TrieMap<Object,NgramFloats>> currentChildren = null;
+        List<String> currentPrefix = new ArrayList<String>();
+        List<String> currentKeys = null;
+        List<TrieMap<String,NgramFloats>> currentChildren = null;
         // loop through lines
         while (tokenizer.ttype != StreamTokenizer.TT_EOF) {
             // read line into tokens
@@ -115,8 +87,8 @@ public class StandardNgramModel extends AbstractStandardNgramModel
                 numNgrams[n-1] = total;
                 // init children, keys lists
                 if (currentChildren == null) { 
-                    currentChildren = new ArrayList<TrieMap<Object,NgramFloats>>(total);  
-                    currentKeys = new ArrayList<Object>(total);  
+                    currentChildren = new ArrayList<TrieMap<String,NgramFloats>>(total);  
+                    currentKeys = new ArrayList<String>(total);  
                 }
                 // calc totals (not actually used anymore)
                 if (n == order) {
@@ -167,9 +139,9 @@ public class StandardNgramModel extends AbstractStandardNgramModel
             }
             String key = tokens[currentOrder];
             currentKeys.add(key);
-            currentChildren.add(new TrieMap<Object,NgramFloats>(new NgramFloats(logprob, bow)));
+            currentChildren.add(new TrieMap<String,NgramFloats>(new NgramFloats(logprob, bow)));
         }
         // set openVocab according to presence of <unk>
-        openVocab = (trieMapRoot.getChild("<unk>") != null);
+        return (trieMapRoot.getChild("<unk>") != null);
     }
 }

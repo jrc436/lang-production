@@ -18,7 +18,7 @@
 
 package hylo;
 
-import grammar.Grammar;
+import lexicon.Lexicon;
 
 import org.jdom.Element;
 
@@ -39,12 +39,12 @@ public final class ModeLabel extends HyloAtom implements Mode {
 
 	private static final long serialVersionUID = -4101305505903588678L;
 
-	public ModeLabel(Grammar grammar, String name) {
-        super(grammar, name);
+	public ModeLabel(Lexicon l, String name) {
+        super(l, name);
     }
 
     public LF copy() {
-        return new ModeLabel(grammar, _name);
+        return new ModeLabel(l, _name);
     }
 
     public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {

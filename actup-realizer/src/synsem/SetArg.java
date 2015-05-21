@@ -18,18 +18,20 @@
 
 package synsem;
 
-import grammar.Grammar;
+import grammar.TypesData;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
+import lexicon.Lexicon;
 
 import org.jdom.Element;
 
 import unify.GUnifier;
-import unify.ModFcn;
+import unify.MutableScript;
 import unify.Substitution;
 import unify.Unifiable;
 import unify.UnifyControl;
@@ -49,46 +51,38 @@ public final class SetArg implements Arg, Serializable {
 	
 	private ArgStack _args;
 	
-	private final Grammar grammar;
-
 	@SuppressWarnings("unchecked")
-	public SetArg(Grammar grammar, Element el) {
-		
-		this.grammar = grammar;
+	public SetArg(Lexicon l, TypesData td, Element el) {
 		List<Element> info = el.getChildren();
 		List<Arg> args = new ArrayList<Arg>();
 		for (Iterator<Element> infoIt = info.iterator(); infoIt.hasNext();) {
-			Slash s = new Slash(grammar, infoIt.next());
-			Category c = CatReader.getCat(grammar, infoIt.next());
+			Slash s = new Slash(infoIt.next());
+			Category c = CatReader.getCat(l, td, infoIt.next());
 			args.add(new BasicArg(s, c));
 		}
 		Arg[] list = new Arg[args.size()];
 		args.toArray(list);
-		_args = new ArgStack(grammar, list);
+		_args = new ArgStack(list);
 	}
 
-	public SetArg(Grammar grammar, Arg[] args) {
-		
-		this.grammar = grammar;
-		_args = new ArgStack(grammar, args);
+	public SetArg(Arg[] args) {
+		_args = new ArgStack(args);
 	}
 
-	public SetArg(Grammar grammar, ArgStack args) {
-		
+	public SetArg(ArgStack args) {		
 		_args = args;
-		this.grammar = grammar;
 	}
 
 	public Arg copy() {
-		return new SetArg(grammar, _args.copy());
+		return new SetArg(_args.copy());
 	}
 
 	public void add(ArgStack as) {
 		_args.add(as);
 	}
 
-	public void forall(CategoryFcn fcn) {
-		_args.forall(fcn);
+	public void applyToAll(CatScript fcn) {
+		_args.applyToAll(fcn);
 	}
 
 	public Arg copyWithout(int pos) {
@@ -99,7 +93,7 @@ public final class SetArg implements Arg, Serializable {
 				return _args.get(0);
 			}
 		} else {
-			return new SetArg(grammar, _args.copyWithout(pos));
+			return new SetArg(_args.copyWithout(pos));
 		}
 	}
 
@@ -115,39 +109,29 @@ public final class SetArg implements Arg, Serializable {
 		return ((BasicArg) _args.get(pos)).getCat();
 	}
 
-	public int indexOf(BasicArg a) {
+	public int indexOf(UnifyControl uc, BasicArg a) {
 		int index = -1;
 		for (int i = 0; i < _args.size() && index < 0; i++) {
 			try {
 				a.unifySlash(((BasicArg) _args.get(i)).getSlash());
-				GUnifier.unify(grammar.getUnifyControl(), getCat(i), a.getCat());
+				GUnifier.unify(uc, getCat(i), a.getCat());
 				index = i;
 			} catch (UnifyFailure uf) {
 			}
 		}
-		// if (index<0) {
-		// throw new UnifyFailure();
-		// } else {
-		// return index;
-		// }
 		return index;
 	}
 
-	public int indexOf(Category cat) {
+	public int indexOf(UnifyControl uc, Category cat) {
 		int index = -1;
 		for (int i = 0; i < _args.size() && index < 0; i++) {
 			try {
-				GUnifier.unify(grammar.getUnifyControl(), getCat(i), cat);
+				GUnifier.unify(uc, getCat(i), cat);
 				index = i;
 			} catch (UnifyFailure uf) {
 			}
 		}
 		return index;
-		// if (index<0) {
-		// throw new UnifyFailure();
-		// } else {
-		// return index;
-		// }
 	}
 
 	public void setSlashModifier(boolean modifier) { 
@@ -187,12 +171,12 @@ public final class SetArg implements Arg, Serializable {
 		throw new UnifyFailure();
 	}
 
-	public Object fill(Substitution s) throws UnifyFailure {
-		return new SetArg(grammar, _args.fill(s));
+	public Object fill(UnifyControl uc, Substitution s) throws UnifyFailure {
+		return new SetArg(_args.fill(uc, s));
 	}
 
-	public void deepMap(ModFcn mf) {
-		_args.deepMap(mf);
+	public void mutateAll(MutableScript m) {
+		_args.mutateAll(m);
 	}
 
 	public boolean occurs(Variable v) {
@@ -230,7 +214,7 @@ public final class SetArg implements Arg, Serializable {
 	/**
 	 * Returns a hash code for this arg, using the given map from vars to ints.
 	 */
-	public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) {
+	public int hashCode(Map<Unifiable, Integer> varMap) {
 		return _args.hashCode(varMap);
 	}
 
@@ -238,7 +222,7 @@ public final class SetArg implements Arg, Serializable {
 	 * Returns whether this arg equals the given object up to variable names,
 	 * using the given maps from vars to ints.
 	 */
-	public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
+	public boolean equals(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2) {
 		if (obj.getClass() != this.getClass()) {
 			return false;
 		}

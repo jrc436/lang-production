@@ -18,16 +18,18 @@
 
 package synsem;
 
-import grammar.Grammar;
+import grammar.TypesData;
 
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
+import lexicon.Lexicon;
 
 import org.jdom.Element;
 
 import unify.FeatureStructure;
 import unify.GUnifier;
-import unify.ModFcn;
+import unify.MutableScript;
 import unify.Substitution;
 import unify.Unifiable;
 import unify.UnifyControl;
@@ -50,18 +52,18 @@ public final class ComplexCat extends AbstractCat {
 	private ArgStack _args;
 
 	/** Constructor with target and single arg. */
-	public ComplexCat(Grammar grammar, TargetCat target, Arg arg) {
-		this(grammar, target, new ArgStack(grammar, arg));
+	public ComplexCat(Lexicon l, TargetCat target, Arg arg) {
+		this(l, target, new ArgStack(arg));
 	}
 
 	/** Constructor with target and arg stack. */
-	public ComplexCat(Grammar grammar, TargetCat target, ArgStack args) {
-		this(grammar, target, args, null);
+	public ComplexCat(Lexicon l, TargetCat target, ArgStack args) {
+		this(l, target, args, null);
 	}
 
 	/** Constructor with target, arg stack and LF. */
-	public ComplexCat(Grammar grammar, TargetCat target, ArgStack args, LF lf) {
-		super(grammar, lf);
+	public ComplexCat(Lexicon l, TargetCat target, ArgStack args, LF lf) {
+		super(l, lf);
 		_target = target;
 		if (args.size() < 1) {
 			System.err.println("WARNING!!! Creating a ComplexCat with"
@@ -70,12 +72,13 @@ public final class ComplexCat extends AbstractCat {
 		_args = args;
 	}
 
-	/** Constructor which retrieves the complex category from the XML element. */
+	/** Constructor which retrieves the complex category from the XML element. 
+	 * @param uc TODO*/
 	// also determines modifier slashes
 	@SuppressWarnings("unchecked")
-	public ComplexCat(Grammar grammar, Element el) {
+	public ComplexCat(Lexicon l, TypesData td, Element el) {
 		// call super to get LF if present
-		super(grammar, el);
+		super(l, td, el);
 		// get children minus LF elt
 		List<Element> info = el.getChildren();
 		Element lfElt = el.getChild("lf");
@@ -83,8 +86,8 @@ public final class ComplexCat extends AbstractCat {
 			info.remove(lfElt);
 		}
 		// get target and args from first and rest of remaining children
-		_target = (TargetCat) CatReader.getCat(grammar, info.get(0));
-		_args = new ArgStack(grammar, info.subList(1, info.size()));
+		_target = (TargetCat) CatReader.getCat(l, td, info.get(0));
+		_args = new ArgStack(l, td, info.subList(1, info.size()));
 		// set modifier slashes
 		setModifierSlashes();
 	}
@@ -142,7 +145,7 @@ public final class ComplexCat extends AbstractCat {
 		if (upto == 0) {
 			return _target;
 		} else {
-			return new ComplexCat(grammar, _target, _args.subList(0, upto));
+			return new ComplexCat(l, _target, _args.subList(0, upto));
 		}
 	}
 
@@ -204,23 +207,23 @@ public final class ComplexCat extends AbstractCat {
 	}
 
 	public Category copy() {
-		return new ComplexCat(this.grammar, (TargetCat) _target.copy(), _args.copy(), (_lf == null) ? null : (LF) _lf.copy());
+		return new ComplexCat(l, (TargetCat) _target.copy(), _args.copy(), (_lf == null) ? null : (LF) _lf.copy());
 	}
 
 	public Category shallowCopy() {
-		return new ComplexCat(this.grammar, _target, _args, _lf);
+		return new ComplexCat(l, _target, _args, _lf);
 	}
 
-	public void deepMap(ModFcn mf) {
-		super.deepMap(mf);
-		_target.deepMap(mf);
-		_args.deepMap(mf);
+	public void mutateAll(MutableScript m) {
+		super.mutateAll(m);
+		_target.mutateAll(m);
+		_args.mutateAll(m);
 	}
 
-	public void forall(CategoryFcn f) {
-		f.forall(this);
-		_target.forall(f);
-		_args.forall(f);
+	public void applyToAll(CatScript f) {
+		f.run(this);
+		_target.applyToAll(f);
+		_args.applyToAll(f);
 	}
 
 	public void unifyCheck(Object u) throws UnifyFailure {
@@ -234,16 +237,16 @@ public final class ComplexCat extends AbstractCat {
 	public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
 
 		if (u instanceof AtomCat && arity() == 1 & containsDollarArg()) {
-			sub.makeSubstitution((Dollar) _args.get(0), new ArgStack(grammar));
-			return GUnifier.unify(grammar.getUnifyControl(), _target, (AtomCat) u, sub);
+			sub.makeSubstitution(uc, (Dollar) _args.get(0), new ArgStack());
+			return GUnifier.unify(uc, _target, (AtomCat) u, sub);
 		} else if (u instanceof ComplexCat) {
 			ComplexCat cc = (ComplexCat) u;
-			ArgStack $args = _args.unify(cc._args, sub);
-			Category $target = GUnifier.unify(grammar.getUnifyControl(), _target, cc._target, sub);
+			ArgStack $args = _args.unify(cc._args, sub, uc);
+			Category $target = GUnifier.unify(uc, _target, cc._target, sub);
 			if ($args.size() == 0) {
 				return $target;
 			} else {
-				return new ComplexCat(grammar, (TargetCat) $target, $args);
+				return new ComplexCat(l, (TargetCat) $target, $args);
 			}
 		} else {
 			throw new UnifyFailure();
@@ -255,16 +258,16 @@ public final class ComplexCat extends AbstractCat {
 	}
 
 	// nb: not yet sure about calling setLF methods
-	public Object fill(Substitution s) throws UnifyFailure {
-		Category $target = (Category) _target.fill(s);
-		ArgStack $args = _args.fill(s);
-		LF $lf = (_lf == null) ? null : (LF) _lf.fill(s);
+	public Object fill(UnifyControl uc, Substitution s) throws UnifyFailure {
+		Category $target = (Category) _target.fill(uc, s);
+		ArgStack $args = _args.fill(uc, s);
+		LF $lf = (_lf == null) ? null : (LF) _lf.fill(uc, s);
 		if ($args.size() == 0) {
 			$target.setLF($lf);
 			return $target;
 		}
 		if ($target instanceof TargetCat) {
-			return new ComplexCat(grammar, (TargetCat) $target, $args, $lf);
+			return new ComplexCat(l, (TargetCat) $target, $args, $lf);
 		} else if ($target instanceof ComplexCat) {
 			((ComplexCat) $target).add($args);
 			$target.setLF($lf);
@@ -303,7 +306,7 @@ public final class ComplexCat extends AbstractCat {
 	 * Returns a hash code for this category ignoring the LF, using the given
 	 * map from vars to ints.
 	 */
-	public int hashCodeNoLF(LinkedHashMap<Unifiable, Integer> varMap) {
+	public int hashCodeNoLF(Map<Unifiable, Integer> varMap) {
 		int retval = _target.hashCodeNoLF(varMap);
 		retval += _args.hashCode(varMap);
 		return retval;
@@ -313,7 +316,7 @@ public final class ComplexCat extends AbstractCat {
 	 * Returns whether this category equals the given object up to variable
 	 * names, using the given maps from vars to ints, ignoring the LFs (if any).
 	 */
-	public boolean equalsNoLF(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
+	public boolean equalsNoLF(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2) {
 		if (obj.getClass() != this.getClass()) {
 			return false;
 		}

@@ -18,7 +18,8 @@
 //////////////////////////////////////////////////////////////////////////////
 package synsem;
 
-import grammar.Grammar;
+import grammar.TypesData;
+import lexicon.Lexicon;
 
 import org.jdom.Element;
 
@@ -32,17 +33,17 @@ import org.jdom.Element;
  */
 public class CatReader {
     
-    public static Category getCat(Grammar grammar, Element catel) {
+    public static Category getCat(Lexicon l, TypesData td, Element catel) {
     	
         Category cat = null;
         String catType = catel.getName();
         
         if (catType.equals("atomcat") || catType.equals("ac")) {    
-            cat =  new AtomCat(grammar, catel);
+            cat =  new AtomCat(l, td, catel);
         }
         
         else if (catType.equals("complexcat") || catType.equals("cc")) {    
-            cat =  new ComplexCat(grammar, catel);
+            cat =  new ComplexCat(l, td, catel);
         }
 
         return cat;

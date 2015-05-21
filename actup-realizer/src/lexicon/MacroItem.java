@@ -19,7 +19,7 @@
 
 package lexicon;
 
-import grammar.Grammar;
+import grammar.TypesData;
 import hylo.HyloHelper;
 
 import java.util.List;
@@ -44,14 +44,14 @@ public class MacroItem {
     private LF[] preds;
 
     @SuppressWarnings("unchecked")
-	public MacroItem (Grammar grammar, Element e) {
+	public MacroItem (Lexicon l, TypesData td, Element e) {
     	
         name = e.getAttributeValue("name");
         if (name == null) { name = e.getAttributeValue("n"); }
         List<Element> fsEls = e.getChildren("fs");
         featStrucs = new FeatureStructure[fsEls.size()];
         for (int i=0; i<featStrucs.length; i++) {
-            featStrucs[i] = new GFeatStruc(grammar, fsEls.get(i));
+            featStrucs[i] = new GFeatStruc(td, l, fsEls.get(i));
         }
         Element lfElt = e.getChild("lf");
         if (lfElt == null) preds = new LF[0];
@@ -59,7 +59,7 @@ public class MacroItem {
             List<Element> predElts = lfElt.getChildren();
             preds = new LF[predElts.size()];
             for (int i=0; i < predElts.size(); i++) {
-                preds[i] = HyloHelper.getLF(grammar, predElts.get(i));
+                preds[i] = HyloHelper.getLF(l, td, predElts.get(i));
             }
         }
     }

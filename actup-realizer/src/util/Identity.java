@@ -2,9 +2,9 @@ package util;
 
 
 //for the use in identity hashmaps, map this object to the value
-public class Identity {
-	private final Object obj;
-	public Identity(Object obj) {
+public class Identity<E> {
+	private final E obj;
+	public Identity(E obj) {
 		this.obj = obj;
 	}
 	public int hashCode() {
@@ -14,7 +14,13 @@ public class Identity {
 		if (o == null || o.getClass() != this.getClass()) {
 			return false;
 		}
-		Identity id = (Identity) o;
-		return id.obj == obj;
+		try {
+			@SuppressWarnings("unchecked")
+			Identity<E> id = (Identity<E>) o;
+			return id.obj == this.obj;
+		}
+		catch (ClassCastException ce) {
+			return false;
+		}
 	}
 }

@@ -38,9 +38,9 @@ public class SimpleSubstitution extends HashMap<Variable,Object> implements Subs
 		super(map);
 	}
 
-	public Object makeSubstitution(Variable var, Object u) throws UnifyFailure {
+	public Object makeSubstitution(UnifyControl uc, Variable var, Object u) throws UnifyFailure {
 		if (u instanceof Unifiable) {
-			u = ((Unifiable) u).fill(this);
+			u = ((Unifiable) u).fill(uc, this);
 		}
 		put(var, u);
 		return u;

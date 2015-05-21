@@ -8,7 +8,7 @@ public class RealizationSettings {
 	 protected static final boolean USE_COMBOS = true;   
 	 protected static final boolean USE_PACKING = false;
 	 protected static final int ITER_LIMIT = 15000;
-	 protected static final boolean JOIN_FRAGMENTS = false;
+	 protected static final boolean JOIN_FRAGMENTS = true;
 	 protected static final boolean GLUE_FRAGMENTS = false;
 	 
 	 private int edgeLimit; //the maximum number of edges that can be created before the process terminates

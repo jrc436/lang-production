@@ -19,7 +19,6 @@
 
 package lexicon;
 
-import grammar.Grammar;
 import hylo.HyloHelper;
 
 import java.util.Iterator;
@@ -30,7 +29,6 @@ import synsem.AtomCat;
 import synsem.Category;
 import synsem.LF;
 import unify.FeatureStructure;
-import unify.ModFcn;
 import unify.Mutable;
 import util.GroupMap;
 
@@ -46,17 +44,17 @@ public class MacroAdder {
 
     private GroupMap<Integer, FeatureStructure> _specificMacros;
     private List<MacroItem> _macroItems; // for LF macros
-    private final Grammar grammar;
+    private final Lexicon l;
     
-    public MacroAdder(GroupMap<Integer, FeatureStructure> sm, List<MacroItem> macroItems, Grammar grammar) {
+    public MacroAdder(GroupMap<Integer, FeatureStructure> sm, List<MacroItem> macroItems, Lexicon l) {
         _specificMacros = sm;
         _macroItems = macroItems;
-        this.grammar = grammar;
+        this.l = l;
     }
 
     public void addMacros(Category cat) {
         // add features 
-        cat.deepMap(addIndexedFeatures);
+        cat.mutateAll(this::addIndexedFeatures);
         // append preds to LF
         LF lf = cat.getLF();
         for (int i=0; i < _macroItems.size(); i++) {
@@ -71,31 +69,28 @@ public class MacroAdder {
                     );
                     continue;
                 }
-                lf = HyloHelper.append(grammar, lf, pred);
+                lf = HyloHelper.append(l, lf, pred);
             }
         }
         // sort and reset LF
-        HyloHelper.sort(grammar, lf);
+        HyloHelper.sort(l, lf);
         cat.setLF(lf);
     }
     
-    private ModFcn addIndexedFeatures = new ModFcn() {
-        @SuppressWarnings("rawtypes")
-		public void modify(Mutable c) {
+    private void addIndexedFeatures(Mutable c) {
             if (c instanceof AtomCat) {
                 FeatureStructure fs = ((AtomCat)c).getFeatureStructure();
                 int fsIndex = fs.getIndex();
-                Set featStrucs = (Set)_specificMacros.get(fsIndex);
+                Set<FeatureStructure> featStrucs = _specificMacros.get(fsIndex);
                 if (null == featStrucs) {
                     return;
                 }
                 FeatureStructure $fs = fs.copy();
-                for (Iterator fsIt = featStrucs.iterator(); fsIt.hasNext();) {
+                for (Iterator<FeatureStructure> fsIt = featStrucs.iterator(); fsIt.hasNext();) {
                     FeatureStructure macroFS = (FeatureStructure) fsIt.next();
                     $fs = $fs.inherit(macroFS);
                 }
                 ((AtomCat)c).setFeatureStructure($fs);
-            }
-        }
-    };
+          }
+    }
 }

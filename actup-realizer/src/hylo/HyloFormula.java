@@ -18,16 +18,16 @@
 
 package hylo;
 
-import grammar.Grammar;
-
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
+import java.util.Map;
+
+import lexicon.Lexicon;
 
 import org.jdom.Element;
 
 import synsem.LF;
-import unify.ModFcn;
+import unify.MutableScript;
 import unify.SimpleType;
 import unify.Substitution;
 import unify.Unifiable;
@@ -45,9 +45,9 @@ import unify.Variable;
  **/
 public abstract class HyloFormula implements LF, Serializable {
 	
-	protected final Grammar grammar;
-	public HyloFormula(Grammar grammar) {
-		this.grammar = grammar;
+	protected final Lexicon l;
+	public HyloFormula(Lexicon l) {
+		this.l = l;
 	}
     
 	private static final long serialVersionUID = 1L;
@@ -89,8 +89,8 @@ public abstract class HyloFormula implements LF, Serializable {
      * which are themselves Mutables.
      * @param mf a function to be applied
      */
-    public void deepMap(ModFcn mf) {
-        mf.modify(this);
+    public void mutateAll(MutableScript m) {
+        m.run(this);
     }
 
     
@@ -139,24 +139,23 @@ public abstract class HyloFormula implements LF, Serializable {
      * Replaces any variables in this Unifiable with the values found
      * for them in the Substitution argument.
      * @param s Substitution containing the variable resolutions
-     *
      * @return a copy of this Unifiable with all variables from the
      *         Substitution replaced by their values.  
      */
-    public Object fill(Substitution s) throws UnifyFailure {
+    public Object fill(UnifyControl uc, Substitution s) throws UnifyFailure {
         return this;
     }
        
     /**
      * Returns a hash code using the given map from vars to ints.
      */
-    public abstract int hashCode(LinkedHashMap<Unifiable, Integer> varMap);
+    public abstract int hashCode(Map<Unifiable, Integer> varMap);
 
     /**
      * Returns whether this LF equals the given object  
      * up to variable names, using the given maps from vars to ints.
      */
-    public abstract boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2);
+    public abstract boolean equals(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2);
     
     /**
      * Returns an XML representation of this LF.

@@ -19,9 +19,9 @@
 package synsem;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
-import unify.ModFcn;
+import unify.MutableScript;
 import unify.Substitution;
 import unify.Unifiable;
 import unify.UnifyControl;
@@ -68,12 +68,12 @@ public final class BasicArg implements Arg, Serializable {
 		return _cat.occurs(v);
 	}
 
-	public Object fill(Substitution sub) throws UnifyFailure {
-		return new BasicArg((Slash) _slash.fill(sub), (Category) _cat.fill(sub));
+	public Object fill(UnifyControl uc, Substitution sub) throws UnifyFailure {
+		return new BasicArg((Slash) _slash.fill(uc, sub), (Category) _cat.fill(uc, sub));
 	}
 
-	public void forall(CategoryFcn fcn) {
-		_cat.forall(fcn);
+	public void applyToAll(CatScript fcn) {
+		_cat.applyToAll(fcn);
 	}
 
 	public void unifySlash(Slash s) throws UnifyFailure {
@@ -93,9 +93,9 @@ public final class BasicArg implements Arg, Serializable {
 
 	}
 
-	public void deepMap(ModFcn mf) {
-		_slash.deepMap(mf);
-		_cat.deepMap(mf);
+	public void mutateAll(MutableScript m) {
+		_slash.mutateAll(m);
+		_cat.mutateAll(m);
 	}
 
 	public String toString() {
@@ -140,7 +140,7 @@ public final class BasicArg implements Arg, Serializable {
 	/**
 	 * Returns a hash code for this, using the given map from vars to ints.
 	 */
-	public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) {
+	public int hashCode(Map<Unifiable, Integer> varMap) {
 		return _slash.hashCode(varMap) + _cat.hashCodeNoLF(varMap);
 	}
 
@@ -148,7 +148,7 @@ public final class BasicArg implements Arg, Serializable {
 	 * Returns whether this arg equals the given object up to variable names,
 	 * using the given maps from vars to ints.
 	 */
-	public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
+	public boolean equals(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2) {
 		if (obj.getClass() != this.getClass()) {
 			return false;
 		}

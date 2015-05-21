@@ -24,7 +24,6 @@ import java.util.*;
 
 /**
  * A FullWord object is a word with all possible fields. 
- * The factory methods return interned objects.
  *
  * @author      Michael White
  * @version     $Revision: 1.6 $, $Date: 2009/07/17 04:23:30 $

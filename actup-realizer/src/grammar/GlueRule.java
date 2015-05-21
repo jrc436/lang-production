@@ -21,6 +21,9 @@ package grammar;
 import java.util.ArrayList;
 import java.util.List;
 
+import lexicon.LexicalData;
+import lexicon.Lexicon;
+import lexicon.Tokenizer;
 import synsem.Arg;
 import synsem.AtomCat;
 import synsem.BasicArg;
@@ -28,6 +31,7 @@ import synsem.Category;
 import synsem.ComplexCat;
 import unify.SimpleSubstitution;
 import unify.Substitution;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 
 /**
@@ -49,9 +53,13 @@ public class GlueRule extends AbstractRule {
 	/** Fragment result type. */
 	public final String resultType = "frag";
 	
-	/** Constructor. */
-	public GlueRule(Grammar rg) {
-		super(rg);
+	private final TypesData td;
+	
+	/** Constructor. 
+	 * @param t TODO*/
+	public GlueRule(UnifyControl uc, LexicalData lex, Lexicon l, TypesData td, Tokenizer t) {
+		super(uc, lex, l, t);
+		this.td = td;
 		name = "glue"; 
 	}
 	
@@ -73,7 +81,7 @@ public class GlueRule extends AbstractRule {
 		// make result cat
         List<Category> results = new ArrayList<Category>(1);
         headCats.clear();
-        AtomCat ac = new AtomCat(grammar, resultType);
+        AtomCat ac = new AtomCat(l, td, resultType);
         appendLFs(inputs[0], inputs[1], ac, emptySubst);
         results.add(ac);
         // guess head, with left as default

@@ -17,14 +17,12 @@
 //////////////////////////////////////////////////////////////////////////////
 package synsem;
 
-import grammar.Grammar;
-
 import java.io.Serializable;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 import unify.Indexed;
-import unify.ModFcn;
 import unify.Mutable;
+import unify.MutableScript;
 import unify.Substitution;
 import unify.Unifiable;
 import unify.UnifyControl;
@@ -48,22 +46,18 @@ public class VarModality implements Variable, Indexed, Mutable, Modality, Serial
     
     private static int UNIQUE_STAMP = 0; //this is retarded but I will try to fix it later because it shouldn't actually break things
     
-    private final Grammar grammar;
-    
-    public VarModality(Grammar grammar) {
-        this(grammar, "VM"+UNIQUE_STAMP++);
+    public VarModality() {
+        this("VM"+UNIQUE_STAMP++);
     }
     
-    public VarModality(Grammar grammar, String name) {
-        this(grammar, name, 0);
+    public VarModality(String name) {
+        this(name, 0);
     }
 
-    protected VarModality(Grammar grammar, String name, int index) {
-    	
+    protected VarModality(String name, int index) {
         _name = name;
         _index = index;
         _hashCode = _name.hashCode() + _index;
-        this.grammar = grammar;
     }
     
     public String name() {
@@ -71,11 +65,11 @@ public class VarModality implements Variable, Indexed, Mutable, Modality, Serial
     }
 
     public Object copy() {
-        return new VarModality(grammar, _name, _index);
+        return new VarModality(_name, _index);
     }
     
-    public void deepMap(ModFcn mf) {
-        mf.modify(this);
+    public void mutateAll(MutableScript m) {
+        m.run(this);
     }
     
     public int getIndex() {
@@ -105,7 +99,7 @@ public class VarModality implements Variable, Indexed, Mutable, Modality, Serial
     /**
 	 * Returns a hash code using the given map from vars to ints.
 	 */
-	public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) {
+	public int hashCode(Map<Unifiable, Integer> varMap) {
 		// see if this already in map
 		if (varMap.containsKey(this))
 			return varMap.get(this);
@@ -119,7 +113,7 @@ public class VarModality implements Variable, Indexed, Mutable, Modality, Serial
 	 * Returns whether this var equals the given object up to variable names,
 	 * using the given maps from vars to ints.
 	 */
-    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
+    public boolean equals(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2) {
         if (this == obj) return true;
         if (obj.getClass() != this.getClass()) { return false; }
         VarModality vm = (VarModality) obj;
@@ -135,19 +129,19 @@ public class VarModality implements Variable, Indexed, Mutable, Modality, Serial
     
     public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
         if (u instanceof SlashMode) {
-            return sub.makeSubstitution(this, u);    
+            return sub.makeSubstitution(uc, this, u);    
         } else if (u instanceof VarModality) {
             VarModality var2 = (VarModality)u;
-            Variable $var = new VarModality(grammar, _name+var2._name,  grammar.getUnifyControl().getUniqueVarIndex());          
-            sub.makeSubstitution(this, $var);
-            sub.makeSubstitution(var2, $var);
+            Variable $var = new VarModality(_name+var2._name, uc.getUniqueVarIndex());          
+            sub.makeSubstitution(uc, this, $var);
+            sub.makeSubstitution(uc, var2, $var);
             return $var;
         } else {
             throw new UnifyFailure();
         }
     }
 
-    public Object fill(Substitution sub) throws UnifyFailure {
+    public Object fill(UnifyControl uc, Substitution sub) throws UnifyFailure {
         Object val = sub.getValue(this);
         if (val != null) {
             return val;

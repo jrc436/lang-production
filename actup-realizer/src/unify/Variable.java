@@ -18,7 +18,7 @@
 
 package unify;
 
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * A variable that can stand for some class of Unifiable objects.
@@ -39,11 +39,11 @@ public interface Variable extends Unifiable {
     /**
 	 * Returns a hash code using the given map from vars to ints.
 	 */
-	public int hashCode(LinkedHashMap<Unifiable, Integer> varMap);
+	public int hashCode(Map<Unifiable, Integer> varMap);
         
     /**
 	 * Returns whether this var equals the given object up to variable names,
 	 * using the given maps from vars to ints.
 	 */
-    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2);
+    public boolean equals(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2);
 }

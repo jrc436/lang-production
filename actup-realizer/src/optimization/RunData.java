@@ -8,13 +8,15 @@ public class RunData {
 	private final VariableSet varVals;
 	private final Evaluation eval;
 	private final String runName;
+	private final long completionTime;
 	public RunData(VariableSet vars) {
-		this(vars, null, null);
+		this(vars, null, null, 0);
 	}
-	public RunData(VariableSet vars, Evaluation eval, String runName) {
+	public RunData(VariableSet vars, Evaluation eval, String runName, long completionTime) {
 		this.varVals = new VariableSet(vars);
 		this.eval = eval;
 		this.runName = runName;
+		this.completionTime = completionTime;
 	}
 	public boolean improvement(RunData other) {
 		if (this.eval == null) {
@@ -37,6 +39,7 @@ public class RunData {
 		retval += (runName + " :: ");
 		retval += eval.toString()+" ";
 		retval += varVals.toString();
+		retval += ";"+(completionTime/1000000000);
 		return retval;
 	}
 	//the evaluation and runName are just for purposes of logging and are optional arguments.

@@ -18,10 +18,12 @@
 
 package hylo;
 
-import grammar.Grammar;
 import grammar.Types;
+import grammar.TypesData;
 
-import java.util.LinkedHashMap;
+import java.util.Map;
+
+import lexicon.Lexicon;
 
 import org.jdom.Element;
 
@@ -52,20 +54,20 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
     protected SimpleType type;
     
     
-    public HyloVar(Grammar grammar, String name) {
-        this(grammar, name, 0, null);
+    public HyloVar(Lexicon l, TypesData td, String name) {
+        this(l, name, 0, td.getSimpleType(Types.TOP_TYPE));
     }
 
-    public HyloVar(Grammar grammar, String name, SimpleType st) {
-        this(grammar, name, 0, st);
+    public HyloVar(Lexicon l, String name, SimpleType st) {
+        this(l, name, 0, st);
     }
 
-    protected HyloVar(Grammar grammar, String name, int index, SimpleType st) {
-    	super(grammar);
+    protected HyloVar(Lexicon l, String name, int index, SimpleType st) {
+    	super(l);
     	_name = name;
         _index = index;
-        type = (st != null) ? st : grammar.getTypes().getSimpleType(Types.TOP_TYPE);
-        _hashCode = _name.hashCode() + _index + type.getIndex();
+        type = st;
+        _hashCode = _name.hashCode() + _index + type.hashCode();
         
     }
     
@@ -74,7 +76,7 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
     }
 
     public LF copy() {
-        return new HyloVar(grammar, _name, _index, type);
+        return new HyloVar(l, _name, _index, type);
     }
 
 
@@ -128,36 +130,36 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
             HyloVar u_hv = (HyloVar)u;
             // equal types, use comparison order
             if (type.equals(u_hv.getType())) {
-                if (compareTo(u_hv) >= 0) return sub.makeSubstitution(this, u_hv); 
-                else return sub.makeSubstitution(u_hv, this);
+                if (compareTo(u_hv) >= 0) return sub.makeSubstitution(uc, this, u_hv); 
+                else return sub.makeSubstitution(uc, u_hv, this);
             }
             // unequal types, use most specific one
-            if (type.equals(st)) return sub.makeSubstitution(u_hv, this);
-            if (u_hv.getType().equals(st)) return sub.makeSubstitution(this, u_hv); 
+            if (type.equals(st)) return sub.makeSubstitution(uc, u_hv, this);
+            if (u_hv.getType().equals(st)) return sub.makeSubstitution(uc, this, u_hv); 
             // otherwise make new hylo var with intersection type, 
             // name based on comparison order and index, and new index
             String name = (compareTo(u_hv) >= 0) ? (u_hv._name + u_hv._index) : (_name + this._index);
-            HyloVar hv_st = new HyloVar(grammar, name, uc.getUniqueVarIndex(), st);
+            HyloVar hv_st = new HyloVar(l, name, uc.getUniqueVarIndex(), st);
             // and subst both
-            sub.makeSubstitution(u_hv, hv_st);
-            return sub.makeSubstitution(this, hv_st); 
+            sub.makeSubstitution(uc, u_hv, hv_st);
+            return sub.makeSubstitution(uc, this, hv_st); 
         }
         // with props, check for more specific type
         if (u instanceof Proposition) {
             Proposition prop = (Proposition) u;
             // if no or same type, just subst
-            if (st == null || prop.getType().equals(st)) return sub.makeSubstitution(this, prop);
+            if (st == null || prop.getType().equals(st)) return sub.makeSubstitution(uc, this, prop);
             // otherwise subst prop with name of type
-            Proposition prop_st = new Proposition(grammar, st.getName(), st); 
-            return sub.makeSubstitution(this, prop_st);
+            Proposition prop_st = new Proposition(l, st.getName(), st); 
+            return sub.makeSubstitution(uc, this, prop_st);
         }
         // otherwise, do occurs check ... 
         if (((LF)u).occurs(this)) throw new UnifyFailure(); 
         // and then go ahead and substitute
-        return sub.makeSubstitution(this, u);
+        return sub.makeSubstitution(uc, this, u);
     }
 
-    public Object fill(Substitution sub) throws UnifyFailure {
+    public Object fill(UnifyControl uc, Substitution sub) throws UnifyFailure {
         Object val = sub.getValue(this);
         if (val != null) {
             return val;
@@ -187,7 +189,7 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
     /**
 	 * Returns a hash code using the given map from vars to ints.
 	 */
-	public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) {
+	public int hashCode(Map<Unifiable, Integer> varMap) {
 		// see if this already in map
 		if (varMap.containsKey(this))
 			return varMap.get(this);
@@ -202,7 +204,7 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
 	 * using the given maps from vars to ints.
 	 * (Note that the name and index may differ, but the types must be equal.)
 	 */
-    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
+    public boolean equals(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2) {
         if (obj.getClass() != this.getClass()) { return false; }
         HyloVar hv = (HyloVar) obj;
         if (varMap.get(this) != varMap2.get(hv)) return false;

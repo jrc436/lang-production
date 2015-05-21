@@ -18,10 +18,21 @@
 
 package grammar;
 
-import unify.*;
-import synsem.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.*;
+import lexicon.LexicalData;
+import lexicon.Lexicon;
+import lexicon.Tokenizer;
+import synsem.ArgStack;
+import synsem.BasicArg;
+import synsem.Category;
+import synsem.ComplexCat;
+import synsem.Slash;
+import unify.GSubstitution;
+import unify.GUnifier;
+import unify.UnifyControl;
+import unify.UnifyFailure;
 
 /**
  * Super class for substitution rules.
@@ -32,8 +43,8 @@ import java.util.*;
  */
 public abstract class AbstractSubstitutionRule extends AbstractApplicationRule {
 
-	protected AbstractSubstitutionRule(Grammar rg) {
-		super(rg);
+	protected AbstractSubstitutionRule(UnifyControl uc, LexicalData lex, Lexicon l, Tokenizer t) {
+		super(uc, lex, l, t);
 	}
 
 	private static final long serialVersionUID = 1L;
@@ -68,14 +79,14 @@ public abstract class AbstractSubstitutionRule extends AbstractApplicationRule {
             secondaryArgZ.unifySlash(_argSlash);
             Category secondaryY = yzCC.getResult();
 
-            GSubstitution sub = new GSubstitution(grammar.getUnifyControl());
+            GSubstitution sub = new GSubstitution(uc);
 
-            GUnifier.unify(grammar.getUnifyControl(), primaryArgZ.getCat(), secondaryArgZ.getCat(), sub);
-            GUnifier.unify(grammar.getUnifyControl(), primaryArgY.getCat(), secondaryY, sub);         
+            GUnifier.unify(uc, primaryArgZ.getCat(), secondaryArgZ.getCat(), sub);
+            GUnifier.unify(uc, primaryArgY.getCat(), secondaryY, sub);         
             
-            Category result = new ComplexCat(grammar, xyzCC.getTarget(), primaryStack.copyWithout(size-2));
+            Category result = new ComplexCat(l, xyzCC.getTarget(), primaryStack.copyWithout(size-2));
             ((GSubstitution)sub).condense();
-            result = (Category)result.fill(sub);
+            result = (Category)result.fill(uc, sub);
             ((ComplexCat)result).getOuterArg().setSlashModifier(false);
             
             appendLFs(xyzCat, yzCat, result, sub);

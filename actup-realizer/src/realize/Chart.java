@@ -18,7 +18,7 @@
 
 package realize;
 
-import hylo.Alt;
+import grammar.RuleGroupData;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lexicon.Lexicon;
+import lexicon.Tokenizer;
 import pruning.PruningStrategy;
 import runconfig.RealizationSettings;
 import synsem.Category;
@@ -57,6 +59,9 @@ public class Chart
     private final RealizationSettings rSet;
     private final EdgeFactory edgeFactory;
     private final PruningStrategy pruningStrategy;   
+    private final Lexicon l;
+    private final RuleGroupData rdg;
+    private final Tokenizer t;
 
     private final List<Edge> agenda = new ArrayList<Edge>(); //edges not yet added
     private final List<Edge> edges = new ArrayList<Edge>(); //representative edges
@@ -85,10 +90,13 @@ public class Chart
     private int cellMax = 0; //maximum number of edges presently in a cell
    
    
-    public Chart(RealizationSettings rs, EdgeFactory edgeFactory, PruningStrategy pruningStrategy) {
+    public Chart(RealizationSettings rs, EdgeFactory edgeFactory, Lexicon l, RuleGroupData rdg, PruningStrategy pruningStrategy, Tokenizer t) {
+    	this.l = l;
+    	this.rdg = rdg;
     	this.rSet = rs;
         this.edgeFactory = edgeFactory;
         this.pruningStrategy = pruningStrategy;
+        this.t = t;
     }
     public void initialize() {
         for (Edge edge : edgeFactory.createInitialEdges())  {
@@ -266,7 +274,7 @@ public class Chart
     
     /** Unpack complete edges, if any; otherwise unpack all. */
 	protected void doUnpacking() {
-        Map<Identity, Edge> unpacked = new LinkedHashMap<Identity, Edge>();
+        Map<Identity<Edge>, Edge> unpacked = new LinkedHashMap<Identity<Edge>, Edge>();
 	    boolean foundComplete = bestEdge.complete();
         // unpack each relevant edge, updating best edge 
         for (Edge edge : edges) {
@@ -277,8 +285,8 @@ public class Chart
     }
     
     // recursively unpack and prune edge, unless already visited
-    private void unpack(Edge edge, Map<Identity, Edge> unpacked) {
-    	Identity ei = new Identity(edge);
+    private void unpack(Edge edge, Map<Identity<Edge>, Edge> unpacked) {
+    	Identity<Edge> ei = new Identity<Edge>(edge);
     	if (unpacked.containsKey(ei)) {
         	return;
         }
@@ -309,7 +317,7 @@ public class Chart
     }
     
     // recursively unpack inputs, make alt combos and add to merged
-    private void unpackAlt(Edge alt, Map<Identity, Edge> unpacked, Map<EdgeSurfaceWords, Edge> merged) {
+    private void unpackAlt(Edge alt, Map<Identity<Edge>, Edge> unpacked, Map<EdgeSurfaceWords, Edge> merged) {
         // first check for opt completed edge
         if (alt.optCompletes != null) {
             // recursively unpack input edge
@@ -343,7 +351,7 @@ public class Chart
         List<Sign[]> altCombos = inputCombos(inputEdges, 0);
         for (Sign[] combo : altCombos) {
         	Sign lexHead = (lefthead) ? combo[0].getLexHead() : combo[1].getLexHead();
-            Sign sign = Sign.createDerivedSignWithNewLF(edgeFactory.grammar, resultCat, combo, history.getRule(), lexHead);
+            Sign sign = Sign.createDerivedSignWithNewLF(rdg, l, t, resultCat, combo, history.getRule(), lexHead);
             Edge edgeToAdd = (sign.equals(alt.sign))
                 ? alt // use this alt for equiv sign
                 : edgeFactory.makeAltEdge(sign, alt); // otherwise make edge for new alt
@@ -616,41 +624,41 @@ public class Chart
     /** The PrintWriter to use with the printing routines.  Default wraps System.out. */
     public PrintWriter log = new PrintWriter(System.out);
     
-    //prints sorted edges
-    public void printEdges(boolean complete) {
-        List<Edge> edgeList = rSet.doingUnpacking() ? edges : allEdges;
-        edgeList = new ArrayList<Edge>(edgeList);
-        //shouldn't need to sort! maintaining sort order always now
-        
-        for (int i=0; i < edgeList.size(); i++) {
-        	Edge edge = edgeList.get(i);
-            if (!complete || edge.complete()) {
-                printEdge(edge, null);
-            }
-
-        }
-        log.flush();
-    }
-    private void printEdge(Edge edge, List<Edge> edgeList) {
-        String str = edge.toString();
-        if (edge.incompleteLfChunk != null) {
-            int id = edgeFactory.lfChunks.indexOf(edge.incompleteLfChunk);
-            str += " <[" + id + "]>";
-        }
-        if (edge.activeLfAlts.size() > 0) str += " ";
-        for (List<Alt> altSet : edge.activeLfAlts) {
-            for (Alt alt : altSet) str += "?" + alt.altSet + "." + alt.numInSet;
-        }
-        str += edgeDerivation(edge, edgeList);
-        log.println(str);
-        // show alts subordinated in packing only case
-        if (rSet.doingUnpacking() && edge.isDisjunctive()) {
-            for (Edge alt : edge.altEdges) {
-                if (alt != edge)
-                        log.println(" \\_ " + alt + edgeDerivation(alt, edgeList));
-            }
-        }
-    }
+//    //prints sorted edges
+//    public void printEdges(boolean complete) {
+//        List<Edge> edgeList = rSet.doingUnpacking() ? edges : allEdges;
+//        edgeList = new ArrayList<Edge>(edgeList);
+//        //shouldn't need to sort! maintaining sort order always now
+//        
+//        for (int i=0; i < edgeList.size(); i++) {
+//        	Edge edge = edgeList.get(i);
+//            if (!complete || edge.complete()) {
+//                printEdge(edge, null);
+//            }
+//
+//        }
+//        log.flush();
+//    }
+//    private void printEdge(Edge edge, List<Edge> edgeList) {
+//        String str = edge.toString();
+//        if (edge.incompleteLfChunk != null) {
+//            int id = edgeFactory.lfChunks.indexOf(edge.incompleteLfChunk);
+//            str += " <[" + id + "]>";
+//        }
+//        if (edge.activeLfAlts.size() > 0) str += " ";
+//        for (List<Alt> altSet : edge.activeLfAlts) {
+//            for (Alt alt : altSet) str += "?" + alt.altSet + "." + alt.numInSet;
+//        }
+//        str += edgeDerivation(edge, edgeList);
+//        log.println(str);
+//        // show alts subordinated in packing only case
+//        if (rSet.doingUnpacking() && edge.isDisjunctive()) {
+//            for (Edge alt : edge.altEdges) {
+//                if (alt != edge)
+//                        log.println(" \\_ " + alt + edgeDerivation(alt, edgeList));
+//            }
+//        }
+//    }
 
 
 }

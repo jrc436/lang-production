@@ -31,7 +31,6 @@ import java.io.OutputStreamWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -54,6 +53,7 @@ import javax.xml.transform.stream.StreamSource;
 import lexicon.DefaultTokenizer;
 import lexicon.FullWordFactory;
 import lexicon.IWordFactory;
+import lexicon.LexicalData;
 import lexicon.Lexicon;
 import lexicon.Tokenizer;
 
@@ -82,7 +82,10 @@ import unify.UnifyControl;
  * @version $Revision: 1.45 $, $Date: 2010/12/06 02:39:35 $ 
  */
 
-//grammars should generally be read only, meaning that they can be concurrently accessed with no problems
+//grammars should generally be read only, meaning that they can be concurrently accessed with no problems. 
+//Grammars are additionally /powerful/. It contains a reference to just about everything. In order to counteract the power of grammar,
+//objects should only be passed the pieces they need
+//there should only ever need to be one grammar, unless different runs wnat to use different styles of wordfactory, etc.
 public class Grammar {
 	 /** The boundary tones recognized as separate tokens for translation to APML. */
     private static final String[] boundaryTones = { 
@@ -93,116 +96,161 @@ public class Grammar {
         "H*", "L*", "L+H*", "L*+H", "H*+L", "H+L*"
     };
     
-	//prefs
-	public static final boolean showFeats = false; 
-    //Whether to show semantic info (logical forms) 
-    public static final boolean showSem = false;
-    //Which features to show. 
-    public static final String featsToShow = "";
-		
-    protected final IWordFactory wordFactory;
-    protected final Lexicon lexicon; 
-    private final UnifyControl unifyController;
-    protected final RuleGroup rules;
-    protected final Types types;
-    protected final Set<String> supertagFeatures = new HashSet<String>(); //feats to include in supertags
+    private final IWordFactory wf;
+    private final RuleGroup rules;
+    private final Types types;
+    private final TypesData td; //this typesdata should ONLY be used to construct new typesdata and to construct the other things in the grammar
+    private final Lexicon l;
+    private final Tokenizer t;
     
-    public Types getTypes() {
-    	return this.types;
-    }
     public Lexicon getLexicon() {
-    	return this.lexicon;
-    }
-    public RuleGroup getRules() {
-    	return this.rules;
+    	return l;
     }
     public IWordFactory getWordFactory() {
-    	return wordFactory;
+    	return wf;
     }
-    public Set<String> getSuperTagFeatures() {
-    	return supertagFeatures;
+    public RuleGroup getRuleGroup() {
+    	return rules;
     }
-    public UnifyControl getUnifyControl() {
-		return unifyController;
-	}
+    /** NOTE THIS SHOULD VERY RARELY BE USED! It should only be used in preparation, NOT during tasks **/
+    public TypesData getGrammarsTypesData() {
+    	return this.td;
+    }
+    public Tokenizer getTokenizer() {
+    	return this.t;
+    }
     
-    public final URL[] fromXmlTransforms; //xml to LF transforms   
-    public final URL[] toXmlTransforms; //LFs to xml transforms
-    private Transformer transformer = null;
-    private Templates[] fromXmlTemplates = null;
-    private Templates[] toXmlTemplates = null;
-    private Transformer apmlTransformer = null;
+    
+    public LexicalData createNewLexicalData(UnifyControl uc, TypesData td) {
+    	return new LexicalData(l, uc, td, wf, t);
+    }
+    public RuleGroupData createNewRuleGroupData(TypesData td, LexicalData lex, UnifyControl uc) {
+    	RuleGroupData retval = new RuleGroupData(wf, td, lex, uc, l, rules, t);
+    	lex.setRuleGroupData(retval);
+    	return retval;
+    }
+    public UnifyControl createNewUnifyControl() {
+    	return new UnifyControl();
+    }
+    public TypesData createNewTypesData() {
+    	return new TypesData(td);
+    }
+    
+    
+    private final Set<String> supertagFeatures = new LinkedHashSet<String>(); //feats to include in supertags
+    //strings are immutable, so giving a copy is ok
+    public Set<String> copySupertagFeatures() {
+    	return new LinkedHashSet<String>(supertagFeatures);
+    }
+      
+    private final URL[] fromXmlTransforms; //xml to LF transforms   
+    private final URL[] toXmlTransforms; //LFs to xml transforms
+    private final Transformer transformer;
+    private final Templates[] fromXmlTemplates;
+    private final Templates[] toXmlTemplates;
+    private final Transformer apmlTransformer;
+   
     
     // name of the grammar
-    private String grammarName = null;
+    private final String grammarName;
 
     // XML factories
-    private SAXParserFactory spf = null; 
-    private SAXTransformerFactory stf = null;
+    private final SAXParserFactory spf; 
+    private final SAXTransformerFactory stf;
     
     private static final Set<String> pitchAccentsSet = new LinkedHashSet<String>(Arrays.asList(pitchAccents));    
     private static final Set<String> boundaryTonesSet = new LinkedHashSet<String>(Arrays.asList(boundaryTones));    
-
     
-    /** Loads a grammar from the given filename. 
-     * @param uc TODO*/
-    public Grammar(String filename, UnifyControl uc) throws IOException {
-        this(new File(filename).toURI().toURL(), uc, false);
-    }
     
-    /** Loads a grammar from the given URL, with the given flag for whether to ignore rule combos. **/
-	public Grammar(URL url, UnifyControl uc, boolean ignoreCombos) throws IOException {
-    	this.unifyController = uc;
-    	this.wordFactory = new FullWordFactory();
+    /** Loads a grammar from the given URL, with the given flag for whether to ignore rule combos. 
+     * @throws IOException **/
+	public Grammar(URL url) throws IOException {
     	
-        SAXBuilder builder = new SAXBuilder();
+    	SAXBuilder builder = new SAXBuilder();
         Document doc;
         try {
             doc = builder.build(url);
         } catch (JDOMException jde) {
             throw (IOException) new IOException().initCause(jde);
         }
-        
         Element root = doc.getRootElement();	// root corresponds to <grammar>
         this.addSuperTagFeatures(root.getChild("supertags"));
+        
         grammarName = root.getAttributeValue("name");
-        this.types = initTypes(root.getChild("types"), url);
-       
+        
+        wf = new FullWordFactory();
+        types = initTypes(root.getChild("types"), url);
+        td = new TypesData(this.types);       
+        t = initTokenizer(root.getChild("tokenizer"));
+        l = setLexicon(root.getChild("lexicon"), root.getChild("morphology"), url, t, wf, td);       
+        rules = initRules(root.getChild("rules"), url, l, td, t);
+        
+        
         this.fromXmlTransforms = initFromXML(root.getChild("LF-from-XML"), url);
         this.toXmlTransforms = initToXML(root.getChild("LF-to-XML"), url);
-        
-        Element lexElt = root.getChild("lexicon");
-        this.lexicon = this.setLexicon(lexElt, initTokenizer(root.getChild("tokenizer")));
-        this.initLexicon(url, root.getChild("lexicon"), root.getChild("morphology"));        
-        
-        this.rules = initRules(root.getChild("rules"), url, ignoreCombos);                
+    	try {
+	        spf = SAXParserFactory.newInstance(); 
+	        spf.setNamespaceAware(true);
+	        
+	        stf = (SAXTransformerFactory) TransformerFactory.newInstance();
+	        try { // try setting indent at factory level
+	            stf.setAttribute("indent-number", new Integer(2));
+	        } catch (IllegalArgumentException exc) {} // ignore
+			transformer = stf.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            try { // also try setting indent as a xalan property 
+                transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2");
+            } catch (IllegalArgumentException exc) {} // ignore
+            InputStream toApmlStr = ClassLoader.getSystemResourceAsStream("grammar/to-apml.xsl");
+
+			apmlTransformer = stf.newTransformer(new StreamSource(toApmlStr));
+            apmlTransformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "apml.dtd");
+            
+            fromXmlTemplates = new Templates[fromXmlTransforms.length];
+            for (int i = 0; i < fromXmlTemplates.length; i++) {
+                String turl = fromXmlTransforms[i].toString();
+                fromXmlTemplates[i] = stf.newTemplates(new StreamSource(turl));
+            }
+            
+            toXmlTemplates = new Templates[toXmlTransforms.length];
+            for (int i = 0; i < toXmlTemplates.length; i++) {
+                // File file = new File(toXmlTransforms[i]);
+                // toXmlTemplates[i] = stf.newTemplates(new StreamSource(file));
+                String turl = toXmlTransforms[i].toString();
+                toXmlTemplates[i] = stf.newTemplates(new StreamSource(turl));
+            }
+    	}
+    	catch (TransformerConfigurationException tce) {
+    		tce.printStackTrace();
+    		throw new IOException();
+    	}
     }
-	private RuleGroup initRules(Element rulesElt, URL url, boolean ignoreCombos) {
-        RuleGroup rules = null;
+	private static RuleGroup initRules(Element rulesElt, URL url, Lexicon l, TypesData td, Tokenizer t) {
 		try {
         	URL rulesUrl = new URL(url, rulesElt.getAttributeValue("file"));
-			rules = new RuleGroup(rulesUrl, this);
-			if (!ignoreCombos) {
-		        String combosfile = rulesElt.getAttributeValue("combosfile");
-		        if (combosfile != null) {
-		        	URL combosUrl = new URL(url, combosfile);
-		        	rules.loadSupercatRuleCombos(combosUrl);
-		        }
-		        // set dynamic combos: defaults to true with a combosfile, otherwise defaults to false
-		        boolean dynamic = (combosfile != null);
-		        String dynamicCombos = rulesElt.getAttributeValue("dynamic-combos");
-		        if (dynamicCombos != null) dynamic = Boolean.parseBoolean(dynamicCombos);
-		        rules.setDynamicCombos(dynamic);
+	        String combosfile = rulesElt.getAttributeValue("combosfile");
+	        String dynamicCombos = rulesElt.getAttributeValue("dynamic-combos");
+	        if (combosfile != null && dynamicCombos != null) {
+	        	return new RuleGroup(rulesUrl, new URL(url, combosfile), l, td, Boolean.parseBoolean(dynamicCombos), t);
 	        }
-		} 
+	        else if (dynamicCombos != null) {
+	        	return new RuleGroup(rulesUrl, l, td, Boolean.parseBoolean(dynamicCombos), t);
+	        }
+	        else if (combosfile != null) {
+	        	return new RuleGroup(rulesUrl, l, td, new URL(url, combosfile), t);
+	        }
+	        else {
+	        	return new RuleGroup(rulesUrl, l, td, t);
+	        }
+        }	
 		catch (IOException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
-		return rules;
+		return null;
        
 	}
-	private Types initTypes(Element typesElt, URL url) {
+	private static Types initTypes(Element typesElt, URL url) {
 		URL typesUrl = null;
 		Types types = null;
         if (typesElt != null) {
@@ -214,72 +262,12 @@ public class Grammar {
 				System.exit(1);
 			}
         }
-        types = typesUrl != null ? new Types(typesUrl, this) : new Types(this);
+        types = typesUrl != null ? new Types(typesUrl) : new Types();
         return types;
 	}
-	private void addSuperTagFeatures(Element supertagsElt) {
-		if (supertagsElt != null) {
-            String feats = supertagsElt.getAttributeValue("feats");
-            if (feats != null) {
-                String[] names = feats.split("\\s+");
-                for (int i = 0; i < names.length; i++) {
-                    supertagFeatures.add(names[i]);
-                }
-            }
-        }
-        if (supertagFeatures.isEmpty()) {
-            // default is "form" and "lex"
-            supertagFeatures.add("form"); supertagFeatures.add("lex"); 
-        }
-	}
-    @SuppressWarnings("unchecked")
-	private URL[] initFromXML(Element fromXmlElt, URL url) {
-        URL[] fromXmlTransforms = null;
-    	if (fromXmlElt != null) {
-            List<Element> children = fromXmlElt.getChildren();
-            fromXmlTransforms = new URL[children.size()];
-            for (int i = 0; i < children.size(); i++) {
-                Element transformElt = (Element) children.get(i);
-                try {
-					fromXmlTransforms[i] = new URL(url, transformElt.getAttributeValue("file"));
-				} catch (MalformedURLException e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
-            }
-        }
-    	else {
-            fromXmlTransforms = new URL[0];
-        }
-    	return fromXmlTransforms;
-    }
-    @SuppressWarnings("unchecked")
-	private URL[] initToXML(Element toXmlElt, URL url) {
-        URL[] toXmlTransforms = null;
-        if (toXmlElt != null) {
-            List<Element> children = toXmlElt.getChildren();
-            toXmlTransforms = new URL[children.size()];
-            for (int i = 0; i < children.size(); i++) {
-                Element transformElt = (Element) children.get(i);
-                try {
-					toXmlTransforms[i] = new URL(url, transformElt.getAttributeValue("file"));
-				} 
-                catch (MalformedURLException e) {
-					e.printStackTrace();
-					System.exit(1);
-				}
-            }
-        } 
-        else {
-            toXmlTransforms = new URL[0];
-        }
-        return toXmlTransforms;
-    }
-    private Lexicon setLexicon(Element lexiconElt, Tokenizer token) {
-    	 boolean openlex = "true".equals(lexiconElt.getAttributeValue("openlex"));  	
-        return new Lexicon(this, token, openlex);
-    }
-    private void initLexicon(URL url, Element lexiconElt, Element morphElt) {
+	
+    private static Lexicon setLexicon(Element lexiconElt, Element morphElt, URL url, Tokenizer token, IWordFactory wf, TypesData td) {
+    	boolean openlex = "true".equals(lexiconElt.getAttributeValue("openlex")); 
     	 URL lexiconUrl = null;
     	 URL morphUrl = null;
          try {
@@ -290,34 +278,34 @@ public class Grammar {
 			System.err.println("Error loading lexicon or morphology!!");
 			System.exit(1);
 		} 
-         try {
- 			this.lexicon.init(lexiconUrl, morphUrl);
- 		} 
-         catch (IOException e) {
- 			e.printStackTrace();
- 			System.err.println("Error inititializing lexicon!!");
- 			System.exit(1);
- 		}
+        try {
+			Lexicon l = new Lexicon(td, token, wf);
+			l.init(openlex, lexiconUrl, morphUrl);
+			return l;
+		} 
+        catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("Error creating Lexicon");
+			System.exit(1);
+		}
+        return null;
     }
-    private Tokenizer initTokenizer(Element tokenizerElt) {
+    private static Tokenizer initTokenizer(Element tokenizerElt) {
     	Tokenizer tokenizer = null;
     	if (tokenizerElt == null) {
-    		return new DefaultTokenizer();
+    		return new DefaultTokenizer(new String[0]);
     	}
+    	String repClasses = tokenizerElt.getAttributeValue("replacement-sem-classes");
+        String[] semClasses = repClasses == null ? new String[0] : repClasses.split("\\s+");
 		String tokenClass = tokenizerElt.getAttributeValue("classname");	
 		try {
-			tokenizer = tokenClass == null ? new DefaultTokenizer() : (Tokenizer) Class.forName(tokenClass).newInstance();
+			tokenizer = tokenClass == null ? new DefaultTokenizer(semClasses) : (Tokenizer) Class.forName(tokenClass).newInstance();
 		} 
 		catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 			e.printStackTrace();
 			System.err.println(tokenClass+" is not a valid classname, apparently");
 			System.exit(1);
 		}       
-    	String repClasses = tokenizerElt.getAttributeValue("replacement-sem-classes");
-        String[] semClasses = repClasses == null ? new String[0] : repClasses.split("\\s+");
-        for (String cl : semClasses) {
-            tokenizer.addReplacementSemClass(cl);
-        }  	
     	return tokenizer;
     }
     
@@ -333,58 +321,13 @@ public class Grammar {
             throw (RuntimeException) new RuntimeException().initCause(exc);
         }
         // return "file:"+System.getProperty("user.dir")+"/"+filename;
-    }
-    
-    
-    // initializes factories and transformers
-    private void initializeTransformers() throws TransformerConfigurationException {
-        // init factories
-        if (spf == null) {
-            spf = SAXParserFactory.newInstance(); 
-            spf.setNamespaceAware(true);
-        }
-        if (stf == null) {
-            stf = (SAXTransformerFactory) TransformerFactory.newInstance();
-            try { // try setting indent at factory level
-                stf.setAttribute("indent-number", new Integer(2));
-            } catch (IllegalArgumentException exc) {} // ignore
-        }
-        // set up transformer with indenting
-        // nb: with some JVMs (eg JDK 1.4.1 on Windows), 
-        //     the transformer needs to be reinitialized each time, in order to 
-        //     run multiple :r FN commands in tccg 
-        if (transformer == null) {
-            transformer = stf.newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            try { // also try setting indent as a xalan property 
-                transformer.setOutputProperty("{http://xml.apache.org/xalan}indent-amount", "2");
-            } catch (IllegalArgumentException exc) {} // ignore
-        }
-        // set up apml transformer 
-        if (apmlTransformer == null) {
-            InputStream toApmlStr = ClassLoader.getSystemResourceAsStream("grammar/to-apml.xsl");
-            apmlTransformer = stf.newTransformer(new StreamSource(toApmlStr));
-            // nb: DOCTYPE SYSTEM also specified in to-apml.xsl; including  
-            //     redundant specification here to workaround omission of DOCTYPE with Linux 1.5 JVM
-            apmlTransformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "apml.dtd");
-        }
-    }
-    
+    }   
     
     // does setup for LF from XML transformation, and returns a SAXSource for the given input stream
     // nb: need a new filter chain one for each use (perhaps due to an underyling bug)
     private SAXSource fromXmlSetup(InputStream istream) throws IOException {
         try {
             // initialize transformer
-            initializeTransformers();
-            // load transformations
-            if (fromXmlTemplates == null) {
-                fromXmlTemplates = new Templates[fromXmlTransforms.length];
-                for (int i = 0; i < fromXmlTemplates.length; i++) {
-                    String url = fromXmlTransforms[i].toString();
-                    fromXmlTemplates[i] = stf.newTemplates(new StreamSource(url));
-                }
-            }
             // set up initial reader
             SAXParser parser = spf.newSAXParser();
             XMLReader reader = parser.getXMLReader();
@@ -444,18 +387,6 @@ public class Grammar {
     // nb: need a new filter chain one for each use (perhaps due to an underyling bug)
     private SAXSource toXmlSetup(Source source) throws IOException {
         try {
-            // initialize transformer
-            initializeTransformers();
-            // load transformations
-            if (toXmlTemplates == null) {
-                toXmlTemplates = new Templates[toXmlTransforms.length];
-                for (int i = 0; i < toXmlTemplates.length; i++) {
-                    // File file = new File(toXmlTransforms[i]);
-                    // toXmlTemplates[i] = stf.newTemplates(new StreamSource(file));
-                    String url = toXmlTransforms[i].toString();
-                    toXmlTemplates[i] = stf.newTemplates(new StreamSource(url));
-                }
-            }
             // set up initial reader
             SAXParser parser = spf.newSAXParser();
             XMLReader reader = parser.getXMLReader();
@@ -527,7 +458,6 @@ public class Grammar {
      */
     public synchronized void serializeXml(Document doc, OutputStream out) throws IOException {
         try {
-            initializeTransformers();
             JDOMResult result = new JDOMResult(); // as suggested by Amy Isard, for better java/xml version compatibility
             transformer.transform(new JDOMSource(doc), result);
             XMLOutputter outputter = new XMLOutputter();
@@ -580,6 +510,65 @@ public class Grammar {
 	public final String getName() {
 		return grammarName;
 	}
+	private void addSuperTagFeatures(Element supertagsElt) {
+		if (supertagsElt != null) {
+            String feats = supertagsElt.getAttributeValue("feats");
+            if (feats != null) {
+                String[] names = feats.split("\\s+");
+                for (int i = 0; i < names.length; i++) {
+                    supertagFeatures.add(names[i]);
+                }
+            }
+        }
+        if (supertagFeatures.isEmpty()) {
+            // default is "form" and "lex"
+            supertagFeatures.add("form"); 
+            supertagFeatures.add("lex"); 
+        }
+	}
+    @SuppressWarnings("unchecked")
+	private URL[] initFromXML(Element fromXmlElt, URL url) {
+        URL[] fromXmlTransforms = null;
+    	if (fromXmlElt != null) {
+            List<Element> children = fromXmlElt.getChildren();
+            fromXmlTransforms = new URL[children.size()];
+            for (int i = 0; i < children.size(); i++) {
+                Element transformElt = (Element) children.get(i);
+                try {
+					fromXmlTransforms[i] = new URL(url, transformElt.getAttributeValue("file"));
+				} catch (MalformedURLException e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
+            }
+        }
+    	else {
+            fromXmlTransforms = new URL[0];
+        }
+    	return fromXmlTransforms;
+    }
+    @SuppressWarnings("unchecked")
+	private URL[] initToXML(Element toXmlElt, URL url) {
+        URL[] toXmlTransforms = null;
+        if (toXmlElt != null) {
+            List<Element> children = toXmlElt.getChildren();
+            toXmlTransforms = new URL[children.size()];
+            for (int i = 0; i < children.size(); i++) {
+                Element transformElt = (Element) children.get(i);
+                try {
+					toXmlTransforms[i] = new URL(url, transformElt.getAttributeValue("file"));
+				} 
+                catch (MalformedURLException e) {
+					e.printStackTrace();
+					System.exit(1);
+				}
+            }
+        } 
+        else {
+            toXmlTransforms = new URL[0];
+        }
+        return toXmlTransforms;
+    }
 	
 }
 

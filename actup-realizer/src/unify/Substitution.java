@@ -29,11 +29,11 @@ public interface Substitution {
 
 	/**
 	 * Request the Substitution to identify a variable with an object.
+	 * @param uc TODO
 	 * @param var
 	 *            the variable whose value has been determined
 	 * @param o
 	 *            the Object identified with the variable
-	 * 
 	 * @return the Object identified with the variable, which has potentially
 	 *         undergone further unifications as a result of making the
 	 *         substitution
@@ -41,7 +41,7 @@ public interface Substitution {
 	 *                UnifyFailure if the Object cannot be unified with a
 	 *                previous value substituted for the Variable.
 	 */
-	public Object makeSubstitution(Variable var, Object u) throws UnifyFailure;
+	public Object makeSubstitution(UnifyControl uc, Variable var, Object u) throws UnifyFailure;
 
 	/**
 	 * Try to get the value of a variable from this Substitution. Should return

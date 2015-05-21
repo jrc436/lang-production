@@ -53,14 +53,13 @@ public class GSubstitution extends LinkedHashMap<Variable, Object> implements Su
      * variable if they contain it.
      * @param var the variable whose value has been determined
      * @param o the Object identified with the variable
-     *
      * @return the Object identified with the variable, which has
      * potentially undergone further unifications as a result of
      * making the substitution
      * @exception throws UnifyFailure if the Object cannot be unified
      * with a previous value substituted for the Variable.
      */
-	public Object makeSubstitution(Variable var, Object u) throws UnifyFailure {
+	public Object makeSubstitution(UnifyControl uc, Variable var, Object u) throws UnifyFailure {
         Object val1 = getValue(var);
         if (u instanceof Variable) {
             Variable var2 = (Variable)u;
@@ -77,13 +76,13 @@ public class GSubstitution extends LinkedHashMap<Variable, Object> implements Su
                 if (val2 != null) {
                     u = Unifier.unify(uc, var, val2, this);
                 } else {
-                    u = makeSubstitution(var2, val1);
+                    u = makeSubstitution(uc, var2, val1);
                 }
             } else if (val2 != null) {
                 if (val2 instanceof Unifiable && ((Unifiable)val2).occurs(var)) {
                     throw new UnifyFailure();   
                 }
-                makeSubstitution(var, val2);
+                makeSubstitution(uc, var, val2);
             } 
         } else if (val1 != null) {
             u = Unifier.unify(uc, val1, u, this);
@@ -93,12 +92,12 @@ public class GSubstitution extends LinkedHashMap<Variable, Object> implements Su
             Variable v = (Variable)i.next();
             Object res = getValue(v);
             if (res instanceof Unifiable) {
-                res = ((Unifiable)res).fill(this);
+                res = ((Unifiable)res).fill(uc, this);
             }
             put(v, res);
         }
         if (u instanceof Unifiable) {
-            u = ((Unifiable)u).fill(this);
+            u = ((Unifiable)u).fill(uc, this);
         }
         return u;
     }
@@ -165,7 +164,7 @@ public class GSubstitution extends LinkedHashMap<Variable, Object> implements Su
         for (int i=0; i < keys.length; i++) {
             Object obj = _indexedObjects.get(keys[i]);
             if (obj instanceof Unifiable) {
-                Object filled = ((Unifiable)obj).fill(this);
+                Object filled = ((Unifiable)obj).fill(uc, this);
                 _indexedObjects.put(keys[i], filled);
             }
         }

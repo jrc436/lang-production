@@ -18,8 +18,6 @@
 
 package lexicon;
 
-import grammar.Grammar;
-
 import java.util.List;
 
 /**
@@ -100,7 +98,7 @@ public interface Tokenizer {
      * and the semantic class of special tokens.
      * Tokens are parsed into words using parseToken.
      */
-    public List<Word> tokenize(Grammar grammar, String s);
+    public List<Word> tokenize(IWordFactory wf, String s);
 
     /**
      * Parses an input string into a list of words, 
@@ -109,20 +107,20 @@ public interface Tokenizer {
      * Tokens are parsed into words using parseToken, according to the given 
      * flag for whether to parse factors strictly.
      */
-    public List<Word> tokenize(Grammar grammar, String s, boolean strictFactors);
+    public List<Word> tokenize(IWordFactory wf, String s, boolean strictFactors);
     
     /** 
      * Parses a token into a word, including any explicitly given factors 
      * and the semantic class of special tokens.
      */
-    public Word parseToken(Grammar grammar, String token);
+    public Word parseToken(IWordFactory wf, String token);
  
     /** 
      * Parses a token into a word, including any explicitly given factors 
      * and the semantic class of special tokens, according to the given 
      * flag for whether to parse factors strictly.
      */
-    public Word parseToken(Grammar grammar, String token, boolean strictFactors);
+    public Word parseToken(IWordFactory wf, String token, boolean strictFactors);
  
  
     /**
@@ -161,12 +159,6 @@ public interface Tokenizer {
      * Returns true iff the token is recognized as a named entity (not listed in lexicon). 
      */
     public boolean isNamedEntity(String token);
-    
-    
-    /**
-     * Adds a semantic class to replace words with for language models.
-     */
-    public void addReplacementSemClass(String semClass);
     
     /** 
      * Returns whether the given semantic class is one to replace words with for language models.

@@ -1,12 +1,12 @@
 package ngrams;
 
-import grammar.Grammar;
-
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import lexicon.IWordFactory;
+import lexicon.Tokenizer;
 import lexicon.Word;
 import synsem.Sign;
 
@@ -37,12 +37,13 @@ public class ACTRNgramModel extends StandardNgramModel {
 	//the most recent timestamp is always stored at 0, the least recent at k
 	private Presentations nGramPresentations;
 	
-	public ACTRNgramModel(double[] varValues, int order, String modelFile, Grammar grammar) throws IOException {
-		super(order, modelFile, varValues, grammar);
+	public ACTRNgramModel(double[] varValues, int order, String modelFile, IWordFactory wf, Tokenizer t) throws IOException {
+		super(order, modelFile, varValues, wf, t);
 		this.priorExposureTime = year_seconds * params[ey_index];
 		nGramPresentations = new Presentations((int) Math.round(params[k_index]));
 	}
-	public synchronized double score(Sign sign, boolean complete) {
+	//only gets happening here
+	public double score(Sign sign, boolean complete) {
 		List<Word> s = sign.getWords();
 		String sf = "";
 		for (Word w : s) {
@@ -91,7 +92,7 @@ public class ACTRNgramModel extends StandardNgramModel {
 		nGramPresentations.decayPresentations(time_approximate);
 	}
 	
-	public synchronized double getActivation(String sf, double ngramPrior) {
+	public double getActivation(String sf, double ngramPrior) {
 		return nGramPresentations.getActivation(sf, ngramPrior, this.exposureTime());
 	}
 	
@@ -121,9 +122,6 @@ public class ACTRNgramModel extends StandardNgramModel {
 			double k = (double) this.depth;
 			double dc = 1.0 + params[negD_index];
 			double check =  c.calculateKActivation() + ( (n-k) * (Math.pow(t_n, dc) - Math.pow(t_k, dc)) ) / ( dc * (t_n - t_k) );
-			if (check <= 0.0 || (check + 1.0) <= .0000001) {
-				System.err.println("Houston we have a problem.");
-			}
 			return Math.log(check);
 		}
 		

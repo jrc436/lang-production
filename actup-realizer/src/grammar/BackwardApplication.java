@@ -18,10 +18,15 @@
 
 package grammar;
 
-import unify.*;
-import synsem.*;
+import java.util.List;
 
-import java.util.*;
+import lexicon.LexicalData;
+import lexicon.Lexicon;
+import lexicon.Tokenizer;
+import synsem.Category;
+import synsem.Slash;
+import unify.UnifyControl;
+import unify.UnifyFailure;
 
 /**
  * Forward application: X/Y Y => X
@@ -33,10 +38,10 @@ public class BackwardApplication extends AbstractApplicationRule {
 
 	private static final long serialVersionUID = 6981288425455531650L;
 
-	public BackwardApplication(Grammar rg) {
-		super(rg);
-		name = "<";
-		_functorSlash = new Slash(grammar, '\\');
+	public BackwardApplication(UnifyControl uc, LexicalData lex, Lexicon l, Tokenizer t) {
+		super(uc, lex, l, t);
+		name = "<";	
+		_functorSlash = new Slash('\\');
 		_functorSlash.setAbility("active");
     }
     

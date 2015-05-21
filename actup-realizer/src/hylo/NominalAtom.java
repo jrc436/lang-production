@@ -18,8 +18,9 @@
 
 package hylo;
 
-import grammar.Grammar;
 import grammar.Types;
+import grammar.TypesData;
+import lexicon.Lexicon;
 
 import org.jdom.Element;
 
@@ -46,17 +47,17 @@ public class NominalAtom extends HyloAtom implements Nominal {
 	
 	protected boolean shared = false;
     
-    public NominalAtom(Grammar grammar, String name) {
-        this(grammar, name, null);
+    public NominalAtom(Lexicon lex, TypesData td, String name) {
+        this(lex, name, td.getSimpleType(Types.TOP_TYPE));
     }
     
-    public NominalAtom(Grammar grammar, String name, SimpleType st) {
-        this(grammar, name, st, false);
+    public NominalAtom(Lexicon lex, String name, SimpleType st) {
+        this(lex, name, st, false);
     }
     
-    public NominalAtom(Grammar grammar, String name, SimpleType st, boolean shared) {
-        super(grammar, name, st);
-        type = (st != null) ? st : grammar.getTypes().getSimpleType(Types.TOP_TYPE);
+    public NominalAtom(Lexicon lex, String name, SimpleType st, boolean shared) {
+        super(lex, name, st);
+        type = st;
         this.shared = shared;
     }
 
@@ -67,7 +68,7 @@ public class NominalAtom extends HyloAtom implements Nominal {
     public void setShared(boolean shared) { this.shared = shared; }
     
     public LF copy() {
-        return new NominalAtom(grammar, _name, type, shared);
+        return new NominalAtom(l, _name, type, shared);
     }
 
     /** Returns a hash code based on the atom name and type. */

@@ -18,7 +18,8 @@
 
 package hylo;
 
-import grammar.Grammar;
+import grammar.TypesData;
+import lexicon.Lexicon;
 
 import org.jdom.Element;
 
@@ -39,16 +40,16 @@ public final class Diamond extends ModalOp {
 
 	private static final long serialVersionUID = 543211908001651361L;
 
-	public Diamond(Grammar grammar, Element e) {
-        super(grammar, e);
+	public Diamond(Lexicon l, TypesData td, Element e) {
+        super(l, td, e);
     }
 
-    public Diamond(Grammar grammar, Mode mode, LF arg) {
-        super(grammar, mode, arg);
+    public Diamond(Lexicon l, Mode mode, LF arg) {
+        super(l, mode, arg);
     }
 
     public LF copy() {
-        return new Diamond(grammar, (Mode)_mode.copy(), _arg.copy());
+        return new Diamond(l, (Mode)_mode.copy(), _arg.copy());
     }
     
     public boolean equals(Object o) {
@@ -70,9 +71,9 @@ public final class Diamond extends ModalOp {
     public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
         if (u instanceof HyloFormula) {
             if (u instanceof Diamond) {
-                Mode $mode = (Mode) Unifier.unify(grammar.getUnifyControl(), _mode, ((Diamond)u)._mode, sub);
-                LF $arg = (LF) Unifier.unify(grammar.getUnifyControl(), _arg, ((Diamond)u)._arg,sub);
-                return new Diamond(grammar, $mode, $arg);
+                Mode $mode = (Mode) Unifier.unify(uc, _mode, ((Diamond)u)._mode, sub);
+                LF $arg = (LF) Unifier.unify(uc, _arg, ((Diamond)u)._arg,sub);
+                return new Diamond(l, $mode, $arg);
             }
             else return super.unify(u, sub, uc);
         } else {
@@ -80,8 +81,8 @@ public final class Diamond extends ModalOp {
         }
     }
 
-    public Object fill(Substitution sub) throws UnifyFailure {
-        return new Diamond(grammar, (Mode)_mode.fill(sub), (LF)_arg.fill(sub));
+    public Object fill(UnifyControl uc, Substitution sub) throws UnifyFailure {
+        return new Diamond(l, (Mode)_mode.fill(uc, sub), (LF)_arg.fill(uc, sub));
     }
     
     /** Returns the string form of this modal op, without the arg. */

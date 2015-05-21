@@ -1,8 +1,12 @@
 package evaluation;
 
+import java.util.Arrays;
+import java.util.List;
+
 import runconfig.ScoringStrategy;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+//more or less a set of scores and some methods on them.
 public class Evaluation {
 	private final double completeness;
 	private final double avgScore;
@@ -10,13 +14,44 @@ public class Evaluation {
 	private final ScoringStrategy strat;
 	private final double complStdDev; //only completes
 	private final double totStdDev; //totals
-	public Evaluation(double completeness, double score, double complScore, double totstddev, double complstddev, ScoringStrategy strat) {
-		this.completeness = completeness;
-		this.avgScore = score;
+	private final List<Score> scores;
+	public Evaluation(ScoringStrategy ss, Score[] scores) {
+		this(ss, Arrays.asList(scores));
+	}
+	public Evaluation(ScoringStrategy ss, List<Score> scores) {
+		double completeNum = 0.0;
+		double totalNum = 0.0;
+		double totalScore = 0.0;
+		double completeScore = 0.0;
+		for (Score score : scores) {
+			totalScore += score.score;
+			totalNum++;
+			if (score.complete) {
+				completeNum++;
+				completeScore += score.score;
+			}
+		}
+		double totScore = totalScore / totalNum;
+		double complScore = completeScore / completeNum;
+		double totstddev = 0.0;
+		double complstddev = 0.0;
+		for (Score score : scores) {
+			totstddev += Math.pow((score.score - totScore), 2);
+			if (score.complete) {
+				complstddev += Math.pow((score.score - complScore), 2);
+			}
+		}
+		totstddev /= totalNum;
+		complstddev /= completeNum;
+		complstddev = Math.sqrt(complstddev);
+		totstddev = Math.sqrt(totstddev);
+		this.avgScore = totScore;
 		this.avgCompleteScore = complScore;
-		this.strat = strat;
-		this.complStdDev = complstddev;
 		this.totStdDev = totstddev;
+		this.complStdDev = complstddev;
+		this.strat = ss;
+		this.completeness = ((double) completeNum) / ((double) totalNum);
+		this.scores = scores;
 	}
 	public double getScore() {
 		switch(strat) {
@@ -46,7 +81,15 @@ public class Evaluation {
 				return complStdDev;
 		}
 	}
-	
+	public String writeScores() {
+		String toWrite = "{";
+		for (Score s : scores) {
+			if (s.complete) {
+				toWrite += String.format("%.5f", s.score)+",";
+			}
+		}
+		return toWrite;
+	}
 	public double getCompleteness() {
 		return completeness;
 	}
@@ -59,6 +102,6 @@ public class Evaluation {
 		return e.completeness == this.completeness && this.avgScore == e.avgScore && this.avgCompleteScore == e.avgCompleteScore && this.totStdDev == e.totStdDev && this.complStdDev == e.complStdDev;
 	}
 	public String toString() {
-		return "score: "+String.format("%.5f", this.getScore())+"; completeness: "+String.format("%.5f", this.completeness)+"; stddev: "+String.format("%.5f", this.getStdDeviation());
+		return "score: "+String.format("%.5f", this.getScore())+"; completeness: "+String.format("%.5f", this.completeness)+"; stddev: "+String.format("%.5f", this.getStdDeviation())+"; scoreList:"+writeScores();
 	}
 }

@@ -18,10 +18,17 @@
 
 package grammar;
 
-import synsem.*;
-import unify.*;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.*;
+import lexicon.LexicalData;
+import lexicon.Lexicon;
+import lexicon.Tokenizer;
+import synsem.Category;
+import synsem.Sign;
+import unify.EmptySubstitution;
+import unify.UnifyControl;
+import unify.UnifyFailure;
 
 
 /**
@@ -35,9 +42,10 @@ public class FragmentJoining extends AbstractRule {
 	private static final long serialVersionUID = 7451163798607652012L;
 
 	/** Constructor. 
+	 * @param t TODO
 	 * @param rg TODO*/
-	public FragmentJoining(Grammar rg) { 
-		super(rg);
+	public FragmentJoining(UnifyControl uc, LexicalData lex, Lexicon l, Tokenizer t) { 
+		super(uc, lex, l, t);
 		name = "*"; 
 	}
 	

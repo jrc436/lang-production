@@ -21,6 +21,7 @@ package grammar;
 
 import synsem.*;
 import unify.*;
+
 import java.util.*;
 
 
@@ -37,7 +38,6 @@ public interface Rule {
     /**
      * Apply this rule to some input categories.
      * @param inputs the input categories to try to combine
-     *
      * @return the Category (or categories) resulting from using this Rule to combine the
      *         inputs
      * @exception UnifyFailure if the inputs cannot be combined by this Rule
@@ -52,19 +52,16 @@ public interface Rule {
      **/
     public int arity();
 
-    /**
-     * Returns the interned name of this rule.
-     */
     public String name();
     
     /**
      * Returns the rule group which contains this rule.
      */
-    public RuleGroup getRuleGroup();
+    public RuleGroupData getRuleGroup();
     
     /**
      * Sets this rule's rule group.
      */
-    public void setRuleGroup(RuleGroup ruleGroup);
+    public void setRuleGroup(RuleGroupData ruleGroup);
 }
 

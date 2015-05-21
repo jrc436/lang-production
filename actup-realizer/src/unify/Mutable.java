@@ -33,6 +33,6 @@ public interface Mutable {
      * which are themselves Mutables.
      * @param mf a function to be applied
      **/
-    public void deepMap (ModFcn mf);
+    public void mutateAll(MutableScript m);
 
 }

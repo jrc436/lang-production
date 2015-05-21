@@ -18,15 +18,13 @@
 
 package synsem;
 
-import grammar.Grammar;
-
 import java.io.Serializable;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.jdom.Element;
 
-import unify.ModFcn;
 import unify.Mutable;
+import unify.MutableScript;
 import unify.Substitution;
 import unify.Unifiable;
 import unify.UnifyControl;
@@ -67,11 +65,8 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 
 	private boolean _harmonicCompositionResult = false;
 	
-	private final Grammar grammar;
 	
-	public Slash(Grammar grammar, Element el) {
-		
-		this.grammar = grammar;
+	public Slash(Element el) {
 		String d = el.getAttributeValue("dir");
 		if (d == null)
 			d = el.getAttributeValue("d");
@@ -90,7 +85,7 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 			if (vm == null)
 				vm = el.getAttributeValue("varModality");
 			if (vm != null) {
-				_modality = new VarModality(grammar, vm);
+				_modality = new VarModality(vm);
 			} else {
 				_modality = new SlashMode();
 			}
@@ -102,41 +97,33 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 		}
 	}
 
-	public Slash(Grammar grammar) {
-		this(grammar, '|');
+	public Slash() {
+		this('|');
 	}
 
-	public Slash(Grammar grammar, char sd) {
-		
-		this.grammar = grammar;
+	public Slash(char sd) {
 		_dir = encode(sd);
 		_modality = new SlashMode();
 	}
 
-	public Slash(Grammar grammar, char sd, String md) {
-		
-		this.grammar = grammar;
+	public Slash(char sd, String md) {
 		_dir = encode(sd);
 		_modality = new SlashMode(md);
 	}
 
-	public Slash(Grammar grammar, char sd, Modality md) {
-		
-		this.grammar = grammar;
+	public Slash(char sd, Modality md) {
 		_dir = encode(sd);
 		_modality = md;
 	}
 
-	private Slash(Grammar grammar, byte d, Modality m, byte a) {
-		
-		this.grammar = grammar;
+	private Slash(byte d, Modality m, byte a) {
 		_dir = d;
 		_modality = m;
 		_ability = a;
 	}
 
 	public Slash copy() {
-		Slash retval = new Slash(grammar, _dir, (Modality) _modality.copy(), _ability);
+		Slash retval = new Slash(_dir, (Modality) _modality.copy(), _ability);
 		retval._modifier = _modifier;
 		retval._harmonicCompositionResult = _harmonicCompositionResult;
 		return retval;
@@ -146,8 +133,8 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 		return _modality.occurs(v);
 	}
 
-	public void deepMap(ModFcn mf) {
-		mf.modify(this);
+	public void mutateAll(MutableScript m) {
+		m.run(this);
 	}
 
 	public boolean isActive() {
@@ -223,7 +210,7 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 			}
 
 			Modality newModality = (Modality) _modality.unify(((Slash) u)._modality, sub, uc);
-			Slash retval = new Slash(grammar, newDir, newModality, newAbility);
+			Slash retval = new Slash(newDir, newModality, newAbility);
 			retval._modifier = _modifier;
 			return retval;
 		} else {
@@ -232,8 +219,8 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 
 	}
 
-	public Object fill(Substitution sub) throws UnifyFailure {
-		Slash retval = new Slash(grammar, _dir, (Modality) _modality.fill(sub), _ability);
+	public Object fill(UnifyControl uc, Substitution sub) throws UnifyFailure {
+		Slash retval = new Slash(_dir, (Modality) _modality.fill(uc, sub), _ability);
 		retval._modifier = _modifier;
 		return retval;
 	}
@@ -295,7 +282,7 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 	/**
 	 * Returns a hash code using the given map from vars to ints.
 	 */
-	public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) {
+	public int hashCode(Map<Unifiable, Integer> varMap) {
 		int retval = 31 * _dir + 7 * _ability;
 		if (_modality instanceof Variable) retval += ((Variable)_modality).hashCode(varMap);
 		else retval += _modality.hashCode();
@@ -306,7 +293,7 @@ public final class Slash implements Unifiable, Mutable, Serializable {
 	 * Returns whether this slash equals the given object up to variable names,
 	 * using the given maps from vars to ints.
 	 */
-	public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
+	public boolean equals(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2) {
 		if (this == obj) return true;
 		if (obj.getClass() != this.getClass()) return false;
 		Slash s = (Slash) obj;

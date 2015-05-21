@@ -24,16 +24,18 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import lexicon.LexicalData;
+import lexicon.Lexicon;
+import lexicon.Tokenizer;
 import synsem.AtomCat;
 import synsem.Category;
-import synsem.CategoryFcn;
-import synsem.CategoryFcnAdapter;
 import synsem.ComplexCat;
 import synsem.LF;
 import synsem.Sign;
 import unify.FeatureStructure;
 import unify.GFeatStruc;
 import unify.Substitution;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 import unify.Variable;
 
@@ -48,15 +50,19 @@ public abstract class AbstractRule implements Rule, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	/** The interned name of this rule. */
     protected String name;
     
-    /** The rule group which contains this rule. */
-    protected final Grammar grammar;
-    protected RuleGroup ruleGroup;
+    protected final UnifyControl uc;
+    protected final LexicalData lex;
+    protected final Lexicon l;
+    protected RuleGroupData ruleGroup;
+    protected final Tokenizer t;
     
-    protected AbstractRule(Grammar rg) {
-    	this.grammar = rg;
+    protected AbstractRule(UnifyControl uc, LexicalData lex, Lexicon l, Tokenizer t) {
+    	this.uc = uc;
+    	this.lex = lex;
+    	this.l = l;
+    	this.t = t;
     }
     
     /** Reusable list of head cats, one for each result. */
@@ -87,44 +93,37 @@ public abstract class AbstractRule implements Rule, Serializable {
                 for (int j=0; j < inputs.length; j++) {
                 	if (inputs[j].getCategory().equals(headCat)) lexHead = inputs[j].getLexHead();
                 }
-                Sign sign = Sign.createDerivedSign(grammar, catResult, inputs, this, lexHead);
+                Sign sign = Sign.createDerivedSign(ruleGroup, t, catResult, inputs, this, lexHead);
                 results.add(sign);
             }
         } catch (UnifyFailure uf) {}
     }
     
-    protected void distributeTargetFeatures(Category cat) {
-        if (grammar.lexicon.getDistributiveAttrs() == null) return;
+    
+    // target cat's feature structure
+    private GFeatStruc targetFS = null;
+    
+	private void distributeTargetFeaturesFcn(Category c) {
+        if (!(c instanceof AtomCat)) return;
+        FeatureStructure fs = c.getFeatureStructure();
+        if (fs == null) return;
+        if (fs.equals(targetFS)) return;
+        for (int i = 0; i < l.numDistrAttrs(); i++) {
+            Object targetVal = targetFS.getValue(l.getDistrAttr(i));
+            if (targetVal != null && !(targetVal instanceof Variable)) {
+                fs.setFeature(l.getDistrAttr(i), UnifyControl.copy(targetVal));
+            }
+        }
+    }
+	protected void distributeTargetFeatures(Category cat) {
         if (!(cat instanceof ComplexCat)) return;
         ComplexCat complexCat = (ComplexCat) cat;
         Category targetCat = (Category) complexCat.getTarget();
         targetFS = (GFeatStruc) targetCat.getFeatureStructure();
         if (targetFS == null) return;
-        cat.forall(distributeTargetFeaturesFcn);
+        cat.applyToAll(this::distributeTargetFeaturesFcn);
     }
     
-    // target cat's feature structure
-    private GFeatStruc targetFS = null;
-
-    // copies ground distributive features from _targetFS to the rest
-    private CategoryFcn distributeTargetFeaturesFcn = new DistributeTargetFeaturesFcn();
-    
-    private class DistributeTargetFeaturesFcn extends CategoryFcnAdapter implements Serializable {
-		private static final long serialVersionUID = 5247861522003485434L;
-		public void forall(Category c) {
-            if (!(c instanceof AtomCat)) return;
-            FeatureStructure fs = c.getFeatureStructure();
-            if (fs == null) return;
-            if (fs.equals(targetFS)) return;
-            String[] distrAttrs = grammar.lexicon.getDistributiveAttrs();
-            for (int i = 0; i < distrAttrs.length; i++) {
-                Object targetVal = targetFS.getValue(distrAttrs[i]);
-                if (targetVal != null && !(targetVal instanceof Variable)) {
-                    fs.setFeature(distrAttrs[i], grammar.getUnifyControl().copy(targetVal));
-                }
-            }
-        }
-    }
     
     
     /**
@@ -138,7 +137,6 @@ public abstract class AbstractRule implements Rule, Serializable {
     /**
      * Apply this rule to some input categories.
      * @param inputs the input categories to try to combine
-     *
      * @return the categories resulting from using this rule to combine the
      *         inputs
      * @exception UnifyFailure if the inputs cannot be combined by this rule
@@ -146,28 +144,6 @@ public abstract class AbstractRule implements Rule, Serializable {
     public abstract List<Category> applyRule(Category[] inputs) throws UnifyFailure;
 
     
-//    /** Prints an apply instance for the given categories to System.out. */
-//    protected void showApplyInstance(Category[] inputs) {
-//        StringBuffer sb = new StringBuffer();  
-//        sb.append(name).append(": ");
-//        
-//        for (int i=0; i < inputs.length; i++) {
-//            sb.append(inputs[i]).append(' ');
-//        }
-//
-//        System.out.println(sb);
-//    }
-//
-//    /** Prints an apply instance for the given categories to System.out. */
-//    protected void showApplyInstance(Category first, Category second) {
-//        Category[] ca = {first,second};
-//        showApplyInstance(ca);
-//    }
-
-    
-    /**
-     * Returns the interned name of this rule.
-     */
     public String name() {
         return name;
     }
@@ -175,12 +151,12 @@ public abstract class AbstractRule implements Rule, Serializable {
     /**
      * Returns the rule group which contains this rule.
      */
-    public RuleGroup getRuleGroup() { return ruleGroup; }
+    public RuleGroupData getRuleGroup() { return ruleGroup; }
     
     /**
      * Sets this rule's rule group.
      */
-    public void setRuleGroup(RuleGroup ruleGroup) { 
+    public void setRuleGroup(RuleGroupData ruleGroup) { 
     	this.ruleGroup = ruleGroup; 
     }
 
@@ -189,10 +165,10 @@ public abstract class AbstractRule implements Rule, Serializable {
     protected void appendLFs(Category cat1, Category cat2, Category result, Substitution sub) 
         throws UnifyFailure
     {
-        LF lf = HyloHelper.append(grammar, cat1.getLF(), cat2.getLF());
+        LF lf = HyloHelper.append(l, cat1.getLF(), cat2.getLF());
         if (lf != null) {
-            lf = (LF) lf.fill(sub);
-            HyloHelper.sort(grammar, lf);
+            lf = (LF) lf.fill(uc, sub);
+            HyloHelper.sort(l, lf);
             HyloHelper.check(lf);
         }
         result.setLF(lf);

@@ -37,10 +37,10 @@ public class Unifier {
      **/
     public static final Object unify (UnifyControl uc, Object u1, Object u2) throws UnifyFailure {
     	
-        Substitution sub = new SelfCondensingSub(uc);
+        Substitution sub = new SelfCondensingSub();
         Object result =  unify(uc, u1, u2, sub);
         if (result instanceof Unifiable) {
-            result = ((Unifiable)result).fill(sub);
+            result = ((Unifiable)result).fill(uc, sub);
         }
         return result;
     }

@@ -18,17 +18,19 @@
 
 package hylo;
 
-import grammar.Grammar;
+import grammar.TypesData;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
+import lexicon.Lexicon;
 
 import org.jdom.Element;
 
 import synsem.LF;
-import unify.ModFcn;
+import unify.MutableScript;
 import unify.Substitution;
 import unify.Unifiable;
 import unify.UnifyControl;
@@ -71,8 +73,8 @@ public class Op extends HyloFormula {
     
     /** Element constructor. */
     @SuppressWarnings("unchecked")
-	public Op(Grammar grammar, Element e) {
-    	super(grammar);
+	public Op(Lexicon l, TypesData td, Element e) {
+    	super(l);
         String name = e.getAttributeValue("name");
         if (name == null) name = e.getAttributeValue("n");
         _name = name;
@@ -80,25 +82,25 @@ public class Op extends HyloFormula {
         int argSize = argElements.size();
         List<LF> args = new ArrayList<LF>(argSize);
         for (int i=0; i<argSize; i++) {
-            args.add(HyloHelper.getLF(grammar, (Element)argElements.get(i)));
+            args.add(HyloHelper.getLF(l, td, (Element)argElements.get(i)));
         }
         // add implicit CONJ op with NEG or OPT
         if (args.size() > 1 && (name.equals(NEG) || name.equals(OPT))) {
             _args = new ArrayList<LF>(1);
-            _args.add(new Op(grammar, CONJ, args));
+            _args.add(new Op(l, CONJ, args));
         }
         else _args = args;
     }
 
     /** Constructor. */
-    public Op(Grammar grammar, String name, List<LF> args) {
-    	super(grammar);
+    public Op(Lexicon l, String name, List<LF> args) {
+    	super(l);
         _name = name; _args = args; 
     }
 
     /** Two arg convenience constructor. */
-    public Op(Grammar grammar, String name, LF first, LF second) {
-    	super(grammar);
+    public Op(Lexicon l, String name, LF first, LF second) {
+    	super(l);
         _name = name;
         _args = new ArrayList<LF>();
         _args.add(first); _args.add(second);
@@ -131,14 +133,14 @@ public class Op extends HyloFormula {
         for (LF arg : _args) {
             $args.add(arg.copy());
         }
-        return new Op(grammar, _name, $args);
+        return new Op(l, _name, $args);
     }
 
-    public void deepMap(ModFcn mf) {
+    public void mutateAll(MutableScript m) {
         for (Iterator<LF> argsIt = _args.iterator(); argsIt.hasNext(); ) {
-            argsIt.next().deepMap(mf);
+            argsIt.next().mutateAll(m);
         }
-        mf.modify(this);
+        m.run(this);
     }
 
     public boolean occurs(Variable var) {
@@ -171,12 +173,12 @@ public class Op extends HyloFormula {
         throw new UnifyFailure();
     }
     
-    public Object fill(Substitution sub) throws UnifyFailure {
+    public Object fill(UnifyControl uc, Substitution sub) throws UnifyFailure {
         List<LF> $args = new ArrayList<LF>(_args.size());
         for (LF arg : _args) {
-            $args.add((LF)arg.fill(sub));
+            $args.add((LF)arg.fill(uc, sub));
         }
-        return new Op(grammar, _name, $args);
+        return new Op(l, _name, $args);
     }
     
     public String toString() {
@@ -240,7 +242,7 @@ public class Op extends HyloFormula {
     /**
      * Returns a hash code using the given map from vars to ints.
      */
-    public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) { 
+    public int hashCode(Map<Unifiable, Integer> varMap) { 
         int retval = _name.hashCode();
         for (Iterator<LF> it = _args.iterator(); it.hasNext(); ) {
             LF arg = it.next();
@@ -254,7 +256,7 @@ public class Op extends HyloFormula {
      * up to variable names, using the given maps from vars to ints
      * (where args must be in the same order).
      */
-    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
+    public boolean equals(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2) {
         if (obj.getClass() != this.getClass()) { return false; }
         Op op = (Op) obj;
         if (!_name.equals(op._name)) return false;

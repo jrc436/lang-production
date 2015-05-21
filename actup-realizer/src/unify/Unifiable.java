@@ -81,12 +81,12 @@ public interface Unifiable {
 	/**
 	 * Replaces any variables in this Unifiable with the values found for them
 	 * in the Substitution argument.
+	 * @param uc TODO
 	 * @param s
 	 *            Substitution containing the variable resolutions
-	 * 
 	 * @return a copy of this Unifiable with all variables from the Substitution
 	 *         replaced by their values.
 	 */
-	public Object fill(Substitution s) throws UnifyFailure;
+	public Object fill(UnifyControl uc, Substitution s) throws UnifyFailure;
 
 }

@@ -9,6 +9,10 @@ public class SupercatCombo {
 	private final String supercat;
 	private final String supercat2;
 	
+	public SupercatCombo(String supercat) {
+		this.supercat = supercat;
+		this.supercat2 = null;
+	}
 	public SupercatCombo(String supercat, String supercat2) {
 		this.supercat = supercat;
 		this.supercat2 = supercat2;

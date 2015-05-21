@@ -19,7 +19,7 @@
 
 package lexicon;
 
-import grammar.Grammar;
+import grammar.TypesData;
 
 import java.util.List;
 
@@ -46,7 +46,7 @@ public class Family {
     //p final Grammar grammar;
 
     @SuppressWarnings("unchecked")
-	public Family(Grammar grammar, Element famel) {
+	public Family(Lexicon l, TypesData td, Element famel) {
     	
     	//this.grammar = grammar;
         setName(famel.getAttributeValue("name"));
@@ -66,7 +66,7 @@ public class Family {
         List<Element> entriesList = famel.getChildren("entry");
         entries = new EntriesItem[entriesList.size()];
         for (int j=0; j < entriesList.size(); j++) {
-            entries[j] = new EntriesItem(grammar, entriesList.get(j), this);
+            entries[j] = new EntriesItem(l, td, entriesList.get(j), this);
         }
         
         List<Element> members = famel.getChildren("member");

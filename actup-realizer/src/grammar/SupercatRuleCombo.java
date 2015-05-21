@@ -2,26 +2,23 @@ package grammar;
 
 // supercat-rule combos, to support filtering on observed ones
 public class SupercatRuleCombo {
-	// NB: strings must be interned
-	private String supercat; 
-	private String supercat2;
-	protected String rule;
+	private final String supercat; 
+	private final String supercat2;
+	private final String rule;
 	// unary rule constructor
 	public SupercatRuleCombo(String supercat, String rule) {
-		setCombo(supercat.intern(), (rule != null) ? rule.intern() : null);
+		this(supercat, null, rule);
 	}
 	// binary rule constructor
 	public SupercatRuleCombo(String supercat, String supercat2, String rule) {
-		setCombo(supercat.intern(), supercat2.intern(), (rule != null) ? rule.intern() : null);
+		this.supercat = supercat;
+		this.supercat2 = supercat2;
+		this.rule = rule;
 	}
-	// setters
-	// NB: assume interned strings!
-	public void setCombo(String supercat, String rule) {
-		this.supercat = supercat; this.supercat2 = null; this.rule = rule;
+	protected boolean hasRule() {
+		return rule != null;
 	}
-	public void setCombo(String supercat, String supercat2, String rule) {
-		this.supercat = supercat; this.supercat2 = supercat2; this.rule = rule;
-	}
+
 	// hashcode
 	public int hashCode() {
 		return 31*System.identityHashCode(supercat) + 17*System.identityHashCode(rule) + System.identityHashCode(supercat2);

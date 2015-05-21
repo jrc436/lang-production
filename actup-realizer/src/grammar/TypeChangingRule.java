@@ -18,11 +18,22 @@
 
 package grammar;
 
-import unify.*;
 import hylo.HyloHelper;
-import synsem.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+
+import lexicon.LexicalData;
+import lexicon.Lexicon;
+import lexicon.Tokenizer;
+import synsem.Category;
+import synsem.LF;
+import synsem.LexSemOrigin;
+import unify.GSubstitution;
+import unify.GUnifier;
+import unify.Substitution;
+import unify.UnifyControl;
+import unify.UnifyFailure;
 
 /**
  * A CCG unary type changing rule.
@@ -51,14 +62,19 @@ public class TypeChangingRule extends AbstractRule implements LexSemOrigin {
     
     /** The first elementary predication in the result LF (or null), before sorting. */
     protected LF _firstEP;
+    
+    protected TypeChangingRule(UnifyControl uc, LexicalData lex, Lexicon l, TypeChangingRuleStruct tcrs, Tokenizer t) {
+    	this(uc, lex, l, tcrs.arg, tcrs.result, tcrs.name, tcrs.firstEP, t);
+    }
 
 
-    /** Constructor. */
-    public TypeChangingRule(Grammar rg, Category arg, Category result, String name, LF firstEP) {
-    	super(rg);
+    /** Constructor. 
+     * @param t TODO*/
+    public TypeChangingRule(UnifyControl uc, LexicalData lex, Lexicon l, Category arg, Category result, String name, LF firstEP, Tokenizer t) {
+    	super(uc, lex, l, t);
     	_arg = arg; 
     	_result = result; 
-    	this.name = name.intern(); 
+    	this.name = name; 
     	_firstEP = firstEP;
     	setOrigin();
     }
@@ -97,15 +113,15 @@ public class TypeChangingRule extends AbstractRule implements LexSemOrigin {
         Category result = _result.copy();
         
         // make variables unique
-        grammar.getUnifyControl().reindex(result, arg);
+        uc.reindex(result, arg);
 
         // unify
-        Substitution sub = new GSubstitution(grammar.getUnifyControl());
-        GUnifier.unify(grammar.getUnifyControl(), input, arg, sub);
+        Substitution sub = new GSubstitution(uc);
+        GUnifier.unify(uc, input, arg, sub);
         ((GSubstitution)sub).condense();
 
         // fill in result
-        Category $result = (Category)result.fill(sub);
+        Category $result = (Category)result.fill(uc, sub);
         appendLFs(input, result, $result, sub);
 
         // return

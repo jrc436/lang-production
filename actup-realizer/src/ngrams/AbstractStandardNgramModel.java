@@ -3,12 +3,11 @@
  */
 package ngrams;
 
-import grammar.Grammar;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import lexicon.IWordFactory;
 import lexicon.Tokenizer;
 import lexicon.Word;
 import util.Pair;
@@ -23,6 +22,7 @@ import util.Pair;
  * @since 0.9.2
  */
 public abstract class AbstractStandardNgramModel extends NgramScorer {
+	protected boolean openVocab;
 	protected double[] params; //this is only because the superclass needs it... the package should not access this... java doesn't have such a setting
 	public boolean varsEquiv(double[] otherParams) {
 		if (params.length != otherParams.length) {
@@ -38,32 +38,23 @@ public abstract class AbstractStandardNgramModel extends NgramScorer {
 	public void resetVars(double[] otherParams) {
 		this.params = otherParams;
 	}
-	/** Reusable list of strings to score. */
-    protected List<String> stringsToScore = new ArrayList<String>();
-	
     /**
      * Creates a new ngram model of the given order.
      * @param order The order of the model.
      * @param useSemClasses Whether this model should use semantic classes.
+     * @param t TODO
      * @see NgramScorer#NgramScorer(int, boolean, Tokenizer)
      */
-    protected AbstractStandardNgramModel(int order, boolean useSemClasses, Grammar grammar, double[] varValues) {
-		super(order, useSemClasses, grammar);
-		numNgrams = new int[order];
+    protected AbstractStandardNgramModel(int order, boolean useSemClasses, IWordFactory wf, Tokenizer t, double[] varValues) {
+		super(order, useSemClasses, wf, t, new int[order]);
 		this.params = varValues;
 	}
-    protected AbstractStandardNgramModel(int order, boolean useSemClasses, Grammar grammar) {
-    	this(order, useSemClasses, grammar, new double[0]);
+    protected AbstractStandardNgramModel(int order, boolean useSemClasses, IWordFactory wf, Tokenizer t) {
+    	this(order, useSemClasses, wf, t, new double[0]);
     }
-//    protected AbstractStandardNgramModel(int order) {
-//  		this(order, new DefaultTokenizer());
-//  	}
-//    protected AbstractStandardNgramModel(int order, boolean useSemClasses) {
-//    	this(order, useSemClasses, new DefaultTokenizer());
-//    }
-      protected AbstractStandardNgramModel(int order, Grammar grammar) {
-      	this(order, false, grammar);
-      }
+    protected AbstractStandardNgramModel(int order, IWordFactory wf, Tokenizer t) {
+      	this(order, false, wf, t);
+    }
     /**
      * This allows an ngram model to update its scoring methodology after each realization. Primarily
      * implemented for the ACTR language model
@@ -77,20 +68,13 @@ public abstract class AbstractStandardNgramModel extends NgramScorer {
     public void clean() {
     	
     }
-
-    /**
-     * Creates a new ngram model with the specified order.
-     * @see AbstractStandardNgramModel#AbstractStandardNgramModel(int, boolean)
-     */
-  
-
 	/**
      * Converts the words in wordsToScore to strings in stringsToScore, before
      * scoring.
      */
     @Override
-    protected void prepareToScoreWords() {
-        stringsToScore.clear();
+    protected List<String> getStringsFromWords(List<Word> wordsToScore) {
+        List<String> strings = new ArrayList<String>();
         for (int i = 0; i < wordsToScore.size(); i++) {
             Word w = wordsToScore.get(i);
             String s = w.getForm();
@@ -114,8 +98,9 @@ public abstract class AbstractStandardNgramModel extends NgramScorer {
             if (openVocab && trieMapRoot.getChild(s) == null)
                 s = "<unk>";
             // add key
-            stringsToScore.add(s);
+            strings.add(s);
         }
+        return strings;
     }
     
     /**
@@ -125,24 +110,16 @@ public abstract class AbstractStandardNgramModel extends NgramScorer {
      * stringsToScore, via call to prepareToScoreWords.)
      */
     @Override
-    protected float logProbFromNgram(int i, int order) {
+    protected float logProbFromNgram(List<String> stringsToScore, int i, int order) {
         // skip initial start tag
         if (i == 0 && order == 1 && stringsToScore.get(0) == "<s>") return 0;
         // set keys list
-        keysList.clear();
+        List<String> keysList = new ArrayList<String>(); 
         for (int j = i; j < i+order; j++) {
             keysList.add(stringsToScore.get(j));
         }
-//        if (debugScore) {
-//            System.out.print("logp( " + keysList.get(order-1) + " | ");
-//            if (order > 1) { 
-//                System.out.print(keysList.get(order-2) + " ... ");
-//            }
-//            System.out.print(") = ");
-//        }
         // calc log prob
-        float retval = logProb(0, order);
-        //if (debugScore) System.out.println("" + retval);
+        float retval = logProb(keysList, 0, order);;
         return retval;
     }
 

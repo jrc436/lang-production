@@ -18,14 +18,12 @@
 
 package synsem;
 
-import grammar.Grammar;
-
 import java.io.Serializable;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 import unify.Indexed;
-import unify.ModFcn;
 import unify.Mutable;
+import unify.MutableScript;
 import unify.Substitution;
 import unify.Unifiable;
 import unify.UnifyControl;
@@ -50,19 +48,16 @@ public final class Dollar implements Arg, Variable, Mutable, Indexed, Serializab
 	private int _index = 0;
 
 	private boolean _hasMostGeneralSlash = false;
-	protected final Grammar grammar;
 
-	public Dollar(Grammar grammar, String name) {
-		this(grammar, new Slash(grammar), name);
+	public Dollar(String name) {
+		this(new Slash(), name);
 	}
 
-	public Dollar(Grammar grammar, Slash s, String name) {
-		this(grammar, s, name, 0);
+	public Dollar(Slash s, String name) {
+		this(s, name, 0);
 	}
 
-	public Dollar(Grammar grammar, Slash s, String name, int id) {
-		
-		this.grammar = grammar;
+	public Dollar(Slash s, String name, int id) {
 		_slash = s;
 		_name = name;
 		_index = id;
@@ -84,10 +79,10 @@ public final class Dollar implements Arg, Variable, Mutable, Indexed, Serializab
 	}
 
 	public Arg copy() {
-		return new Dollar(grammar, _slash.copy(), _name, _index);
+		return new Dollar(_slash.copy(), _name, _index);
 	}
 
-	public void forall(CategoryFcn fcn) {
+	public void applyToAll(CatScript fcn) {
 	}
 
 	public Slash getSlash() {
@@ -111,7 +106,7 @@ public final class Dollar implements Arg, Variable, Mutable, Indexed, Serializab
 		return (v instanceof Dollar && equals(v));
 	}
 
-	public Object fill(Substitution sub) throws UnifyFailure {
+	public Object fill(UnifyControl uc, Substitution sub) throws UnifyFailure {
 		Object value = sub.getValue(this);
 		if (value == null) {
 			return this;
@@ -122,10 +117,10 @@ public final class Dollar implements Arg, Variable, Mutable, Indexed, Serializab
 		// nb: must do occurs check here, at least in part b/c ArgStack doesn't
 		// quite implement Unifiable
 		if (value instanceof Arg && !((Arg) value).occurs(this)) {
-			return ((Arg) value).fill(sub);
+			return ((Arg) value).fill(uc, sub);
 		} else if (value instanceof ArgStack
 				&& !((ArgStack) value).occurs(this)) {
-			return ((ArgStack) value).fill(sub);
+			return ((ArgStack) value).fill(uc, sub);
 		} else {
 			// System.out.println("Error in value for dollar: " + this +" = " +
 			// value);
@@ -148,12 +143,12 @@ public final class Dollar implements Arg, Variable, Mutable, Indexed, Serializab
 		} else {
 			throw new UnifyFailure();
 		}
-		sub.makeSubstitution(this, u);
+		sub.makeSubstitution(uc, this, u);
 		return u;
 	}
 
-	public void deepMap(ModFcn mf) {
-		mf.modify(this);
+	public void mutateAll(MutableScript m) {
+		m.run(this);
 	}
 
 	public String toString() {
@@ -189,7 +184,7 @@ public final class Dollar implements Arg, Variable, Mutable, Indexed, Serializab
 	/**
 	 * Returns a hash code using the given map from vars to ints.
 	 */
-	public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) {
+	public int hashCode(Map<Unifiable, Integer> varMap) {
 		int retval = _slash.hashCode(varMap);
 		// see if this already in map
 		if (varMap.containsKey(this)) {
@@ -208,7 +203,7 @@ public final class Dollar implements Arg, Variable, Mutable, Indexed, Serializab
 	 * Returns whether this dollar equals the given object up to variable names,
 	 * using the given maps from vars to ints.
 	 */
-	public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
+	public boolean equals(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2) {
 		if (this == obj) return true;
 		if (obj.getClass() != this.getClass()) return false;
 		Dollar d = (Dollar) obj;

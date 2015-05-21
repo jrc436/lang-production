@@ -18,7 +18,13 @@
 
 package grammar;
 
-import synsem.*;
+import lexicon.LexicalData;
+import lexicon.Lexicon;
+import lexicon.Tokenizer;
+import synsem.Category;
+import synsem.Slash;
+import synsem.VarModality;
+import unify.UnifyControl;
 
 /**
  * Backward type-raising: X => Y\(Y/X).
@@ -32,9 +38,10 @@ public class BackwardTypeRaising extends AbstractTypeRaisingRule {
 	private static final long serialVersionUID = 4334502669369098203L;
 
 	/** Creates a backward type raising rule with the given parameters. 
+	 * @param t TODO
 	 * @param rg TODO*/
-    public BackwardTypeRaising(Grammar rg, boolean useDollar, Category arg, Category result) {
-        super(rg, "<T", new Slash(rg, '\\', new VarModality(rg, "i")), new Slash(rg, '/', new VarModality(rg, "i")), useDollar, arg, result);
+    public BackwardTypeRaising(UnifyControl uc, LexicalData lex, Lexicon l, boolean useDollar, Category arg, Category result, Tokenizer t) {
+        super(uc, lex, l, "<T", new Slash('\\', new VarModality("i")), new Slash('/', new VarModality("i")), useDollar, arg, result, t);
     }
     
     public String toString() {

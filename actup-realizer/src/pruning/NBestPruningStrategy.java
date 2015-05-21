@@ -34,9 +34,6 @@ public class NBestPruningStrategy implements PruningStrategy
     /** The current pruning val. */
     protected int pruneCutoff;
     
-    /** Reusable return list. */
-    protected List<Edge> retval = new ArrayList<Edge>();
-    
     /** Constructor with pruning val. */
     public NBestPruningStrategy(int pruningVal) {
         pruneCutoff = pruningVal;
@@ -50,11 +47,11 @@ public class NBestPruningStrategy implements PruningStrategy
      * ones in the given list.
      */
     public List<Edge> pruneEdges(List<Edge> catEdges) {
-        retval.clear();
+        List<Edge> toReturn = new ArrayList<Edge>();
         while (pruneCutoff < catEdges.size()) {
-            retval.add(catEdges.remove(pruneCutoff));
+            toReturn.add(catEdges.remove(pruneCutoff));
         }
-        return retval;
+        return toReturn;
     }
 }
 

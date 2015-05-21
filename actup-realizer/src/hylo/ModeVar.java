@@ -18,7 +18,8 @@
 
 package hylo;
 
-import grammar.Grammar;
+import grammar.TypesData;
+import lexicon.Lexicon;
 
 import org.jdom.Element;
 
@@ -41,12 +42,12 @@ public class ModeVar extends HyloVar implements Mode {
     
 	private static final long serialVersionUID = -6872985893931836901L;
 
-	public ModeVar(Grammar grammar, String name) {
-        super(grammar, name);
+	public ModeVar(Lexicon l, TypesData td, String name) {
+        super(l, td, name);
     }
 
-    protected ModeVar(Grammar grammar, String name, int index, SimpleType st) {
-        super(grammar, name, index, st);
+    protected ModeVar(Lexicon l, String name, int index, SimpleType st) {
+        super(l, name, index, st);
     }
     
     /**
@@ -59,7 +60,7 @@ public class ModeVar extends HyloVar implements Mode {
 	}
 
 	public LF copy() {
-        return new ModeVar(grammar, _name, _index, type);
+        return new ModeVar(l, _name, _index, type);
     }
 
     
@@ -70,23 +71,23 @@ public class ModeVar extends HyloVar implements Mode {
     
     public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
         if (u instanceof ModeLabel) {
-            return sub.makeSubstitution(this, u);
+            return sub.makeSubstitution(uc, this, u);
         } else if (u instanceof ModeVar) {
             ModeVar u_nv = (ModeVar)u;
             if (equals(u_nv)) return this;
             // substitute according to comparison order, 
             // so that the direction of unification doesn't matter
             if (compareTo(u_nv) >= 0) {
-                return sub.makeSubstitution(this, u_nv);
+                return sub.makeSubstitution(uc, this, u_nv);
             } else {
-                return sub.makeSubstitution(u_nv, this);
+                return sub.makeSubstitution(uc, u_nv, this);
             }
         } else {
             throw new UnifyFailure();
         }
     }
 
-    public Object fill(Substitution sub) throws UnifyFailure {
+    public Object fill(UnifyControl uc, Substitution sub) throws UnifyFailure {
         Object val = sub.getValue(this);
         if (val != null) {
             return val;

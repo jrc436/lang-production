@@ -28,7 +28,7 @@ import java.util.Iterator;
  */
 public class EmptySubstitution implements Substitution {
 
-	public Object makeSubstitution(Variable var, Object u) throws UnifyFailure {
+	public Object makeSubstitution(UnifyControl uc, Variable var, Object u) throws UnifyFailure {
 		return u;
 	}
 

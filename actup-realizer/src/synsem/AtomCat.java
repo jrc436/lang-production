@@ -19,15 +19,17 @@
 
 package synsem;
 
-import grammar.Grammar;
+import grammar.TypesData;
 
-import java.util.LinkedHashMap;
+import java.util.Map;
+
+import lexicon.Lexicon;
 
 import org.jdom.Element;
 
 import unify.FeatureStructure;
 import unify.GFeatStruc;
-import unify.ModFcn;
+import unify.MutableScript;
 import unify.Substitution;
 import unify.Unifiable;
 import unify.UnifyControl;
@@ -53,37 +55,37 @@ public final class AtomCat extends AbstractCat implements TargetCat {
     public boolean fragCompletion = false;
     
     /** Constructor which creates an atomic category with the given type. */
-    public AtomCat(Grammar grammar, String t) {
-        this(grammar, t, new GFeatStruc(grammar));
+    public AtomCat(Lexicon l, TypesData td, String t) {
+        this(l, t, new GFeatStruc());
     }
 
     /** Constructor which creates an atomic category with the given type and feature structure. */
-    public AtomCat(Grammar grammar, String t, FeatureStructure fs) {
-        this(grammar, t, fs, null); 
+    public AtomCat(Lexicon l, String t, FeatureStructure fs) {
+        this(l, t, fs, null); 
     }
 
     /** Constructor which creates an atomic category with the given type, feature structure and LF. */
-    public AtomCat(Grammar grammar, String t, FeatureStructure fs, LF lf) {
-        super(grammar, lf);
+    public AtomCat(Lexicon l, String t, FeatureStructure fs, LF lf) {
+        super(l, lf);
         type = t; 
         _featStruc = fs; 
     }
 
     /** Constructor which retrieves the atomic category from the XML element. */
-    public AtomCat(Grammar grammar, Element acel) {
+    public AtomCat(Lexicon l, TypesData td, Element acel) {
         // call super to get LF if present
-        super(grammar, acel);
+        super(l, td, acel);
         // get type
         type = acel.getAttributeValue("type");
         if (type == null) type = acel.getAttributeValue("t"); 
         // get feature structure
         Element fsEl = acel.getChild("fs");
         if (fsEl != null) {
-            _featStruc = new GFeatStruc(grammar, fsEl);
+            _featStruc = new GFeatStruc(td, l, fsEl);
         }
         // or create empty one
         else {
-            _featStruc = new GFeatStruc(grammar);
+            _featStruc = new GFeatStruc();
         }
     }
 
@@ -100,20 +102,20 @@ public final class AtomCat extends AbstractCat implements TargetCat {
 
     
     public Category copy() {
-    	AtomCat retval = new AtomCat(grammar, type, _featStruc.copy(), (_lf == null) ? null : (LF) _lf.copy());
+    	AtomCat retval = new AtomCat(l, type, _featStruc.copy(), (_lf == null) ? null : (LF) _lf.copy());
     	retval.fragCompletion = fragCompletion;
         return retval;
     }
 
     public Category shallowCopy() {
-        AtomCat retval = new AtomCat(grammar, type, _featStruc, _lf);
+        AtomCat retval = new AtomCat(l, type, _featStruc, _lf);
     	retval.fragCompletion = fragCompletion;
         return retval;
     }
 
-    public void deepMap(ModFcn mf) { 
-        super.deepMap(mf);
-        _featStruc.deepMap(mf);
+    public void mutateAll(MutableScript m) { 
+        super.mutateAll(m);
+        _featStruc.mutateAll(m);
     }
 
     public void unifyCheck (Object u) throws UnifyFailure {
@@ -144,16 +146,16 @@ public final class AtomCat extends AbstractCat implements TargetCat {
             } else {
                 $fs = (FeatureStructure)_featStruc.unify(u_ac._featStruc, sub, uc);
             }
-            return new AtomCat(grammar, type, $fs);
+            return new AtomCat(l, type, $fs);
         }
         else {
             throw new UnifyFailure();
         }
     }
 
-    public Object fill(Substitution s) throws UnifyFailure {
+    public Object fill(UnifyControl uc, Substitution s) throws UnifyFailure {
         AtomCat $ac =
-            new AtomCat(grammar, type, (FeatureStructure)_featStruc.fill(s), (_lf == null) ? null : (LF) _lf.fill(s));
+            new AtomCat(l, type, (FeatureStructure)_featStruc.fill(uc, s), (_lf == null) ? null : (LF) _lf.fill(uc, s));
         return $ac;
     }
 
@@ -201,7 +203,7 @@ public final class AtomCat extends AbstractCat implements TargetCat {
      * Returns a hash code for this category ignoring the LF, 
      * using the given map from vars to ints.
      */
-    public int hashCodeNoLF(LinkedHashMap<Unifiable, Integer> varMap) {
+    public int hashCodeNoLF(Map<Unifiable, Integer> varMap) {
         int retval = type.hashCode();
         if (_featStruc != null) { 
             if (_featStruc instanceof GFeatStruc) {
@@ -218,7 +220,7 @@ public final class AtomCat extends AbstractCat implements TargetCat {
      * up to variable names, using the given maps from vars to ints, 
      * ignoring the LFs (if any).
      */
-    public boolean equalsNoLF(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
+    public boolean equalsNoLF(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2) {
         if (obj.getClass() != this.getClass()) { return false; }
         AtomCat ac = (AtomCat) obj;
         if (_featStruc != null && ac._featStruc == null) { return false; }

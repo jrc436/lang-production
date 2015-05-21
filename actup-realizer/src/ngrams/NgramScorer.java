@@ -18,16 +18,15 @@
 
 package ngrams;
 
-import grammar.Grammar;
-
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.WeakHashMap;
 
+import lexicon.IWordFactory;
+import lexicon.Tokenizer;
 import lexicon.Word;
 import synsem.Sign;
 import synsem.SignScorer;
@@ -39,219 +38,94 @@ import util.TrieMap;
  * @author      Michael White
  * @version     $Revision: 1.37 $, $Date: 2010/02/25 22:26:11 $
  */
-public abstract class NgramScorer implements SignScorer, Reversible
+public abstract class NgramScorer implements SignScorer
 {
     
     // tokenizer reference
-    protected final Grammar grammar;
-	
-	protected NgramScorer(int order, Grammar grammar) {
-		this(order, false, grammar);
-	}
-	
-	protected NgramScorer(int order, boolean useSemClasses, Grammar grammar) {
-		this.order = order;
-		this.useSemClasses = useSemClasses;
-		this.grammar = grammar;
-	}
-	
-    /** The n-gram order of the model. */
-    protected int order;
+    protected final IWordFactory wf;
+    protected final Tokenizer t;
+    protected final boolean useSemClasses;
+    protected final boolean useNgramFeatures = true;
+    protected final int order;
     
-    /** Returns the n-gram order of the model. */
-    public int getOrder() { return order; }
-
-    /** Flag for whether to reverse words before scoring (defaults to false). */
-    protected boolean reverse = false;
+    //should only be used in loading the model, I believe
+    protected final int[] numNgrams;   /** The n-gram totals for different histories. */
     
-    /** Get reverse flag. */
-    public boolean getReverse() { return reverse; }
-    
-    /** Set reverse flag, and propagate to any reversible filters. */
-    public void setReverse(boolean reverse) { 
-        this.reverse = reverse; 
-    }
+    /** Weak hash map for cached log probs, keyed from a sign's words. */
+    protected Map<List<Word>,Float> cachedLogProbs;
     
     /** Root of the n-gram trie.  Nodes store NgramFloats instances. */
-    protected TrieMap<Object,NgramFloats> trieMapRoot = new TrieMap<Object,NgramFloats>(null);
+    //this is loaded from the model, after which it should NOT be changed!!!
+    protected TrieMap<String, NgramFloats> trieMapRoot = new TrieMap<String, NgramFloats>(null);
+    
+    
+	protected NgramScorer(int order, IWordFactory wf, Tokenizer t) {
+		this(order, false, wf, t);
+	}
+	
+	protected NgramScorer(int order, boolean useSemClasses, IWordFactory wf, Tokenizer t) {
+		this(order, useSemClasses, wf, t, new int[0]);
+	}
+	protected NgramScorer(int order, boolean useSemClasses, IWordFactory wf, Tokenizer t, int[] numNgrams) {
+		this.order = order;
+		this.useSemClasses = useSemClasses;
+		this.wf = wf;
+		this.t = t;
+		cachedLogProbs = new WeakHashMap<List<Word>, Float>();
+		this.numNgrams = numNgrams;
+	}    
+    
 
     /** An ngram data object, for holding the log prob and backoff weight. */
-    public static class NgramFloats {
-        /** The log prob. */
-        public float logprob;
-        /** The backoff weight. */
-        public float bow;
-        /** Constructor. */
-        public NgramFloats(float logprob, float bow) {
+    class NgramFloats {       
+    	private float logprob; /** The log prob. */     
+    	private float bow;  /** The backoff weight. */
+        NgramFloats(float logprob, float bow) {
             this.logprob = logprob; this.bow = bow; 
-        }
-        
+        }      
         @Override
         public String toString() { return "logprob: " + logprob + ", bow: " + bow; }
     }
-
-    
-    /** The n-gram totals for different histories. */
-    protected int[] numNgrams = null;
-    
-    /** Flag for open vocabulary, ie whether the unknown word &lt;unk&gt; is in the model. */
-    protected boolean openVocab = false;
-    
-    /** Flag for whether to show scoring breakdown. */
-    //protected boolean debugScore = false;
-//    
-//    /** Sets the debug score flag. */
-//    public void setDebug(boolean debugScore) { this.debugScore = debugScore; }  
-    
-    /** Weak hash map for cached log probs, keyed from a sign's words. */
-    protected Map<List<Word>,Float> cachedLogProbs = null;
-    
-    /** Reference to current sign to score. */
-    protected Sign signToScore = null;
-    
-    /** Reusable list of words to score. */
-    protected List<Word> wordsToScore = new ArrayList<Word>();
-
-    /** Flag for whether start/end tags were added with the current words. */
-    protected boolean tagsAdded = false;
-    
-    /** Reusable list of keys for n-gram lookups. */
-    protected List<Object> keysList = new ArrayList<Object>();
-    
-    /** Reusable list of keys for n-gram feature lookups. */
-    protected List<String> featureKeysList = new ArrayList<String>();
-    
     
     /** Gets a cached log prob for the given list of words (or null if none). */
-    protected Float getCachedLogProb(List<Word> words) {
-        if (cachedLogProbs == null) return null;
+    protected synchronized Float getCachedLogProb(List<Word> words) {
         return cachedLogProbs.get(words);
     }
     
     /** Caches a log prob for the given list of words. */
-    protected void putCachedLogProb(List<Word> words, Float logprob) {
-        if (cachedLogProbs == null) cachedLogProbs = new WeakHashMap<List<Word>,Float>();
+    protected synchronized void putCachedLogProb(List<Word> words, Float logprob) {
         cachedLogProbs.put(words, logprob);
     }
 
     
     /** 
-     * Returns a score between 0 (worst) and 1 (best) for the given sign 
-     * and completeness flag, based on the n-gram score of the sign's words.
-     * If the sign is complete, sentence delimiters are added before 
-     * scoring the words, if not already present.
-     * Returns 0 if any filter flags the n-gram for filtering, or if 
-     * the sign has no words.
-     * Otherwise, sets <code>signToScore</code>, calls <code>prepareToScoreWords</code>, 
+     * Returns a score between 0 (worst) and 1 (best) for the given sign and completeness flag, based on the n-gram score of the sign's words.
+     * If the sign is complete, sentence delimiters are added before scoring the words, if not already present.
+     * Returns 0 if any filter flags the n-gram for filtering, or if the sign has no words.
      * and then returns the result of <code>logprob()</code> converted to a probability.
      */
-    public synchronized double score(Sign sign, boolean complete) {
+    public double score(Sign sign, boolean complete) {
     	return convertToProb(logprob(sign, complete));
     }
     
     /** 
-     * Returns a log prob for the given sign and completeness flag, 
-     * based on the n-gram log prob of the sign's words.
-     * If the sign is complete, sentence delimiters are added before 
-     * scoring the words, if not already present.
+     * Returns a log prob for the given sign and completeness flag, based on the n-gram log prob of the sign's words.
+     * If the sign is complete, sentence delimiters are added before scoring the words, if not already present.
      * Returns the log prob for zero probability if any filter flags the n-gram for filtering, or if 
-     * the sign has no words.
-     * Otherwise, sets <code>signToScore</code>, calls <code>prepareToScoreWords</code>, 
-     * and then returns the result of <code>logProb()</code>.
+     * the sign has no words. then returns the result of <code>logProb()</code>.
      */
-    public synchronized double logprob(Sign sign, boolean complete) {
+    public double logprob(Sign sign, boolean complete) {
         List<Word> words = sign.getWords(); 
         if (words == null) return 0;
         if (!complete) { // check cache
             Float logprob = getCachedLogProb(words);
             if (logprob != null) return logprob;
         }
-        signToScore = sign;
-        setWordsToScore(words, complete);
-        prepareToScoreWords();
-        double retval = logprob();
-        signToScore = null;
+        boolean tagsAdded = setWordsToScore(words, complete);
+        List<String> strings = getStringsFromWords(words);
+        double retval = logprob(tagsAdded, strings, sign, words);
         return retval;
     }
-    
-    /**
-     * Returns an n-gram probability from the given list of words, 
-     * by converting the result of the <code>logprob</code> method.
-     */
-    public synchronized double score(List<Word> words) {
-    	return convertToProb(logprob(words));
-    }
-    
-    /** 
-     * Returns an n-gram log prob for the given list of words.
-     * This method is a simplified version of scoring a sign's words 
-     * that does not cache results, filter n-grams or ever add 
-     * sentence delimiters.
-     */
-    public synchronized double logprob(List<Word> words) {
-        setWordsToScore(words, false);
-        prepareToScoreWords();
-        return logprob();
-    }
-    
-    /** Sets wordsToScore to the given list, for sharing purposes. */
-    protected void shareWordsToScore(List<Word> wordsToScore) {
-        this.wordsToScore = wordsToScore;
-    }
-    
-    /**
-	 * Resets wordsToScore to the given ones, reversing them when the reverse
-	 * flag is true, and adding sentence delimiters if not already present, when
-	 * the completeness flag is true. Also sets the tagsAdded flag.
-	 */
-    protected void setWordsToScore(List<Word> words, boolean complete) {
-        wordsToScore.clear();
-        tagsAdded = false; 
-        if (complete && (reverse || words.get(0).getForm() != "<s>")) { 
-            wordsToScore.add(Word.createWord(grammar.getWordFactory(), "<s>"));
-            tagsAdded = true;
-        }
-        if (reverse) {
-            for (int j = words.size()-1; j >= 0; j--) {
-                Word w = words.get(j);
-                if (w.getForm() == "<s>" || w.getForm() == "</s>") continue; // skip <s> or </s>
-                wordsToScore.add(w);
-            }
-        }
-        else
-            wordsToScore.addAll(words);
-        if (complete && (reverse || words.get(words.size()-1).getForm() != "</s>")) {
-            wordsToScore.add(Word.createWord(grammar.getWordFactory(), "</s>"));
-            tagsAdded = true;
-        }
-    }
-    
-    /** Optional step to do further preparation before scoring words. */
-    protected void prepareToScoreWords() {}
-    
-
-	
-    /**
-	 * Returns a list of feature keys for the ngram starting at the given index in
-	 * wordsToScore and with the given order, using the keys in keysList after
-	 * setting them appropriately with setKeysToNgram; returns null if this
-	 * operation does not succeed normally.
-	 */
-    protected List<String> ngram(int i, int order) { 
-    	boolean ok = setKeysToNgram(i, order);
-    	if (!ok) return null;
-    	featureKeysList.clear();
-    	for (int j=0; j < keysList.size(); j++) {
-    		Object key = keysList.get(j);
-    		if (!(key instanceof String)) {
-    			throw new RuntimeException("Feature keys must be strings!");
-    		}
-    		else featureKeysList.add((String)key);
-    	}
-    	return featureKeysList;
-    }
-    
-	
     /** 
      * Returns a log prob for the words in wordsToScore.
      * The default method returns the log prob of the word sequence 
@@ -263,13 +137,13 @@ public abstract class NgramScorer implements SignScorer, Reversible
      * been calculated, and at the end the log prob of signToScore's words 
      * is stored in the cache.
      */
-    protected double logprob() {
+    protected double logprob(boolean tagsAdded, List<String> strings, Sign signToScore, List<Word> wordsToScore) {
         float logProbTotal = 0;
         int numCached = 0;
         if (!tagsAdded && signToScore != null) { // check cache for initial words
             Sign[] inputs = signToScore.getDerivationHistory().getInputs();
             if (inputs != null) {
-                Sign initialSign = (!reverse) ? inputs[0] : inputs[inputs.length-1];
+                Sign initialSign = inputs[0];
                 List<Word> initialWords = initialSign.getWords();
                 Float logprob = getCachedLogProb(initialWords);
                 if (logprob != null) {
@@ -281,7 +155,7 @@ public abstract class NgramScorer implements SignScorer, Reversible
         for (int i = numCached; i < wordsToScore.size(); i++) {
             int orderToUse = Math.min(order, i+1);
             int startPos = i - (orderToUse-1);
-            logProbTotal += logProbFromNgram(startPos, orderToUse);
+            logProbTotal += logProbFromNgram(strings, startPos, orderToUse);
         }
         if (!tagsAdded && signToScore != null) { // add log prob to cache
             putCachedLogProb(signToScore.getWords(), new Float(logProbTotal));
@@ -289,12 +163,37 @@ public abstract class NgramScorer implements SignScorer, Reversible
         return logProbTotal;
     }
     
+    /**
+	 * Resets wordsToScore to the given ones, reversing them when the reverse
+	 * flag is true, and adding sentence delimiters if not already present, when
+	 * the completeness flag is true. Also sets the tagsAdded flag.
+	 */
+    protected boolean setWordsToScore(List<Word> words, boolean complete) {
+        boolean tagsAdded = false; 
+        if (complete && words.get(0).getForm() != "<s>") { 
+            words.add(Word.createWord(wf, "<s>"));
+            tagsAdded = true;
+        }
+        if (complete && (words.get(words.size()-1).getForm() != "</s>")) {
+            words.add(Word.createWord(wf, "</s>"));
+            tagsAdded = true;
+        }
+        return tagsAdded;
+    }
+    
+    /** Optional step to do further preparation before scoring words. 
+     * @return */
+    protected List<String> getStringsFromWords(List<Word> words) {
+    	return null;
+    }
+	
+    
     
     /**
 	 * Returns the log prob of the ngram starting at the given index in
 	 * wordsToScore and with the given order, with backoff.
 	 */
-    abstract protected float logProbFromNgram(int i, int order);
+    abstract protected float logProbFromNgram(List<String> wordsToScore, int i, int order);
     
     /**
 	 * Sets the keys in keysList to hold the ngram starting at the given index in
@@ -302,31 +201,14 @@ public abstract class NgramScorer implements SignScorer, Reversible
 	 * succeeds normally. The default implementation invokes
 	 * logProbFromNgram, and returns false if the log prob is zero.
 	 */
-	protected boolean setKeysToNgram(int i, int order) {
-		float logprob = logProbFromNgram(i, order);
+	protected boolean setKeysToNgram(List<String> wordsToScore, int i, int order) {
+		float logprob = logProbFromNgram(wordsToScore, i, order);
 		return logprob != 0;
 	}
-
-    
-	/** Flag for using ngrams as features. */
-	protected boolean useNgramFeatures = true;
-	
-    /** Sets the the flag for using ngrams as features. */
-	public void setNgramFeatures(boolean useNgramFeatures) { 
-		this.useNgramFeatures = useNgramFeatures; 
-	}
-
-	
-    /**
-     * Flag whether to use sem classes in place of words.
-     * Defaults to false.
-     */
-    protected boolean useSemClasses = false;
-
     
     /** Returns whether the given semantic class is a replacement one. */
     protected boolean isReplacementSemClass(String semClass) {
-        return semClass != null && grammar.getLexicon().getTokenizer().isReplacementSemClass(semClass);
+        return semClass != null && t.isReplacementSemClass(semClass);
     }
     
     /**
@@ -348,40 +230,30 @@ public abstract class NgramScorer implements SignScorer, Reversible
 	 * Adds the TrieMap children, with their keys, under the given prefix, then
 	 * resets the lists.
 	 */
-    protected void addTrieMapChildren(List<Object> prefix, List<Object> keys, List<TrieMap<Object,NgramFloats>> children) {
+    protected void addTrieMapChildren(List<String> prefix, List<String> keys, List<TrieMap<String,NgramFloats>> children) {
         if (!keys.isEmpty()) {
-            TrieMap<Object,NgramFloats> prefixNode = trieMapRoot.findChildFromList(prefix);
+            TrieMap<String, NgramFloats> prefixNode = trieMapRoot.findChildFromList(prefix);
             prefixNode.addChildren(keys, children);
         }
         prefix.clear(); keys.clear(); children.clear();
     }
     
     /** Returns the TrieMap node for the given sublist of keysList. */ 
-    protected TrieMap<Object,NgramFloats> getNode(int pos, int len) {
+    protected TrieMap<String, NgramFloats> getNode(List<String> keysList, int pos, int len) {
         return trieMapRoot.getChildFromList(keysList.subList(pos, pos+len));
     }
-    
-    
-    // from CMU-Cambridge Statistical Language Modeling Toolkit
-    //
-    // p(wd3|wd1,wd2)= if(trigram exists)           p_3(wd1,wd2,wd3)
-                    // else if(bigram w1,w2 exists) bo_wt_2(w1,w2)*p(wd3|wd2)
-                    // else                         p(wd3|w2)
-    // 
-    // p(wd2|wd1)= if(bigram exists) p_2(wd1,wd2)
-                // else              bo_wt_1(wd1)*p_1(wd2)
     
     /**
 	 * Returns the log prob (base 10) of the given sublist of keysList, with
 	 * backoff, or -99 if not found.
 	 */
-    protected float logProb(int pos, int len) {
-        TrieMap<Object,NgramFloats> node = getNode(pos, len);
+    protected float logProb(List<String> keysList, int pos, int len) {
+        TrieMap<String,NgramFloats> node = getNode(keysList, pos, len);
         if (node != null && node.data != null) return node.data.logprob;
         if (len == 1) return -99;
-        float retval = logProb(pos+1, len-1);
+        float retval = logProb(keysList, pos+1, len-1);
       //  if (debugScore) System.out.print("(" + (len-1) + "-gram: " + retval + ") ");
-        if (retval > -99) retval += backoffWeight(pos, len-1);
+        if (retval > -99) retval += backoffWeight(keysList, pos, len-1);
         return retval;
     }
     
@@ -389,8 +261,8 @@ public abstract class NgramScorer implements SignScorer, Reversible
 	 * Returns the back-off weight (log base 10) of the given sublist of
 	 * keysList, or 0 if not found.
 	 */
-    protected float backoffWeight(int pos, int len) {
-        TrieMap<Object,NgramFloats> node = getNode(pos, len);
+    protected float backoffWeight(List<String> keysList, int pos, int len) {
+        TrieMap<String,NgramFloats> node = getNode(keysList, pos, len);
         if (node != null && node.data != null) {
             float retval = node.data.bow;
             // if (debugScore && retval != 0) System.out.print("(bow: " + retval + ") ");

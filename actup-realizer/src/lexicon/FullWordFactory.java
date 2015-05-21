@@ -6,36 +6,16 @@ import java.util.List;
 import util.Pair;
 
 public class FullWordFactory implements IWordFactory {
-
-    // reusable word, for looking up already interned ones
-    private FullWord w = new FullWord(null, null, null, null, null, null, null);
-
-    // sets the form and factors of the reusable word w 
-    private void setW(
-        String form, String pitchAccent, List<Pair<String,String>> attrValPairs, 
-        String stem, String POS, String supertag, String semClass 
-    ) {
-        w.form = form; w.pitchAccent = pitchAccent;
-        w.attrValPairs = attrValPairs;
-        w.stem = stem; w.POS = POS; w.supertag = supertag; w.semClass = semClass;
-    }
-    
-    // looks up the word equivalent to w, or if none, returns a new one based on it
-    private Word getOrCreateFromW() {
-       // Word retval = (Word) intern.getInterned(w);
-        Word retval = null;
-    	//if (retval != null) return retval;
+//    // looks up the word equivalent to w, or if none, returns a new one based on it
+    private Word getOrCreateFromW(FullWord w) {
         if (w.isSurfaceWord() && w.attrValPairs == null) {
-            retval = w.pitchAccent == null ? new SimpleWord(w.form) : new WordWithPitchAccent(w.form, w.pitchAccent);
+            return w.pitchAccent == null ? new SimpleWord(w.form) : new WordWithPitchAccent(w.form, w.pitchAccent);
         }
         else {
-        	retval = new FullWord(w.form, w.pitchAccent, w.attrValPairs, w.stem, w.POS, w.supertag, w.semClass);
+        	return new FullWord(w.form, w.pitchAccent, w.attrValPairs, w.stem, w.POS, w.supertag, w.semClass);
         }
-        return retval;
-        //return (Word) intern.intern(retval);
     }
     
-    /** Creates a surface word with the given interned form. */
     public Word create(String form) {
         return create(form, null, null, null, null, null, null);
     }
@@ -60,12 +40,9 @@ public class FullWordFactory implements IWordFactory {
         return create(form, pitchAccent, attrValPairs, stem, POS, supertag, semClass);
     }
     
-    /** Creates a (surface or full) word from the given canonical factors. */
-    public Word create(
-        String form, String pitchAccent, List<Pair<String,String>> attrValPairs, 
-        String stem, String POS, String supertag, String semClass 
-    ) {
-        setW(form, pitchAccent, attrValPairs, stem, POS, supertag, semClass);
-        return getOrCreateFromW();
+//    /** Creates a (surface or full) word from the given canonical factors. */
+    public Word create(String form, String pitchAccent, List<Pair<String,String>> attrValPairs, String stem, String POS, String supertag, String semClass) {
+    	FullWord w = new FullWord(form, pitchAccent, attrValPairs, stem, POS, supertag, semClass);
+        return getOrCreateFromW(w);
     }
 }

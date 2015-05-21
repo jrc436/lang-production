@@ -18,15 +18,17 @@
 
 package hylo;
 
-import grammar.Grammar;
+import grammar.TypesData;
 
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
+import lexicon.Lexicon;
 
 import org.jdom.Element;
 
 import synsem.LF;
-import unify.ModFcn;
+import unify.MutableScript;
 import unify.Unifiable;
 import unify.UnifyFailure;
 import unify.Variable;
@@ -47,22 +49,22 @@ public abstract class ModalOp extends HyloFormula {
     protected LF _arg;
 
     @SuppressWarnings("unchecked")
-	protected ModalOp(Grammar grammar, Element e) {
-    	super(grammar);
+	protected ModalOp(Lexicon l, TypesData td, Element e) {
+    	super(l);
         String atomLabel = e.getAttributeValue("mode");
         if (atomLabel == null) atomLabel = e.getAttributeValue("m");
         if (atomLabel != null) {
-            _mode = new ModeLabel(grammar, atomLabel);
-            _arg = HyloHelper.getLF_FromChildren(grammar, e);
+            _mode = new ModeLabel(l, atomLabel);
+            _arg = HyloHelper.getLF_FromChildren(l, td, e);
         } else {
             List<Element> children = e.getChildren();
-            _mode = (Mode)HyloHelper.getLF(grammar, (Element)children.get(0));
-            _arg = HyloHelper.getLF(grammar, (Element)children.get(1));
+            _mode = (Mode)HyloHelper.getLF(l, td, (Element)children.get(0));
+            _arg = HyloHelper.getLF(l, td, (Element)children.get(1));
         }
     }
     
-    protected ModalOp(Grammar grammar, Mode mode, LF arg) {
-    	super(grammar);
+    protected ModalOp(Lexicon l, Mode mode, LF arg) {
+    	super(l);
         _mode = mode;
         _arg = arg;
     }
@@ -73,9 +75,9 @@ public abstract class ModalOp extends HyloFormula {
     public LF getArg() { return _arg; }
     public void setArg(LF arg) { _arg = arg; }
     
-    public void deepMap(ModFcn mf) {
-        _arg.deepMap(mf);
-        mf.modify(this);
+    public void mutateAll(MutableScript m) {
+        _arg.mutateAll(m);
+        m.run(this);
     }
 
     public boolean occurs(Variable var) {
@@ -101,7 +103,7 @@ public abstract class ModalOp extends HyloFormula {
     /**
      * Returns a hash code using the given map from vars to ints.
      */
-    public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) { 
+    public int hashCode(Map<Unifiable, Integer> varMap) { 
         return _mode.hashCode(varMap) + _arg.hashCode(varMap); 
     }
         
@@ -109,7 +111,7 @@ public abstract class ModalOp extends HyloFormula {
      * Returns whether this modal op equals the given object  
      * up to variable names, using the given maps from vars to ints.
      */
-    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
+    public boolean equals(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2) {
         if (obj.getClass() != this.getClass()) { return false; }
         ModalOp mo = (ModalOp) obj;
         return _mode.equals(mo._mode, varMap, varMap2) && 

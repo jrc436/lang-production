@@ -54,34 +54,33 @@ import util.Pair;
 public class DefaultTokenizer implements Tokenizer {
 
     // date format with pattern yyyy.MM.dd, strict parsing
-    private DateFormat dateFormat = null;
+    private final DateFormat dateFormat;
 
     // date format with pattern *.MM.dd, strict parsing
-    private DateFormat dateFormatNoYear = null;
+    private final DateFormat dateFormatNoYear;
 
     // time format with pattern HH:mm, strict parsing
-    private DateFormat timeFormat = null;
+    private final DateFormat timeFormat;
     
     // factory for parsing durations, in format "PnYnMnDTnHnMnS", as defined in XML Schema 1.0 section 3.2.6.1
-    private DatatypeFactory datatypeFactory = null;
+    private final DatatypeFactory datatypeFactory;
     
     /**
      * Map from special token semantic classes to special token constants. 
      * The map is initialized in the constructor, where 
      * the standard constants (eg Tokenizer.DATE_CLASS and Tokenizer.DATE_VAL) are added.
      */
-    protected Map<String, String> specialTokenMap = null;
+    private final Map<String, String> specialTokenMap;
     
     /** 
      * A set containing semantic classes to replace words with for language models.
-     * Equality is checked with identity, for use with interned strings.
      */
-	protected Set<String> replacementSemClasses = new LinkedHashSet<String>();
+	private final Set<String> replacementSemClasses = new LinkedHashSet<String>();
 
     /**
      * Constructor.
      */
-    public DefaultTokenizer() {
+    public DefaultTokenizer(String[] semClasses) {
         // init date, time formats
         dateFormat = new SimpleDateFormat("yyyy.MM.dd", Locale.ENGLISH);
         dateFormat.setLenient(false);
@@ -103,19 +102,14 @@ public class DefaultTokenizer implements Tokenizer {
         specialTokenMap.put(Tokenizer.AMT_CLASS, Tokenizer.AMT_VAL);
         specialTokenMap.put(Tokenizer.DUR_CLASS, Tokenizer.DUR_VAL);
         specialTokenMap.put(Tokenizer.NE_CLASS, Tokenizer.NE_VAL);
-    }
-    
-    
-    /**
-     * Adds a semantic class to replace words with for language models.
-     */
-    public void addReplacementSemClass(String semClass) {
-        replacementSemClasses.add(semClass.intern());
+        
+        for (String s : semClasses) {
+        	replacementSemClasses.add(s);
+        }
     }
     
     /** 
      * Returns whether the given semantic class is one to replace words with for language models.
-     * The sem class is assumed to have been interned.
      */
     public boolean isReplacementSemClass(String semClass) {
         return replacementSemClasses.contains(semClass);
@@ -129,7 +123,9 @@ public class DefaultTokenizer implements Tokenizer {
      * Tokens are parsed into words using parseToken with the strictFactors
      * flag set to false.
      */
-    public List<Word> tokenize(Grammar grammar, String s) { return tokenize(grammar, s, false); }
+    public List<Word> tokenize(IWordFactory wf, String s) { 
+    	return tokenize(wf, s, false);
+    }
 
     /**
      * Parses an input string into a list of words, 
@@ -139,10 +135,10 @@ public class DefaultTokenizer implements Tokenizer {
      * flag for whether to parse factors strictly.
      * The string is assumed to have white-space delimited tokens.
      */
-    public List<Word> tokenize(Grammar grammar, String s, boolean strictFactors) {
+    public List<Word> tokenize(IWordFactory wf, String s, boolean strictFactors) {
         List<Word> retval = new ArrayList<Word>();
         StringTokenizer st = new StringTokenizer(s);
-        while (st.hasMoreTokens()) { retval.add(parseToken(grammar, st.nextToken(), strictFactors)); }
+        while (st.hasMoreTokens()) { retval.add(parseToken(wf, st.nextToken(), strictFactors)); }
         return retval;
     }
 
@@ -153,7 +149,7 @@ public class DefaultTokenizer implements Tokenizer {
      * Parsing is performed using parseToken with the strictFactors
      * flag set to false.
      */
-    public Word parseToken(Grammar grammar, String token) { return parseToken(grammar, token, false); }
+    public Word parseToken(IWordFactory wf, String token) { return parseToken(wf, token, false); }
     
     /** 
      * Parses a token into a word, including any explicitly given factors 
@@ -171,7 +167,7 @@ public class DefaultTokenizer implements Tokenizer {
      * appear without escaping in the word form.
      * After splitting the token into factors, it is unescaped.
      */
-    public Word parseToken(Grammar grammar, String token, boolean strictFactors) {
+    public Word parseToken(IWordFactory wf, String token, boolean strictFactors) {
         // init
         String form = token;
         String pitchAccent = null;
@@ -234,7 +230,7 @@ public class DefaultTokenizer implements Tokenizer {
         String specialTokenClass = isSpecialToken(form);
         if (specialTokenClass != null) semClass = specialTokenClass;
         // done
-        return Word.createWord(grammar.getWordFactory(),form,pitchAccent,attrValPairs,stem,POS,supertag, semClass);
+        return Word.createWord(wf,form,pitchAccent,attrValPairs,stem,POS,supertag, semClass);
     }
     
     

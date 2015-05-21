@@ -18,10 +18,15 @@
 
 package grammar;
 
-import unify.*;
-import synsem.*;
+import java.util.List;
 
-import java.util.*;
+import lexicon.LexicalData;
+import lexicon.Lexicon;
+import lexicon.Tokenizer;
+import synsem.Category;
+import synsem.Slash;
+import unify.UnifyControl;
+import unify.UnifyFailure;
 
 /**
  * Forward composition, e.g. X/Y Y/Z => X/Z
@@ -33,21 +38,21 @@ public class ForwardComposition extends AbstractCompositionRule {
 
 	private static final long serialVersionUID = -5029901211362928251L;
 
-	public ForwardComposition(Grammar rg) {
-		this(rg, true);
+	public ForwardComposition(UnifyControl uc, LexicalData lex, Lexicon l, Tokenizer t) {
+		this(uc, lex, l, true, t);
 	}
 
-	public ForwardComposition(Grammar rg, boolean isHarmonic) {
-		super(rg);
+	public ForwardComposition(UnifyControl uc, LexicalData lex, Lexicon l, boolean isHarmonic, Tokenizer t) {
+		super(uc, lex, l, t);
 		_isHarmonic = isHarmonic;
 		if (isHarmonic) {
 			name = ">B";
-			_functorSlash = new Slash(grammar, '/', "^");
-			_argSlash = new Slash(grammar, '/', "^");
+			_functorSlash = new Slash('/', "^");
+			_argSlash = new Slash('/', "^");
 		} else {
 			name = ">Bx";
-			_functorSlash = new Slash(grammar, '/', "x");
-			_argSlash = new Slash(grammar, '\\', "x");
+			_functorSlash = new Slash('/', "x");
+			_argSlash = new Slash('\\', "x");
 		}
 		_functorSlash.setAbility("active");
 	}

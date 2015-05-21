@@ -68,7 +68,7 @@ abstract public class DiversityPruningStrategy extends NBestPruningStrategy
      */
     public List<Edge> pruneEdges(List<Edge> catEdges) {
         // clear reusable return list
-        retval.clear();
+        List<Edge> retval = new ArrayList<Edge>();
         // ensure pruning enabled
         if (pruneCutoff == Consts.PRUNE_LEAST_EDGES) {
         	return retval;

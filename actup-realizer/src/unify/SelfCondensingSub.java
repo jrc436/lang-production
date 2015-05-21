@@ -32,10 +32,6 @@ public class SelfCondensingSub extends HashMap<Variable,Object> implements Subst
 
 	private static final long serialVersionUID = 1L;
 
-	private final UnifyControl uc;
-	public SelfCondensingSub(UnifyControl uc) {
-		this.uc = uc;
-	}
 	/**
 	 * Request the Substitution to identify a variable with an object.
 	 * Automagically condenses the Substitution so that all other values in this
@@ -44,7 +40,6 @@ public class SelfCondensingSub extends HashMap<Variable,Object> implements Subst
 	 *            the variable whose value has been determined
 	 * @param o
 	 *            the Object identified with the variable
-	 * 
 	 * @return the Object identified with the variable, which has potentially
 	 *         undergone further unifications as a result of making the
 	 *         substitution
@@ -52,7 +47,7 @@ public class SelfCondensingSub extends HashMap<Variable,Object> implements Subst
 	 *                UnifyFailure if the Object cannot be unified with a
 	 *                previous value substituted for the Variable.
 	 */
-	public Object makeSubstitution(Variable var, Object u) throws UnifyFailure {
+	public Object makeSubstitution(UnifyControl uc, Variable var, Object u) throws UnifyFailure {
 
 		Object val1 = getValue(var);
 
@@ -63,10 +58,10 @@ public class SelfCondensingSub extends HashMap<Variable,Object> implements Subst
 				if (val2 != null)
 					u = Unifier.unify(uc, var, val2, this);
 				else
-					u = makeSubstitution(var2, val1);
+					u = makeSubstitution(uc, var2, val1);
 			} else {
 				if (val2 != null)
-					makeSubstitution(var, val2);
+					makeSubstitution(uc, var, val2);
 				else
 					put(var, var2);
 			}
@@ -78,12 +73,12 @@ public class SelfCondensingSub extends HashMap<Variable,Object> implements Subst
 			Variable v = i.next();
 			Object res = getValue(v);
 			if (res instanceof Unifiable) {
-				res = ((Unifiable) res).fill(this);
+				res = ((Unifiable) res).fill(uc, this);
 			}
 			put(v, res);
 		}
 		if (u instanceof Unifiable) {
-			u = ((Unifiable) u).fill(this);
+			u = ((Unifiable) u).fill(uc, this);
 		}
 		return u;
 	}

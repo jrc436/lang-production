@@ -17,11 +17,11 @@
 //////////////////////////////////////////////////////////////////////////////
 package unify;
 
-import grammar.Grammar;
 import grammar.Types;
+import grammar.TypesData;
 
 import java.io.Serializable;
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * A class for variables which can stand for any feature.
@@ -39,23 +39,20 @@ public class GFeatVar implements Variable, Indexed, Mutable, Serializable {
     protected int _index;
     protected int _hashCode;
     protected SimpleType type;
-    private final Grammar grammar;
     
-    public GFeatVar(Grammar grammar, String name) {
-        this(grammar, name, 0, null);
+    public GFeatVar(TypesData td, String name) {
+        this(name, 0, td.getSimpleType(Types.TOP_TYPE));
     }
 
-    public GFeatVar(Grammar grammar, String name, SimpleType st) {
-        this(grammar, name, 0, st);
+    public GFeatVar(String name, SimpleType st) {
+        this(name, 0, st);
     }
 
-    protected GFeatVar(Grammar grammar, String name, int index, SimpleType st) {
-    	
+    protected GFeatVar(String name, int index, SimpleType st) {   	
         _name = name;
         _index = index;
-        type = (st != null) ? st : grammar.getTypes().getSimpleType(Types.TOP_TYPE);
-        _hashCode = _name.hashCode() + _index + type.getIndex();
-        this.grammar = grammar;
+        type = st;
+        _hashCode = _name.hashCode() + _index + type.hashCode();
     }
     
     public String name() {
@@ -63,11 +60,11 @@ public class GFeatVar implements Variable, Indexed, Mutable, Serializable {
     }
 
     public Object copy() {
-        return new GFeatVar(grammar, _name, _index, type);
+        return new GFeatVar(_name, _index, type);
     }
     
-    public void deepMap(ModFcn mf) {
-        mf.modify(this);
+    public void mutateAll(MutableScript m) {
+       m.run(this);
     }
     
     public int getIndex() {
@@ -101,7 +98,7 @@ public class GFeatVar implements Variable, Indexed, Mutable, Serializable {
     /**
 	 * Returns a hash code using the given map from vars to ints.
 	 */
-	public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) {
+	public int hashCode(Map<Unifiable, Integer> varMap) {
 		// see if this already in map
 		if (varMap.containsKey(this))
 			return varMap.get(this);
@@ -116,7 +113,7 @@ public class GFeatVar implements Variable, Indexed, Mutable, Serializable {
 	 * using the given maps from vars to ints.
 	 * (Note that the name and index may differ, but the types must be equal.)
 	 */
-    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
+    public boolean equals(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2) {
         if (this == obj) return true;
         if (obj.getClass() != this.getClass()) { return false; }
         GFeatVar gv = (GFeatVar) obj;
@@ -134,7 +131,7 @@ public class GFeatVar implements Variable, Indexed, Mutable, Serializable {
         else if (u instanceof SimpleType) {
             SimpleType st1 = getType();
             SimpleType st2 = (SimpleType)u;
-            return sub.makeSubstitution(this, st2.unify(st1, sub, uc));
+            return sub.makeSubstitution(uc, this, st2.unify(st1, sub, uc));
         }
         else if (u instanceof GFeatVar) {
             GFeatVar var = (GFeatVar) u;
@@ -143,21 +140,21 @@ public class GFeatVar implements Variable, Indexed, Mutable, Serializable {
             SimpleType st2 = var.getType();
             SimpleType st3 = (SimpleType) st2.unify(st1, sub, uc);
             // substitute var with most specific type
-            if (st3.equals(st2)) return sub.makeSubstitution(this, var);
-            else if (st3.equals(st1)) return sub.makeSubstitution(var, this);
+            if (st3.equals(st2)) return sub.makeSubstitution(uc, this, var);
+            else if (st3.equals(st1)) return sub.makeSubstitution(uc, var, this);
             else {
                 // need a new var with intersection type
-                GFeatVar var3 = new GFeatVar(grammar, _name, grammar.getUnifyControl().getUniqueVarIndex(), st3);
-                sub.makeSubstitution(var, var3);
-                return sub.makeSubstitution(this, var3);
+                GFeatVar var3 = new GFeatVar(_name, uc.getUniqueVarIndex(), st3);
+                sub.makeSubstitution(uc, var, var3);
+                return sub.makeSubstitution(uc, this, var3);
             }
         }
         else {
-            return sub.makeSubstitution(this, u);
+            return sub.makeSubstitution(uc, this, u);
         }
     }
 
-    public Object fill(Substitution sub) throws UnifyFailure {
+    public Object fill(UnifyControl uc, Substitution sub) throws UnifyFailure {
         Object val = sub.getValue(this);
         if (val != null) {
             return val;

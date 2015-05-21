@@ -20,12 +20,11 @@ package synsem;
 
 import grammar.Grammar;
 import grammar.Rule;
-import grammar.RuleGroup;
+import grammar.RuleGroupData;
 import grammar.TypeChangingRule;
 import hylo.HyloHelper;
 import hylo.Nominal;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +36,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lexicon.IWordFactory;
+import lexicon.Lexicon;
+import lexicon.Tokenizer;
 import lexicon.Word;
 
 import org.jdom.Document;
@@ -72,110 +74,115 @@ public class Sign implements LexSemOrigin, Serializable, Comparable<Sign> {
     
     /** List of transient data objects, for retrieval by class. */
     protected LinkedList<Object> data = null; 
-    
-    protected final Grammar grammar;
-    
-
-    /** Constructor for subclasses. */
-    protected Sign(Grammar grammar) {
-    	
-    	this.grammar = grammar;
+   
+    private final Tokenizer token;
+    protected Sign(Tokenizer token) {
+    	this.token = token;
     }
     
-    /** Constructor with derivation history. */
-	protected Sign(Grammar grammar, List<Word> words, Category cat, DerivationHistory dh, Sign lexHead) {
-        this(grammar);
+    /** Constructor with derivation history. 
+     * @param token TODO*/
+	protected Sign(Tokenizer token, List<Word> words, Category cat, DerivationHistory dh, Sign lexHead) {
+		this(token);
     	_words = words; 
         _cat = cat;
         _history = dh;
         _lexHead = lexHead;
     }
 
-    /** Constructor with no additional derivation history. */
-    public Sign(Grammar grammar, List<Word> words, Category cat) {
-        this(grammar, words, cat, null, null);
-        _history = new DerivationHistory(grammar, this);
+    /** Constructor with no additional derivation history. 
+     * @param token TODO*/
+    public Sign(RuleGroupData rdg, Tokenizer token, List<Word> words, Category cat) {
+        this(token, words, cat, null, null);
+        _history = new DerivationHistory(rdg, this);
         _lexHead = this;
     }
 
-    /** Constructor with no additional derivation history. */
-    public Sign(Grammar grammar, Word word, Category cat) {
-    	this(grammar, new ArrayList<Word>(Arrays.asList(word)), cat);
+    /** Constructor with no additional derivation history. 
+     * @param token TODO*/
+    public Sign(RuleGroupData rdg, Tokenizer token, Word word, Category cat) {
+    	this(rdg, token, new ArrayList<Word>(Arrays.asList(word)), cat);
+    }
+    /** Constructor with words and derivation history formed from the given inputs, rule and lex head. 
+     * @param token TODO*/
+    protected Sign(RuleGroupData rdg, Tokenizer token, Category cat, Sign[] inputs, Rule rule, Sign lexHead) {
+        this(token, getRemainingWords(inputs, 0), cat, null, lexHead);
+        _history = new DerivationHistory(rdg, inputs, this, rule);
     }
     
-    
-    // during serialization, skips non-serializable data objects
-    private void writeObject(java.io.ObjectOutputStream stream) throws IOException {
-    	// save old data objects
-    	LinkedList<Object> tmp = data;
-    	// filter non-serializable ones
-    	if (tmp != null) {
-    		data = new LinkedList<Object>();
-    		for (Object obj : tmp) {
-    			if (obj instanceof Serializable) data.add(obj);
-    		}
-    		if (data.isEmpty()) data = null;
-    	}
-    	// serialize
-    	stream.defaultWriteObject();
-    	// restore old data objects
-    	data = tmp;
-    }
+//    // during serialization, skips non-serializable data objects
+//    private void writeObject(java.io.ObjectOutputStream stream) throws IOException {
+//    	// save old data objects
+//    	LinkedList<Object> tmp = data;
+//    	// filter non-serializable ones
+//    	if (tmp != null) {
+//    		data = new LinkedList<Object>();
+//    		for (Object obj : tmp) {
+//    			if (obj instanceof Serializable) data.add(obj);
+//    		}
+//    		if (data.isEmpty()) data = null;
+//    	}
+//    	// serialize
+//    	stream.defaultWriteObject();
+//    	// restore old data objects
+//    	data = tmp;
+//    }
 
     
-    /** Factory method for creating a sign from a lexical sign plus a coarticulation one. */
-    public static Sign createCoartSign(Grammar grammar, Category cat, Sign lexSign, Sign coartSign) {
+    /** Factory method for creating a sign from a lexical sign plus a coarticulation one. 
+     * @param rdg TODO
+     * @param token TODO*/
+    public static Sign createCoartSign(IWordFactory wf, RuleGroupData rdg, Tokenizer token, Category cat, Sign lexSign, Sign coartSign) {
     	
         List<Word> words = lexSign.getWords();
         if (words.size() > 1) 
             throw new RuntimeException("Can't create coarticulation sign from multiple words.");
         Word word = words.get(0);
         Word coartWord = coartSign.getWords().get(0);
-        Word wordPlus = Word.createWordWithAttrs(grammar.getWordFactory(), word, coartWord);
-        Sign retval = new Sign(grammar, new ArrayList<Word>(Arrays.asList(wordPlus)), cat, null, null);
+        Word wordPlus = Word.createWordWithAttrs(wf, word, coartWord);
+        Sign retval = new Sign(token, new ArrayList<Word>(Arrays.asList(wordPlus)), cat, null, null);
         retval._lexHead = retval;
         Rule coartRule = new Rule() {
             public String name() { return "coart"; }
             public int arity() { return 1; }
             public List<Category> applyRule(Category[] inputs) { throw new RuntimeException("Not supported."); }
-            public RuleGroup getRuleGroup() { throw new RuntimeException("Not supported."); }
-            public void setRuleGroup(RuleGroup ruleGroup) { throw new RuntimeException("Not supported."); }
+            public RuleGroupData getRuleGroup() { throw new RuntimeException("Not supported."); }
+            public void setRuleGroup(RuleGroupData ruleGroup) { throw new RuntimeException("Not supported."); }
         };
-        retval._history = new DerivationHistory(grammar, new Sign[]{lexSign,coartSign}, retval, coartRule);
+        retval._history = new DerivationHistory(rdg, new Sign[]{lexSign,coartSign}, retval, coartRule);
         return retval;
     }
     
-    /** Factory method for creating derived signs with the given cat from the given inputs, rule and lex head. */
-    public static Sign createDerivedSign(Grammar grammar, Category cat, Sign[] inputs, Rule rule, Sign lexHead) {
+    /** Factory method for creating derived signs with the given cat from the given inputs, rule and lex head. 
+     * @param token TODO*/
+    public static Sign createDerivedSign(RuleGroupData rdg, Tokenizer token, Category cat, Sign[] inputs, Rule rule, Sign lexHead) {
     	
-        return new Sign(grammar, cat, inputs, rule, lexHead);
+        return new Sign(rdg, token, cat, inputs, rule, lexHead);
     }
 
     /** Factory method for creating derived signs from the given result cat, inputs, rule and lex head, 
         with a new LF constructed from the inputs.
         Note that unlike with rule applications, the result LF is constructed with 
-        no var substitutions, so it is useful only for creating alternative signs during realization. */
-    public static Sign createDerivedSignWithNewLF(Grammar grammar, Category cat, Sign[] inputs, Rule rule, Sign lexHead) {
+        no var substitutions, so it is useful only for creating alternative signs during realization. 
+     * @param rdg TODO
+     * @param token TODO*/
+    public static Sign createDerivedSignWithNewLF(RuleGroupData rdg, Lexicon l, Tokenizer token, Category cat, Sign[] inputs, Rule rule, Sign lexHead) {
     	
         Category copyCat = cat.shallowCopy();
         LF lf = null;
         for (int i = 0; i < inputs.length; i++) {
-            lf = HyloHelper.append(grammar, lf, inputs[i].getCategory().getLF());
+            lf = HyloHelper.append(l, lf, inputs[i].getCategory().getLF());
         }
         if (rule instanceof TypeChangingRule) {
             TypeChangingRule tcr = (TypeChangingRule) rule;
-            lf = HyloHelper.append(grammar, lf, tcr.getResult().getLF());
+            lf = HyloHelper.append(l, lf, tcr.getResult().getLF());
         }
-        if (lf != null) { HyloHelper.sort(grammar, lf); }
+        if (lf != null) { HyloHelper.sort(l, lf); }
         copyCat.setLF(lf);
-        return new Sign(grammar, copyCat, inputs, rule, lexHead);
+        return new Sign(rdg, token, copyCat, inputs, rule, lexHead);
     }
         
-    /** Constructor with words and derivation history formed from the given inputs, rule and lex head. */
-    protected Sign(Grammar grammar, Category cat, Sign[] inputs, Rule rule, Sign lexHead) {
-        this(grammar, getRemainingWords(inputs, 0), cat, null, lexHead);
-        _history = new DerivationHistory(grammar, inputs, this, rule);
-    }
+   
     
     // returns the remaining words in a structure sharing way
     private static List<Word> getRemainingWords(Sign[] inputs, int index) {
@@ -196,7 +203,7 @@ public class Sign implements LexSemOrigin, Serializable, Comparable<Sign> {
 
     /** Returns the words as a string.  Delegates to the current tokenizer's getOrthography method. */
     public String getOrthography() {
-        return grammar.getLexicon().getTokenizer().getOrthography(_words);
+        return token.getOrthography(_words);
     }
 
     /** Returns the sign's category. */
@@ -405,7 +412,7 @@ public class Sign implements LexSemOrigin, Serializable, Comparable<Sign> {
     // multiwords are enclosed within a multiword element; 
     // any attribute-value pairs are added to the word or multiword element
     private void addWords(Element parent, Word word) {
-        List<String> orthWords = grammar.getLexicon().getTokenizer().expandWord(word);
+        List<String> orthWords = token.expandWord(word);
         Element child;
         if (orthWords.size() == 1) {
             Element wordElt = new Element("word");

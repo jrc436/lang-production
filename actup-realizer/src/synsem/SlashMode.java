@@ -122,7 +122,7 @@ public final class SlashMode implements Modality, Serializable {
 		}
 	}
 
-	public Object fill(Substitution sub) throws UnifyFailure {
+	public Object fill(UnifyControl uc, Substitution sub) throws UnifyFailure {
 		return copy();
 	}
 

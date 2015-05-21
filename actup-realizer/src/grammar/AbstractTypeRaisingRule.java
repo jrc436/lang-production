@@ -21,6 +21,9 @@ package grammar;
 import java.util.ArrayList;
 import java.util.List;
 
+import lexicon.LexicalData;
+import lexicon.Lexicon;
+import lexicon.Tokenizer;
 import synsem.AtomCat;
 import synsem.BasicArg;
 import synsem.Category;
@@ -32,6 +35,7 @@ import synsem.TargetCat;
 import unify.GFeatStruc;
 import unify.GSubstitution;
 import unify.Substitution;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 
 /**
@@ -68,10 +72,11 @@ public abstract class AbstractTypeRaisingRule extends AbstractRule {
      * Creates a new type raising rule with the given name; upper and lower slashes; 
      * use dollar switch; arg category; and result category.  Defaults are used 
      * for the arg and result categories if null.
-     * @param rg TODO
+     * @param t TODO
+     * @param rd TODO
      */
-    protected AbstractTypeRaisingRule(Grammar rg, String name, Slash uslash, Slash eslash, boolean useDollar, Category arg, Category result) {
-        super(rg);
+    protected AbstractTypeRaisingRule(UnifyControl uc, LexicalData lex, Lexicon l, String name, Slash uslash, Slash eslash, boolean useDollar, Category arg, Category result, Tokenizer t) {
+        super(uc, lex, l, t);
     	this.name = name;
         _upperSlash = uslash;
         _upperSlash.setAbility("active");
@@ -80,22 +85,22 @@ public abstract class AbstractTypeRaisingRule extends AbstractRule {
         _embeddedSlash.setAbility("active");
 
         if (arg != null) { _arg = arg; }
-        else { _arg = new AtomCat(grammar, "np", new GFeatStruc(grammar)); }
+        else { _arg = new AtomCat(l, "np", new GFeatStruc()); }
 
         if (result != null) { 
             _result = result;
             result.getFeatureStructure().setIndex(1);
         }
         else {
-            GFeatStruc resfs = new GFeatStruc(grammar);
+            GFeatStruc resfs = new GFeatStruc();
             resfs.setIndex(1);
-            _result = new AtomCat(grammar, "s", resfs);
+            _result = new AtomCat(l, "s", resfs);
         }
         
         if (useDollar) {
-            Dollar dol = new Dollar(grammar, "1");
+            Dollar dol = new Dollar("1");
             dol.setIndex(1);
-            _result = new ComplexCat(grammar, (AtomCat)_result, dol);
+            _result = new ComplexCat(l, (AtomCat)_result, dol);
         }
         
     }
@@ -115,27 +120,27 @@ public abstract class AbstractTypeRaisingRule extends AbstractRule {
 
     /** Applies this rule to the given input. */
     protected List<Category> apply(Category input) throws UnifyFailure {
-        Substitution sub = new GSubstitution(grammar.getUnifyControl());
-        Category arg = (Category)_arg.unify(input, sub, grammar.getUnifyControl());
+        Substitution sub = new GSubstitution(uc);
+        Category arg = (Category)_arg.unify(input, sub, uc);
         ((GSubstitution)sub).condense();
         
         Category result = _result.copy();
         ComplexCat range;
-        grammar.getUnifyControl().reindex(result);
+        uc.reindex(result);
         if (result instanceof ComplexCat) {
             range = (ComplexCat)result.copy();
             range.add(new BasicArg(_embeddedSlash, arg));
             ((ComplexCat)result).add(new BasicArg(_upperSlash, range));
         } else {
-            range = new ComplexCat(grammar, (TargetCat)result.copy(), new BasicArg(_embeddedSlash, arg));
-            result = new ComplexCat(grammar, (TargetCat)result.copy(), new BasicArg(_upperSlash, range));
+            range = new ComplexCat(l, (TargetCat)result.copy(), new BasicArg(_embeddedSlash, arg));
+            result = new ComplexCat(l, (TargetCat)result.copy(), new BasicArg(_upperSlash, range));
         }
         
         // nb: with defined type changing rules, this step is done when the 
         //     rule is created; with type raising, it is done here, so that 
         //     the arg need not have its distributive features yet, and since 
         //     the full result category doesn't exist beforehand
-        grammar.lexicon.propagateDistributiveAttrs(result);
+        lex.propagateDistributiveAttrs(result);
         
         LF inputLF = input.getLF();
         if (inputLF != null) {

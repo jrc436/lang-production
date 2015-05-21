@@ -1,22 +1,22 @@
 package optimization;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Random;
+import java.util.Set;
 
+import ngrams.AbstractStandardNgramModel;
 import realize.Realization;
 import realize.RealizeMain;
 import realize.Realizer;
+import runconfig.BeginMessage;
+import runconfig.EndMessage;
 import runconfig.IOSettings;
+import runconfig.InputStruct;
+import runconfig.Message;
+import runconfig.ResultMessage;
 import evaluation.Evaluation;
 import evaluation.Evaluator;
 import evaluation.LevenshteinDistance;
@@ -25,95 +25,70 @@ import evaluation.Rouge;
 
 //a hillclimber... that likes valleys
 public class ValleyClimber implements Optimizer {
-	private Queue<File> inputFiles;
-	private String realizationLogPath;
-	private String resultsLogPath;
-	private IOSettings runSettings;
+
 	private Evaluator eval;
 	private RealizeMain r;
-	private HashSet<RunData> prevRuns;
 	
-	public ValleyClimber(IOSettings s, RealizeMain r, String inputFileDir, String resultsLogPath, double percentFiles, String realizationLogPath) {
-		inputFiles = this.getInputFiles(inputFileDir, percentFiles);
-		
+	private HashSet<RunData> prevRuns;
+	Queue<Message> resultQ;
+	Queue<String> log;
+	private final IOSettings io;
+	
+	public ValleyClimber(RealizeMain r, IOSettings io, Queue<Message> resultQ, Queue<String> log) {
+		this.resultQ = resultQ;
+		this.log = log;
 		prevRuns = new HashSet<RunData>();
-		
-		this.realizationLogPath = realizationLogPath;
-		this.resultsLogPath = resultsLogPath;
-		this.runSettings = s;
 		this.r = r;
-		switch (s.getEvaluationType()) {
+		this.io = io;
+		switch (io.getEvaluationType()) {
 			case EditDistanceChar:
-				eval = new LevenshteinDistance(s.getScoringStrategy());
+				eval = new LevenshteinDistance(io.getScoringStrategy());
 				break;
 			case EditDistanceWord:
-				eval = new LevenshteinDistanceWord(s.getScoringStrategy());
+				eval = new LevenshteinDistanceWord(io.getScoringStrategy());
 				break;
 			case ROUGE:
-				eval = new Rouge(s.getScoringStrategy(), s.getEvaluationType().extPath());
+				eval = new Rouge(io.getScoringStrategy(), io.getEvaluationType().extPath());
 				break;
 		}
 	}
-	private Queue<File> getInputFiles(String dir, double percentToUse) {
-		List<File> allInput = new ArrayList<File>(Arrays.asList(new File(dir).listFiles()));
-		int numFilesToUse = Math.max(1, (int) Math.round((double)allInput.size() * percentToUse));
-		List<File> out = new ArrayList<File>();
-		Random r = new Random();
-		for (int i = 0; i < numFilesToUse; i++) {
-			//no repeats!
-			int fileIndex = r.nextInt(allInput.size());
-			out.add(allInput.get(fileIndex));
-			allInput.remove(fileIndex);
-		}
-		Collections.sort(out);
-		return new LinkedList<File>(out);
-	}
+	
 	
 	//experiment name should be a specific run of an experiment... which should be independent of the settings
 	//and only dependent on opt
-	public VariableSet optimizeVariables(String experimentName, VariableSet opt, int maxIter) throws IOException{
+	public VariableSet optimizeVariables(String experimentName, VariableSet opt, int maxIter) {
 		Realizer real = r.createNewRealizer();
-		FileWriter fw = null;
 			//it's for obvious reasons very important that no one holds the same experiment name in a concurrent setup!!!
-		fw = new FileWriter(resultsLogPath+experimentName, true);
-		long timeNS = System.nanoTime();
-		fw.write(this.runSettings.toString()+"\n");
-		for (File f : inputFiles) {
-			fw.write(this.parseRunNum(f.toPath())+",");
-			fw.flush();
-		}
-		fw.write("\n");
-		
+		long timeNS = System.nanoTime();		
 		int currentIter = 1;
 		String iterName;
 		RunData bestRun = new RunData(opt);
-		System.out.println("%%% "+experimentName+":: is a "+runSettings.toString()+"%%%");
+		resultQ.offer(new BeginMessage(io, r.getRunFiles(), experimentName));
 		while (true) {
 			if (currentIter > maxIter) {
-				fw.write("Reached iter limit\n");
-				fw.write("Best: " + bestRun.toString());
-				fw.write("Elapsed Time: " + (System.nanoTime() - timeNS));
-				fw.flush();
+				log.offer(experimentName+" Reached iter limit");
+				log.offer(experimentName+" Best: " + bestRun.toString());
+				log.offer(experimentName+" Total Elapsed Time: " + (System.nanoTime() - timeNS));
+				resultQ.offer(new EndMessage(bestRun, experimentName));
 				break;
 			}
-			System.out.println("%%% "+experimentName+":: Iteration "+currentIter+"/"+maxIter+"%%%");
+			log.offer("%%% "+experimentName+":: Iteration "+currentIter+"/"+maxIter+"%%%");
 			iterName = experimentName+"-i"+String.format("%04d", currentIter);
 			
 			//lastScore = currentScore;
 			Evaluation done = getRun(new RunData(opt));
 			RunData newRun;
 			if (done == null) {
-				newRun = new RunData(opt, performRun(real, iterName, opt), iterName);
+				newRun = new RunData(opt, performRun(real, iterName, opt), iterName, System.nanoTime() - timeNS);
+				resultQ.offer(new ResultMessage(newRun, experimentName));
 				addRunToRuns(newRun);
 			}
 			else {
-				System.out.println("%%% This run has been done before. Loading! %%%");
-				newRun = new RunData(opt, done, iterName);
+				log.offer("%%% "+experimentName+" This run has been done before. Loading! %%%");
+				newRun = new RunData(opt, done, iterName, System.nanoTime() - timeNS);
+				resultQ.offer(new ResultMessage(newRun, experimentName));
 			}
-			fw.write(newRun.toString() + "\n");
-			fw.flush();
-			
-			System.out.println("%%%"+newRun.toString()+"%%%");
+			log.offer(experimentName+": "+newRun.toString());
 			
 			boolean goodStep = false;
 			if (newRun.improvement(bestRun)) {
@@ -124,94 +99,50 @@ public class ValleyClimber implements Optimizer {
 			//this checks if the variable itself is still improving, always true if first run
 			boolean stillMoving = opt.step(goodStep); 
 			if (!stillMoving && !opt.updateIndex()) { //note that updateIndex will only be called if stillmoving is false
-				fw.write("Breaking early as all variables have been optimized.");
-				fw.write("Best: " + bestRun.toString());
-				fw.write("Elapsed Time: " + (System.nanoTime() - timeNS));
-				fw.flush();
+				log.offer(experimentName+ " Breaking early as all variables have been optimized.");
+				log.offer(experimentName+ " Best: " + bestRun.toString());
+				resultQ.offer(new EndMessage(bestRun, experimentName));
+				log.offer(experimentName+" Total Elapsed Time: " + (System.nanoTime() - timeNS));
 				break;
 			}
 			currentIter++;
 		}
-		fw.close();
 		return opt;
 	}
 	private synchronized void addRunToRuns(RunData run) {
 		prevRuns.add(run);
 	}
-	private synchronized Evaluation getRun(RunData run) {
+	private Evaluation getRun(RunData run) {
 		return prevRuns.contains(run) ? run.getEval() : null;
 	}
 	
-	//this can get the 3 digit number from an input file that can be used for the lm and output file
-	private String parseRunNum(Path fp) {
-		String name = fp.getFileName().toString();
-		String[] sections = name.split("-");
-		for (String section : sections) {
-			try {
-				Integer.parseInt(section);
-				return section;
-			}
-			catch (NumberFormatException nfe) {
-				continue;
-			}
-		}
-		return "";
-	}
-	
-	private synchronized Queue<File> copyInput() {
-		return new LinkedList<File>(inputFiles);
-	}
-	
 	private Evaluation performRun(Realizer real, String runName, VariableSet opt)  {	
-		//String num = in.getName().split("-")[1];
-		
-		
-		//locking mechanism means no thread should ever be trying to realize the same
-		Queue<File> localInput = this.copyInput(); //deepcopy
 		List<Realization> realizations = new ArrayList<Realization>();
-		int attempts = 0;
-		boolean bypassCache = false;
-		while (!localInput.isEmpty()) { 
-			File in = localInput.peek(); 
-			String num = parseRunNum(in.toPath());
-			if (!r.attemptAcquireLock(this.runSettings, num)) {
-				attempts++;
-				if (attempts > localInput.size()) {
-					//most likely, two tasks both need the same lock, and it's probably faster to have one recreate the scorer then wait.
-					System.err.println("Forcibly acquiring lock: "+num);
-					bypassCache = true;
-				}
-				else {
-					localInput.offer(localInput.poll());
-					continue;
-				}
+		Set<Integer> alreadyHad = new HashSet<Integer>();
+		
+		while (true) {
+			int lock = RealizeMain.NO_LOCK_AVAIL;
+			while (lock == RealizeMain.NO_LOCK_AVAIL) {
+				log.offer(runName + " is attempting to acquire a lock");
+				lock = r.attemptAcquireLock(alreadyHad);
 			}
-			attempts = 0;
-			System.out.println("%%% "+runName+" is beginning run on file: "+num+"%%%");
-			localInput.poll();
+			if (lock == RealizeMain.NO_LOCK_REMAINING) {
+				break;
+			}
+			log.offer(runName+" successfully acquired lock:"+lock);
+			Queue<InputStruct[]> inp = r.getInput(lock);
+			AbstractStandardNgramModel scorer = r.getScorer(lock, opt.getDoubleArray());
+			//at this point, we clearly have a lock
 			
-			String iterName = runName + "-f" + num;
-			try {
-				String realizationLogPath = this.realizationLogPath == null ? null : this.realizationLogPath+iterName+".spl";
-				realizations.addAll(Arrays.asList(r.realize(r.setLM(real.getGrammar(), runSettings, opt, num, bypassCache), real, in.getPath().toString(), realizationLogPath, bypassCache)));
+			while (!inp.isEmpty()) {
+				InputStruct[] is = inp.poll();
+				log.offer("%%% "+runName+" is beginning run on file: "+is[0].getFileNum()+"%%%");		
+				realizations.addAll(Arrays.asList(r.realize(scorer, real, is, log, runName)));
+				scorer.clean();				
 			}
-			catch (Exception e) {
-				e.printStackTrace();
-				System.err.println("Error while realizing");
-				System.exit(1);
-			}
-			if (!bypassCache) {
-				r.releaseLock(this.runSettings, num);
-			}
-			else {
-				bypassCache = false; 
-			}
+			r.releaseLock(lock);
+			
 		}
-		Evaluation e = null;
-		synchronized(eval) {
-			eval.loadData(realizations);
-			e = eval.scoreAll();
-		}
-		return e;
+		return eval.scoreAll(realizations);
 	}
 }

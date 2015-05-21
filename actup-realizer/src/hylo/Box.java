@@ -18,12 +18,14 @@
 
 package hylo;
 
-import grammar.Grammar;
+import grammar.TypesData;
+import lexicon.Lexicon;
 
 import org.jdom.Element;
 
 import synsem.LF;
 import unify.Substitution;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 
 
@@ -37,16 +39,16 @@ public final class Box extends ModalOp {
 
 	private static final long serialVersionUID = 1575311851235814524L;
 
-	public Box(Grammar grammar, Element e) {
-        super(grammar, e);
+	public Box(Lexicon l, TypesData td, Element e) {
+        super(l, td, e);
     }
 
-    private Box(Grammar grammar, Mode mode, LF arg) {
-        super(grammar, mode, arg);
+    private Box(Lexicon l, Mode mode, LF arg) {
+        super(l, mode, arg);
     }
 
     public LF copy() {
-        return new Box(grammar, (Mode)_mode.copy(), _arg.copy());
+        return new Box(l, (Mode)_mode.copy(), _arg.copy());
     }
     
     public boolean equals(Object o) {
@@ -65,8 +67,8 @@ public final class Box extends ModalOp {
         }
     }
 
-    public Object fill(Substitution sub) throws UnifyFailure {
-        return new Box(grammar, (Mode)_mode.fill(sub), (LF)_arg.fill(sub));
+    public Object fill(UnifyControl uc, Substitution sub) throws UnifyFailure {
+        return new Box(l, (Mode)_mode.fill(uc, sub), (LF)_arg.fill(uc, sub));
     }
     
     /** Returns the string form of this modal op, without the arg. */

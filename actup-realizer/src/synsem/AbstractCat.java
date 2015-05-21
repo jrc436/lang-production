@@ -19,18 +19,20 @@
 
 package synsem;
 
-import grammar.Grammar;
+import grammar.TypesData;
 import hylo.HyloHelper;
 import hylo.Nominal;
 
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.LinkedHashMap;
+import java.util.Map;
+
+import lexicon.Lexicon;
 
 import org.jdom.Element;
 
 import unify.FeatureStructure;
-import unify.ModFcn;
+import unify.MutableScript;
 import unify.Substitution;
 import unify.Unifiable;
 import unify.UnifyControl;
@@ -51,7 +53,7 @@ public abstract class AbstractCat implements Category, Serializable {
 
 	/** The feature structure, which should only be used with atomic categories. */
     protected FeatureStructure _featStruc;
-    protected final Grammar grammar;
+    protected final Lexicon l;
     
     /** The logical form, which should be used only with the outermost category. */
     protected LF _lf;
@@ -71,32 +73,34 @@ public abstract class AbstractCat implements Category, Serializable {
     /** Default constructor. */
 
     /** Constructor which sets the LF. */
-    public AbstractCat(Grammar grammar, LF lf) {
-    	
+    public AbstractCat(Lexicon l, LF lf) {
+    	this(l);
     	_lf = lf; 
-    	this.grammar = grammar;
+    }
+    private AbstractCat(Lexicon l) {
+    	this.l = l;
     }
 
     /** 
      * Constructor which retrieves the LF from the XML element 
      * and flattens it to a conjunction of elementary predications
      * (or a single one). 
+     * @param td TODO
      */
-    public AbstractCat(Grammar grammar, Element elt) {
-    	
+    public AbstractCat(Lexicon l, TypesData td, Element elt) {
+    	this(l);
         Element lfElt = elt.getChild("lf");
-        this.grammar = grammar;
         if (lfElt != null) {
-            _lf = HyloHelper.flattenLF(grammar, HyloHelper.getLF(grammar, lfElt));
+            _lf = HyloHelper.flattenLF(l, td, HyloHelper.getLF(l, td, lfElt));
         }
     }
-
-    // during deserialization, intern computed supertag, and ensure varmap recomputed
-    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
-    	in.defaultReadObject();
-    	if (_supertag != null) _supertag = _supertag.intern();
-    	_varMap = null;
-    }
+//
+//    // during deserialization, intern computed supertag, and ensure varmap recomputed
+//    private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException {
+//    	in.defaultReadObject();
+//    	if (_supertag != null) _supertag = _supertag.intern();
+//    	_varMap = null;
+//    }
     
     
     /** Gets the feature structure. */
@@ -140,7 +144,7 @@ public abstract class AbstractCat implements Category, Serializable {
     public abstract Category copy();
     public abstract Category shallowCopy();
     
-    public abstract Object fill (Substitution s) throws UnifyFailure;
+    public abstract Object fill (UnifyControl uc, Substitution s) throws UnifyFailure;
     public abstract void unifyCheck (Object u) throws UnifyFailure;
     /** NB: The LF does not participate in unification. */
     public abstract Object unify (Object u, Substitution sub, UnifyControl uc) 
@@ -159,13 +163,13 @@ public abstract class AbstractCat implements Category, Serializable {
         return equals(o); 
     }
 
-    public void deepMap(ModFcn mf) { 
-        if (_lf != null) _lf.deepMap(mf);
-        mf.modify(this);
+    public void mutateAll(MutableScript m) { 
+        if (_lf != null) _lf.mutateAll(m);
+        m.run(this);
     }
 
-    public void forall(CategoryFcn f) { 
-        f.forall(this); 
+    public void applyToAll(CatScript f) { 
+        f.run(this); 
     }
     
     public boolean occurs(Variable v) {
@@ -227,7 +231,7 @@ public abstract class AbstractCat implements Category, Serializable {
      * using the given map from vars to ints, 
      * to allow for equivalence up to variable names.
      */
-    public abstract int hashCodeNoLF(LinkedHashMap<Unifiable, Integer> varMap);
+    public abstract int hashCodeNoLF(Map<Unifiable, Integer> varMap);
 
     /** 
      * Returns whether this category equals the given object. 
@@ -278,7 +282,7 @@ public abstract class AbstractCat implements Category, Serializable {
      * up to variable names, using the given maps from vars to ints, 
      * ignoring the LFs (if any).
      */
-    public abstract boolean equalsNoLF(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2);
+    public abstract boolean equalsNoLF(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2);
 
 
     /**

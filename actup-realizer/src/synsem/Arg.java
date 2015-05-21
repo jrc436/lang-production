@@ -18,7 +18,7 @@
 
 package synsem;
 
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 import unify.Mutable;
 import unify.Unifiable;
@@ -34,7 +34,7 @@ import unify.UnifyFailure;
 public interface Arg extends Unifiable, Mutable {
 
     public Arg copy();
-    public void forall(CategoryFcn fcn);
+    public void applyToAll(CatScript fcn);
     public void unifySlash(Slash s) throws UnifyFailure;
     
     /** Sets the modifier status of each slash. */
@@ -47,13 +47,13 @@ public interface Arg extends Unifiable, Mutable {
      * Returns a hash code for this arg, 
      * using the given map from vars to ints.
      */
-    public int hashCode(LinkedHashMap<Unifiable, Integer> varMap);
+    public int hashCode(Map<Unifiable, Integer> varMap);
     
     /**
      * Returns whether this arg equals the given object  
      * up to variable names, using the given maps from vars to ints.
      */
-    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2);
+    public boolean equals(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2);
     
     /**
      * Returns the supertag for the arg.

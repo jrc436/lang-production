@@ -18,10 +18,15 @@
 
 package grammar;
 
-import unify.*;
-import synsem.*;
+import java.util.List;
 
-import java.util.*;
+import lexicon.LexicalData;
+import lexicon.Lexicon;
+import lexicon.Tokenizer;
+import synsem.Category;
+import synsem.Slash;
+import unify.UnifyControl;
+import unify.UnifyFailure;
 
 /**
  * Forward substitution, e.g. X/Y/Z Y/Z => X/Z
@@ -33,21 +38,21 @@ public class ForwardSubstitution extends AbstractSubstitutionRule {
 
 	private static final long serialVersionUID = 7324585108055853456L;
 
-	public ForwardSubstitution(Grammar rg) {
-		this(rg, true);
+	public ForwardSubstitution(UnifyControl uc, LexicalData lex, Lexicon l, Tokenizer t) {
+		this(uc, lex, l, true, t);
 	}
 
-	public ForwardSubstitution(Grammar rg, boolean isHarmonic) {
-		super(rg);
+	public ForwardSubstitution(UnifyControl uc, LexicalData lex, Lexicon l, boolean isHarmonic, Tokenizer t) {
+		super(uc, lex, l, t);
 		_isHarmonic = isHarmonic;
 		if (isHarmonic) {
 			name = ">S";
-			_functorSlash = new Slash(grammar, '/', "^");
-			_argSlash = new Slash(grammar, '/', "^");
+			_functorSlash = new Slash('/', "^");
+			_argSlash = new Slash('/', "^");
 		} else {
 			name = ">Sx";
-			_functorSlash = new Slash(grammar, '/', "x");
-			_argSlash = new Slash(grammar, '\\', "x");
+			_functorSlash = new Slash('/', "x");
+			_argSlash = new Slash('\\', "x");
 		}
 		_functorSlash.setAbility("active");
 	}

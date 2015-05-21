@@ -18,19 +18,22 @@
 
 package synsem;
 
-import grammar.Grammar;
+import grammar.TypesData;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
+import lexicon.Lexicon;
 
 import org.jdom.Element;
 
-import unify.ModFcn;
+import unify.MutableScript;
 import unify.Substitution;
 import unify.Unifiable;
+import unify.UnifyControl;
 import unify.UnifyFailure;
 import unify.Variable;
 
@@ -50,16 +53,13 @@ public class ArgStack implements Serializable {
 	protected boolean _hasDollar = false;
 
 	protected boolean _hasSet = false;
-
-	public ArgStack(Grammar grammar) {
-		
-		this.grammar = grammar;
+	
+	
+	public ArgStack() {
 		_list = new Arg[0];
 	}
 
-	public ArgStack(Grammar grammar, Arg c) {
-		
-		this.grammar = grammar;
+	public ArgStack(Arg c) {
 		_list = new Arg[1];
 		_list[0] = c;
 		if (c instanceof Dollar) {
@@ -69,47 +69,43 @@ public class ArgStack implements Serializable {
 		}
 	}
 
-	public ArgStack(Grammar grammar, Slash s, Category c) {
-		this(grammar, new BasicArg(s, c));
+	public ArgStack(Slash s, Category c) {
+		this(new BasicArg(s, c));
 	}
 
-	public ArgStack(Grammar grammar, Arg[] list) {
-		
-		this.grammar = grammar;
+	public ArgStack(Arg[] list) {
 		_list = list;
 		checkForDollar();
 		checkForSet();
 	}
 	
-	private final Grammar grammar;
+	
 
-	public ArgStack(Grammar grammar, List<Element> info) {
-		
-		this.grammar = grammar;
+	public ArgStack(Lexicon l, TypesData td, List<Element> info) {
 		List<Arg> args = new ArrayList<Arg>();
 		for (Iterator<Element> infoIt = info.iterator(); infoIt.hasNext();) {
 			Element el = infoIt.next();
 			String elName = el.getName();
 			if (elName.equals("setarg")) {
-				args.add(new SetArg(grammar, el));
+				args.add(new SetArg(l, td, el));
 				_hasSet = true;
 			} else if (elName.equals("dollar")) {
 				String name = el.getAttributeValue("name");
 				if (name == null)
 					name = el.getAttributeValue("n");
-				args.add(new Dollar(grammar, name));
+				args.add(new Dollar(name));
 				_hasDollar = true;
 			} else if (elName.equals("slash") || elName.equals("sl")) {
-				Slash s = new Slash(grammar, el);
+				Slash s = new Slash(el);
 				Element argEl = infoIt.next();
 				if (argEl.getName().equals("dollar")) {
 					String name = argEl.getAttributeValue("name");
 					if (name == null)
 						name = argEl.getAttributeValue("n");
-					args.add(new Dollar(grammar, s, name));
+					args.add(new Dollar(s, name));
 					_hasDollar = true;
 				} else {
-					args.add(new BasicArg(s, CatReader.getCat(grammar, argEl)));
+					args.add(new BasicArg(s, CatReader.getCat(l, td, argEl)));
 				}
 			} else {
 				System.err.println("Invalid element for creating ArgStack: "
@@ -206,7 +202,7 @@ public class ArgStack implements Serializable {
 		Arg insertInto = _list[index];
 		if (insertInto instanceof BasicArg) {
 			cl.add(insertInto);
-			_list[index] = new SetArg(grammar, cl);
+			_list[index] = new SetArg(cl);
 			_hasSet = true;
 		} else if (insertInto instanceof SetArg) {
 			((SetArg) insertInto).add(cl);
@@ -260,7 +256,7 @@ public class ArgStack implements Serializable {
 		for (int i = 0; i < $list.length; i++) {
 			$list[i] = _list[i].copy();
 		}
-		return new ArgStack(grammar, $list);
+		return new ArgStack($list);
 	}
 
 	public ArgStack copyWithout(int indexToRemove) {
@@ -274,7 +270,7 @@ public class ArgStack implements Serializable {
 				$list[index++] = _list[i].copy();
 			}
 		}
-		return new ArgStack(grammar, $list);
+		return new ArgStack($list);
 	}
 
 	public ArgStack subList(int from) {
@@ -292,11 +288,11 @@ public class ArgStack implements Serializable {
 		} else {
 			$list = new Arg[0];
 		}
-		return new ArgStack(grammar, $list);
+		return new ArgStack($list);
 	}
 
 	public ArgStack shallowCopy() {
-		return new ArgStack(grammar, _list);
+		return new ArgStack(_list);
 	}
 
 	public boolean occurs(Variable v) {
@@ -308,10 +304,10 @@ public class ArgStack implements Serializable {
 		return false;
 	}
 
-	public ArgStack fill(Substitution s) throws UnifyFailure {
-		ArgStack args = new ArgStack(grammar);
+	public ArgStack fill(UnifyControl uc, Substitution s) throws UnifyFailure {
+		ArgStack args = new ArgStack();
 		for (int i = 0; i < _list.length; i++) {
-			Object value = _list[i].fill(s);
+			Object value = _list[i].fill(uc, s);
 			if (value instanceof ArgStack) {
 				args.add((ArgStack) value);
 			} else {
@@ -321,9 +317,9 @@ public class ArgStack implements Serializable {
 		return args;
 	}
 
-	public void deepMap(ModFcn mf) {
+	public void mutateAll(MutableScript mf) {
 		for (int i = 0; i < _list.length; i++) {
-			_list[i].deepMap(mf);
+			_list[i].mutateAll(mf);
 		}
 	}
 
@@ -346,55 +342,55 @@ public class ArgStack implements Serializable {
 		}
 	}
 
-	public int unifySuffix(ArgStack as, Substitution sub) throws UnifyFailure {
+	public int unifySuffix(ArgStack as, Substitution sub, UnifyControl uc) throws UnifyFailure {
 
 		int asIndex = as.size();
 		for (int i = _list.length - 1; i >= 0; i--) {
 			asIndex--;
-			get(i).unify(as.get(asIndex), sub, grammar.getUnifyControl());
+			get(i).unify(as.get(asIndex), sub, uc);
 		}
 		return asIndex;
 	}
 
-	public ArgStack unify(ArgStack as, Substitution sub) throws UnifyFailure {
-		return unifyPrefix(as, as.size(), sub);
+	public ArgStack unify(ArgStack as, Substitution sub, UnifyControl uc) throws UnifyFailure {
+		return unifyPrefix(as, as.size(), sub, uc);
 	}
 
-	public ArgStack unifyPrefix(ArgStack as, int upto, Substitution sub)
+	public ArgStack unifyPrefix(ArgStack as, int upto, Substitution sub, UnifyControl uc)
 			throws UnifyFailure {
 
 		ArgStack $args;
 		if (containsDollarArg()) {
 			if (as.containsDollarArg()) {
-				$args = unifyDollarWithDollar(as, upto, sub);
+				$args = unifyDollarWithDollar(as, upto, sub, uc);
 			} else {
-				$args = unifyDollarWithNoDollar(size(), as, upto, sub);
+				$args = unifyDollarWithNoDollar(size(), as, upto, sub, uc);
 			}
 		} else if (as.containsDollarArg()) {
-			$args = as.unifyDollarWithNoDollar(upto, this, size(), sub);
+			$args = as.unifyDollarWithNoDollar(upto, this, size(), sub, uc);
 		} else if (size() == upto) {
-			$args = unifySimple(as, upto, sub);
+			$args = unifySimple(as, upto, sub, uc);
 		} else {
-			$args = unifyComplex(as, upto, sub);
+			$args = unifyComplex(as, upto, sub, uc);
 			// throw new UnifyFailure();
 		}
 		return $args;
 	}
 
-	private ArgStack unifySimple(ArgStack as, int upto, Substitution sub)
+	private ArgStack unifySimple(ArgStack as, int upto, Substitution sub, UnifyControl uc)
 			throws UnifyFailure {
 
-		ArgStack $args = new ArgStack(grammar);
+		ArgStack $args = new ArgStack();
 		for (int i = upto - 1; i >= 0; i--) {
-			$args.addFront((Arg) _list[i].unify(as.get(i), sub, grammar.getUnifyControl()));
+			$args.addFront((Arg) _list[i].unify(as.get(i), sub, uc));
 		}
 		return $args;
 	}
 
-	private ArgStack unifyComplex(ArgStack as, int upto, Substitution sub)
+	private ArgStack unifyComplex(ArgStack as, int upto, Substitution sub, UnifyControl uc)
 			throws UnifyFailure {
 
-		ArgStack $args = new ArgStack(grammar);
+		ArgStack $args = new ArgStack();
 
 		int aIndex = size() - 1;
 		int bIndex = upto - 1;
@@ -405,7 +401,7 @@ public class ArgStack implements Serializable {
 
 			if ((aArg instanceof BasicArg && bArg instanceof BasicArg)
 					|| (aArg instanceof SetArg && bArg instanceof SetArg)) {
-				$args.addFront((Arg) aArg.unify(bArg, sub, grammar.getUnifyControl()));
+				$args.addFront((Arg) aArg.unify(bArg, sub, uc));
 				aIndex--;
 				bIndex--;
 			} else if (aArg instanceof BasicArg && bArg instanceof SetArg) {
@@ -415,14 +411,14 @@ public class ArgStack implements Serializable {
 					for (; aIndex > stop;) {
 						aIndex--;
 						if (bArg instanceof BasicArg) {
-							$args.addFront((Arg) aArg.unify(bArg, sub, grammar.getUnifyControl()));
+							$args.addFront((Arg) aArg.unify(bArg, sub, uc));
 						} else {
 							int idInSet = ((SetArg) bArg)
-									.indexOf((BasicArg) aArg);
+									.indexOf(uc, (BasicArg) aArg);
 							if (idInSet == -1)
 								throw new UnifyFailure();
 							$args.addFront((Arg) aArg.unify(((SetArg) bArg)
-									.get(idInSet), sub, grammar.getUnifyControl()));
+									.get(idInSet), sub, uc));
 							aArg = get(aIndex);
 							bArg = ((SetArg) bArg).copyWithout(idInSet);
 						}
@@ -444,13 +440,13 @@ public class ArgStack implements Serializable {
 	}
 
 	private ArgStack unifyDollarWithNoDollar(int uptoThis, ArgStack otherStack, int uptoOther,
-			Substitution sub) throws UnifyFailure {
+			Substitution sub, UnifyControl uc) throws UnifyFailure {
 
 		if ((!(_hasSet || otherStack._hasSet) && uptoThis > uptoOther + 1)
 				|| (uptoThis > 1 && uptoOther < 1)) {
 			throw new UnifyFailure();
 		}
-		ArgStack $args = new ArgStack(grammar);
+		ArgStack $args = new ArgStack();
 		otherStack = otherStack.subList(0, uptoOther);
 		int otherIndex = uptoOther - 1;
 
@@ -462,7 +458,7 @@ public class ArgStack implements Serializable {
 				} else {
 					ArgStack $subArgs = otherStack.subList(0, otherIndex + 1);
 					// Slash dsl = ((Dollar) argi).getSlash();
-					((Dollar) argi).unify($subArgs.copy(), sub, grammar.getUnifyControl());
+					((Dollar) argi).unify($subArgs.copy(), sub, uc);
 					otherIndex = 0;
 					$args.addFront($subArgs);
 				}
@@ -473,14 +469,14 @@ public class ArgStack implements Serializable {
 
 				Arg otherArg = otherStack.get(otherIndex);
 				if (otherArg instanceof BasicArg) {
-					$args.addFront((Arg) argi.unify(otherArg, sub, grammar.getUnifyControl()));
+					$args.addFront((Arg) argi.unify(otherArg, sub, uc));
 					otherIndex--;
 				} else if (otherArg instanceof SetArg) {
 					SetArg sa = (SetArg) otherArg;
-					int id = sa.indexOf((BasicArg) argi);
+					int id = sa.indexOf(uc, (BasicArg) argi);
 					if (id == -1)
 						throw new UnifyFailure();
-					$args.addFront((Arg) argi.unify(sa.get(id), sub, grammar.getUnifyControl()));
+					$args.addFront((Arg) argi.unify(sa.get(id), sub, uc));
 					otherStack.set(otherIndex, sa.copyWithout(id));
 				}
 			} else {
@@ -493,26 +489,26 @@ public class ArgStack implements Serializable {
 		return $args;
 	}
 
-	private ArgStack unifyDollarWithDollar(ArgStack as, int upto, Substitution sub) throws UnifyFailure {
+	private ArgStack unifyDollarWithDollar(ArgStack as, int upto, Substitution sub, UnifyControl uc) throws UnifyFailure {
 
 		ArgStack $args;
 		if (size() == 1) {
 			$args = as.subList(0, upto);
-			((Dollar) get(0)).unify($args.copy(), sub, grammar.getUnifyControl());
+			((Dollar) get(0)).unify($args.copy(), sub, uc);
 		} else if (upto == 1) {
 			$args = subList(0, size());
-			((Dollar) as.get(0)).unify($args.copy(), sub, grammar.getUnifyControl());
+			((Dollar) as.get(0)).unify($args.copy(), sub, uc);
 		} else if (upto == size()) {
-			$args = unifySimple(as, upto, sub);
+			$args = unifySimple(as, upto, sub, uc);
 		} else {
 			throw new UnifyFailure();
 		}
 		return $args;
 	}
 
-	public void forall(CategoryFcn fcn) {
+	public void applyToAll(CatScript fcn) {
 		for (int i = 0; i < _list.length; i++) {
-			_list[i].forall(fcn);
+			_list[i].applyToAll(fcn);
 		}
 	}
 
@@ -580,7 +576,7 @@ public class ArgStack implements Serializable {
 	/**
 	 * Returns a hash code using the given map from vars to ints.
 	 */
-	public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) {
+	public int hashCode(Map<Unifiable, Integer> varMap) {
 		int retval = 0;
 		for (int i = 0; i < _list.length; i++) {
 			retval += _list[i].hashCode(varMap);
@@ -592,7 +588,7 @@ public class ArgStack implements Serializable {
 	 * Returns whether this arg stack equals the given object up to variable
 	 * names, using the given maps from vars to ints.
 	 */
-	public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
+	public boolean equals(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2) {
 		if (obj.getClass() != this.getClass()) {
 			return false;
 		}

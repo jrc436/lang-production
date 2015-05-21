@@ -21,7 +21,7 @@ package synsem;
 
 import hylo.Nominal;
 
-import java.util.LinkedHashMap;
+import java.util.Map;
 
 import unify.FeatureStructure;
 import unify.Mutable;
@@ -83,7 +83,7 @@ public interface Category extends Unifiable, Mutable, java.io.Serializable {
      * and every subcategory.
      * @param f a function to be applied
      */    
-    public void forall(CategoryFcn f); //to ls
+    public void applyToAll(CatScript f); //to ls
 
     
     /** 
@@ -103,7 +103,7 @@ public interface Category extends Unifiable, Mutable, java.io.Serializable {
      * using the given map from vars to ints, 
      * to allow for equivalence up to variable names.
      */
-    public int hashCodeNoLF(LinkedHashMap<Unifiable, Integer> varMap);
+    public int hashCodeNoLF(Map<Unifiable, Integer> varMap);
 
     
     /** 
@@ -124,7 +124,7 @@ public interface Category extends Unifiable, Mutable, java.io.Serializable {
      * up to variable names, using the given maps from vars to ints, 
      * ignoring the LFs (if any).
      */
-    public boolean equalsNoLF(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2);
+    public boolean equalsNoLF(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2);
     
     
     /**

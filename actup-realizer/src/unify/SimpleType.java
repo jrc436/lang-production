@@ -1,4 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
+
 //// Copyright (C) 2003-9 Gunes Erkan and Michael White
 //// 
 //// This library is free software; you can redistribute it and/or
@@ -18,7 +19,7 @@
 
 package unify;
 
-import grammar.Types;
+import grammar.TypesData;
 
 import java.io.Serializable;
 import java.util.BitSet;
@@ -36,26 +37,41 @@ public class SimpleType implements Unifiable, Serializable {
     
 	private static final long serialVersionUID = 7028285176993549672L;
 	
-	private int index;
-    private String name;
-    private BitSet bitset;
-    private BitSet tempBitset = new BitSet();
-    private transient Types types;
-
-    public SimpleType(int i, String n, BitSet bs, Types t) {
-        index = i;
-        name = n;
-        bitset = bs;
-        types = t;
+	private final int index;
+    private final String name;
+    public BitSet bitset;
+//    
+//    //WARNING: FULL IMPLICATIONS OF MUTABIiLITY OF SIMPLETYPE HAVE NOT BEEN INVESTIGATED
+    public void setBit(int index) {
+    	
+    	bitset.set(index);
     }
-	
-    public int getIndex() { return index; }
+    
+    private TypesData typesList;
+    public void setTypesData(TypesData typesdata) {
+    	this.typesList = typesdata;    	//return new SimpleType(index, name, (BitSet) bitset.clone(), typesdata);
+    }
+    public SimpleType(int i, String n, BitSet bs, TypesData td) {
+    	this.index = i;
+    	this.name = n;
+    	this.bitset = bs;
+    	this.typesList = td;
+    }
 
-    public BitSet getBitSet() { return bitset; }
+    public SimpleType(int i, String n, BitSet bs) {
+        this(i, n, bs, null);
+    }
+//    public void setBitsetIndex(int i) {
+//    //	BitSet bs = (BitSet) bitset.clone();
+//    	bitset.set(i);
+//    	//return new SimpleType(index, name, bs, typesList);
+//    }
 
     public String getName() { return name; }
 
     public String toString() { return name; }
+    
+    public int getIndex() { return index; } 
     
     public void unifyCheck(Object u) throws UnifyFailure {
         if (!(u instanceof SimpleType)) {
@@ -66,20 +82,41 @@ public class SimpleType implements Unifiable, Serializable {
     public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
         if (!(u instanceof SimpleType)) {
             throw new UnifyFailure();
-        }
-        if (this == u) return this;
+        }    
+        if (this.equals(u)) return this;
         SimpleType st2 = (SimpleType) u;
+//        if (st2.typesList != this.typesList) {
+//        	System.err.println("Different lists");
+//        	System.exit(1);
+//        }
+//        if (bitset.nextSetBit(0) == 53 || st2.bitset.nextSetBit(0) == 53) {
+//        	System.err.println("wat the fuk");
+//        	System.exit(1);
+//        }
+        BitSet tempBitset = new BitSet(Math.max(bitset.size(), st2.bitset.size()));
         tempBitset.clear();
         tempBitset.or(bitset);
-        tempBitset.and(st2.getBitSet());
+        tempBitset.and(st2.bitset);
         int resultTypeIndex = tempBitset.nextSetBit(0);
         if (resultTypeIndex == -1) {
         	throw new UnifyFailure();
         }
-        return types.getIndexMap().get(resultTypeIndex);
+//        if (resultTypeIndex == 53) {
+//        	System.err.println(bitset.nextSetBit(0));
+//        	System.err.println(bitset.get(53));
+//        	System.err.println(st2.bitset.get(53));
+//        	System.exit(1);
+//        }
+      //  int resultTypeIndex = Math.min(st2.index, index);
+        if (typesList.size() > st2.typesList.size()) {
+        	return typesList.getAtIndex(resultTypeIndex);
+        }
+        else {
+        	return st2.typesList.getAtIndex(resultTypeIndex);
+        }
     }
 
-    public Object fill(Substitution s) throws UnifyFailure {
+    public Object fill(UnifyControl uc, Substitution s) throws UnifyFailure {
         return this;
     }
     
@@ -89,7 +126,7 @@ public class SimpleType implements Unifiable, Serializable {
     
     public boolean equals(Object o) {
         if (!(o instanceof SimpleType)) return false;
-        if (index == ((SimpleType)o).getIndex()) return true;
+        if (index == ((SimpleType)o).index) return true;
         else return false;
     }
 }

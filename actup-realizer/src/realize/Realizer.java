@@ -19,55 +19,64 @@
 package realize;
 
 import grammar.Grammar;
+import grammar.RuleGroupData;
+import grammar.TypesData;
 import hylo.HyloHelper;
 import hylo.SatOp;
 
 import java.util.List;
 
+import lexicon.LexicalData;
+import lexicon.Lexicon;
+
 import org.jdom.Element;
 
-import pruning.NBestPruningStrategy;
 import pruning.PruningStrategy;
 import runconfig.RealizationSettings;
 import synsem.LF;
 import synsem.SignScorer;
+import unify.UnifyControl;
 
 /**
- * The realizer manages the realization process.
- * Realization options may be set for use across calls 
- * to the realizer.
- *
  * @author      Michael White
  * @version     $Revision: 1.31 $, $Date: 2011/07/19 03:40:46 $
+ * 
+ * Realizers are thread-specific handlers of the realization-process. RealizeMain is the thread-generic handler of the realizers.
+ * As a thread-specific handler, here's a list of what it should and shouldn't keep track of:
+ * 	An NgramScorer: This is more specific than the Thread-level. NgramScorers need be cleaned after every conversation, but they are also file-specific
+ *                  Therefore, its' recommended to pass this in during the call to score, and let RealizeMain handle the scorers
+ *   Immutable Run Data: The Lexicon, the Grammar, the Types, the Tokenizer, PruningStrategy, the WordFactory, the RuleGroup - all fine, since they're immutable, will receive from RealizeMain
+ *   Mutable Run Data: UnifyControl, the LexicalData, the TypesData, the RuleGroupData - this is the same level. Each Realizer should have separate ones.
  */
 public class Realizer
 {	
     /** The grammar used for realization. */
-    private final Grammar grammar;
-    public Grammar getGrammar() {
-    	return this.grammar;
-    }
-    private Chart chart;
-    private PruningStrategy pruningStrategy;
-    private final RealizationSettings rSet;
+    private final Grammar grammar; 
+    private final PruningStrategy pruningStrategy;
+    private final LexicalData lex;
+    private final RuleGroupData rgd;
+    private final TypesData td;
+    private final UnifyControl uc;
     
-    /** Constructor. */
-    public Realizer(RealizationSettings rs, Grammar grammar) { 
+    private final RealizationSettings rSet;
+
+    protected Realizer(RealizationSettings rs, PruningStrategy ps, Grammar grammar) { 
     	this.rSet = rs;
         this.grammar = grammar;
-        this.pruningStrategy = new NBestPruningStrategy(rSet.getEdgePruningValue());
+        uc = grammar.createNewUnifyControl();
+        td = grammar.createNewTypesData();
+        lex = grammar.createNewLexicalData(uc, td);
+        rgd = grammar.createNewRuleGroupData(td, lex, uc);
+        this.pruningStrategy = ps; 
     }
     
-    /** Returns the chart used in the latest request, or null if none. */
-    public Chart getChart() { return chart; }
-
     /**
      * Retrieves an input LF from the given XML element, processing any 
      * LF chunks along the way.
      */
-    public static LF getLfFromElt(Grammar grammar, Element lfElt) {
+    public static LF getLfFromElt(Lexicon l, Element lfElt, TypesData td) {
         HyloHelper.processChunks(lfElt);
-        LF lf = HyloHelper.getLF(grammar, lfElt);
+        LF lf = HyloHelper.getLF(l, td, lfElt);
         return lf;
     }
     
@@ -77,16 +86,16 @@ public class Realizer
      * If a hypertagger is employed, realization proceeds iteratively through the available beta-best values 
      * within the overall time or edge limit.
      */
-    public Edge realize(LF lf, SignScorer signScorer) {
-    	boolean printOnlyComplete = true;
-        List<SatOp> preds = HyloHelper.flatten(grammar, lf);
+    public Chart realize(LF lf, SignScorer signScorer) {
+    //	boolean printOnlyComplete = true;
+        List<SatOp> preds = HyloHelper.flatten(grammar.getLexicon(), td, lf);
         SignScorer scorerToUse = signScorer;
         // realize iteratively with hypertagger, if present
         // otherwise make chart, set start time 
-        chart = new Chart(rSet, new EdgeFactory(grammar, preds, scorerToUse), this.pruningStrategy);
+        Chart chart = new Chart(rSet, new EdgeFactory(lex, uc, grammar.getLexicon(), rgd, grammar.getWordFactory(), td, grammar.getRuleGroup(), preds, scorerToUse, grammar.getTokenizer()), grammar.getLexicon(), rgd, this.pruningStrategy, grammar.getTokenizer());
         chart.initialize();
         chart.combine(rSet.getIterLimit());
-        chart.printEdges(printOnlyComplete);
-        return chart.getBestEdge();
+      //  chart.printEdges(printOnlyComplete);
+        return chart;
     }
 }

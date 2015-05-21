@@ -45,7 +45,16 @@ public class LicensingFeature
      * A list of string values of other features that suffice to license 
      * categories with this feature.
      */
-    public final List<String> alsoLicensedBy;
+    private final List<String> alsoLicensedBy;
+    public String getAlsoLicense(int i) {
+    	return alsoLicensedBy.get(i);
+    }
+    public int numAlso() {
+    	return alsoLicensedBy.size();
+    }
+    public boolean alsoContains(String s) {
+    	return alsoLicensedBy.contains(s);
+    }
     
     /**
      * A flag indicating whether semantically null categories with the 

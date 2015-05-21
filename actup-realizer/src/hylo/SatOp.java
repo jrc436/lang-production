@@ -18,17 +18,19 @@
 
 package hylo;
 
-import grammar.Grammar;
+import grammar.TypesData;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+
+import lexicon.Lexicon;
 
 import org.jdom.Element;
 
 import synsem.LF;
 import synsem.LexSemOrigin;
-import unify.ModFcn;
+import unify.MutableScript;
 import unify.Substitution;
 import unify.Unifiable;
 import unify.Unifier;
@@ -93,25 +95,25 @@ public class SatOp extends HyloFormula {
     protected Nominal _nominal;
     protected LF _arg;
 
-    public SatOp(Grammar grammar, Element e) {
-    	super(grammar);
+    public SatOp(Lexicon l, TypesData td, Element e) {
+    	super(l);
         boolean shared = "true".equals(e.getAttributeValue("shared"));
         String nom = e.getAttributeValue("nom");
         if (nom != null) {
-            _nominal = new NominalAtom(grammar, HyloHelper.prefix(nom), HyloHelper.type(grammar, nom), shared);
+            _nominal = new NominalAtom(l, HyloHelper.prefix(nom), HyloHelper.type(td, nom), shared);
         } else {
             nom = e.getAttributeValue("nomvar");
             if (nom != null) {
-                _nominal = new NominalVar(grammar, HyloHelper.prefix(nom), HyloHelper.type(grammar, nom), shared);
+                _nominal = new NominalVar(l, HyloHelper.prefix(nom), HyloHelper.type(td, nom), shared);
             } else {
                 throw new RuntimeException("Satop must have a nom or nomvar.");
             }
         }
-        _arg = HyloHelper.getLF_FromChildren(grammar, e);
+        _arg = HyloHelper.getLF_FromChildren(l, td, e);
     }
 
-    public SatOp(Grammar grammar, Nominal nom, LF arg) {
-    	super(grammar);
+    public SatOp(Lexicon l, Nominal nom, LF arg) {
+    	super(l);
         _nominal = nom;
         _arg = arg;
     }
@@ -123,15 +125,15 @@ public class SatOp extends HyloFormula {
     public void setArg(LF arg) { _arg = arg; }
     
     public LF copy() {
-        SatOp retval = new SatOp(grammar, (Nominal)_nominal.copy(), _arg.copy());
+        SatOp retval = new SatOp(l, (Nominal)_nominal.copy(), _arg.copy());
         retval._origin = _origin;
         return retval;
     }
 
-    public void deepMap(ModFcn mf) {
-        _nominal.deepMap(mf);
-        _arg.deepMap(mf);
-        mf.modify(this);
+    public void mutateAll(MutableScript m) {
+        _nominal.mutateAll(m);
+        _arg.mutateAll(m);
+        m.run(this);
     }
 
     public boolean occurs(Variable var) {
@@ -153,9 +155,9 @@ public class SatOp extends HyloFormula {
     public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
         if (u instanceof HyloFormula) {
             if (u instanceof SatOp) {
-                Nominal $nom = (Nominal) Unifier.unify(grammar.getUnifyControl(), _nominal, ((SatOp)u)._nominal, sub);
-                LF $arg = (LF)Unifier.unify(grammar.getUnifyControl(), _arg, ((SatOp)u)._arg,sub);
-                SatOp retval = new SatOp(grammar, $nom, $arg);
+                Nominal $nom = (Nominal) Unifier.unify(uc, _nominal, ((SatOp)u)._nominal, sub);
+                LF $arg = (LF)Unifier.unify(uc, _arg, ((SatOp)u)._arg,sub);
+                SatOp retval = new SatOp(l, $nom, $arg);
                 retval._origin = _origin;
                 return retval;
             }
@@ -165,8 +167,8 @@ public class SatOp extends HyloFormula {
         }
     }
 
-    public Object fill(Substitution sub) throws UnifyFailure {
-        SatOp retval = new SatOp(grammar, (Nominal)_nominal.fill(sub), (LF)_arg.fill(sub));
+    public Object fill(UnifyControl uc, Substitution sub) throws UnifyFailure {
+        SatOp retval = new SatOp(l, (Nominal)_nominal.fill(uc, sub), (LF)_arg.fill(uc, sub));
         retval._origin = _origin;
         return retval;
     }
@@ -211,7 +213,7 @@ public class SatOp extends HyloFormula {
     /**
      * Returns a hash code using the given map from vars to ints.
      */
-    public int hashCode(LinkedHashMap<Unifiable, Integer> varMap) { 
+    public int hashCode(Map<Unifiable, Integer> varMap) { 
         return _nominal.hashCode(varMap) + _arg.hashCode(varMap); 
     }
         
@@ -219,7 +221,7 @@ public class SatOp extends HyloFormula {
      * Returns whether this sat op equals the given object  
      * up to variable names, using the given maps from vars to ints.
      */
-    public boolean equals(Object obj, LinkedHashMap<Unifiable, Integer> varMap, LinkedHashMap<Unifiable, Integer> varMap2) {
+    public boolean equals(Object obj, Map<Unifiable, Integer> varMap, Map<Unifiable, Integer> varMap2) {
         if (obj.getClass() != this.getClass()) { return false; }
         SatOp so = (SatOp) obj;
         return _nominal.equals(so._nominal, varMap, varMap2) && 

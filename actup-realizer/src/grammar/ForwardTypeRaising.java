@@ -18,7 +18,13 @@
 
 package grammar;
 
-import synsem.*;
+import lexicon.LexicalData;
+import lexicon.Lexicon;
+import lexicon.Tokenizer;
+import synsem.Category;
+import synsem.Slash;
+import synsem.VarModality;
+import unify.UnifyControl;
 
 /**
  * Forward type-raising: X => Y/(Y\X).
@@ -31,9 +37,10 @@ public class ForwardTypeRaising extends AbstractTypeRaisingRule {
     
 	private static final long serialVersionUID = 1417585756957436141L;
 
-	/** Creates a forward type raising rule with the given parameters. */
-    public ForwardTypeRaising (Grammar rg, boolean useDollar, Category arg, Category result) {
-        super(rg, ">T", new Slash(rg, '/', new VarModality(rg, "i")), new Slash(rg, '\\', new VarModality(rg, "i")), useDollar, arg, result);
+	/** Creates a forward type raising rule with the given parameters. 
+	 * @param t TODO*/
+    public ForwardTypeRaising(UnifyControl uc, LexicalData lex, Lexicon l, boolean useDollar, Category arg, Category result, Tokenizer t) {
+        super(uc, lex, l, ">T", new Slash('/', new VarModality("i")), new Slash('\\', new VarModality("i")), useDollar, arg, result, t);
     }
     
     public String toString() {

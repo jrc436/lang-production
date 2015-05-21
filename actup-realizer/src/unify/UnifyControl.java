@@ -22,8 +22,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import synsem.Category;
-import synsem.CategoryFcn;
-import synsem.CategoryFcnAdapter;
 import synsem.LF;
 
 /**
@@ -44,12 +42,11 @@ public class UnifyControl {
     /**
      * A function that makes variables unique.
      */
-    private final ModFcn uniqueFcn = new ModFcn() {
-        public void modify (Mutable m) {
+    private final void uniqueFcn(Mutable m) {
             if (m instanceof Indexed && m instanceof Variable) {
                 ((Indexed)m).setIndex(_varIndex);
             }
-        }};
+        }
 
 
     /**
@@ -58,8 +55,7 @@ public class UnifyControl {
     private int _fsIndex = 1;
     private Map<Integer, Integer> _reindexed = new LinkedHashMap<Integer, Integer>();
 
-    private CategoryFcn indexFcn = new CategoryFcnAdapter() {
-        public void forall(Category c) {
+    private void indexFcn(Category c) {
             FeatureStructure fs = c.getFeatureStructure();
             if (fs != null) {
                 int index = fs.getIndex();
@@ -73,7 +69,7 @@ public class UnifyControl {
                 }
             }
         }
-    };
+    
 
     /** Resets the uniqueness counters. */
     public void startUnifySequence() {
@@ -89,11 +85,11 @@ public class UnifyControl {
     /** Sets the var and feature structure indices to unique values. */
     public void reindex(Category cat, Category anotherCat) {
         _reindexed.clear();
-        cat.forall(indexFcn);
-        cat.deepMap(uniqueFcn);
+        cat.applyToAll(this::indexFcn);
+        cat.mutateAll(this::uniqueFcn);
         if (cat != anotherCat && anotherCat != null) {
-            anotherCat.forall(indexFcn);
-            anotherCat.deepMap(uniqueFcn);
+            anotherCat.applyToAll(this::indexFcn);
+            anotherCat.mutateAll(this::uniqueFcn);
         }
         _varIndex++;
     }
@@ -106,7 +102,7 @@ public class UnifyControl {
         return ++_fsIndex;
     }
     
-    public Object copy(Object o) {
+    public static Object copy(Object o) {
         if (o instanceof Category) {
             return ((Category)o).copy();
         } else if (o instanceof GFeatVar) {

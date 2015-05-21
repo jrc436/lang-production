@@ -18,6 +18,7 @@
 
 package realize;
 
+import grammar.TypesData;
 import hylo.NominalAtom;
 import hylo.NominalVar;
 
@@ -30,11 +31,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lexicon.Lexicon;
 import lexicon.LicensingFeature;
 import synsem.AtomCat;
 import synsem.Category;
-import synsem.CategoryFcn;
-import synsem.CategoryFcnAdapter;
 import synsem.ComplexCat;
 import unify.FeatureStructure;
 import unify.SimpleSubstitution;
@@ -56,22 +56,25 @@ public class FeatureLicenser
 
     // the edge factory for which this feature licenser is a helper
     private final EdgeFactory edgeFactory;
-    
-    // the licensing features     
     private final LicensingFeature[] licensingFeatures;
     
+    // the licensing features     
+    private final Lexicon lex;
+    private final TypesData td;
+    
     /** Constructor. */
-    public FeatureLicenser(EdgeFactory edgeFactory) { 
+    public FeatureLicenser(EdgeFactory edgeFactory, Lexicon l, TypesData td) { 
         this.edgeFactory = edgeFactory; 
-        this.licensingFeatures = edgeFactory.grammar.getLexicon().getLicensingFeatures();
+        this.lex = l;
+        licensingFeatures = l.copyFeatures();
+        this.td = td;
     }
-
-    /** Constructor with licensing features. */
-    public FeatureLicenser(EdgeFactory edgeFactory, LicensingFeature[] licensingFeatures) { 
-        this.edgeFactory = edgeFactory; 
-        this.licensingFeatures = licensingFeatures;
+    public FeatureLicenser(EdgeFactory ef, Lexicon l, TypesData td, LicensingFeature[] featuresToUse) {
+    	this.edgeFactory = ef;
+    	this.lex = l;
+    	this.td = td;
+    	this.licensingFeatures = featuresToUse;
     }
-
     
     //-----------------------------------------------------------------
     // semantically null word indexing
@@ -85,7 +88,7 @@ public class FeatureLicenser
      * The same nominal is reused for repeated occurrences of a 'lex' value.
      */
     public void indexSemanticallyNullWords(Category cat) {
-        cat.forall(semanticallyNullWordIndexer);
+        cat.applyToAll(this::semanticallyNullWordIndexer);
     }
     
     // counter
@@ -95,30 +98,28 @@ public class FeatureLicenser
     private Map<String, String> wordIndexMap = new HashMap<String, String>();
     
     // cat function
-    private CategoryFcn semanticallyNullWordIndexer = new CategoryFcnAdapter() {
-        public void forall(Category c) {
-            if (!(c instanceof AtomCat)) return;
-            FeatureStructure fs = c.getFeatureStructure();
-            if (fs == null) return;
-            if (!fs.hasAttribute("lex")) return;
-            Object indexVal = fs.getValue("index"); 
-            if (indexVal == null || (indexVal instanceof NominalVar)) {
-                String lexVal = fs.getValue("lex").toString();
-                String index = wordIndexMap.get(lexVal);
-                NominalAtom nom;
-                if (index == null) {
-                    do {
-                        index = "w" + ++wordCounter;
-                        nom = new NominalAtom(edgeFactory.grammar, index);
-                    } while (edgeFactory.nominals.containsKey(nom));
-                    wordIndexMap.put(lexVal, index);
-                    edgeFactory.nominals.put(nom, edgeFactory.nominals.size());
-                }
-                else nom = new NominalAtom(edgeFactory.grammar, index);
-                fs.setFeature("index", nom);
-            }
+    private void semanticallyNullWordIndexer(Category c) {
+    	if (!(c instanceof AtomCat)) return;
+    	FeatureStructure fs = c.getFeatureStructure();
+    	if (fs == null) return;
+        if (!fs.hasAttribute("lex")) return;
+        Object indexVal = fs.getValue("index"); 
+        if (indexVal == null || (indexVal instanceof NominalVar)) {
+        	String lexVal = fs.getValue("lex").toString();
+        	String index = wordIndexMap.get(lexVal);
+        	NominalAtom nom;
+        	if (index == null) {
+        		do {
+        			index = "w" + ++wordCounter;
+        			nom = new NominalAtom(lex, td, index);
+        		} while (edgeFactory.nominals.containsKey(nom));
+        		wordIndexMap.put(lexVal, index);
+        		edgeFactory.nominals.put(nom, edgeFactory.nominals.size());
+        	}
+        	else nom = new NominalAtom(lex, td, index);
+        	fs.setFeature("index", nom);
         }
-    };
+    }
     
 
     //-----------------------------------------------------------------
@@ -130,7 +131,7 @@ public class FeatureLicenser
      */
     public void updateFeatureMap(Category cat) {
         currentFeatureMap = featureMap; 
-        cat.forall(featureMapUpdater);
+        cat.applyToAll(this::featureMapUpdater);
         currentFeatureMap = null;
     }
     
@@ -138,7 +139,7 @@ public class FeatureLicenser
     private void updateCatFeatureMap(Category cat) {
         catFeatureMap.clear(); 
         currentFeatureMap = catFeatureMap; 
-        cat.forall(featureMapUpdater);
+        cat.applyToAll(this::featureMapUpdater);
         currentFeatureMap = null;
     }
     
@@ -156,8 +157,7 @@ public class FeatureLicenser
     private List<Category> allInitialAtomCats = new ArrayList<Category>();
     
     // feature map updater    
-    private CategoryFcn featureMapUpdater = new CategoryFcnAdapter() {
-        public void forall(Category c) {
+    private void featureMapUpdater(Category c) {
             if (!(c instanceof AtomCat)) return;
             if (currentFeatureMap == featureMap) allInitialAtomCats.add(c);
             FeatureStructure fs = c.getFeatureStructure();
@@ -170,8 +170,7 @@ public class FeatureLicenser
                     // check for relevant value
                     String valStr = val.toString(); 
                     String fVal = licensingFeatures[i].val;
-                    List<String> alsoList = licensingFeatures[i].alsoLicensedBy;
-                    if (fVal != null && !fVal.equals(valStr) && !alsoList.contains(valStr)) continue;
+                    if (fVal != null && !fVal.equals(valStr) && !licensingFeatures[i].alsoContains(valStr)) continue;
                     // add to feature map
                     Map<String, Set<Category>> valMap = currentFeatureMap.get(attr); 
                     if (valMap == null) {
@@ -187,7 +186,6 @@ public class FeatureLicenser
                 }
             }
         }
-    };
 
     
     //-----------------------------------------------------------------
@@ -262,9 +260,8 @@ public class FeatureLicenser
                     if (fmValMap == null) return false;
                     boolean foundLicensingVal = fmValMap.containsKey(val);
                     if (!foundLicensingVal) {
-                        List<String> alsoList = licensingFeatures[i].alsoLicensedBy;
-                        for (int j = 0; j < alsoList.size(); j++) {
-                            if (fmValMap.containsKey(alsoList.get(j))) { 
+                        for (int j = 0; j < licensingFeatures[i].numAlso(); j++) {
+                            if (fmValMap.containsKey(licensingFeatures[i].getAlsoLicense(j))) { 
                                 foundLicensingVal = true; break;
                             }
                         }
@@ -349,7 +346,7 @@ public class FeatureLicenser
             // ensure cats with lex feature have an index var
             FeatureStructure fs = ac.getFeatureStructure();
             if (fs.hasAttribute("lex") && !fs.hasAttribute("index")) {
-                fs.setFeature("index", new NominalVar(edgeFactory.grammar, "W"));
+                fs.setFeature("index", new NominalVar(lex, "W", td));
                 uc.reindex(ac);
             }
             // unify with appropriate initial cats
@@ -359,15 +356,12 @@ public class FeatureLicenser
             else { 
                 Map<String, Set<Category>> fmValMap = featureMap.get(attr);
                 initialCats = fmValMap.get(val);
-                List<String> alsoList = currentLicensingFeature.alsoLicensedBy;
-                if (alsoList.size() > 0) { 
-                    if (initialCats != null) initialCats = new HashSet<Category>(initialCats);
-                    else initialCats = new HashSet<Category>();
-                    for (int i = 0; i < alsoList.size(); i++) {
-                        Set<Category> alsoSet = fmValMap.get(alsoList.get(i));
-                        if (alsoSet != null) initialCats.addAll(alsoSet);
-                    }
-                }
+                if (initialCats != null) initialCats = new HashSet<Category>(initialCats);
+                else initialCats = new HashSet<Category>();
+                for (int i = 0; i < currentLicensingFeature.numAlso(); i++) {
+                    Set<Category> alsoSet = fmValMap.get(currentLicensingFeature.getAlsoLicense(i));
+                    if (alsoSet != null) initialCats.addAll(alsoSet);
+                }              
             }
             if (initialCats == null) {
                 System.err.println("Warning, unable to find initial cats for feature " + attr + "=" + val); 
@@ -398,7 +392,7 @@ public class FeatureLicenser
                         if (!it2.next().equals(index)) it2.remove();
                     }
                     // instantiate
-                    Category instCat = (Category) cat.fill(simpleSubst);
+                    Category instCat = (Category) cat.fill(uc, simpleSubst);
                     // and add instantiated cats
                     instantiatedCats.add(instCat);
                 }

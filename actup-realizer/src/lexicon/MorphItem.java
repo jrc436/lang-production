@@ -20,8 +20,6 @@ package lexicon;
 
 import org.jdom.*;
 
-import grammar.Grammar;
-
 
 /**
  * A data structure for morphological entries.
@@ -47,16 +45,17 @@ public class MorphItem {
     /** Constructor. */
     public MorphItem() {};
 
-    /** Constructor from XML element. */
-    public MorphItem(Grammar grammar, Element e) {
+    /** Constructor from XML element. 
+     * @param wf TODO*/
+    public MorphItem(Tokenizer t, IWordFactory wf, Element e) {
     	
         String coartString = e.getAttributeValue("coart");
         if ("true".equals(coartString)) coart = true;
         
         String wordString = e.getAttributeValue("word");
         boolean strictFactors = coart; // parse with flag for strict factors with coart items
-        Word tokenizedWord = grammar.getLexicon().getTokenizer().parseToken(grammar, wordString, strictFactors);
-        surfaceWord = Word.createSurfaceWord(grammar.getWordFactory(), tokenizedWord);
+        Word tokenizedWord = t.parseToken(wf, wordString, strictFactors);
+        surfaceWord = Word.createSurfaceWord(wf, tokenizedWord);
         
         String stem = e.getAttributeValue("stem");
         if (stem == null) stem = surfaceWord.getForm();
@@ -65,7 +64,7 @@ public class MorphItem {
         String supertag = null; // supertag comes later from syn cat
         String semClass = e.getAttributeValue("class");
         
-        word = Word.createFullWord(grammar.getWordFactory(), surfaceWord, stem, POS, supertag, semClass);
+        word = Word.createFullWord(wf, surfaceWord, stem, POS, supertag, semClass);
         
         String macrosString = e.getAttributeValue("macros");
         if (macrosString != null) {
@@ -81,7 +80,7 @@ public class MorphItem {
         if (coart) {
             String indexAttr = wordString.substring(0, wordString.indexOf("-"));
             String indexVal = surfaceWord.getVal(indexAttr);
-            coartIndexingWord = Word.createWord(grammar.getWordFactory(), indexAttr, indexVal);
+            coartIndexingWord = Word.createWord(wf, indexAttr, indexVal);
         }
     }
 

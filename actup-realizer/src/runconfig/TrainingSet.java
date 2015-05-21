@@ -17,4 +17,10 @@ public enum TrainingSet {
 				return "";
 		}
 	}
+	public int numInputFilesUsed() {
+		switch (this) {
+			default:
+				return 650;
+		}
+	}
 }

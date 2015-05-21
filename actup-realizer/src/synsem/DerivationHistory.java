@@ -18,8 +18,8 @@
 //////////////////////////////////////////////////////////////////////////////
 package synsem;
 
-import grammar.Grammar;
 import grammar.Rule;
+import grammar.RuleGroupData;
 import grammar.TypeChangingRule;
 
 import java.io.Serializable;
@@ -43,18 +43,18 @@ public class DerivationHistory implements Serializable, Comparable<DerivationHis
     private boolean _noHistory = false;
     private transient int _complexity = -1;
     
-    private final Grammar grammar;
+    private final RuleGroupData rdg;
     
     /** Constructor for a sign with no prior history. */
-    public DerivationHistory(Grammar grammar, Sign output) {
+    public DerivationHistory(RuleGroupData rdg, Sign output) {
     	
         _noHistory = true;
         _output = output;
-        this.grammar = grammar;
+        this.rdg = rdg;
     }
     
     /** Constructor for a sign created by rule. */
-    public DerivationHistory(Grammar grammar, Sign[] inputs, Sign output, Rule rule) {
+    public DerivationHistory(RuleGroupData rdg, Sign[] inputs, Sign output, Rule rule) {
     	
         _inputs = new Sign[inputs.length];
         for (int i=0; i < inputs.length; i++) {
@@ -62,7 +62,7 @@ public class DerivationHistory implements Serializable, Comparable<DerivationHis
         }
         _output = output;
         _rule = rule;
-        this.grammar = grammar;
+        this.rdg = rdg;
     }
 
 
@@ -100,7 +100,7 @@ public class DerivationHistory implements Serializable, Comparable<DerivationHis
         }
         // type-changing rule (possibly)
         String ruleName = _rule.name();
-        TypeChangingRule tcr = grammar.getRules().getTypeChangingRule(ruleName);
+        TypeChangingRule tcr = rdg.getTypeChangingRule(ruleName);
         if (tcr != null) {
             sb.append("(gram) ");
             for (int i = 6; i < maxRuleLen; i++) { sb.append(' '); }

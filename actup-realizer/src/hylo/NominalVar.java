@@ -18,7 +18,8 @@
 
 package hylo;
 
-import grammar.Grammar;
+import lexicon.Lexicon;
+import grammar.TypesData;
 
 import org.jdom.Element;
 
@@ -43,25 +44,25 @@ public class NominalVar extends HyloVar implements Nominal {
 	
 	protected boolean shared = false;
     
-    public NominalVar(Grammar grammar, String name) {
-        super(grammar, name);
+    public NominalVar(Lexicon l, String name, TypesData td) {
+        super(l, td, name);
     }
 
-    public NominalVar(Grammar grammar, String name, SimpleType st) {
-        super(grammar, name, st);
+    public NominalVar(Lexicon l, String name, SimpleType st) {
+        super(l, name, st);
     }
 
-    public NominalVar(Grammar grammar, String name, SimpleType st, boolean shared) {
-        super(grammar, name, st);
+    public NominalVar(Lexicon l, String name, SimpleType st, boolean shared) {
+        super(l, name, st);
         this.shared = shared;
     }
 
-    protected NominalVar(Grammar grammar, String name, int index, SimpleType st) {
-        super(grammar, name, index, st);
+    protected NominalVar(Lexicon l, String name, int index, SimpleType st) {
+        super(l, name, index, st);
     }
     
-    protected NominalVar(Grammar grammar, String name, int index, SimpleType st, boolean shared) {
-        super(grammar, name, index, st);
+    protected NominalVar(Lexicon l, String name, int index, SimpleType st, boolean shared) {
+        super(l, name, index, st);
         this.shared = shared;
     }
     
@@ -72,12 +73,12 @@ public class NominalVar extends HyloVar implements Nominal {
     public void setShared(boolean shared) { this.shared = shared; }
     
     public void setType(SimpleType st) { 
-        _hashCode += st.getIndex() - type.getIndex();
+        _hashCode += st.hashCode() - type.hashCode();
         type = st; 
     }
     
     public LF copy() {
-        return new NominalVar(grammar, _name, _index, type, shared);
+        return new NominalVar(l, _name, _index, type, shared);
     }
 
     
@@ -106,44 +107,44 @@ public class NominalVar extends HyloVar implements Nominal {
         if (lf.getType() == null) throw new UnifyFailure();
         SimpleType st = (SimpleType) type.unify(lf.getType(), sub, uc);
         // with nominal atoms, go ahead and substitute
-        if (u instanceof NominalAtom) return sub.makeSubstitution(this, u); 
+        if (u instanceof NominalAtom) return sub.makeSubstitution(uc, this, u); 
         // with nominal vars, substitute according to type specificity then comparison order,  
         // so that the direction of unification doesn't matter
         if (u instanceof NominalVar) {
             NominalVar u_nv = (NominalVar) u;
             // equal types, use comparison order
             if (type.equals(u_nv.getType())) {
-                if (super.compareTo(u_nv) >= 0) return sub.makeSubstitution(this, u_nv); 
-                else return sub.makeSubstitution(u_nv, this);
+                if (super.compareTo(u_nv) >= 0) return sub.makeSubstitution(uc, this, u_nv); 
+                else return sub.makeSubstitution(uc, u_nv, this);
             }
             // unequal types, use most specific one
-            if (type.equals(st)) return sub.makeSubstitution(u_nv, this);
-            if (u_nv.getType().equals(st)) return sub.makeSubstitution(this, u_nv); 
+            if (type.equals(st)) return sub.makeSubstitution(uc, u_nv, this);
+            if (u_nv.getType().equals(st)) return sub.makeSubstitution(uc, this, u_nv); 
             // otherwise make new nom var with intersection type, 
             // name based on comparison order and index, and new index
             String name = (super.compareTo(u_nv) >= 0) ? (u_nv._name + u_nv._index) : (_name + _index);
-            NominalVar nv_st = new NominalVar(grammar, name, uc.getUniqueVarIndex(), st);
+            NominalVar nv_st = new NominalVar(l, name, uc.getUniqueVarIndex(), st);
             // and subst both
-            sub.makeSubstitution(u_nv, nv_st);
-            return sub.makeSubstitution(this, nv_st); 
+            sub.makeSubstitution(uc, u_nv, nv_st);
+            return sub.makeSubstitution(uc, this, nv_st); 
         }
         // with hylo vars, substitute the hylo var for this 
         if (u instanceof HyloVar) { 
             HyloVar u_hv = (HyloVar) u;
             // check for same type
-            if (type.equals(st)) return sub.makeSubstitution(u_hv, this); 
+            if (type.equals(st)) return sub.makeSubstitution(uc, u_hv, this); 
             // otherwise make new nom var with intersection type, 
             // same name, and new index
-            NominalVar nv_st = new NominalVar(grammar, this._name, uc.getUniqueVarIndex(), st);
+            NominalVar nv_st = new NominalVar(l, this._name, uc.getUniqueVarIndex(), st);
             // and subst both
-            sub.makeSubstitution(u_hv, nv_st);
-            return sub.makeSubstitution(this, nv_st); 
+            sub.makeSubstitution(uc, u_hv, nv_st);
+            return sub.makeSubstitution(uc, this, nv_st); 
         }
         // otherwise give up
         throw new UnifyFailure();
     }
 
-    public Object fill(Substitution sub) throws UnifyFailure {
+    public Object fill(UnifyControl uc, Substitution sub) throws UnifyFailure {
         Object val = sub.getValue(this);
         if (val != null) {
             return val;

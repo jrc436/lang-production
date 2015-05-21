@@ -18,7 +18,7 @@
 
 package hylo;
 
-import grammar.Grammar;
+import lexicon.Lexicon;
 
 import org.jdom.Element;
 
@@ -41,16 +41,16 @@ public class Proposition extends HyloAtom {
 
 	private static final long serialVersionUID = -5392519210634765414L;
 
-	public Proposition(Grammar grammar, String name) {
-        super(grammar, name);
+	public Proposition(Lexicon lex, String name) {
+        super(lex, name);
     }
     
-    public Proposition(Grammar grammar, String name, SimpleType st) {
-        super(grammar, name, st);
+    public Proposition(Lexicon l, String name, SimpleType st) {
+        super(l, name, st);
     }
     
     public LF copy() {
-        return new Proposition(grammar, _name, type);
+        return new Proposition(l, _name, type);
     }
     
     public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
@@ -65,7 +65,7 @@ public class Proposition extends HyloAtom {
             if (st.equals(type)) return this;
             if (st.equals(prop.type)) return prop;
             // otherwise return prop with name of intersection type
-            return new Proposition(grammar, st.getName(), st);
+            return new Proposition(l, st.getName(), st);
         }
         // otherwise defer to default routine
         return super.unify(u, sub, uc);

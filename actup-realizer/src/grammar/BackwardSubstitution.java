@@ -18,10 +18,15 @@
 
 package grammar;
 
-import unify.*;
-import synsem.*;
+import java.util.List;
 
-import java.util.*;
+import lexicon.LexicalData;
+import lexicon.Lexicon;
+import lexicon.Tokenizer;
+import synsem.Category;
+import synsem.Slash;
+import unify.UnifyControl;
+import unify.UnifyFailure;
 
 /**
  * Backward substitution, e.g. Y\Z X\Y\Z => X\Z
@@ -33,21 +38,21 @@ public class BackwardSubstitution extends AbstractSubstitutionRule {
 
 	private static final long serialVersionUID = -4597839433754132265L;
 
-	public BackwardSubstitution(Grammar rg) {
-		this(rg, true);
+	public BackwardSubstitution(UnifyControl uc, LexicalData lex, Lexicon l, Tokenizer t) {
+		this(uc, lex, l, true, t);
 	}
 
-	public BackwardSubstitution(Grammar rg, boolean isHarmonic) {
-		super(rg);
+	public BackwardSubstitution(UnifyControl uc, LexicalData lex, Lexicon l, boolean isHarmonic, Tokenizer t) {
+		super(uc, lex, l, t);
 		_isHarmonic = isHarmonic;
 		if (isHarmonic) {
 			name = "<S";
-			_functorSlash = new Slash(grammar, '\\', "^");
-			_argSlash = new Slash(grammar, '\\', "^");
+			_functorSlash = new Slash('\\', "^");
+			_argSlash = new Slash('\\', "^");
 		} else {
 			name = "<Sx";
-			_functorSlash = new Slash(grammar, '\\', "x");
-			_argSlash = new Slash(grammar, '/', "x");
+			_functorSlash = new Slash('\\', "x");
+			_argSlash = new Slash('/', "x");
 		}
 		_functorSlash.setAbility("active");
 	}

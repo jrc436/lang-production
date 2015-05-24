@@ -63,8 +63,8 @@ public class Realizer
     protected Realizer(RealizationSettings rs, PruningStrategy ps, Grammar grammar) { 
     	this.rSet = rs;
         this.grammar = grammar;
-        uc = grammar.createNewUnifyControl();
         td = grammar.createNewTypesData();
+        uc = grammar.createNewUnifyControl(td);       
         lex = grammar.createNewLexicalData(uc, td);
         rgd = grammar.createNewRuleGroupData(td, lex, uc);
         this.pruningStrategy = ps; 

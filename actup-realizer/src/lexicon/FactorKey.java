@@ -48,7 +48,7 @@ public class FactorKey {
         if (val == null) {
         	val = "<NULL>";
         }
-        if (attr == Tokenizer.WORD_ATTR) {
+        if (attr.equals(Tokenizer.WORD_ATTR)) {
         	return val;
         }
         else{
@@ -66,7 +66,7 @@ public class FactorKey {
         if (this == obj) return true;
         if (!(obj instanceof FactorKey)) return false;
         FactorKey key = (FactorKey) obj;
-        return factor == key.factor && val == key.val;
+        return factor.equals(key.factor) && val.equals(key.val);
     }
 
     /** Returns "factor-val". */

@@ -33,6 +33,7 @@ public class ValleyClimber implements Optimizer {
 	Queue<Message> resultQ;
 	Queue<String> log;
 	private final IOSettings io;
+	private final int timeoutNum;
 	
 	public ValleyClimber(RealizeMain r, IOSettings io, Queue<Message> resultQ, Queue<String> log) {
 		this.resultQ = resultQ;
@@ -49,6 +50,17 @@ public class ValleyClimber implements Optimizer {
 				break;
 			case ROUGE:
 				eval = new Rouge(io.getScoringStrategy(), io.getEvaluationType().extPath());
+				break;
+		}
+		switch (io.getTrainingSet()) {
+			case SWBD10FOLD:
+				timeoutNum = 10;
+				break;
+			case SWBDM1:
+				timeoutNum = 650;
+				break;
+			default:
+				timeoutNum = 1;
 				break;
 		}
 	}
@@ -121,11 +133,7 @@ public class ValleyClimber implements Optimizer {
 		Set<Integer> alreadyHad = new HashSet<Integer>();
 		
 		while (true) {
-			int lock = RealizeMain.NO_LOCK_AVAIL;
-			while (lock == RealizeMain.NO_LOCK_AVAIL) {
-				log.offer(runName + " is attempting to acquire a lock");
-				lock = r.attemptAcquireLock(alreadyHad);
-			}
+			int lock = r.attemptAcquireLock(alreadyHad, runName, log, timeoutNum);
 			if (lock == RealizeMain.NO_LOCK_REMAINING) {
 				break;
 			}
@@ -141,7 +149,6 @@ public class ValleyClimber implements Optimizer {
 				scorer.clean();				
 			}
 			r.releaseLock(lock);
-			
 		}
 		return eval.scoreAll(realizations);
 	}

@@ -425,7 +425,7 @@ public class DefaultTokenizer implements Tokenizer {
         sb.append("<s> ");
         for (int i = 0; i < words.size(); i++) {
             Word w = words.get(i);
-            if (w.getForm() == "<s>" || w.getForm() == "</s>") continue; // skip <s> or </s>
+            if (w.getForm().equals("<s>") || w.getForm().equals("</s>")) continue; // skip <s> or </s>
             sb.append(format(w, semClassReplacement));
             sb.append(" ");
         }
@@ -492,7 +492,7 @@ public class DefaultTokenizer implements Tokenizer {
         }
         for(int i=0; i < s.length(); i++) {
             char c = s.charAt(i);
-            if (output == null && (c=='<' || c=='>' || c=='&' || c=='\'' || c=='"' || c==':' || c=='-')) {
+            if (output == null && (c == '<' || c=='>' || c=='&' || c=='\'' || c=='"' || c==':' || c=='-')) {
                 output = new StringBuffer();
                 output.append(s.substring(0,i));
             }
@@ -578,12 +578,12 @@ public class DefaultTokenizer implements Tokenizer {
     public List<String> expandWord(Word word) {
         String token = word.getForm();
         String sc = word.getSemClass();
-        if (sc == Tokenizer.DATE_CLASS && isDate(token)) return expandDate(token);
-        if (sc == Tokenizer.TIME_CLASS && isTime(token)) return expandTime(token);
-        if (sc == Tokenizer.NUM_CLASS && isNum(token)) return expandNum(token);
-        if (sc == Tokenizer.AMT_CLASS && isAmt(token)) return expandAmt(token);
-        if (sc == Tokenizer.DUR_CLASS && isDur(token)) return expandDur(token);
-        if (sc == Tokenizer.NE_CLASS && isNamedEntity(token)) return expandNamedEntity(token);
+        if (sc.equals(Tokenizer.DATE_CLASS) && isDate(token)) return expandDate(token);
+        if (sc.equals(Tokenizer.TIME_CLASS) && isTime(token)) return expandTime(token);
+        if (sc.equals(Tokenizer.NUM_CLASS) && isNum(token)) return expandNum(token);
+        if (sc.equals(Tokenizer.AMT_CLASS) && isAmt(token)) return expandAmt(token);
+        if (sc.equals(Tokenizer.DUR_CLASS) && isDur(token)) return expandDur(token);
+        if (sc.equals(Tokenizer.NE_CLASS) && isNamedEntity(token)) return expandNamedEntity(token);
         String[] words = token.split("_");
         return Arrays.asList(words);
     }

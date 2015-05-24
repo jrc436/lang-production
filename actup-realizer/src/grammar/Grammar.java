@@ -129,8 +129,8 @@ public class Grammar {
     	lex.setRuleGroupData(retval);
     	return retval;
     }
-    public UnifyControl createNewUnifyControl() {
-    	return new UnifyControl();
+    public UnifyControl createNewUnifyControl(TypesData td) {
+    	return new UnifyControl(td);
     }
     public TypesData createNewTypesData() {
     	return new TypesData(td);

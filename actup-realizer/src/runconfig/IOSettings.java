@@ -11,18 +11,18 @@ import optimization.VariableSet;
 //temporary solution...
 public class IOSettings {
 	//I/O Settings
-	protected static final String basePath = "/Users/jrc/Public/jrc-research/";
-	//protected static final String basePath = "/work/research/"; //basepath refers to where the research dir is located
-	protected static final String trialSet = "emnlp"; //trialset refers to a single optimization run's name
+	//protected static final String basePath = "/Users/jrc/Public/jrc-research/";
+	protected static final String basePath = "/work/research/"; //basepath refers to where the research dir is located
+	protected static final String trialSet = "emnlp-test8"; //trialset refers to a single optimization run's name
 	protected static final int iterCap = 1; //number of iterations before it terminates
-	protected static final int NumConcurrentStarts = 6; //should be roughly equal to number of processors
+	protected static final int NumConcurrentStarts = 2; //should be roughly equal to number of processors
 	protected static final int RunsPerThread = 1;
 	private static final int startIndex = ACTRNgramModel.ey_index;
 	protected static final ModelType mType = ModelType.ACTR;
-	protected static final TrainingSet trSet = TrainingSet.SWBDM1;
+	protected static final TrainingSet trSet = TrainingSet.SWBD10FOLD;
 	protected static final EvaluationType eval = EvaluationType.EditDistanceWord;
 	protected static final ScoringStrategy strat = ScoringStrategy.ScoreComplete;
-	protected static final double percentInput = 0.1;
+	protected static final double percentInput = 0.3;
 	
 	protected static final boolean logRealizations = false;
 	protected static final boolean loadGoldFromFile = false;

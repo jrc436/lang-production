@@ -69,7 +69,7 @@ public class LexDependency {
         if (obj == this) return true;
         if (!(obj instanceof LexDependency)) return false;
         LexDependency dep = (LexDependency) obj;
-		return lexHead == dep.lexHead && lexDep == dep.lexDep && rel.equals(dep.rel);
+		return lexHead.equals(dep.lexHead) && lexDep.equals(dep.lexDep) && rel.equals(dep.rel);
 	}
 	
 	/** toString. */
@@ -283,7 +283,7 @@ public class LexDependency {
 		List<LexDependency> retval = new ArrayList<LexDependency>(deps1.size());
 		for (LexDependency dep1 : deps1) {
 			for (LexDependency dep2 : deps2) {
-				if (dep1.lexHead == dep2.lexHead) {
+				if (dep1.lexHead.equals(dep2.lexHead)) {
 					retval.add(dep1); break;
 				}
 			}

@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
@@ -95,6 +96,7 @@ class ReportResults implements Runnable {
 					cachedfw[tn].write(r.print()+"\n");
 					if (r instanceof EndMessage) {
 						cachedfw[tn].close();
+						//if there's anyone waiting, there's a new lock available!
 					}
 				} 
 				catch (IOException e) {
@@ -118,7 +120,9 @@ class Logger implements Runnable {
 		while (true) {
 			if (!messages.isEmpty()) {
 				try {
-					fw.write(messages.poll()+"\n");
+					String[] parts = new Date().toString().split(" ");
+					String date = parts[0]+"-"+parts[3]+"::";
+					fw.write(date+messages.poll()+"\n");
 					fw.flush();
 				} catch (IOException e) {
 					e.printStackTrace();

@@ -39,33 +39,24 @@ public class SimpleType implements Unifiable, Serializable {
 	
 	private final int index;
     private final String name;
-    public BitSet bitset;
-//    
-//    //WARNING: FULL IMPLICATIONS OF MUTABIiLITY OF SIMPLETYPE HAVE NOT BEEN INVESTIGATED
-    public void setBit(int index) {
-    	
-    	bitset.set(index);
+    private final BitSet bitset;
+    
+    public SimpleType setbit(int index) {
+    	BitSet bs = (BitSet) this.bitset.clone();
+    	bs.set(index);
+    	return new SimpleType(this.index, this.name, bs);
     }
     
-    private TypesData typesList;
-    public void setTypesData(TypesData typesdata) {
-    	this.typesList = typesdata;    	//return new SimpleType(index, name, (BitSet) bitset.clone(), typesdata);
-    }
-    public SimpleType(int i, String n, BitSet bs, TypesData td) {
+    public SimpleType(int i, String n, BitSet bs) {
     	this.index = i;
     	this.name = n;
     	this.bitset = bs;
-    	this.typesList = td;
     }
-
-    public SimpleType(int i, String n, BitSet bs) {
-        this(i, n, bs, null);
+    public SimpleType(SimpleType st) {
+    	this.index = st.index;
+    	this.name = st.name;
+    	this.bitset = (BitSet) st.bitset.clone();
     }
-//    public void setBitsetIndex(int i) {
-//    //	BitSet bs = (BitSet) bitset.clone();
-//    	bitset.set(i);
-//    	//return new SimpleType(index, name, bs, typesList);
-//    }
 
     public String getName() { return name; }
 
@@ -78,6 +69,11 @@ public class SimpleType implements Unifiable, Serializable {
             throw new UnifyFailure();
         }
     }
+    
+    //this returns the version of this type used by the given typesdata, rather than any reference to it
+    private SimpleType getCanon(TypesData td) {
+    	return td.getAtIndex(index);
+    }
 
     public Object unify(Object u, Substitution sub, UnifyControl uc) throws UnifyFailure {
         if (!(u instanceof SimpleType)) {
@@ -85,39 +81,18 @@ public class SimpleType implements Unifiable, Serializable {
         }    
         if (this.equals(u)) return this;
         SimpleType st2 = (SimpleType) u;
-//        if (st2.typesList != this.typesList) {
-//        	System.err.println("Different lists");
-//        	System.exit(1);
-//        }
-//        if (bitset.nextSetBit(0) == 53 || st2.bitset.nextSetBit(0) == 53) {
-//        	System.err.println("wat the fuk");
-//        	System.exit(1);
-//        }
-        BitSet tempBitset = new BitSet(Math.max(bitset.size(), st2.bitset.size()));
-        tempBitset.clear();
-        tempBitset.or(bitset);
-        tempBitset.and(st2.bitset);
+        BitSet tempBitset = new BitSet();
+        tempBitset.or(this.getCanon(uc.getTD()).bitset);
+        tempBitset.and(st2.getCanon(uc.getTD()).bitset);
         int resultTypeIndex = tempBitset.nextSetBit(0);
         if (resultTypeIndex == -1) {
         	throw new UnifyFailure();
-        }
-//        if (resultTypeIndex == 53) {
-//        	System.err.println(bitset.nextSetBit(0));
-//        	System.err.println(bitset.get(53));
-//        	System.err.println(st2.bitset.get(53));
-//        	System.exit(1);
-//        }
-      //  int resultTypeIndex = Math.min(st2.index, index);
-        if (typesList.size() > st2.typesList.size()) {
-        	return typesList.getAtIndex(resultTypeIndex);
-        }
-        else {
-        	return st2.typesList.getAtIndex(resultTypeIndex);
-        }
+        }      
+        return uc.getTD().getAtIndex(resultTypeIndex);
     }
 
     public Object fill(UnifyControl uc, Substitution s) throws UnifyFailure {
-        return this;
+        return this.getCanon(uc.getTD());
     }
     
     public boolean occurs(Variable v) { return false; }

@@ -51,8 +51,22 @@ public class RealizeMain
 		this.lm = lm;
 	}
 	
-	public synchronized int attemptAcquireLock(Set<Integer> alreadyHad) {
-		return lm.attemptAcquireLock(alreadyHad);
+	public synchronized int attemptAcquireLock(Set<Integer> alreadyHad, String runName, Queue<String> log, int timeoutNum) {
+		int lock = RealizeMain.NO_LOCK_AVAIL;
+		int iter = 0;		
+		while (lock == RealizeMain.NO_LOCK_AVAIL) {
+			log.offer(runName + " is attempting to acquire a lock");
+			lock = lm.attemptAcquireLock(alreadyHad);
+			iter++;
+			while (iter > timeoutNum) {
+				try {
+					wait();
+				} catch (InterruptedException e) {
+					iter = 0;
+				}
+			}
+		}
+		return lock;
 	}
 	public synchronized AbstractStandardNgramModel getScorer(int lock, double[] vars) {
 		return lm.getFreshModel(lock, vars);
@@ -62,6 +76,7 @@ public class RealizeMain
 	}
 	public synchronized void releaseLock(int lock) {
 		lm.releaseLock(lock);
+		notify();
 	}
 	public Set<Integer> getRunFiles() {
 		return inh.getFiles();
@@ -79,7 +94,7 @@ public class RealizeMain
 		for (int i = 0; i < items.length; i++) {
 			Chart chart = realizer.realize(items[i].getLF(), ngramScorer);
 			r[i] = chart.getBestRealization(items[i].getGoal());
-			log.offer(expname+","+"line"+i+";"+r[i].str);
+			log.offer(expname+","+"l"+i+":"+r[i].str);
 			ngramScorer.updateAfterRealization(items[i].getGoal());
 		}
 		return r;

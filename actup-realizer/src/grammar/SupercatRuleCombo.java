@@ -27,7 +27,7 @@ public class SupercatRuleCombo {
 	public boolean equals(Object obj) {
 		if (!(obj instanceof SupercatRuleCombo)) return false;
 		SupercatRuleCombo combo = (SupercatRuleCombo) obj;
-		return supercat == combo.supercat && supercat2 == combo.supercat2 && rule == combo.rule;
+		return supercat.equals(combo.supercat) && supercat2.equals(combo.supercat2) && rule.equals(combo.rule);
 	}
 	public SupercatCombo getSupercat() {
 		return new SupercatCombo(supercat, supercat2);

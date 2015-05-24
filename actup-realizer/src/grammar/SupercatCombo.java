@@ -28,6 +28,9 @@ public class SupercatCombo {
 			return false;
 		}
 		SupercatCombo combo = (SupercatCombo) obj;
-		return supercat == combo.supercat && supercat2 == combo.supercat2;
+		//necessary since we switched to .equals
+		if ((supercat == null && combo.supercat != null) || (supercat2 == null && combo.supercat2 != null)) { return false; }
+		if (supercat == null && supercat2 == null && combo.supercat == null && combo.supercat2 == null) { return true; }
+		return (supercat.equals(combo.supercat) && supercat2 == null && combo.supercat2 == null) || (supercat.equals(combo.supercat) && supercat2.equals(combo.supercat2));
 	}
 }

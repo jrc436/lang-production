@@ -148,7 +148,9 @@ public class HyloVar extends HyloFormula implements Variable, Indexed {
         if (u instanceof Proposition) {
             Proposition prop = (Proposition) u;
             // if no or same type, just subst
-            if (st == null || prop.getType().equals(st)) return sub.makeSubstitution(uc, this, prop);
+            if (st == null || prop.getType().equals(st)) {
+            	return sub.makeSubstitution(uc, this, prop);
+            }
             // otherwise subst prop with name of type
             Proposition prop_st = new Proposition(l, st.getName(), st); 
             return sub.makeSubstitution(uc, this, prop_st);

@@ -18,6 +18,8 @@
 
 package unify;
 
+import grammar.TypesData;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -33,7 +35,16 @@ import synsem.LF;
  * @version     $Revision: 1.6 $, $Date: 2005/10/20 17:30:30 $
  */
 public class UnifyControl { 
-
+	//use sparingly... put in as a response to type unification without wanting to refactor what it means to unify... yet
+	protected TypesData getTD() {
+		return td;
+	}
+	private final TypesData td; //this is for the purpose of unifying
+	public UnifyControl(TypesData td) {
+		this.td = td;
+	}
+	
+	
     /**
      * An integer used to keep variables unique in lexical items.
      */

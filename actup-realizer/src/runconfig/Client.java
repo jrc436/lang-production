@@ -35,7 +35,7 @@ public class Client {
 			opt = IOSettings.actr_opt;
 		}
 		try {
-			if (IOSettings.logRealizations) { Files.createDirectory(Paths.get(Consts.trialRealizationSetPath)); }
+			//if (IOSettings.logRealizations) { Files.createDirectory(Paths.get(Consts.trialRealizationSetPath)); }
 			Files.createDirectory(Paths.get(Consts.trialOutputPath));
 		}
 		catch (FileAlreadyExistsException ex) {

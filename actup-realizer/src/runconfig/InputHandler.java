@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Random;
-import java.util.Set;
 
 import org.jdom.Document;
 import org.jdom.Element;
@@ -24,12 +23,15 @@ import synsem.LF;
 public class InputHandler {
 	private final Map<Integer, InputStruct[]> inputCache;
 	private final TrainingSet ts;
+	private final List<Integer> readableFiles;
 	public InputHandler(Grammar g, String inputDirectory, TrainingSet ts, double percentToUse) {
 		this.inputCache = prepareInputCache(g, inputDirectory, percentToUse);
 		this.ts = ts;
+		readableFiles = new ArrayList<Integer>(inputCache.keySet());
+		Collections.sort(readableFiles);
 	}
-	public Set<Integer> getFiles() {
-		return inputCache.keySet();
+	public List<Integer> getFiles() {
+		return readableFiles;
 	}
 	public Queue<InputStruct[]> getCurrentLockQueue(int currentLock) {
 		int[] set = LMHandler.getFileSetFromLMNum(ts, currentLock);

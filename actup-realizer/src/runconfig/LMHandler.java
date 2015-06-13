@@ -26,7 +26,9 @@ public class LMHandler {
 			locks.put(lock, false);
 		}
 	}	
-	
+	public int numLocks() {
+		return locks.size();
+	}
 	//returns what lock you acquired, or -1 if none
 	//choices refers to all of the locks that you're interested in acquiring
 	public synchronized int attemptAcquireLock(Set<Integer> alreadyHad) {

@@ -20,7 +20,6 @@ package realize;
 
 import grammar.RuleGroupData;
 
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collections;
@@ -389,13 +388,26 @@ public class Chart
         return retval;
     }
     
+    //the improvement of the first best edge over the second best edge
+    public double firstImprovement() {
+    	List<Edge> bestEdges = bestEdges();
+    	if (bestEdges.size() < 2) {
+    		return Double.MAX_VALUE;
+    	}
+    	if (bestEdges.get(0).score != bestEdge.score || bestEdges.get(1).score > bestEdges.get(0).score) {
+    		System.err.println("Don't understand how best edges works");
+    		System.exit(1);
+    	}
+    	return bestEdges.get(0).score - bestEdges.get(1).score;
+    }
+    
 
     public List<Edge> bestEdges() {
         ArrayList<Edge> bestEdges = new ArrayList<Edge>();
         //no complete edges!
-        if (!bestEdge.complete()) {
-        	return bestEdges;
-        }
+//        if (!bestEdge.complete()) {
+//        	return bestEdges;
+//        }
         List<Edge> edgesToUse = rSet.doingUnpacking() ? edges : allEdges;
         for (Edge edge : edgesToUse) {
             if (edge.complete()) {
@@ -411,7 +423,7 @@ public class Chart
     
     public Realization getBestRealization(String goal) {
         String bracketedEdge = bestEdge.sign.getBracketedString();
-        return new Realization(bracketedEdge.replace(")", "").replace("(", ""), goal, bestEdge.complete());
+        return new Realization(bracketedEdge.replace(")", "").replace("(", ""), goal, bestEdge.complete(), firstImprovement());
     }
     
     public String getBestEdgeDerivation() {
@@ -622,7 +634,7 @@ public class Chart
     };
     
     /** The PrintWriter to use with the printing routines.  Default wraps System.out. */
-    public PrintWriter log = new PrintWriter(System.out);
+ //   public PrintWriter log = new PrintWriter(System.out);
     
 //    //prints sorted edges
 //    public void printEdges(boolean complete) {

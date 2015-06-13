@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import realize.Realization;
+import runconfig.IOSettings;
 import runconfig.ScoringStrategy;
 
 /**
@@ -13,7 +14,7 @@ import runconfig.ScoringStrategy;
  * @author jrc
  */
 public abstract class Evaluator implements TextScorer {
-	private ScoringStrategy ss;
+	private final ScoringStrategy ss;
 	public Evaluator(ScoringStrategy ss) {
 		this.ss = ss;
 	}
@@ -29,5 +30,17 @@ public abstract class Evaluator implements TextScorer {
 			scores.add(this.score(r));
 		}
 		return new Evaluation(ss, scores);
+	}
+	public static Evaluator instantiate(IOSettings io) throws Exception {
+		switch(io.getEvaluationType()) {
+			case EditDistanceChar:
+				return new LevenshteinDistance(io.getScoringStrategy());
+			case EditDistanceWord:
+				return new LevenshteinDistance(io.getScoringStrategy());
+			case ROUGE:
+				return new Rouge(io.getScoringStrategy(), io.getEvaluationType().extPath());
+			default:
+				throw new Exception("Not supported");		
+		}
 	}
 }

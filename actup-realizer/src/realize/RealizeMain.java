@@ -20,6 +20,7 @@ package realize;
 
 import grammar.Grammar;
 
+import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 
@@ -51,6 +52,10 @@ public class RealizeMain
 		this.lm = lm;
 	}
 	
+	public int totalNumLocks() {
+		return lm.numLocks();
+	}
+	
 	public synchronized int attemptAcquireLock(Set<Integer> alreadyHad, String runName, Queue<String> log, int timeoutNum) {
 		int lock = RealizeMain.NO_LOCK_AVAIL;
 		int iter = 0;		
@@ -78,7 +83,7 @@ public class RealizeMain
 		lm.releaseLock(lock);
 		notify();
 	}
-	public Set<Integer> getRunFiles() {
+	public List<Integer> getRunFiles() {
 		return inh.getFiles();
 	}
 	
@@ -94,7 +99,7 @@ public class RealizeMain
 		for (int i = 0; i < items.length; i++) {
 			Chart chart = realizer.realize(items[i].getLF(), ngramScorer);
 			r[i] = chart.getBestRealization(items[i].getGoal());
-			log.offer(expname+","+"l"+i+":"+r[i].str);
+			log.offer(expname+","+"l"+i+":"+r[i].toString());
 			ngramScorer.updateAfterRealization(items[i].getGoal());
 		}
 		return r;

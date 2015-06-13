@@ -84,11 +84,11 @@ public class Evaluation {
 	public String writeScores() {
 		String toWrite = "{";
 		for (Score s : scores) {
-			if (s.complete) {
+			if (s.complete || strat == ScoringStrategy.ScoreAll || strat == ScoringStrategy.AdjScoreAll) {
 				toWrite += String.format("%.5f", s.score)+",";
 			}
 		}
-		return toWrite;
+		return toWrite.substring(0, toWrite.length()-2)+"}";
 	}
 	public double getCompleteness() {
 		return completeness;

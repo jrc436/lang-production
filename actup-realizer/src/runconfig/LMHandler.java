@@ -28,6 +28,9 @@ public class LMHandler {
 		for (Integer lock : cache.keySet()) {
 			locks.put(lock, false);
 		}
+	}
+	public boolean lockAvail(int lock) {
+		return !locks.get(lock);
 	}	
 	public int numLocks() {
 		return locks.size();
@@ -105,7 +108,7 @@ public class LMHandler {
 		switch (ts) {
 			case SWBD10FOLD:
 				int[] set = new int[ts.numInputFilesUsed() / 10];
-				int st = lmNum * 10;
+				int st = lmNum * 10; //the first index 
 				for (int i = st, j = 0; i < st+set.length; i++, j++) {
 					set[j] = i;
 				}

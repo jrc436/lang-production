@@ -39,7 +39,7 @@ public class Client {
 			Files.createDirectory(Paths.get(Consts.trialOutputPath));
 		}
 		catch (FileAlreadyExistsException ex) {
-			System.err.println("You are potentially overwriting a run!!!");
+			Files.createDirectory(Paths.get(Consts.trialOutputPath+"-2"));
 		}
 		BlockingQueue<String> progress = new LinkedBlockingQueue<String>();
 		BlockingQueue<Message> results = new LinkedBlockingQueue<Message>();
@@ -82,7 +82,7 @@ public class Client {
 			es.execute(new OptTask(opt, hc, i, interestingTasks, t));
 			ts.add(t);
 		}
-		Thread inpt = new Thread(new InputClient(rm, ts, r, log));
+		Thread inpt = new Thread(new InputClient(ts, rm,  r, log));
 		inpt.setDaemon(true);
 		inpt.start();
 		
@@ -185,7 +185,7 @@ class InputClient implements Runnable {
 						System.out.println("Thread"+i+" :: "+ts.get(i).status());
 					}
 					break;
-				cse locks:
+				case locks:
 					System.out.println(rm.getLockStatus());
 					break;
 				default:

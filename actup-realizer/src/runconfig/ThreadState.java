@@ -71,7 +71,10 @@ public class ThreadState {
 	
 	//should only be called from I/O threads
 	public String status() {
-		if (lockNum == -1) {
+		if (locksFinished.size() == numLocks && currentIter == maxiter) {
+			return "Thread has completed all locks. Waiting for other threads.";
+		}
+		else if (lockNum == -1) {
 			return "Thread is attempting to acquire a lock";
 		}
 		else if (fileNum == -1) {

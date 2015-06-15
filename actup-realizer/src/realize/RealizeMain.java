@@ -23,6 +23,8 @@ import grammar.Grammar;
 import java.util.List;
 import java.util.Queue;
 import java.util.Set;
+import java.util.Map;
+import java.util.HashMap;
 
 import ngrams.AbstractStandardNgramModel;
 import pruning.NBestPruningStrategy;
@@ -64,9 +66,9 @@ public class RealizeMain
 		String retval = "";
 		for (Map.Entry<Integer, String> entry : locksOwnedBy.entrySet()) {
 			String owner = entry.getValue() != "" ? entry.getValue() : "no one";
-			retval += "Lock " + entry.getKey() + " is owned by " + owner+"\n";
+			retval += "Lock " + entry.getKey() + " is owned by " + owner+". (Available: "+lm.lockAvail(entry.getKey())")+\n";
 		}
-		return retval;
+		return retval.substring(0, retval.length()-1);
 	}
 	
 	public synchronized int attemptAcquireLock(Set<Integer> alreadyHad, String runName, Queue<String> log, int timeoutNum) {

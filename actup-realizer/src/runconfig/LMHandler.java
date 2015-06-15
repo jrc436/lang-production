@@ -108,7 +108,7 @@ public class LMHandler {
 		switch (ts) {
 			case SWBD10FOLD:
 				int[] set = new int[ts.numInputFilesUsed() / 10];
-				int st = lmNum * 10; //the first index 
+				int st = lmNum * (ts.numInputFilesUsed()/10); //the first index 
 				for (int i = st, j = 0; i < st+set.length; i++, j++) {
 					set[j] = i;
 				}

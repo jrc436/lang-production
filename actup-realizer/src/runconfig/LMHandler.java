@@ -112,6 +112,11 @@ public class LMHandler {
 				for (int i = st, j = 0; i < st+set.length; i++, j++) {
 					set[j] = i;
 				}
+				String check = "LM NUMBER: "+lmNum+" HAS ";
+				for (Integer g : set) {
+					check += g+",";
+				}
+				System.err.println(check);
 				return set;
 			case SWBDM1:
 				return new int[] { lmNum };

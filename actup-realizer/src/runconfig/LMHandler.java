@@ -97,7 +97,7 @@ public class LMHandler {
 	public static int getLMNumFromFileNum(TrainingSet ts, int fileNum) {
 		switch (ts) {
 			case SWBD10FOLD:
-				return fileNum / 10;
+				return fileNum / (ts.numInputFilesUsed()/10);
 			case SWBDM1:
 				return fileNum;
 			default:

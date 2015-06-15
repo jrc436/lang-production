@@ -66,7 +66,7 @@ public class RealizeMain
 		String retval = "";
 		for (Map.Entry<Integer, String> entry : locksOwnedBy.entrySet()) {
 			String owner = entry.getValue() != "" ? entry.getValue() : "no one";
-			retval += "Lock " + entry.getKey() + " is owned by " + owner+". (Available: "+lm.lockAvail(entry.getKey())")+\n";
+			retval += "Lock " + entry.getKey() + " is owned by " + owner+". (Available: "+lm.lockAvail(entry.getKey())+")\n";
 		}
 		return retval.substring(0, retval.length()-1);
 	}

@@ -19,7 +19,7 @@ public class Consts {
 	protected static final String trialRealizationBaseDir = experimentBasePath + "trial-realizations/";
 	protected static final String trialOutputPath = experimentBasePath+"output/"+IOSettings.trialSet+"/"; //output folder for the trial
 	protected static final String trialRealizationSetPath = trialRealizationBaseDir+IOSettings.trialSet+"/"; //where the set of realization folders should be
-	protected static final String logPath = trialOutputPath + "log";
+	//protected static final String logPath = trialOutputPath + "log";
 	
 	protected static final int actr_length = 4;
 }

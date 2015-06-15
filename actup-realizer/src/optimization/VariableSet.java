@@ -33,8 +33,8 @@ public class VariableSet {
 	public boolean step(boolean lastStepGood) {
 		return vars.length != 0 ? vars[currentIndex].step(lastStepGood) : false; 
 	}
-	protected Variable[] getVarArray() {
-		return this.vars;
+	public int getNumVars() {
+		return this.vars.length;
 	}
 	public double[] getDoubleArray() {
 		double[] d = new double[vars.length];

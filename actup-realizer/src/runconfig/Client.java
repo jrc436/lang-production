@@ -5,9 +5,6 @@ import grammar.Grammar;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.FileAlreadyExistsException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
@@ -34,13 +31,30 @@ public class Client {
 		if (s.getModelType() == ModelType.ACTR) {
 			opt = IOSettings.actr_opt;
 		}
-		try {
-			//if (IOSettings.logRealizations) { Files.createDirectory(Paths.get(Consts.trialRealizationSetPath)); }
-			Files.createDirectory(Paths.get(Consts.trialOutputPath));
+		File dir = new File(Consts.trialOutputPath);
+		while (dir.exists()) {
+			String newPath = dir.getPath(); //peel off the slash
+			String runNum = "";
+			for (int j = newPath.length() - 1; j >= 0; j--) {
+				int digit = Character.digit(newPath.charAt(j), 10);
+				if (digit >= 0) {
+					runNum = digit + runNum;
+				}
+				else {
+					break;
+				} 
+			} //find the trialing number, if any
+			if (runNum == "") { //if none use 0
+				runNum = "0";
+			}
+			else {
+				int newRunNum = Integer.parseInt(runNum) + 1;
+				newPath = newPath.substring(0, newPath.length()-1) +newRunNum;
+			}
+			dir = new File(newPath);
 		}
-		catch (FileAlreadyExistsException ex) {
-			Files.createDirectory(Paths.get(Consts.trialOutputPath+"-2"));
-		}
+		dir.mkdir();
+		
 		BlockingQueue<String> progress = new LinkedBlockingQueue<String>();
 		BlockingQueue<Message> results = new LinkedBlockingQueue<Message>();
 		
@@ -56,11 +70,11 @@ public class Client {
 		
 		ExecutorService es = Executors.newCachedThreadPool();		
 		
-		Thread log = new Thread(new Logger(progress, Consts.logPath));
+		Thread log = new Thread(new Logger(progress, dir.toString()+"/log"));
 		log.setDaemon(true);
 		log.start();
 		
-		Thread r = new Thread(new ReportResults(results));
+		Thread r = new Thread(new ReportResults(dir.toString(), results));
 		r.setDaemon(true);
 		r.start();
 				
@@ -199,16 +213,18 @@ class InputClient implements Runnable {
 class ReportResults implements Runnable {
 	private final BlockingQueue<Message> results;
 	private final FileWriter[] cachedfw;
-	public ReportResults(BlockingQueue<Message> results) {
+	private final String dirPath;
+	public ReportResults(String dirPath, BlockingQueue<Message> results) {
 		cachedfw = new FileWriter[IOSettings.NumConcurrentStarts];
 		this.results = results;
+		this.dirPath = dirPath;
 	}
 	private void writeMessage(Message r) {
 		int tn = Client.getThreadNum(r.getExpName());
 		try {								
 			if (r instanceof BeginMessage) {
-				cachedfw[tn] = new FileWriter(Consts.trialOutputPath+r.getExpName(), true);
-				System.out.println("Opening file writer for: "+r.getExpName()+" at "+Consts.trialOutputPath+r.getExpName());
+				cachedfw[tn] = new FileWriter(dirPath+"/"+r.getExpName(), true);
+				System.out.println("Opening file writer for: "+r.getExpName()+" at "+dirPath+"/"+r.getExpName());
 			}			
 			cachedfw[tn].write(r.print()+"\n");
 			cachedfw[tn].flush();
@@ -293,7 +309,7 @@ class OptTask implements Runnable {
 	}
 	public void run() {
 		for (int i = 0; i < IOSettings.RunsPerThread; i++) {
-			if (params.peek() == null) {
+			if (params.peek() == null || opt.getNumVars() != params.peek().length) {
 				opt.randomAll();
 			}
 			else {

@@ -83,6 +83,7 @@ public class RealizeMain
 					wait();
 				} catch (InterruptedException e) {
 					iter = 0;
+					break;
 				}
 			}
 		}

@@ -82,7 +82,7 @@ public class Client {
 			es.execute(new OptTask(opt, hc, i, interestingTasks, t));
 			ts.add(t);
 		}
-		Thread inpt = new Thread(new InputClient(ts, r, log));
+		Thread inpt = new Thread(new InputClient(rm, ts, r, log));
 		inpt.setDaemon(true);
 		inpt.start();
 		
@@ -104,16 +104,18 @@ class InputClient implements Runnable {
 	private final List<ThreadState> ts;
 	private final Thread prog;
 	private final Thread log;
-	public InputClient(List<ThreadState> ts, Thread prog, Thread log) {
+	private final RealizeMain rm;
+	public InputClient(List<ThreadState> ts, RealizeMain rm, Thread prog, Thread log) {
 		in = new Scanner(System.in);
 		this.ts = ts;
 		this.prog = prog;
 		this.log = log;
+		this.rm = rm;
 	}
 	public void run() {
 		while (in.hasNextLine()) {
 			String s = in.nextLine();
-			InpComm.processCommand(ts, log, prog, s);
+			InpComm.processCommand(rm, ts, log, prog, s);
 		}
 	}
 	private enum InpComm {
@@ -122,6 +124,7 @@ class InputClient implements Runnable {
 		save,
 		help,
 		quit,
+		locks,
 		other;
 		private static String description(InpComm s) {
 			switch(s) {
@@ -135,6 +138,8 @@ class InputClient implements Runnable {
 					return "saves the current progress in much the same way as it should save at termination";
 				case status:
 					return "prints the current job and the time of last activity for all threads";
+				case locks:
+					return "prints the current status of each lock. In SWM1, this could be a large amount of information.";
 				default:
 					return null;			
 			}
@@ -149,7 +154,7 @@ class InputClient implements Runnable {
 			}
 			return retval;
 		}
-		private static void processCommand(List<ThreadState> ts, Thread prog, Thread log, String s) {
+		private static void processCommand(RealizeMain rm, List<ThreadState> ts, Thread prog, Thread log, String s) {
 			InpComm ic = InpComm.getEnum(s);
 			switch (ic) {
 				case help:
@@ -179,6 +184,9 @@ class InputClient implements Runnable {
 					for (int i = 0; i < ts.size(); i++) {
 						System.out.println("Thread"+i+" :: "+ts.get(i).status());
 					}
+					break;
+				cse locks:
+					System.out.println(rm.getLockStatus());
 					break;
 				default:
 					System.out.println("Type help for more information");

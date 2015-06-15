@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Collections;
 
 import ngrams.ACTRNgramModel;
 import ngrams.AbstractStandardNgramModel;
@@ -28,6 +31,11 @@ public class LMHandler {
 	}	
 	public int numLocks() {
 		return locks.size();
+	}
+	public List<Integer> lockList() {
+		List<Integer> retval = new ArrayList<Integer>(locks.keySet());
+		Collections.sort(retval);
+		return retval;
 	}
 	//returns what lock you acquired, or -1 if none
 	//choices refers to all of the locks that you're interested in acquiring

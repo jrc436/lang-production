@@ -41,6 +41,7 @@ public class RealizeMain
 	private final Grammar g;
 	private final InputHandler inh;
 	private final LMHandler lm;
+	private final Map<Integer, String> locksOwnedBy; //a map from locks to threads
 
 	//should only need one realizemain, generally, as it is generally threadsafe
 	//with the locking mechanisms in valleyclimber
@@ -50,10 +51,22 @@ public class RealizeMain
 		this.g = grammar;
 		this.inh = inh;
 		this.lm = lm;
+		locksOwnedBy = new HashMap<Integer, String>();
+		for (Integer lock : this.lm.lockList()) {
+			locksOwnedBy.put(lock, "");
+		}
 	}
 	
 	public int totalNumLocks() {
 		return lm.numLocks();
+	}
+	public String getLockStatus() {
+		String retval = "";
+		for (Map.Entry<Integer, String> entry : locksOwnedBy.entrySet()) {
+			String owner = entry.getValue() != "" ? entry.getValue() : "no one";
+			retval += "Lock " + entry.getKey() + " is owned by " + owner+"\n";
+		}
+		return retval;
 	}
 	
 	public synchronized int attemptAcquireLock(Set<Integer> alreadyHad, String runName, Queue<String> log, int timeoutNum) {
@@ -71,6 +84,9 @@ public class RealizeMain
 				}
 			}
 		}
+		if (lock != RealizeMain.NO_LOCK_REMAINING) {
+			locksOwnedBy.put(lock, runName);
+		}
 		return lock;
 	}
 	public synchronized AbstractStandardNgramModel getScorer(int lock, double[] vars) {
@@ -81,6 +97,7 @@ public class RealizeMain
 	}
 	public synchronized void releaseLock(int lock) {
 		lm.releaseLock(lock);
+		locksOwnedBy.put(lock, "");
 		notify();
 	}
 	public List<Integer> getRunFiles() {

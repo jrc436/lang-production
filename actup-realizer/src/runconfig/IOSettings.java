@@ -13,7 +13,7 @@ public class IOSettings {
 	//I/O Settings
 	protected static final String basePath = "/Users/jrc/Public/jrc-research/";
 	//protected static final String basePath = "/work/research/"; //basepath refers to where the research dir is located
-	protected static final String trialSet = "cmd-test"; //trialset refers to a single optimization run's name
+	protected static final String trialSet = "cmd-test2"; //trialset refers to a single optimization run's name
 	protected static final int iterCap = 1; //number of iterations before it terminates
 	protected static final int NumConcurrentStarts = 6; //should be roughly equal to number of processors
 	protected static final int RunsPerThread = 1;

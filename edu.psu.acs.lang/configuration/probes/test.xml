@@ -1,0 +1,17 @@
+<instrument window="0.05">
+
+ <model pattern=".*">
+ 
+  <module pattern=".*Retrieval.*">
+   <probe pattern=".*" poll="true" />
+  </module>
+  
+  <chunk-type pattern=".*">
+   <chunk pattern=".*">
+    <probe pattern=".*Activation" poll="true"/>
+   </chunk>
+  </chunk-type>
+  
+ </model>
+ 
+</instrument>

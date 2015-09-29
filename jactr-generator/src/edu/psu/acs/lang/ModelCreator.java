@@ -42,26 +42,36 @@ public class ModelCreator {
 	//private static final String workingDirectory = "/work/research/";
 	private static final String workingDirectory = "/Users/jrc/";
 	
-	List<IModelElement> elements;
-	FileWriter fw;
-	private ModelCreator(String fname) throws IOException {
+	private static List<IModelElement> elements;
+	private static FileWriter fw;
+	private static void writeModel(String fname) throws IOException {
+		fw = new FileWriter(fname);
 		elements = new ArrayList<IModelElement>();
 		elements.add(new SimpleElement("<declarative-memory>"));
 		elements.addAll(makeChunkTypes());
-		elements.addAll(makeChunks());
+		writeOut("Finished making chunk types");
+		elements.addAll(makeChunks(ChunkTypeEnum.CCGType));
+		writeOut("Finished making ccgtype chunks");
+		elements.addAll(makeChunks(ChunkTypeEnum.lexsyn));
+		writeOut("Finished making lexsyn types");
+		elements.addAll(makeChunks(ChunkTypeEnum.sentence));
+		writeOut("Finished making sentence-goals");
 		elements.add(new SimpleElement("</declarative-memory>"));
 		elements.add(new SimpleElement("<procedural-memory>"));
 		elements.addAll(makeRules());
 		elements.add(new SimpleElement("</procedural-memory>")); 
-		fw = new FileWriter(fname);
+		writeOut("Finished!");
+		
 	}
-	private void writeAll() throws IOException {
+	private static void writeOut(String stdoutMessage) throws IOException {
 		for (IModelElement ime : elements) {
 			for (String s : ime.toXML()) {
 				fw.write(s+System.getProperty("line.separator"));
 			}
 		}
+		System.out.println(stdoutMessage);
 		fw.flush();
+		elements.clear();
 	}
 	//first, model can read all the types (from types.txt) and load them into a CCGType.
 		//importantly, every type has a variety of subtypes. These, down to the base type, need to be stored.
@@ -101,54 +111,61 @@ public class ModelCreator {
 		
 		return toret;
 	}
-	private static List<IModelElement> makeChunks() throws IOException {
+	private static List<IModelElement> makeChunks(ChunkTypeEnum ct) throws IOException {
 		//sentence will obviously start off empty... (this could change as a reasonable method of learning?)
 		//CCGTypes, read from types.txt. Importantly, we also want all subtypes of all of these types to be added. In a set-like way.
 		List<IModelElement> ele = new ArrayList<IModelElement>();
-		Set<CCGType> types = new HashSet<CCGType>();
-		List<String> typelines = Files.readAllLines(Paths.get(workingDirectory+"actup-production/data/types.txt"));
-		for (String line : typelines) {
-			CCGType cg = CCGCompoundType.makeCCGType(line);
-			if (cg instanceof CCGCompoundType) {
-				CCGCompoundType ccgt = (CCGCompoundType) cg;
-				types.addAll(ccgt.harvestTypes());
-			}
-			else {
-				types.add(cg);
-			}
+		switch (ct) {
+			case CCGType:
+				Set<CCGType> types = new HashSet<CCGType>();
+				List<String> typelines = Files.readAllLines(Paths.get(workingDirectory+"actup-production/data/types.txt"));
+				for (String line : typelines) {
+					CCGType cg = CCGCompoundType.makeCCGType(line);
+					if (cg instanceof CCGCompoundType) {
+						CCGCompoundType ccgt = (CCGCompoundType) cg;
+						types.addAll(ccgt.harvestTypes());
+					}
+					else {
+						types.add(cg);
+					}
+				}
+				ele.addAll(types);
+				break;
+			case lexsyn:
+				List<LexSyn> lexsyns = new ArrayList<LexSyn>();
+				List<String> wordlines = Files.readAllLines(Paths.get(workingDirectory+"actup-production/data/words.dsv"));
+				for (String line : wordlines) {
+					String[] l = line.split(":-:");
+					if (l.length < 2) {
+						System.err.println("Line does not contain bare minimum of type and word");
+						System.err.println(l);
+						System.exit(1);
+					}
+					//System.out.println("Word:"+l[0]);
+					List<String> typerz = new ArrayList<String>(Arrays.asList(l));
+					typerz.remove(0); //removing the word itself
+					List<CCGType> typerzTypes = new ArrayList<CCGType>();
+					for (String f : typerz) {
+						typerzTypes.add(CCGCompoundType.makeCCGType(f));
+					}
+					lexsyns.add(LexSyn.makeLexSyn(l[0], typerzTypes, mostTypesN));
+				}
+				ele.addAll(lexsyns);
+				break;
+			case sentence:
+				List<Sentence> goals = new ArrayList<Sentence>();
+				List<String> sentlines = Files.readAllLines(Paths.get(workingDirectory+"actup-production/data/swbd.txt"));
+				int k = 1;
+				for (String line : sentlines) {
+					List<String> wordBag = new ArrayList<String>(Arrays.asList(line.split(" ")));
+					goals.add(Sentence.makeSentence("goal"+k, wordBag, mostTypesN, largestSentenceK));
+					k++;
+				}
+				ele.addAll(goals);
+				break;
+			default:
+				break;		
 		}
-		ele.addAll(types);
-		
-		List<LexSyn> lexsyns = new ArrayList<LexSyn>();
-		List<String> wordlines = Files.readAllLines(Paths.get(workingDirectory+"actup-production/data/words.dsv"));
-		for (String line : wordlines) {
-			String[] l = line.split(":-:");
-			if (l.length < 2) {
-				System.err.println("Line does not contain bare minimum of type and word");
-				System.err.println(l);
-				System.exit(1);
-			}
-			//System.out.println("Word:"+l[0]);
-			List<String> typerz = new ArrayList<String>(Arrays.asList(l));
-			typerz.remove(0); //removing the word itself
-			List<CCGType> typerzTypes = new ArrayList<CCGType>();
-			for (String f : typerz) {
-				typerzTypes.add(CCGCompoundType.makeCCGType(f));
-			}
-			lexsyns.add(LexSyn.makeLexSyn(l[0], typerzTypes, mostTypesN));
-		}
-		ele.addAll(lexsyns);
-		
-		List<Sentence> goals = new ArrayList<Sentence>();
-		List<String> sentlines = Files.readAllLines(Paths.get(workingDirectory+"actup-production/data/swbd.txt"));
-		int k = 1;
-		for (String line : sentlines) {
-			List<String> wordBag = new ArrayList<String>(Arrays.asList(line.split(" ")));
-			goals.add(Sentence.makeSentence("goal"+k, wordBag, mostTypesN, largestSentenceK));
-			k++;
-		}
-		ele.addAll(goals);
-//		//lexsyns, read from words.dsv
 		return ele;
 	}
 	private static List<IModelElement> makeRules() {
@@ -174,8 +191,7 @@ public class ModelCreator {
 	public static void main(String[] args) throws IOException {
 		//createWords();
 		//createTypes();
-		ModelCreator tc = new ModelCreator(workingDirectory+"actup-production/data/test-model.jactr");
-		tc.writeAll();
+		ModelCreator.writeModel(workingDirectory+"actup-production/data/test-model.jactr");
 	}
 	private static void createTypes() throws IOException {
 		List<String> lines = Files.readAllLines(Paths.get(workingDirectory+"actup-production/data/words.dsv"));

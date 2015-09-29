@@ -1,6 +1,6 @@
 package edu.psu.acs.lang.declarative;
 
-import org.apache.commons.lang.NotImplementedException;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
 //sentence slot name, for modularity

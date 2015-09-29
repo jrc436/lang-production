@@ -1,6 +1,6 @@
 package edu.psu.acs.lang.declarative;
 
-import org.apache.commons.lang.NotImplementedException;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
 public class LSSlotName implements SlotName {
@@ -12,7 +12,7 @@ public class LSSlotName implements SlotName {
 			case Word:
 				break;
 			default:
-				throw new NotImplementedException("Try other constructor");	
+				throw new NotImplementedException();	
 		}
 	}
 	public LSSlotName(LSSlotNameEnum en, int typeNum) {
@@ -31,7 +31,7 @@ public class LSSlotName implements SlotName {
 				this.typeNum = typeNum;
 				break;
 			default:
-				throw new NotImplementedException("Try other constructor");		
+				throw new NotImplementedException();		
 		}
 	}
 	public String toString() {

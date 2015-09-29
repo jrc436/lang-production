@@ -3,7 +3,7 @@ package edu.psu.acs.lang.production;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang.NotImplementedException;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import edu.psu.acs.lang.declarative.ChunkTypeEnum;
 import edu.psu.acs.lang.IModelElement;

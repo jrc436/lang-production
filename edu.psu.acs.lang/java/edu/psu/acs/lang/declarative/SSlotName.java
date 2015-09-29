@@ -28,7 +28,7 @@ public class SSlotName implements SlotName {
 				this.cueTypeNum = cueTypeNum;
 				break;		
 			default:
-				throw new NotImplementedException("Please consider using one of the other constructors");		
+				throw new NotImplementedException();		
 		}
 	}
 	public SSlotName(SSlotNameEnum en, int cueNum) {
@@ -41,7 +41,7 @@ public class SSlotName implements SlotName {
 				this.cueNum = cueNum;
 				break;	
 		default:
-			throw new NotImplementedException("Please consider using one of the other constructors");				
+			throw new NotImplementedException();				
 		}
 	}
 	public SSlotName(SSlotNameEnum en) {
@@ -56,7 +56,7 @@ public class SSlotName implements SlotName {
 			case RightFullType:
 				break;
 			default:
-				throw new NotImplementedException("Please consider using one of the other constructors");
+				throw new NotImplementedException();
 		}
 	}
 	public String toString() {

@@ -39,8 +39,8 @@ import edu.psu.acs.lang.production.ResolveForwardComposition;
 public class ModelCreator {
 	private static final int largestSentenceK = 93; //i
 	private static final int mostTypesN = 136; //j
-	//private static final String workingDirectory = "/work/research/";
-	private static final String workingDirectory = "/Users/jrc/";
+	private static final String workingDirectory = "/work/research/";
+	//private static final String workingDirectory = "/Users/jrc/";
 	
 	private static List<IModelElement> elements;
 	private static FileWriter fw;

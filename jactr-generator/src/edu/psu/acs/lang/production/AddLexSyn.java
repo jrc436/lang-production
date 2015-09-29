@@ -33,7 +33,7 @@ public class AddLexSyn extends ProductionRule {
 		
 		List<Slot> goalprecond = new ArrayList<Slot>();
 		goalprecond.add(new Slot(new SSlotName(SSlotNameEnum.Cue, wordNum), new SlotVar(wordVar)));
-		goalprecond.add(new Slot(new SSlotName(SSlotNameEnum.CueType, 1), new NullValue())); //check if any types are populated
+		goalprecond.add(new Slot(new SSlotName(SSlotNameEnum.CueType, wordNum, 1), new NullValue())); //check if any types are populated
 		super.conditions.add(new BufferConditions(Buffer.goal, ChunkTypeEnum.sentence, goalprecond));
 		
 		//the trick here is we need to populate the cue with *all* of the types....

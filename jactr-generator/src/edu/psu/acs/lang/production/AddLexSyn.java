@@ -40,19 +40,19 @@ public class AddLexSyn extends ProductionRule {
 		List<Slot> retcheck = new ArrayList<Slot>();
 		retcheck.add(new Slot(new LSSlotName(LSSlotNameEnum.Word), new SlotVar(wordVar)));
 		for (int i = 1; i <= maxNumTypes; i++) {
-			retcheck.add(new Slot(new LSSlotName(LSSlotNameEnum.Type, i), new SlotVar(typeVar[i])));
-			retcheck.add(new Slot(new LSSlotName(LSSlotNameEnum.LeftType, i), new SlotVar(leftTypeVar[i])));
-			retcheck.add(new Slot(new LSSlotName(LSSlotNameEnum.RightType, i), new SlotVar(rightTypeVar[i])));
-			retcheck.add(new Slot(new LSSlotName(LSSlotNameEnum.Combinator, i), new SlotVar(combos[i])));
+			retcheck.add(new Slot(new LSSlotName(LSSlotNameEnum.Type, i), new SlotVar(typeVar[i-1])));
+			retcheck.add(new Slot(new LSSlotName(LSSlotNameEnum.LeftType, i), new SlotVar(leftTypeVar[i-1])));
+			retcheck.add(new Slot(new LSSlotName(LSSlotNameEnum.RightType, i), new SlotVar(rightTypeVar[i-1])));
+			retcheck.add(new Slot(new LSSlotName(LSSlotNameEnum.Combinator, i), new SlotVar(combos[i-1])));
 		}
 		super.conditions.add(new BufferConditions(Buffer.retrieval, ChunkTypeEnum.lexsyn, retcheck));
 		
 		List<Slot> cueAdds = new ArrayList<Slot>();
 		for (int i = 1; i <= maxNumTypes; i++) {
-			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.CueType, wordNum, i), new SlotVar(typeVar[i])));
-			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.CueLeftType, wordNum, i), new SlotVar(leftTypeVar[i])));
-			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.CueRightType, wordNum, i), new SlotVar(rightTypeVar[i])));
-			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.CueCombo, wordNum, i), new SlotVar(combos[i])));
+			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.CueType, wordNum, i), new SlotVar(typeVar[i-1])));
+			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.CueLeftType, wordNum, i), new SlotVar(leftTypeVar[i-1])));
+			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.CueRightType, wordNum, i), new SlotVar(rightTypeVar[i-1])));
+			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.CueCombo, wordNum, i), new SlotVar(combos[i-1])));
 		}
 		super.effects.add(BufferEffects.modifyGoal(cueAdds));
 	}

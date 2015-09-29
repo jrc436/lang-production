@@ -39,8 +39,8 @@ import edu.psu.acs.lang.production.ResolveForwardComposition;
 public class ModelCreator {
 	private static final int largestSentenceK = 93; //i
 	private static final int mostTypesN = 136; //j
-	private static final String workingDirectory = "/work/research/";
-	//private static final String workingDirectory = "/Users/jrc/";
+	//private static final String workingDirectory = "/work/research/";
+	private static final String workingDirectory = "/Users/jrc/";
 	
 	private static List<IModelElement> elements;
 	private static FileWriter fw;
@@ -160,8 +160,10 @@ public class ModelCreator {
 					List<String> wordBag = new ArrayList<String>(Arrays.asList(line.split(" ")));
 					goals.add(Sentence.makeSentence("goal"+k, wordBag, mostTypesN, largestSentenceK));
 					k++;
-					if (k > 10) {
-						break; //let's just get some test sentences... memory requirement too big for all of them
+					if (k % 100 == 0) {
+						elements.addAll(goals);
+						writeOut("Finished "+k+" sentences");
+						goals.clear();
 					}
 				}
 				ele.addAll(goals);

@@ -3,7 +3,7 @@ package edu.psu.acs.lang.production;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.psu.acs.lang.declarative.ChunkType;
+import edu.psu.acs.lang.declarative.ChunkTypeEnum;
 import edu.psu.acs.lang.IModelElement;
 import edu.psu.acs.lang.declarative.Slot;
 
@@ -15,14 +15,12 @@ import edu.psu.acs.lang.declarative.Slot;
  */
 public class BufferConditions implements IModelElement {
 	private final Buffer buffer;
-	private List<Slot> toMatch;
-	private List<Slot> freeVars; 
-	private ChunkType chunk;
-	public BufferConditions(Buffer buffer, ChunkType type, List<Slot> toMatch, List<Slot> freeVars) {
+	private List<Slot> toMatch; 
+	private ChunkTypeEnum chunk;
+	public BufferConditions(Buffer buffer, ChunkTypeEnum type, List<Slot> vars) {
 		this.buffer = buffer;
 		chunk = type;
-		this.toMatch = toMatch;
-		this.freeVars = freeVars;
+		this.toMatch = vars;
 	}
 
 	@Override
@@ -30,9 +28,6 @@ public class BufferConditions implements IModelElement {
 		List<String> lines = new ArrayList<String>();
 		lines.add("<match buffer=\""+buffer.toString()+"\" type=\""+chunk.toString()+"\">");
 		for (Slot s : toMatch) {
-			lines.add("<slot name=\""+s.getName()+"\" equals=\""+s.getValue()+"/>");
-		}
-		for (Slot s : freeVars) {
 			lines.add("<slot name=\""+s.getName()+"\" equals=\""+s.getValue()+"/>");
 		}
 		lines.add("</match>");

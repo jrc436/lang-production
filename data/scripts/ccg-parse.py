@@ -10,8 +10,6 @@ linesSoFar = 0
 lineInd = []
 bigIter = 0
 for line in lines:
-	#this is obviously a rough and inefficient system. It should work based on the general formatting of the ccg file
-	linesSoFar = linesSoFar + 1
 	if linesSoFar > 413332 and "NEW SENTENCE" in line:
 		linesSoFar = 0
 		bigIter = bigIter + 1

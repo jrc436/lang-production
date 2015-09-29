@@ -6,9 +6,9 @@ package edu.psu.acs.lang.declarative;
  *
  */
 public class Slot {
-	private final String name;
+	private final SlotName name;
 	private final SlotValue value;
-	public Slot(String name, SlotValue value) {
+	public Slot(SlotName name, SlotValue value) {
 		this.name = name;
 		this.value = value;
 	}
@@ -18,7 +18,7 @@ public class Slot {
 	
 	//mostly for use in production
 	public String getName() {
-		return name;
+		return name.toString();
 	}
 	public String getValue() {
 		return value.toString();

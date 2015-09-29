@@ -107,7 +107,6 @@ public class ModelCreator {
 		List<IModelElement> ele = new ArrayList<IModelElement>();
 		Set<CCGType> types = new HashSet<CCGType>();
 		List<String> typelines = Files.readAllLines(Paths.get(workingDirectory+"actup-production/data/types.txt"));
-		int h = 0;
 		for (String line : typelines) {
 			CCGType cg = CCGCompoundType.makeCCGType(line);
 			if (cg instanceof CCGCompoundType) {
@@ -117,8 +116,6 @@ public class ModelCreator {
 			else {
 				types.add(cg);
 			}
-			//System.out.println(h);
-			h++;
 		}
 		ele.addAll(types);
 		

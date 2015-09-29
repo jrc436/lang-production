@@ -3,10 +3,8 @@ package edu.psu.acs.lang.production;
 import java.util.ArrayList;
 import java.util.List;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-import edu.psu.acs.lang.declarative.ChunkTypeEnum;
 import edu.psu.acs.lang.IModelElement;
+import edu.psu.acs.lang.declarative.ChunkTypeEnum;
 import edu.psu.acs.lang.declarative.Slot;
 
 public class BufferEffects implements IModelElement {
@@ -39,7 +37,7 @@ public class BufferEffects implements IModelElement {
 				lines.add("<add buffer=\""+buffer.toString()+"\" type=\""+chunk.toString()+"\">");
 				break;
 			default:
-				throw new NotImplementedException();
+				throw new UnsupportedOperationException();
 			}
 		for (Slot s : vars) {
 			lines.add("<slot name=\""+s.getName()+"\" equals=\""+s.getValue()+"/>");
@@ -52,7 +50,7 @@ public class BufferEffects implements IModelElement {
 				lines.add("</add>");
 				break;
 			default:
-				throw new NotImplementedException();
+				throw new UnsupportedOperationException();
 		}
 		return lines;
 	}

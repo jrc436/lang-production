@@ -1,6 +1,5 @@
 package edu.psu.acs.lang.declarative;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 
 public class LSSlotName implements SlotName {
@@ -12,7 +11,7 @@ public class LSSlotName implements SlotName {
 			case Word:
 				break;
 			default:
-				throw new NotImplementedException();	
+				throw new UnsupportedOperationException();	
 		}
 	}
 	public LSSlotName(LSSlotNameEnum en, int typeNum) {
@@ -31,7 +30,7 @@ public class LSSlotName implements SlotName {
 				this.typeNum = typeNum;
 				break;
 			default:
-				throw new NotImplementedException();		
+				throw new UnsupportedOperationException();		
 		}
 	}
 	public String toString() {

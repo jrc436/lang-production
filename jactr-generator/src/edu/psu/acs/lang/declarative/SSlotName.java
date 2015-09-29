@@ -1,8 +1,5 @@
 package edu.psu.acs.lang.declarative;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
-
-
 //sentence slot name, for modularity
 public class SSlotName implements SlotName {
 	private SSlotNameEnum en;
@@ -28,7 +25,7 @@ public class SSlotName implements SlotName {
 				this.cueTypeNum = cueTypeNum;
 				break;		
 			default:
-				throw new NotImplementedException();		
+				throw new UnsupportedOperationException();		
 		}
 	}
 	public SSlotName(SSlotNameEnum en, int cueNum) {
@@ -41,7 +38,7 @@ public class SSlotName implements SlotName {
 				this.cueNum = cueNum;
 				break;	
 		default:
-			throw new NotImplementedException();				
+			throw new UnsupportedOperationException();				
 		}
 	}
 	public SSlotName(SSlotNameEnum en) {
@@ -56,7 +53,7 @@ public class SSlotName implements SlotName {
 			case RightFullType:
 				break;
 			default:
-				throw new NotImplementedException();
+				throw new UnsupportedOperationException();
 		}
 	}
 	public String toString() {

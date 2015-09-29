@@ -160,6 +160,9 @@ public class ModelCreator {
 					List<String> wordBag = new ArrayList<String>(Arrays.asList(line.split(" ")));
 					goals.add(Sentence.makeSentence("goal"+k, wordBag, mostTypesN, largestSentenceK));
 					k++;
+					if (k > 10) {
+						break; //let's just get some test sentences... memory requirement too big for all of them
+					}
 				}
 				ele.addAll(goals);
 				break;

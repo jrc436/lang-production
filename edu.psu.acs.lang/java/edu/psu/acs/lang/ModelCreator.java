@@ -37,8 +37,11 @@ import edu.psu.acs.lang.production.ResolveForwardApplication;
 import edu.psu.acs.lang.production.ResolveForwardComposition;
 
 public class ModelCreator {
-	public static final int largestSentenceK = 93; //i
-	public static final int mostTypesN = 136; //j
+	private static final int largestSentenceK = 93; //i
+	private static final int mostTypesN = 136; //j
+	//private static final String workingDirectory = "/work/research/";
+	private static final String workingDirectory = "/Users/jrc/";
+	
 	List<IModelElement> elements;
 	FileWriter fw;
 	private ModelCreator(String fname) throws IOException {
@@ -103,7 +106,7 @@ public class ModelCreator {
 		//CCGTypes, read from types.txt. Importantly, we also want all subtypes of all of these types to be added. In a set-like way.
 		List<IModelElement> ele = new ArrayList<IModelElement>();
 		Set<CCGType> types = new HashSet<CCGType>();
-		List<String> typelines = Files.readAllLines(Paths.get("/work/research/actup-production/data/types.txt"));
+		List<String> typelines = Files.readAllLines(Paths.get(workingDirectory+"actup-production/data/types.txt"));
 		int h = 0;
 		for (String line : typelines) {
 			CCGType cg = CCGCompoundType.makeCCGType(line);
@@ -120,7 +123,7 @@ public class ModelCreator {
 		ele.addAll(types);
 		
 		List<LexSyn> lexsyns = new ArrayList<LexSyn>();
-		List<String> wordlines = Files.readAllLines(Paths.get("/work/research/actup-production/data/words.dsv"));
+		List<String> wordlines = Files.readAllLines(Paths.get(workingDirectory+"actup-production/data/words.dsv"));
 		for (String line : wordlines) {
 			String[] l = line.split(":-:");
 			if (l.length < 2) {
@@ -140,7 +143,7 @@ public class ModelCreator {
 		ele.addAll(lexsyns);
 		
 		List<Sentence> goals = new ArrayList<Sentence>();
-		List<String> sentlines = Files.readAllLines(Paths.get("/work/research/actup-production/data/swbd.txt"));
+		List<String> sentlines = Files.readAllLines(Paths.get(workingDirectory+"actup-production/data/swbd.txt"));
 		int k = 1;
 		for (String line : sentlines) {
 			List<String> wordBag = new ArrayList<String>(Arrays.asList(line.split(" ")));
@@ -174,12 +177,12 @@ public class ModelCreator {
 	public static void main(String[] args) throws IOException {
 		//createWords();
 		//createTypes();
-		ModelCreator tc = new ModelCreator("/work/research/actup-production/data/test-model.jactr");
+		ModelCreator tc = new ModelCreator(workingDirectory+"actup-production/data/test-model.jactr");
 		tc.writeAll();
 	}
 	private static void createTypes() throws IOException {
-		List<String> lines = Files.readAllLines(Paths.get("/work/research/actup-production/data/words.dsv"));
-		FileWriter write = new FileWriter("/work/research/actup-production/data/types.txt");
+		List<String> lines = Files.readAllLines(Paths.get(workingDirectory+"actup-production/data/words.dsv"));
+		FileWriter write = new FileWriter(workingDirectory+"actup-production/data/types.txt");
 		Set<String> types = new HashSet<String>();
 		for (String line : lines) {
 			String[] separated = line.split(":-:");
@@ -195,12 +198,12 @@ public class ModelCreator {
 	}
 	private static void createWords() throws IOException {
 		//first, we'll just grab the word and make a list of all of their types so that we have a clear idea
-		List<String> lines = Files.readAllLines(Paths.get("/work/research/actup-production/data/swbd1.ccg"));
-		lines.addAll(Files.readAllLines(Paths.get("/work/research/actup-production/data/swbd2.ccg")));
-		lines.addAll(Files.readAllLines(Paths.get("/work/research/actup-production/data/swbd3.ccg")));
-		lines.addAll(Files.readAllLines(Paths.get("/work/research/actup-production/data/swbd4.ccg")));
-		lines.addAll(Files.readAllLines(Paths.get("/work/research/actup-production/data/swbd5.ccg")));
-		FileWriter write = new FileWriter("/work/research/actup-production/data/words.dsv");
+		List<String> lines = Files.readAllLines(Paths.get(workingDirectory+"actup-production/data/swbd1.ccg"));
+		lines.addAll(Files.readAllLines(Paths.get(workingDirectory+"actup-production/data/swbd2.ccg")));
+		lines.addAll(Files.readAllLines(Paths.get(workingDirectory+"actup-production/data/swbd3.ccg")));
+		lines.addAll(Files.readAllLines(Paths.get(workingDirectory+"actup-production/data/swbd4.ccg")));
+		lines.addAll(Files.readAllLines(Paths.get(workingDirectory+"actup-production/data/swbd5.ccg")));
+		FileWriter write = new FileWriter(workingDirectory+"actup-production/data/words.dsv");
 		HashMap<String, Set<String>> map = new HashMap<String, Set<String>>();
 		for (String line : lines) {
 			int start = line.indexOf('{');

@@ -1,3 +1,10 @@
+data/swbd.ccg
+edu.psu.acs.lang/models/
+edu.psu.acs.lang/runs/
+david/
+data/
+
+*.local
 *.cached
 *.lisp~
 *.com

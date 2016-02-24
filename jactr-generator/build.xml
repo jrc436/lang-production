@@ -6,17 +6,53 @@
               as the first entry and export the buildfile again. --><project basedir="." default="build" name="jactr-generator">
     <property environment="env"/>
     <property name="ECLIPSE_HOME" value="../../../../opt/eclipse/"/>
+    <property name="edu.psu.acs.lang.location" value="../edu.psu.acs.lang"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.8"/>
     <property name="source" value="1.8"/>
+    <path id="Plug-in Dependencies.libraryclasspath">
+        <pathelement location="${ECLIPSE_HOME}plugins/org.jactr_2.0.0.201510231004.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.jactr.support_1.2.2.201507141147.jar"/>
+        <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/org/jactr/commons-primitives-1.0.jar"/>
+        <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/org/commons-logging-1.1.1.jar"/>
+        <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/javolution.jar"/>
+        <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/jscience.jar"/>
+        <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/org/jactr/commons-lang-2.5.jar"/>
+        <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/org/jactr/commons-cli-1.2.jar"/>
+        <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/org/jactr/commons-collections-3.2.1.jar"/>
+        <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/jmock/jmock-2.6.0.jar"/>
+        <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/jmock/jmock-junit4-2.6.0.jar"/>
+        <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/jmock/jmock-legacy-2.6.0.jar"/>
+        <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/jmock/jmock-script-2.6.0.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.apache.log4j_1.2.15.v201012070815.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.junit_4.11.0.v201303080030/junit.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.hamcrest.core_1.3.0.v201303031735.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.jactr.io_2.0.0.201507141147"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.jactr.io_2.0.0.201507141147/lib/antlr-3.1.1.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.jactr.tools_2.0.0.201509281524/tools.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.jactr.tools_2.0.0.201509281524/lib/commons-math-2.1.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.commonreality.api_2.0.0.201509251143.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.commonreality.core_2.0.0.201509251143.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.commonreality.time_2.0.0.201509251143.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.commonreality.sensors_2.0.0.201507141147.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.commonreality.modalities_1.0.0.201509251143.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.jactr.modules.temporal_1.0.0.201507131128.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.commonreality.support_1.0.0.201508181348.jar"/>
+        <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.commonreality.support_1.0.0.201508181348/lib/commons-logging-1.1.1.jar"/>
+        <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.commonreality.support_1.0.0.201508181348/lib/javolution.jar"/>
+    </path>
+    <path id="edu.psu.acs.lang.classpath">
+        <path refid="Plug-in Dependencies.libraryclasspath"/>
+        <pathelement location="${edu.psu.acs.lang.location}/bin"/>
+    </path>
     <path id="jactr-generator.classpath">
         <pathelement location="bin"/>
+        <path refid="edu.psu.acs.lang.classpath"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
         <copy includeemptydirs="false" todir="bin">
             <fileset dir="src">
-                <exclude name="**/*.launch"/>
                 <exclude name="**/*.java"/>
             </fileset>
         </copy>
@@ -24,9 +60,17 @@
     <target name="clean">
         <delete dir="bin"/>
     </target>
-    <target depends="clean" name="cleanall"/>
+    <target depends="clean" name="cleanall">
+        <ant antfile="build.xml" dir="${edu.psu.acs.lang.location}" inheritAll="false" target="clean"/>
+    </target>
     <target depends="build-subprojects,build-project" name="build"/>
-    <target name="build-subprojects"/>
+    <target name="build-subprojects">
+        <ant antfile="build.xml" dir="${edu.psu.acs.lang.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
     <target depends="init" name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
@@ -49,7 +93,13 @@
         <antcall target="build"/>
     </target>
     <target name="ModelCreator">
-        <java classname="edu.psu.acs.lang.ModelCreator" failonerror="true" fork="yes">
+        <java classname="edu.psu.acs.lang.gen.ModelCreator" failonerror="true" fork="yes">
+            <jvmarg line="-Xmx3g"/>
+            <classpath refid="jactr-generator.classpath"/>
+        </java>
+    </target>
+    <target name="ModelWriter">
+        <java classname="edu.psu.acs.lang.gen.ModelWriter" failonerror="true" fork="yes">
             <jvmarg line="-Xmx3g"/>
             <classpath refid="jactr-generator.classpath"/>
         </java>

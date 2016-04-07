@@ -11,10 +11,12 @@ import java.util.Random;
 
 import edu.psu.acs.lang.IModelElement;
 import edu.psu.acs.lang.PathConsts;
+import edu.psu.acs.lang.declarative.Sentence;
+import edu.psu.acs.lang.declarative.SentenceManager;
 
 public class ModelWriter {
 	private static final int numDivisionsToUse = 1;
-	private static final int numDivisions = 10000000;
+	private static final int numDivisions = 30000;
 	private final FileWriter fw;
 	public ModelWriter(Path path) throws IOException {
 		fw = new FileWriter(path.toFile());
@@ -35,6 +37,8 @@ public class ModelWriter {
 		String exp = PathConsts.expName;
 		String swbdName = PathConsts.swbdBaseName;
 		String dataDirStr = PathConsts.dataDirName;
+		String projectName = PathConsts.projectName;
+		String modelsName = PathConsts.models;
 		
 		Random r = new Random();
 		File workingDir = new File(ModelCreator.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
@@ -48,25 +52,30 @@ public class ModelWriter {
 			divisionsToUse[i] = r.nextInt(divisions);
 		}
 		ModelPreparer prep = new ModelPreparer(expDir, divisionsToUse);
-		ModelCreator mc = new ModelCreator(prep, expDir);
-		Path modelDir = basePath.resolve("edu.psu.acs.lang/models/");
-		ModelWriter mw = new ModelWriter(modelDir.resolve("lang_"+exp+".jactr"));
+		ModelCreator mc = new ModelCreator(prep, expDir, prep.getNumSentences());
+		Path modelDir = basePath.resolve(projectName).resolve(modelsName);
+		ModelWriter mw = new ModelWriter(modelDir.resolve("lp-"+exp+".jactr"));
 				
 		List<IModelElement> writer = new ArrayList<IModelElement>();
-		writer.addAll(getIntro(exp));
+		writer.addAll(getIntro(exp, false));
 		writer.add(new SimpleElement("<declarative-memory>"));
 		writer.addAll(mc.makeChunkTypes());
 		mw.writeOut("Finished making chunk types", writer);
+		writer.addAll(mc.makeConjChunks());
 		writer.addAll(mc.makeOperatorChunks());
 		writer.addAll(mc.makeTypeChunks());
 		writer.addAll(mc.makeEmptyChunk());
 		mw.writeOut("Finished making type chunks", writer);
 		writer.addAll(mc.makeLexSynAndWordChunks());
 		mw.writeOut("Finished making lex syns", writer);
+		List<Sentence> allSentences = new ArrayList<Sentence>();
 		for (int division : divisionsToUse) {
-			writer.addAll(mc.makeSentences(division));
-			mw.writeOut("Finished making sentence: "+division, writer);
+			allSentences.addAll(mc.makeSentences(division));
+			mw.writeOut("Finished making sentences in file: "+division, writer);
 		}
+		writer.addAll(mc.makeSentenceManagers(allSentences));
+		writer.addAll(allSentences);
+		
 		writer.add(new SimpleElement("</declarative-memory>"));
 		writer.add(new SimpleElement("<procedural-memory>"));
 		writer.addAll(mc.makeRules());
@@ -75,13 +84,18 @@ public class ModelWriter {
 		writer.addAll(getOutro());
 		mw.writeOut("Finished!", writer);
 	}
-	private static List<SimpleElement> getIntro(String exp) {
+	private static List<SimpleElement> getIntro(String exp, boolean tracer) {
 		List<SimpleElement> intro = new ArrayList<SimpleElement>();
 		intro.add(new SimpleElement("<actr>"));
 		intro.add(new SimpleElement("<model name=\""+exp+"\">"));
 		intro.add(new SimpleElement("<modules>"));
 		intro.add(new SimpleElement("<module class=\"org.jactr.core.module.declarative.six.DefaultDeclarativeModule6\"/>"));
-		intro.add(new SimpleElement("<module class=\"org.jactr.core.module.procedural.sixtrace.TracerProceduralModule6\"/>"));
+		if (tracer) {
+			intro.add(new SimpleElement("<module class=\"org.jactr.core.module.procedural.sixtrace.TracerProceduralModule6\"/>"));
+		}
+		else {
+			intro.add(new SimpleElement("<module class=\"org.jactr.core.module.procedural.six.DefaultProceduralModule6\"/>"));
+		}
 		intro.add(new SimpleElement("<module class=\"org.jactr.core.module.goal.six.DefaultGoalModule6\"/>"));
 		intro.add(new SimpleElement("<module class=\"org.jactr.core.module.procedural.six.learning.DefaultProceduralLearningModule6\"/>"));
 		intro.add(new SimpleElement("<module class=\"org.jactr.core.module.retrieval.six.DefaultRetrievalModule6\">"));
@@ -94,7 +108,7 @@ public class ModelWriter {
 	}
 	private static List<SimpleElement> getOutro() {
 		List<SimpleElement> intro = new ArrayList<SimpleElement>();
-		intro.add(new SimpleElement("<buffer name=\"goal\" chunk=\"goal1\"/>"));
+		intro.add(new SimpleElement("<buffer name=\"goal\" chunk=\""+SentenceManager.getFirst()+"\"/>"));
 		intro.add(new SimpleElement("<buffer name=\"retrieval\">"));
 		intro.add(new SimpleElement("<parameters>"));
 		intro.add(new SimpleElement("<parameter name=\"StrictHarvestingEnabled\" value=\"true\"/>"));

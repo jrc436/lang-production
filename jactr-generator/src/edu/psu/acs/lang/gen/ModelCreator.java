@@ -19,6 +19,8 @@ import edu.psu.acs.lang.declarative.CCGType;
 import edu.psu.acs.lang.declarative.CCGTypeSlot;
 import edu.psu.acs.lang.declarative.ChunkType;
 import edu.psu.acs.lang.declarative.ChunkTypeEnum;
+import edu.psu.acs.lang.declarative.ConjEnum;
+import edu.psu.acs.lang.declarative.Conjable;
 import edu.psu.acs.lang.declarative.EmptyChunk;
 import edu.psu.acs.lang.declarative.EmptyEnum;
 import edu.psu.acs.lang.declarative.LSSlotName;
@@ -27,6 +29,9 @@ import edu.psu.acs.lang.declarative.LexSyn;
 import edu.psu.acs.lang.declarative.SSlotName;
 import edu.psu.acs.lang.declarative.SSlotNameEnum;
 import edu.psu.acs.lang.declarative.Sentence;
+import edu.psu.acs.lang.declarative.SentenceManager;
+import edu.psu.acs.lang.declarative.SingletonSlotName;
+import edu.psu.acs.lang.declarative.SingletonSlotNameEnum;
 import edu.psu.acs.lang.declarative.SlotName;
 import edu.psu.acs.lang.declarative.Word;
 import edu.psu.acs.lang.production.AddLexSyn;
@@ -36,6 +41,10 @@ import edu.psu.acs.lang.production.ConjunctionLeft;
 import edu.psu.acs.lang.production.ConjunctionRight;
 import edu.psu.acs.lang.production.FinishConjunctionLeft;
 import edu.psu.acs.lang.production.FinishConjunctionRight;
+import edu.psu.acs.lang.production.FlushRetrievalLS;
+import edu.psu.acs.lang.production.FlushRetrievalType;
+import edu.psu.acs.lang.production.FocusHome;
+import edu.psu.acs.lang.production.FocusNewGoal;
 import edu.psu.acs.lang.production.ForwardApplication;
 import edu.psu.acs.lang.production.ForwardComposition;
 import edu.psu.acs.lang.production.GrabWord;
@@ -43,6 +52,7 @@ import edu.psu.acs.lang.production.ResolveBackwardApplication;
 import edu.psu.acs.lang.production.ResolveBackwardComposition;
 import edu.psu.acs.lang.production.ResolveForwardApplication;
 import edu.psu.acs.lang.production.ResolveForwardComposition;
+import edu.psu.acs.lang.production.RetrieveHome;
 import edu.psu.acs.lang.production.SyntaxRule;
 
 public class ModelCreator {
@@ -52,14 +62,16 @@ public class ModelCreator {
 	private final Path typesPath;
 	private final Path wordsPath;
 	private final Path sentPath;
+	private final int numSentences;
 	//private final File[] sentFiles;
-	public ModelCreator(ModelPreparer prep, Path expDir) throws URISyntaxException, IOException {
+	public ModelCreator(ModelPreparer prep, Path expDir, int numSentences) throws URISyntaxException, IOException {
 		prep.createWords(delimiter);
 		largestSentenceK = prep.maxWordsPerSentence();
 		mostTypesN = prep.createTypes();
 		typesPath = expDir.resolve(PathConsts.typesFName);
 		wordsPath = expDir.resolve(PathConsts.wordsFName);
 		sentPath = expDir.resolve(PathConsts.wordCat);
+		this.numSentences = numSentences;
 	}
 	public List<IModelElement> makeChunkTypes() {
 		List<IModelElement> toret = new ArrayList<IModelElement>();
@@ -78,11 +90,11 @@ public class ModelCreator {
 		toret.add(new ChunkType(ChunkTypeEnum.lexsyn, lsslots));
 		toret.add(new ChunkType(ChunkTypeEnum.word, new ArrayList<SlotName>()));
 		toret.add(new ChunkType(ChunkTypeEnum.operator, new ArrayList<SlotName>()));
+		toret.add(new ChunkType(ChunkTypeEnum.conj, new ArrayList<SlotName>()));
 		toret.add(new ChunkType(ChunkTypeEnum.empty, new ArrayList<SlotName>()));
 		
 		//sentences 
 		List<SlotName> sslots = new ArrayList<SlotName>();
-		
 		for (int i = 1; i <= largestSentenceK; i++) {
 			sslots.add(new SSlotName(SSlotNameEnum.WordSem, i, largestSentenceK));
 			sslots.add(new SSlotName(SSlotNameEnum.LexsynString, i, largestSentenceK));
@@ -95,6 +107,13 @@ public class ModelCreator {
 			}
 		}
 		toret.add(new ChunkType(ChunkTypeEnum.sentence, sslots));
+		
+		//sentence manager
+		List<SlotName> smSlots = new ArrayList<SlotName>();
+		smSlots.add(new SingletonSlotName(SingletonSlotNameEnum.goal));
+		toret.add(new ChunkType(ChunkTypeEnum.sentenceManager, smSlots));
+		
+		
 		return toret;
 	}
 	public List<IModelElement> makeEmptyChunk() {
@@ -108,6 +127,12 @@ public class ModelCreator {
 		ele.add(new CCGOperator(CCGOperatorEnum.Slash));
 		ele.add(new CCGOperator(CCGOperatorEnum.Backslash));
 		return ele;
+	}
+	public List<IModelElement> makeConjChunks() {
+		List<IModelElement> el = new ArrayList<IModelElement>();
+		el.add(new Conjable(ConjEnum.Conjable));
+		el.add(new Conjable(ConjEnum.Nonconjable));
+		return el;
 	}
 	public List<IModelElement> makeTypeChunks() throws IOException {
 		List<IModelElement> ele = new ArrayList<IModelElement>();
@@ -189,22 +214,39 @@ public class ModelCreator {
 		ele.addAll(lexsyns);
 		return ele;
 	}
-		
-	public List<IModelElement> makeSentences(int fileNum) throws IOException {
-		List<IModelElement> ele = new ArrayList<IModelElement>();
+	public List<Sentence> makeSentences(int fileNum) throws IOException {
+		List<Sentence> ele = new ArrayList<Sentence>();
 		List<Sentence> goals = new ArrayList<Sentence>();
 		List<String> sentlines = Files.readAllLines(sentPath);
 		int k = 1;
 		for (String line : sentlines) {
 			List<String> wordBag = new ArrayList<String>(Arrays.asList(line.split(" ")));
-			goals.add(Sentence.makeSentence("goal"+k, wordBag, mostTypesN, largestSentenceK));
+			goals.add(Sentence.makeSentence(k, wordBag, mostTypesN, largestSentenceK));
 			k++;
 		}
 		ele.addAll(goals);
+	
 		return ele;
 	}
+	public List<IModelElement> makeSentenceManagers(List<Sentence> allSentences) {
+		List<IModelElement> ele = new ArrayList<IModelElement>();
+		for (int i = 1; i <= allSentences.size(); i++) {
+			ele.add(SentenceManager.makeSentenceManager(i, allSentences.get(i-1)));
+		}
+		return ele;
+	}
+	
 	public List<IModelElement> makeRules() {
 		List<IModelElement> rules = new ArrayList<IModelElement>();
+		
+		rules.add(new FlushRetrievalLS());
+		rules.add(new FlushRetrievalType());
+		rules.add(new FocusHome());
+		rules.add(new FocusNewGoal());
+		rules.add(new RetrieveHome());
+//		for (int j = 1; j <= numSentences; j++) {
+//			rules.add(new RetrieveHome(j));
+//		}
 		for (int j = 1; j <= largestSentenceK; j++) {
 			rules.add(new AddLexSyn(j, mostTypesN, largestSentenceK));
 			rules.add(new GrabWord(j, largestSentenceK));
@@ -222,10 +264,10 @@ public class ModelCreator {
 						rules.add(new BackwardApplication(j, i, k, l, mostTypesN, largestSentenceK));
 						rules.add(new ForwardComposition(j, i, k, l, mostTypesN, largestSentenceK));
 						rules.add(new BackwardComposition(j, i, k, l, mostTypesN, largestSentenceK));
-						rules.add(new ConjunctionLeft(j, i, k, l, largestSentenceK, mostTypesN));
-						rules.add(new ConjunctionRight(j, i, k, l, largestSentenceK, mostTypesN));
-						rules.add(new FinishConjunctionLeft(j, i, k, l, largestSentenceK, mostTypesN));
-						rules.add(new FinishConjunctionRight(j, i, k, l, largestSentenceK, mostTypesN));
+						rules.add(new ConjunctionLeft(j, i, k, l, mostTypesN, largestSentenceK));
+						rules.add(new ConjunctionRight(j, i, k, l, mostTypesN, largestSentenceK));
+						rules.add(new FinishConjunctionLeft(j, i, k, l, mostTypesN, largestSentenceK));
+						rules.add(new FinishConjunctionRight(j, i, k, l, mostTypesN, largestSentenceK));
 					}
 				}
 			}

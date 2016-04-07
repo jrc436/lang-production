@@ -1,8 +1,9 @@
-data/swbd.ccg
-edu.psu.acs.lang/models/
-edu.psu.acs.lang/runs/
 david/
 data/
+runs/
+models/
+old-models/
+srilm/lib/
 
 *.local
 *.cached

@@ -33,6 +33,7 @@ public class ModelPreparer {
 	private File wordCat;
 	private File typeCat;
 	private final NodeParser p;
+	private final int numSentences;
 	public ModelPreparer(Path expDir, int[] divisionsToUse) throws IOException {
 		this.divisionsToUse = divisionsToUse;
 		this.expDir = expDir;
@@ -46,20 +47,42 @@ public class ModelPreparer {
 				return f.getName().endsWith(".txt");
 			}
 		};
-		catFiles(ccgFilter, txtFilter);
+		numSentences = catFiles(ccgFilter, txtFilter);
 		p = new NodeParser(typeCat.toPath(),true);
 		recreateTypeFile();
 	}
-	private void catFiles(FileFilter ccgFilter, FileFilter txtFilter) throws IOException {
+	public int getNumSentences() {
+		return numSentences;
+	}
+	private int catFiles(FileFilter ccgFilter, FileFilter txtFilter) throws IOException {
 		List<String> lines = new ArrayList<String>();
 		List<String> tlines = new ArrayList<String>();
 		File[] files = expDir.toFile().listFiles(txtFilter);
 		Arrays.sort(files);
+		File[] tfiles = expDir.toFile().listFiles(ccgFilter);
+		Arrays.sort(tfiles);
+		if (files.length != tfiles.length) {
+			System.err.println("Files: "+files.length+"; tfiles: "+tfiles.length);
+			for (int j = 0; j < Math.max(files.length, tfiles.length); j++) {
+				if (j < files.length && j >= tfiles.length) {
+					System.err.println("Files"+j+": "+files[j]+"Tfiles"+j+": "+"None");
+					break;
+				}
+				else if (j < tfiles.length && j >= files.length) {
+					System.err.println("Files"+j+": "+"None"+"Tfiles"+j+": "+tfiles[j]);
+					break;
+				}
+				else if (files[j] != tfiles[j]) {
+					System.err.println("Files"+j+": "+files[j]+"Tfiles"+j+": "+tfiles[j]);
+					break;
+				}
+			}
+			System.exit(1);
+		}
 		for (int division : divisionsToUse) {
 			lines.addAll(Files.readAllLines(files[division].toPath()));
 		}
-		File[] tfiles = expDir.toFile().listFiles(ccgFilter);
-		Arrays.sort(tfiles);
+		
 		for (int division : divisionsToUse) {
 			tlines.addAll(Files.readAllLines(tfiles[division].toPath()));
 		}
@@ -78,6 +101,7 @@ public class ModelPreparer {
 			fwtype.write(line+System.getProperty("line.separator"));
 		}
 		fwtype.close();
+		return lines.size();
 	}
 	private void recreateTypeFile() throws IOException {
 		List<ParseNode> parse = p.getTops();
@@ -212,6 +236,9 @@ public class ModelPreparer {
 			if (pair.getValue().contains("CODE")) {
 				//continue; this shouldn't be a problem anymore, but I want to double check
 				System.err.println("Parsing algorithm captures CODES");
+			}
+			if (pair.getValue().contains("TOP")) {
+				continue; //not sure if this is generally right... but we'll try it. 
 			}
 //			if (pair.getValue().size() == 1 && (pair.getValue().contains(".") || pair.getValue().contains(",") || pair.getValue().contains(":"))) {
 //				continue;

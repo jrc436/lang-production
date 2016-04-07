@@ -3,24 +3,17 @@
 ../obj/i686-m64$(OBJ_OPTION)/fcheck.o: fcheck.c zio.h fcheck.h
 ../obj/i686-m64$(OBJ_OPTION)/fake-rand48.o: fake-rand48.c
 ../obj/i686-m64$(OBJ_OPTION)/version.o: version.c zio.h version.h SRILMversion.h
-../obj/i686-m64$(OBJ_OPTION)/ztest.o: ztest.c zio.h \
- /work/research/actup-production/srilm//include/zlib.h \
- /work/research/actup-production/srilm//include/zconf.h option.h \
- cfuncproto.h version.h
+../obj/i686-m64$(OBJ_OPTION)/ztest.o: ztest.c zio.h ../../include/zlib.h ../../include/zconf.h \
+ option.h cfuncproto.h version.h
 ../obj/i686-m64$(OBJ_OPTION)/Debug.o: Debug.cc Debug.h Boolean.h
-../obj/i686-m64$(OBJ_OPTION)/File.o: File.cc zio.h Boolean.h File.h \
- /work/research/actup-production/srilm//include/zlib.h \
- /work/research/actup-production/srilm//include/zconf.h \
- /work/research/actup-production/srilm//include/Array.cc \
- /work/research/actup-production/srilm//include/Array.h \
- /work/research/actup-production/srilm//include/Boolean.h \
- /work/research/actup-production/srilm//include/MemStats.h srilm_iconv.h
+../obj/i686-m64$(OBJ_OPTION)/File.o: File.cc zio.h Boolean.h File.h ../../include/zlib.h \
+ ../../include/zconf.h ../../include/Array.cc ../../include/Array.h \
+ ../../include/Boolean.h ../../include/MemStats.h srilm_iconv.h
 ../obj/i686-m64$(OBJ_OPTION)/MStringTokUtil.o: MStringTokUtil.cc MStringTokUtil.h
 ../obj/i686-m64$(OBJ_OPTION)/tls.o: tls.cc tls.h
 ../obj/i686-m64$(OBJ_OPTION)/tserror.o: tserror.cc tserror.h TLSWrapper.h tls.h Boolean.h
-../obj/i686-m64$(OBJ_OPTION)/testFile.o: testFile.cc File.h zio.h \
- /work/research/actup-production/srilm//include/zlib.h \
- /work/research/actup-production/srilm//include/zconf.h Boolean.h
+../obj/i686-m64$(OBJ_OPTION)/testFile.o: testFile.cc File.h zio.h ../../include/zlib.h \
+ ../../include/zconf.h Boolean.h
 ../bin/i686-m64$(OPTION)/ztest:	../obj/i686-m64$(OPTION)/ztest.o
 ztest:	../bin/i686-m64$(OPTION)/ztest
 ../bin/i686-m64$(OPTION)/testFile:	../obj/i686-m64$(OPTION)/testFile.o

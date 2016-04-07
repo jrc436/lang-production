@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StreamTokenizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import lexicon.IWordFactory;
@@ -46,6 +47,9 @@ public class StandardNgramModel extends AbstractStandardNgramModel
 	 public StandardNgramModel(int order, String filename, double[] varValues, IWordFactory wf, Tokenizer t) throws IOException {
 		 this(order, filename, false, varValues, wf, t);
 	 }
+	 public StandardNgramModel(int order, String fileName) throws IOException {
+		 this(order, fileName, false, new double[0], null, null);
+	 }
 	
 	/** 
      * Loads an n-gram model of the given order in ARPA (Doug Paul) format from
@@ -58,6 +62,10 @@ public class StandardNgramModel extends AbstractStandardNgramModel
     		throws IOException {
         super(order, useSemClasses, wf, t, varValues);
         openVocab = readModel(new BufferedReader(new FileReader(filename)));
+    }
+    public double easyScore(String fragment) {
+    	List<String> words = Arrays.asList(fragment.trim().split(" "));
+    	return convertToProb(super.logProbFromNgram(words, 0, this.order));
     }
 	
 	// reads in model

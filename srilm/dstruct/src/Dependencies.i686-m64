@@ -1,86 +1,50 @@
 ../obj/i686-m64$(OBJ_OPTION)/qsort.o: qsort.c
-../obj/i686-m64$(OBJ_OPTION)/maxalloc.o: maxalloc.c \
- /work/research/actup-production/srilm//include/option.h \
- /work/research/actup-production/srilm//include/cfuncproto.h
+../obj/i686-m64$(OBJ_OPTION)/maxalloc.o: maxalloc.c ../../include/option.h ../../include/cfuncproto.h
 ../obj/i686-m64$(OBJ_OPTION)/MemStats.o: MemStats.cc MemStats.h
 ../obj/i686-m64$(OBJ_OPTION)/LHashTrie.o: LHashTrie.cc
 ../obj/i686-m64$(OBJ_OPTION)/SArrayTrie.o: SArrayTrie.cc Trie.cc Trie.h MemStats.h SArray.h Map.h \
- /work/research/actup-production/srilm//include/Boolean.h SArray.cc \
- BlockMalloc.h
-../obj/i686-m64$(OBJ_OPTION)/BlockMalloc.o: BlockMalloc.cc BlockMalloc.h \
- /work/research/actup-production/srilm//include/TLSWrapper.h \
- /work/research/actup-production/srilm//include/tls.h \
- /work/research/actup-production/srilm//include/Boolean.h
+ ../../include/Boolean.h SArray.cc BlockMalloc.h
+../obj/i686-m64$(OBJ_OPTION)/BlockMalloc.o: BlockMalloc.cc BlockMalloc.h ../../include/TLSWrapper.h \
+ ../../include/tls.h ../../include/Boolean.h
 ../obj/i686-m64$(OBJ_OPTION)/DStructThreads.o: DStructThreads.cc DStructThreads.h BlockMalloc.h \
- /work/research/actup-production/srilm//include/tserror.h
-../obj/i686-m64$(OBJ_OPTION)/Array.o: Array.cc Array.h \
- /work/research/actup-production/srilm//include/Boolean.h MemStats.h
-../obj/i686-m64$(OBJ_OPTION)/IntervalHeap.o: IntervalHeap.cc IntervalHeap.h \
- /work/research/actup-production/srilm//include/Boolean.h Array.cc \
- Array.h MemStats.h
-../obj/i686-m64$(OBJ_OPTION)/Map.o: Map.cc Map.h \
- /work/research/actup-production/srilm//include/Boolean.h MemStats.h
-../obj/i686-m64$(OBJ_OPTION)/SArray.o: SArray.cc BlockMalloc.h SArray.h Map.h \
- /work/research/actup-production/srilm//include/Boolean.h MemStats.h
-../obj/i686-m64$(OBJ_OPTION)/LHash.o: LHash.cc LHash.h Map.h \
- /work/research/actup-production/srilm//include/Boolean.h MemStats.h \
+ ../../include/tserror.h
+../obj/i686-m64$(OBJ_OPTION)/Array.o: Array.cc Array.h ../../include/Boolean.h MemStats.h
+../obj/i686-m64$(OBJ_OPTION)/IntervalHeap.o: IntervalHeap.cc IntervalHeap.h ../../include/Boolean.h \
+ Array.cc Array.h MemStats.h
+../obj/i686-m64$(OBJ_OPTION)/Map.o: Map.cc Map.h ../../include/Boolean.h MemStats.h
+../obj/i686-m64$(OBJ_OPTION)/SArray.o: SArray.cc BlockMalloc.h SArray.h Map.h ../../include/Boolean.h \
+ MemStats.h
+../obj/i686-m64$(OBJ_OPTION)/LHash.o: LHash.cc LHash.h Map.h ../../include/Boolean.h MemStats.h \
  BlockMalloc.h
-../obj/i686-m64$(OBJ_OPTION)/Map2.o: Map2.cc Map2.h LHash.h Map.h \
- /work/research/actup-production/srilm//include/Boolean.h MemStats.h \
+../obj/i686-m64$(OBJ_OPTION)/Map2.o: Map2.cc Map2.h LHash.h Map.h ../../include/Boolean.h MemStats.h \
  LHash.cc BlockMalloc.h
-../obj/i686-m64$(OBJ_OPTION)/Trie.o: Trie.cc Trie.h MemStats.h LHash.h Map.h \
- /work/research/actup-production/srilm//include/Boolean.h LHash.cc \
- BlockMalloc.h
-../obj/i686-m64$(OBJ_OPTION)/CachedMem.o: CachedMem.cc CachedMem.h \
- /work/research/actup-production/srilm//include/TLSWrapper.h \
- /work/research/actup-production/srilm//include/tls.h \
- /work/research/actup-production/srilm//include/Boolean.h
-../obj/i686-m64$(OBJ_OPTION)/testArray.o: testArray.cc Array.cc Array.h \
- /work/research/actup-production/srilm//include/Boolean.h MemStats.h
-../obj/i686-m64$(OBJ_OPTION)/testMap.o: testMap.cc SArray.h Map.h \
- /work/research/actup-production/srilm//include/Boolean.h MemStats.h \
+../obj/i686-m64$(OBJ_OPTION)/Trie.o: Trie.cc Trie.h MemStats.h LHash.h Map.h ../../include/Boolean.h \
+ LHash.cc BlockMalloc.h
+../obj/i686-m64$(OBJ_OPTION)/CachedMem.o: CachedMem.cc CachedMem.h ../../include/TLSWrapper.h \
+ ../../include/tls.h ../../include/Boolean.h
+../obj/i686-m64$(OBJ_OPTION)/testArray.o: testArray.cc Array.cc Array.h ../../include/Boolean.h \
+ MemStats.h
+../obj/i686-m64$(OBJ_OPTION)/testMap.o: testMap.cc SArray.h Map.h ../../include/Boolean.h MemStats.h \
  LHash.h SArray.cc BlockMalloc.h LHash.cc
-../obj/i686-m64$(OBJ_OPTION)/testFloatMap.o: testFloatMap.cc SArray.h Map.h \
- /work/research/actup-production/srilm//include/Boolean.h MemStats.h \
- LHash.h SArray.cc BlockMalloc.h LHash.cc
-../obj/i686-m64$(OBJ_OPTION)/benchHash.o: benchHash.cc \
- /work/research/actup-production/srilm//include/option.h \
- /work/research/actup-production/srilm//include/cfuncproto.h LHash.cc \
- LHash.h Map.h /work/research/actup-production/srilm//include/Boolean.h \
- MemStats.h BlockMalloc.h Trie.cc Trie.h
-../obj/i686-m64$(OBJ_OPTION)/testHash.o: testHash.cc LHash.cc LHash.h Map.h \
- /work/research/actup-production/srilm//include/Boolean.h MemStats.h \
- BlockMalloc.h
+../obj/i686-m64$(OBJ_OPTION)/testFloatMap.o: testFloatMap.cc SArray.h Map.h ../../include/Boolean.h \
+ MemStats.h LHash.h SArray.cc BlockMalloc.h LHash.cc
+../obj/i686-m64$(OBJ_OPTION)/benchHash.o: benchHash.cc ../../include/option.h \
+ ../../include/cfuncproto.h LHash.cc LHash.h Map.h \
+ ../../include/Boolean.h MemStats.h BlockMalloc.h Trie.cc Trie.h
+../obj/i686-m64$(OBJ_OPTION)/testHash.o: testHash.cc LHash.cc LHash.h Map.h ../../include/Boolean.h \
+ MemStats.h BlockMalloc.h
 ../obj/i686-m64$(OBJ_OPTION)/testSizes.o: testSizes.cc Trie.cc Trie.h MemStats.h LHash.h Map.h \
- /work/research/actup-production/srilm//include/Boolean.h LHash.cc \
- BlockMalloc.h /work/research/actup-production/srilm//include/Counts.h \
- /work/research/actup-production/srilm//include/Boolean.h \
- /work/research/actup-production/srilm//include/XCount.h \
- /work/research/actup-production/srilm//include/File.h \
- /work/research/actup-production/srilm//include/zio.h \
- /work/research/actup-production/srilm//include/zlib.h \
- /work/research/actup-production/srilm//include/zconf.h \
- /work/research/actup-production/srilm//include/XCount.h \
- /work/research/actup-production/srilm//include/Vocab.h \
- /work/research/actup-production/srilm//include/LHash.h \
- /work/research/actup-production/srilm//include/SArray.h \
- /work/research/actup-production/srilm//include/Map.h \
- /work/research/actup-production/srilm//include/Array.h \
- /work/research/actup-production/srilm//include/MemStats.h \
- /work/research/actup-production/srilm//include/TLSWrapper.h \
- /work/research/actup-production/srilm//include/tls.h \
- /work/research/actup-production/srilm//include/NgramStats.h \
- /work/research/actup-production/srilm//include/LMStats.h \
- /work/research/actup-production/srilm//include/Vocab.h \
- /work/research/actup-production/srilm//include/TextStats.h \
- /work/research/actup-production/srilm//include/Prob.h \
- /work/research/actup-production/srilm//include/Counts.h \
- /work/research/actup-production/srilm//include/Debug.h \
- /work/research/actup-production/srilm//include/Trie.h
+ ../../include/Boolean.h LHash.cc BlockMalloc.h ../../include/Counts.h \
+ ../../include/Boolean.h ../../include/XCount.h ../../include/File.h \
+ ../../include/zio.h ../../include/zlib.h ../../include/zconf.h \
+ ../../include/XCount.h ../../include/Vocab.h ../../include/LHash.h \
+ ../../include/SArray.h ../../include/Map.h ../../include/Array.h \
+ ../../include/MemStats.h ../../include/TLSWrapper.h ../../include/tls.h \
+ ../../include/NgramStats.h ../../include/LMStats.h ../../include/Vocab.h \
+ ../../include/TextStats.h ../../include/Prob.h ../../include/Counts.h \
+ ../../include/Debug.h ../../include/Trie.h
 ../obj/i686-m64$(OBJ_OPTION)/testCachedMem.o: testCachedMem.cc CachedMem.cc CachedMem.h \
- /work/research/actup-production/srilm//include/TLSWrapper.h \
- /work/research/actup-production/srilm//include/tls.h \
- /work/research/actup-production/srilm//include/Boolean.h
+ ../../include/TLSWrapper.h ../../include/tls.h ../../include/Boolean.h
 ../obj/i686-m64$(OBJ_OPTION)/testBlockMalloc.o: testBlockMalloc.cc BlockMalloc.h
 ../bin/i686-m64$(OPTION)/maxalloc:	../obj/i686-m64$(OPTION)/maxalloc.o
 maxalloc:	../bin/i686-m64$(OPTION)/maxalloc

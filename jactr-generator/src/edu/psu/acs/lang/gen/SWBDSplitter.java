@@ -6,12 +6,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import edu.psu.acs.lang.PathConsts;
+
 public class SWBDSplitter {
 	private final Path swbdTextPath;
 	private final Path swbdCCGPath;
 	public SWBDSplitter(Path dataDir, String swbdBaseName) {		
-		this.swbdTextPath = dataDir.resolve(swbdBaseName+".txt");
-		this.swbdCCGPath = dataDir.resolve(swbdBaseName+".ccg");
+		this.swbdTextPath = dataDir.resolve(swbdBaseName+PathConsts.sentExt);
+		this.swbdCCGPath = dataDir.resolve(swbdBaseName+PathConsts.sentAnnoExt);
 	}
 	public int split(int divisions, Path expDir) throws IOException {
 		expDir.toFile().mkdir();
@@ -24,7 +26,7 @@ public class SWBDSplitter {
 		int divisionNumber = 1; 
 		int numDigits = String.valueOf(divisions).length();
 		String formatter = "%0"+numDigits+"d";
-		FileWriter fw = new FileWriter(expDir.resolve("swbd"+String.format(formatter, divisionNumber)+".txt").toFile());
+		FileWriter fw = new FileWriter(expDir.resolve(PathConsts.swbdBaseName+String.format(formatter, divisionNumber)+".txt").toFile());
 		int sentenceCounter = 0;
 		for (int i = 0; i < numSentences; i++) {
 			lines.set(i, lines.get(i).replace(" .", "").replace(" ?", "").replace(" :", "").replace(" ,", "").replace(". ", "").replace(", ", "").replace("? ", ""));
@@ -36,7 +38,7 @@ public class SWBDSplitter {
 				fw.close();
 				divisionNumber++;
 				sentenceCounter = 0;
-				fw = new FileWriter(expDir.resolve("swbd"+String.format(formatter, divisionNumber)+".txt").toFile());
+				fw = new FileWriter(expDir.resolve(PathConsts.swbdBaseName+String.format(formatter, divisionNumber)+".txt").toFile());
 			}
 		}
 		fw.close();

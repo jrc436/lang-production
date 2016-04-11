@@ -4,6 +4,7 @@ runs/
 models/
 old-models/
 srilm/lib/
+jactr-production-old/
 
 *.local
 *.cached

@@ -20,6 +20,10 @@ public class ChangeGoalBuffer extends BufferEffects {
 		}
 		lines.add("</remove>");
 		lines.add("<add buffer=\""+buffer.toString()+"\" chunk=\""+nameOfNewGoalChunk+"\"/>");
+//		for (ISlot s : vars) {
+//			lines.add(s.toXML());
+//		}
+//		lines.add("</set>");
 		return lines;
 	}
 }

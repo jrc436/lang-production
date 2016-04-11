@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Set;
 
 import edu.psu.acs.lang.IModelElement;
-import edu.psu.acs.lang.PathConsts;
 import edu.psu.acs.lang.declarative.CCGCompoundType;
 import edu.psu.acs.lang.declarative.CCGOperator;
 import edu.psu.acs.lang.declarative.CCGOperatorEnum;
@@ -29,14 +28,12 @@ import edu.psu.acs.lang.declarative.LexSyn;
 import edu.psu.acs.lang.declarative.SSlotName;
 import edu.psu.acs.lang.declarative.SSlotNameEnum;
 import edu.psu.acs.lang.declarative.Sentence;
-import edu.psu.acs.lang.declarative.SentenceManager;
-import edu.psu.acs.lang.declarative.SingletonSlotName;
-import edu.psu.acs.lang.declarative.SingletonSlotNameEnum;
 import edu.psu.acs.lang.declarative.SlotName;
 import edu.psu.acs.lang.declarative.Word;
 import edu.psu.acs.lang.production.AddLexSyn;
 import edu.psu.acs.lang.production.BackwardApplication;
 import edu.psu.acs.lang.production.BackwardComposition;
+import edu.psu.acs.lang.production.ClearRetrievalError;
 import edu.psu.acs.lang.production.ConjunctionLeft;
 import edu.psu.acs.lang.production.ConjunctionRight;
 import edu.psu.acs.lang.production.FinishConjunctionLeft;
@@ -44,7 +41,6 @@ import edu.psu.acs.lang.production.FinishConjunctionRight;
 import edu.psu.acs.lang.production.FlushRetrievalLS;
 import edu.psu.acs.lang.production.FlushRetrievalType;
 import edu.psu.acs.lang.production.FocusHome;
-import edu.psu.acs.lang.production.FocusNewGoal;
 import edu.psu.acs.lang.production.ForwardApplication;
 import edu.psu.acs.lang.production.ForwardComposition;
 import edu.psu.acs.lang.production.GrabWord;
@@ -54,6 +50,7 @@ import edu.psu.acs.lang.production.ResolveForwardApplication;
 import edu.psu.acs.lang.production.ResolveForwardComposition;
 import edu.psu.acs.lang.production.RetrieveHome;
 import edu.psu.acs.lang.production.SyntaxRule;
+import edu.psu.acs.lang.util.PathConsts;
 
 public class ModelCreator {
 	private final int largestSentenceK; //93 is overall on swbd; //i
@@ -62,16 +59,14 @@ public class ModelCreator {
 	private final Path typesPath;
 	private final Path wordsPath;
 	private final Path sentPath;
-	private final int numSentences;
 	//private final File[] sentFiles;
-	public ModelCreator(ModelPreparer prep, Path expDir, int numSentences) throws URISyntaxException, IOException {
+	public ModelCreator(ModelPreparer prep, Path expDir) throws URISyntaxException, IOException {
 		prep.createWords(delimiter);
 		largestSentenceK = prep.maxWordsPerSentence();
 		mostTypesN = prep.createTypes();
 		typesPath = expDir.resolve(PathConsts.typesFName);
 		wordsPath = expDir.resolve(PathConsts.wordsFName);
 		sentPath = expDir.resolve(PathConsts.wordCat);
-		this.numSentences = numSentences;
 	}
 	public List<IModelElement> makeChunkTypes() {
 		List<IModelElement> toret = new ArrayList<IModelElement>();
@@ -109,9 +104,9 @@ public class ModelCreator {
 		toret.add(new ChunkType(ChunkTypeEnum.sentence, sslots));
 		
 		//sentence manager
-		List<SlotName> smSlots = new ArrayList<SlotName>();
-		smSlots.add(new SingletonSlotName(SingletonSlotNameEnum.goal));
-		toret.add(new ChunkType(ChunkTypeEnum.sentenceManager, smSlots));
+	//	List<SlotName> smSlots = new ArrayList<SlotName>();
+	//	smSlots.add(new SingletonSlotName(SingletonSlotNameEnum.goal));
+	//	toret.add(new ChunkType(ChunkTypeEnum.sentenceManager, smSlots));
 		
 		
 		return toret;
@@ -228,22 +223,23 @@ public class ModelCreator {
 	
 		return ele;
 	}
-	public List<IModelElement> makeSentenceManagers(List<Sentence> allSentences) {
-		List<IModelElement> ele = new ArrayList<IModelElement>();
-		for (int i = 1; i <= allSentences.size(); i++) {
-			ele.add(SentenceManager.makeSentenceManager(i, allSentences.get(i-1)));
-		}
-		return ele;
-	}
-	
+//	public List<IModelElement> makeSentenceManagers(List<Sentence> allSentences) {
+//		List<IModelElement> ele = new ArrayList<IModelElement>();
+//		for (int i = 1; i <= allSentences.size(); i++) {
+//			ele.add(SentenceManager.makeSentenceManager(i, allSentences.get(i-1)));
+//		}
+//		return ele;
+//	}
+//	
 	public List<IModelElement> makeRules() {
 		List<IModelElement> rules = new ArrayList<IModelElement>();
 		
 		rules.add(new FlushRetrievalLS());
 		rules.add(new FlushRetrievalType());
 		rules.add(new FocusHome());
-		rules.add(new FocusNewGoal());
+	//	rules.add(new FocusNewGoal());
 		rules.add(new RetrieveHome());
+		rules.add(new ClearRetrievalError());
 //		for (int j = 1; j <= numSentences; j++) {
 //			rules.add(new RetrieveHome(j));
 //		}

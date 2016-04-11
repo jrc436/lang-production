@@ -1,41 +1,75 @@
+\section{Background}\label{sec:ccg}
+Language comprehension could be briefly stated as the process of transforming words into meaning. Language production is the opposite process. Language production thus consists of several tasks, including transforming some semantic representation into words, and then combining those words into ideas. For now, we primarily focus on the second task, which we accomplish with a grammar formalism, \textit{Combinatory Categorial Grammar} (CCG) \citep{ccg}.
+
+CCG is a grammar in the family of mildly-context sensitive grammars, along with Tree-Adjoining Grammar \citep{tag}. Mildly-context sensitive grammars have been shown to be capable of representing human speech, and computationally plausible in real-time \citep{convergence}. Also importantly, CCG stores only a single type value at any given point for combined words, as opposed to TAG which stores the entire tree. The types in CCG can be arbitrarily complex, but its rules are quite simple. See Figure~\ref{eqn:ccg} for a demonstration of the rules. See Figure~\ref{fig:ccg} for an example of a derivation.
+
+\begin{figure}
+\[X/Y > Y = X\]
+\[Y < X\setminus Y = X\]
+\[X/Y >> Y/Z = X/Z\]
+\[Y\setminus Z << X\setminus Y = X\setminus Z\]
+\caption{Forward Application, Backward Application, Forward Composition, and Backward Composition respectively. Note that types $A,B$ could be any of combinatorially derived types of CCG}
+\label{eqn:ccg}
+\end{figure}
+
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=0.95\columnwidth]{figures/ccg}
+\end{center}
+\caption{An example of a derivation of CCG. Note that the $T>$ is for type-raising, which is handled my declarative memory rather than production rules in my model. \textbf{Redo with my own application combinators}}  
+\label{fig:ccg}
+\end{figure}
+
 \section{Model}
-\subsection{Chunks and Buffers}
-Our model relies on a fairly simple set of chunks. 
+The presented model is implemented in jACT-R \citep{jactr}, a full Java implementation of the ACT-R theory \citep{actr}. Unlike other potential variants \citep{actup}, jACT-R has the same full set of constraints as ACT-R.  
 
-\subsubsection{Word}
-A word is the simplest type. It just has a name, which is the text of the word. It has no slots. The word chunks are built by creating a chunk of each word in the Switchboard corpus.
+The presented model's chunks and productions presently largely have a one to one correspondence with CCG. The primary production rules besides memory retrievals are rules directly from CCG; the primary computational units are the types in CCG.  
 
-\subsubsection{Type}
-At the heart of our model are chunks representing CCG syntactic types. There are two basic types of CCG types, though they appear to ACT-R as the same. One is what we refer to as a \textit{simple} type, where the type is a primitive type, such as a noun phrase. There are approximately ten basic CCG types found in the Switchboard data set. The second is a \textit{compound} type, where the type is composed of a left type, a right type, and a \textit{combinatory operator}. The left type and right type of each compound type can be either simple or additional compound types. Type chunks thus have three slots, the FullType, the LeftType, the RightType, and the Combinatory Operator (the last three are null if it is a simple type). Lastly, it has a flag to mark if that type is able to join (via conjunctions) with others of its type. The type chunks are built by creating a type for each type that appears in the Switchboard corpus.
+In theory, a model of language production should not make any more assumptions beyond ACT-R, in practice, the model relies on several simplifications. In the future, many of these could become parameters to a model to compare how well the model fits. The model's basic goal is to greedily combine lexical-syntactic chunks together to form a sentence. Right now, the process for that combination consists of the syntactic rules of CCG, and the model has no inherent preference for what to combine with what, besides as described later in experiments.
 
-\subsubsection{Combinatory Operator}
-A combinatory operator is a very simple operator that can be thought of as a dependency within a type. As the end-goal of sentence production is to produce a sentence, a complete sentence is always of type \textit{S}, which is one of the CCG simple types. Then, verbs, adjectives, and so on are assigned compound types in such a way that they could ultimately be part of a complete sentence. For instance, an adjective might be NP/N, suggesting that it needs a noun to its right in order to be a noun phrase. If it was NP\textbackslash N, it would instead suggest it needs a noun to its left. Thus, the two combinatory operators are slash and backslash. Combinatory Operator chunks have no slots. These two combinatory operators are predefined.
+\subsection{Rules and Chunks}
+The model itself, due to its ability to generalize to any sentence, is programatically generated. The model has \textit{classes} of rules and classes of chunks. A general layout of the production rules can be found in Figure~\ref{fig:prod}. The organizational scheme of the chunks can be found in Figure~\ref{fig:dm}.
 
-\subsubsection{Lexsyn}
-A Lexsyn is a Chunk that associates words with their type information. It, simply put, has a slot for the word, and then has the five slots for each type the word can take, where these slots are the exact same as described in the Type chunk. These are built by reading Switchboard, and associating every type (including type-raised types) that any given word ever takes with the word, and then creating the Lexsyn accordingly.  
-
-\subsubsection{Sentence}
-The Sentence is essentially the goal chunk. In this way, it basically contains predefined slots that are the input, and then predefined slots to store the output. Its first several slots is a set of words that are unordered. These are predefined, and consist of the words in a sentence that appears in Switchboard. The Sentence chunk also has several other slots, which correspond basically to lexsyns. Due to the methodology for accessing slots of slots, these are all stored in a flat manner, similarly to how the lexsyn stores types. Thus, the sentence chunk's total number of slots is the maximum number of words in the target sentences multiplied by the maximum number of types any given word has in the target sentences. This makes the chunk quite large. 
-
-The final, correct output for the model is a single Lexsyn with the type S. In general, the output can be thought of as a Lexsyn that contains some number of words and some final syntactic type, where it can no longer combine with any of the other lexsyns. Details on how the Rules utilize the working space in the Sentence chunk will be covered in the next section. 
-
-\subsection{Production Rules}
-\subsubsection{Retrieving Syntactic Information}
-There are two relevant production rules to begin processing: GrabWord and AddLexSyn. GrabWord is the simple process of retrieving syntactic information about a word in the input. It can fire at any time the retrieval buffer is not busy. This takes a word from the input and makes a retrieval request for a Lexsyn with that word. AddLexSyn then updates the goal state and does cleanup, by removing the word from input and adding the lexsyn to the goal buffer. This presently allows for an infinite working memory span, though the model in principle could work the same by having a fixed working memory span. As of now, however, this could possibly lead to retrieving a set of lexsyns where none could be combined. Both GrabWord and Lexsyn have as many variants as there are maximum number of words in a sentence. 
-
-\subsubsection{Syntactic Rules and Resolutions}
-Each Syntactic rule is defined many times, requiring dependencies in the Sentence chunk to be met. Mostly, this is by checking if any Lexsyns in the sentence chunk are matches for each other's dependencies. If it is a match, a retrieval request is put out for the matching type. This sets up another type of production rule to follow where the rule is resolved. This updates the type that's stored in chunk, removes the chunk that's been absorbed (in Composition, for no particular reason, the left always absorbs the right), and removes all other possible types of the new chunk, if they still exist. In other words, on the first combination, each Lexsyn contains multiple types, but after it's been combined and forms a type that's not specific to that word, the other types are removed as they are non-equivalent. The syntactic rules in CCG are described below. 
-
+\subsubsection{Production Rules}\label{sec:rules}
+There are several classes of production rules. A class of production rules can be thought of as a type of operation, with each specific production rule being that operation on that chunk. For instance, it takes two separate production rules to combine two elements that are at different points in the sentence. Secondly, it takes a different production rule to determine which of the types the Lexsyn should use to combine. For instance, family can be either an adjective or a noun, and it could fill a slot earlier in the sentence ("My family and I went to eat dinner") or later ("I went with my family members to eat dinner"). The main classes of production rules are as follows:
 \begin{itemize}
-\item \textit{Forward Application} is a simple combinatory rule where a single dependency of a compound type is resolved to the right (in other words, the type has the Slash combinatory operator). The type resolving the dependency can be a simple type or a compound type. 
-
-\item \textit{Backward Application} is a simple combinatory rule where a single dependency of a compound type is resolved to the left (in other words, the type has the Backslash operator). The type resolving the dependency can be a simple type or a compound type.
-
-\item \textit{Forward Composition} takes two compound types with the Slash operator. If one type has a dependency to the right, and the other type's left side resolves that dependency, then that type gains the other type's right side as a new dependency to the right but resolves its current one and adds that word to the right. 
-
-\item \textit{Backward Composition} takes two compound types with the Backslash operator. If one type has a dependency to the left, and the other type's right side resolves that dependency, then that type gains the other type's left side as a new dependency to the left but resolves its current one and adds that word to the left.  
-
-\item \textit{Begin Conjunction} corresponds to adding a conjunction to a type that could benefit from it. For instance, this would be the process of transforming "walking" to "and walking" or "walking and". 
-
-\item \textit{Finish Conjunction} corresponds to adding an equivalent type to the phrase that contains the conjunction. In other words, it's the processing of transforming "and walking" to "talking and walking" or "walking and" to "walking and talking".
+\item Move word $A$ into the model: The word moves from DM into the goal buffer. This class contains position information, so there are $N$ of them, where $N$ is the number of words in the sentence.
+\item Retrieve lexsyn $A_{lex}$ for the word $A$: The type info moves from DM into the goal buffer. This class contains position information, so there are $N$ of them, where $N$ is the number of words in the sentence.
+\item Apply Syntactic Rule to $A_{lex}$ and $B_{lex}$: CCG defines four basic and a few more complicated syntactic rules, which are described in Section~\ref{sec:ccg}. This class contains position and type information both two arguments, so there are $N * K * (N-1) * J$, where $N$ is the number of words in the sentence, $K$ is the number of types $A_{lex}$ has, and $J$ is the number of types $B_{lex}$ has
+\item Resolve Syntactic Rule on $A_{lex}$: In this step, the new type that results from the previous operation is retrieved and stored in $A_{lex}$, and $B_{lex}$ is removed from the goal buffer.
+\item Terminate and begin new sentence: If only a single lexsyn remains because all of them have been successfully combined, or no more rules are applicable, then the sentence is finished and the model will start its next goal. 
 \end{itemize}
+
+\subsubsection{Declarative Memory}\label{sec:dm}
+Declarative Memory is composed of a few simple chunk types, described below.
+\begin{itemize}
+\item Word : A word simply has a name, which corresponds to its lexical information (e.g. family).
+\item Type : A type is an arbitrarily complicated CCG type. The types that exist in DM are the types that are used in the Switchboard CCG derivations.
+\item Lexsyn : A Lexsyn associates a Word with some number of Types. The chosen types are the types that the word has in the Switchboard corpus, including from type-raising.\footnote{Type-raising is a CCG operation where a type changes to a symbolically different but effectively equivalent type. This allows derivations in different orders.}
+\item Sentence : A sentence is the work area to create the final utterance. Thus, it starts with words, which eventually become several Lexsyns, which eventually combine into a single Lexsyn, representing the finished sentence.
+\end{itemize}
+
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=0.95\columnwidth]{figures/model-FSA}
+\end{center}
+\caption{General process flow of the production rules of the model. See Section~\ref{sec:rules} for a more detailed description.}  
+\label{fig:prod}
+\end{figure}
+
+\begin{figure}[ht]
+\begin{center}
+\includegraphics[width=0.95\columnwidth]{figures/prodtypes}
+\end{center}
+\caption{General data model of the declarative memory. See Section~\ref{sec:dm} for a more detailed description.}  
+\label{fig:dm}
+\end{figure}
+
+\subsection{Input}
+Normally, to simulate language production, we would prefer the model start with a semantic representation. Unfortunately, starting with a true semantic representation requires both an evaluation of that representation and an implementation of lexical selection. Thus, we used a simple proxy for the semantic representation as an unordered set of words that could create at least one valid sentence. The words are taken from sentences in the Switchboard corpus.
+
+\subsection{Output}
+The model attempts to produce a sentence. However, it does not always successfully finish a sentence, sometimes producing a fragment or several disconnected fragments.
+
+\subsection{Evaluation}
+Naturally, while the model produces utterances, those utterances don't always make sense. Quantifying exactly what it is to make sense is obviously difficult, so we went with a simpler metric: what is probable. We scored each sentence using a weighted bigram average using the SRILM toolkit trained on the spoken BNC corpus \citep{srilm} inspired by \citet{chart}. While we could have compared the utterance to the original sentence, since we are mostly bypassing the semantic representation component, we are more concerned with the model producing any good utterances, rather than the ones with the intended meaning.

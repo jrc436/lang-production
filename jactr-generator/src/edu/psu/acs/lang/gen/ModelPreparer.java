@@ -11,17 +11,19 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 
-import edu.psu.acs.lang.LexNode;
-import edu.psu.acs.lang.NodeParser;
-import edu.psu.acs.lang.ParseNode;
-import edu.psu.acs.lang.PathConsts;
 import edu.psu.acs.lang.RuleNode;
-import edu.psu.acs.lang.declarative.CCGBaseTypeEnum;
+import edu.psu.acs.lang.declarative.CCGType;
 import edu.psu.acs.lang.production.SyntaxRuleType;
+import edu.psu.acs.lang.util.LexNode;
+import edu.psu.acs.lang.util.NodeParser;
+import edu.psu.acs.lang.util.ParseException;
+import edu.psu.acs.lang.util.ParseNode;
+import edu.psu.acs.lang.util.PathConsts;
 
 public class ModelPreparer {
 	
@@ -29,13 +31,13 @@ public class ModelPreparer {
 	//private static final Pattern txtRegex = Pattern.compile("swbd[0-9]+\\.txt");
 	
 	private final Path expDir;
-	private final int[] divisionsToUse;
+	private final int divisionToUse;
 	private File wordCat;
 	private File typeCat;
 	private final NodeParser p;
-	private final int numSentences;
-	public ModelPreparer(Path expDir, int[] divisionsToUse) throws IOException {
-		this.divisionsToUse = divisionsToUse;
+	private Map<CCGType, Set<CCGType>> equivalences;
+	public ModelPreparer(Path expDir, int divisionToUse) throws IOException, ParseException {
+		this.divisionToUse = divisionToUse;
 		this.expDir = expDir;
 		FileFilter ccgFilter = new FileFilter() { 
 			public boolean accept(File f) {
@@ -47,12 +49,10 @@ public class ModelPreparer {
 				return f.getName().endsWith(".txt");
 			}
 		};
-		numSentences = catFiles(ccgFilter, txtFilter);
-		p = new NodeParser(typeCat.toPath(),true);
+		catFiles(ccgFilter, txtFilter);
+		p = new NodeParser(typeCat.toPath(), true);
+		equivalences = new HashMap<CCGType, Set<CCGType>>();
 		recreateTypeFile();
-	}
-	public int getNumSentences() {
-		return numSentences;
 	}
 	private int catFiles(FileFilter ccgFilter, FileFilter txtFilter) throws IOException {
 		List<String> lines = new ArrayList<String>();
@@ -79,13 +79,9 @@ public class ModelPreparer {
 			}
 			System.exit(1);
 		}
-		for (int division : divisionsToUse) {
-			lines.addAll(Files.readAllLines(files[division].toPath()));
-		}
+		lines.addAll(Files.readAllLines(files[divisionToUse].toPath()));
+		tlines.addAll(Files.readAllLines(tfiles[divisionToUse].toPath()));
 		
-		for (int division : divisionsToUse) {
-			tlines.addAll(Files.readAllLines(tfiles[division].toPath()));
-		}
 		
 		wordCat = expDir.resolve(PathConsts.wordCat).toFile();
 		typeCat = expDir.resolve(PathConsts.typeCat).toFile();
@@ -112,16 +108,8 @@ public class ModelPreparer {
 				ParseNode cur = s.pop();
 				if (cur instanceof RuleNode) {
 					RuleNode rcur = (RuleNode) cur;
-					if (rcur.getLeftChild() instanceof RuleNode) {
-						RuleNode lc = (RuleNode) rcur.getLeftChild();
-						rcur.setLeftChild(grokTypeRaise(lc));
-						rcur.setLeftChild(grokPCT(lc));
-					}
-					if (rcur.getRightChild() instanceof RuleNode) {
-						RuleNode rc = (RuleNode) rcur.getRightChild();
-						rcur.setRightChild(grokTypeRaise(rc));
-						rcur.setRightChild(grokPCT(rc));
-					}
+					rcur.setLeftChild(grokPCT(grokTypeRaise(rcur.getLeftChild())));
+					rcur.setRightChild(grokPCT(grokTypeRaise(rcur.getRightChild())));
 					s.push(rcur.getLeftChild());
 					s.push(rcur.getRightChild());				
 				}
@@ -132,16 +120,39 @@ public class ModelPreparer {
 		}
 		//I believe this should just be done now. Just have to now write it back out.
 	}
-	//returns either this, or 
-	private ParseNode grokTypeRaise(RuleNode rn) {
-		if (rn.getRule() == SyntaxRuleType.TypeRaise || rn.getRule() == SyntaxRuleType.TCR) {
+	
+	
+	
+	private ParseNode grokTypeRaise(ParseNode pn) {
+		if (!(pn instanceof RuleNode)) {
+			return pn;
+		}
+		RuleNode rn = (RuleNode) pn;
+		if (rn.getRule() == SyntaxRuleType.TypeRaise || rn.getRule() == SyntaxRuleType.TCR || rn.getRule() == SyntaxRuleType.TPC) {
 			System.out.println("Grokking type raise");
+			if (!equivalences.containsKey(rn.getLeftChild().getType())) {
+				equivalences.put(rn.getLeftChild().getType(), new HashSet<CCGType>());
+			}
+			if (!equivalences.containsKey(rn.getType())) {
+				equivalences.put(rn.getType(), new HashSet<CCGType>());
+			}
+			equivalences.get(rn.getLeftChild().getType()).add(rn.getType());
+			equivalences.get(rn.getType()).add(rn.getLeftChild().getType());
+			if (rn.getLeftChild() instanceof RuleNode) {
+				//dam this sux.
+				System.err.println("Purity test failed");
+				return rn;
+			}
 			return new LexNode(rn.getPhrase(), rn.getType());
 		}
 		return rn;
 	}
-	private ParseNode grokPCT(RuleNode rn) {
-		if (rn.getRule() == SyntaxRuleType.PCT) {
+	private ParseNode grokPCT(ParseNode pn) {
+		if (!(pn instanceof RuleNode)) {
+			return pn;
+		}
+		RuleNode rn = (RuleNode) pn;
+		if (rn.getRule() == SyntaxRuleType.PCT || rn.getRule() == SyntaxRuleType.UNK) {
 			if (rn.getLeftChild().getType().isPCT()) {
 				return rn.getRightChild();
 			}
@@ -209,13 +220,14 @@ public class ModelPreparer {
 			if (pn instanceof RuleNode) {
 				RuleNode rn = (RuleNode) pn;
 				parse.add(rn.getLeftChild());
-				if (rn.getRightChild() == null) {
-					//look, it must be some kind of typeraising. We need to basically create our own thing, here.
-					parse.add(new LexNode(rn.getPhrase(), rn.getType()));
-				}
-				else {
-					parse.add(rn.getRightChild());
-				}
+				parse.add(rn.getRightChild());
+//				if (rn.getRightChild() == null) {
+//					//look, it must be some kind of typeraising. We need to basically create our own thing, here.
+//					parse.add(new LexNode(rn.getPhrase(), rn.getType()));
+//				}
+//				else {
+//					parse.add(rn.getRightChild());
+//				}
 			}
 			else if (pn instanceof LexNode) {
 				collect.add((LexNode)pn);
@@ -228,7 +240,7 @@ public class ModelPreparer {
 			else {
 				Set<String> types = new HashSet<String>();
 				types.add(lex.typeToString());
-				map.put(lex.getPhrase(), types);
+				map.put(lex.getPhrase().toLowerCase(), types);
 			}
 		}
 		for (Entry<String, Set<String>> pair : map.entrySet()) {
@@ -243,9 +255,10 @@ public class ModelPreparer {
 //			if (pair.getValue().size() == 1 && (pair.getValue().contains(".") || pair.getValue().contains(",") || pair.getValue().contains(":"))) {
 //				continue;
 //			}
-			if (pair.getValue().contains(CCGBaseTypeEnum.N.toString()) && !pair.getValue().contains(CCGBaseTypeEnum.NP.toString())) {
-				pair.getValue().add(CCGBaseTypeEnum.NP.toString()); //any noun can act as a noun phrase... sort of...
-			}
+//			if (pair.getValue().contains(CCGBaseTypeEnum.N.toString()) && !pair.getValue().contains(CCGBaseTypeEnum.NP.toString())) {
+//				pair.getValue().add(CCGBaseTypeEnum.NP.toString()); //any noun can act as a noun phrase... sort of...
+//			}
+			addEquivalences(pair.getValue());
 			String toWrite = pair.getKey()+delimiter;
 			for (String type : pair.getValue()) {
 				toWrite += type+delimiter;
@@ -254,6 +267,15 @@ public class ModelPreparer {
 			write.write(toWrite);
 		}
 		write.close();
+	}
+	private void addEquivalences(Set<String> types) {
+		for (CCGType s : equivalences.keySet()) {
+			if (types.contains(s.toString())) {
+				for (CCGType cg : equivalences.get(s)) {
+					types.add(cg.toString());
+				}
+			}
+		}
 	}
 	//TODO:
 	//Delete Type raising rules. We're capturing the types, then go back and recreate this shit without them?

@@ -2,28 +2,30 @@ package edu.psu.acs.lang;
 
 import edu.psu.acs.lang.declarative.CCGType;
 import edu.psu.acs.lang.production.SyntaxRuleType;
+import edu.psu.acs.lang.util.ParseException;
+import edu.psu.acs.lang.util.ParseNode;
 
 public class RuleNode implements ParseNode {
 	private CCGType result;
 	private ParseNode left;
 	private ParseNode right;
 	private SyntaxRuleType rule;
-	public RuleNode(CCGType result, ParseNode left, ParseNode right, SyntaxRuleType rule) {	
+	public RuleNode(CCGType result, ParseNode left, ParseNode right, SyntaxRuleType rule) throws ParseException {	
 		if (result == null || left == null || rule == null) {
 			System.err.println(left);
 		    System.err.println(right);
 			System.err.println(rule);
 			System.err.println(result);
-			throw new IllegalArgumentException("Null values for result, left, and rule are never allowed");
+			throw new ParseException("Null values for result, left, and rule are never allowed");
 		}
 		
 		//typeraise should only have one node
-		if ((rule == SyntaxRuleType.TypeRaise || rule == SyntaxRuleType.TCR) && right != null) {
+		if ((rule == SyntaxRuleType.TypeRaise || rule == SyntaxRuleType.TCR || rule == SyntaxRuleType.TPC) && right != null) {
 			System.err.println(left);
 		    System.err.println(right);
 			System.err.println(rule);
 			System.err.println(result);
-			throw new IllegalArgumentException("TypeRaise should only have one node!");
+			throw new ParseException("TypeRaise should only have one node!");
 		}
 		//not typeraise should have exactly two nodes
 		if (!(rule == SyntaxRuleType.TypeRaise || rule == SyntaxRuleType.TCR) && right == null) {
@@ -31,7 +33,7 @@ public class RuleNode implements ParseNode {
 		    System.err.println(right);
 			System.err.println(rule);
 			System.err.println(result);
-			throw new IllegalArgumentException("Only TypeRaise should only have one node!");
+			throw new ParseException("Only TypeRaise should only have one node!");
 		}
 		this.left = left;
 		this.right = right;

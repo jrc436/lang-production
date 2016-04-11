@@ -16,6 +16,12 @@ public class BufferQueries extends BufferConditions {
 		this.type = type;
 		this.req = req;
 	}
+	public static BufferQueries checkRetrievalFree() {
+		return new BufferQueries(Buffer.retrieval, BufferStateEnum.free.type(), BufferStateEnum.free);
+	}
+	public static BufferQueries checkRetrievalError() {
+		return new BufferQueries(Buffer.retrieval, BufferStateEnum.error.type(), BufferStateEnum.error);
+	}
 	public static BufferQueries checkRetrievalEmpty() {
 		return new BufferQueries(Buffer.retrieval, BufferValueEnum.empty.type(), BufferValueEnum.empty);
 	}

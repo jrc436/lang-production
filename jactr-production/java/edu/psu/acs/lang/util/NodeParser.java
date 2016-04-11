@@ -1,12 +1,15 @@
-package edu.psu.acs.lang;
+package edu.psu.acs.lang.util;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Stack;
 
+import edu.psu.acs.lang.RuleNode;
 import edu.psu.acs.lang.declarative.CCGCompoundType;
 import edu.psu.acs.lang.declarative.CCGType;
 import edu.psu.acs.lang.production.SyntaxRuleType;
@@ -45,9 +48,8 @@ public class NodeParser {
 		}
 		return retval;
 	}
-	public NodeParser(Path path, boolean originalFiles) {
-		this.alternateSeperators = !originalFiles;
-		topNodes = new ArrayList<ParseNode>();
+	public NodeParser(Path path, boolean originalFiles) throws ParseException {
+		this.alternateSeperators = !originalFiles;		
 		List<String> lines = null;
 		try {
 			lines = Files.readAllLines(path);
@@ -57,11 +59,15 @@ public class NodeParser {
 			System.err.println("Closing...");
 			System.exit(1);
 		}
+		popTops(lines);
+	}
+	private void popTops(List<String> lines) throws ParseException {
+		topNodes = new ArrayList<ParseNode>();
 		boolean skipNext = false;
 		for (int i = 0; i < lines.size(); i++) {
 			String line = lines.get(i);
 			if (line.charAt(0) == '#' && line.contains("Incremental")) {
-				skipNext = true;
+				//skipNext = true;
 				continue;
 			}
 			if (line.charAt(0) == '#') {
@@ -83,15 +89,81 @@ public class NodeParser {
 			}
 		}
 	}
-	public NodeParser(String file, boolean originalFiles) {
+	public static boolean testPurity(String ccgTerms) {
+		NodeParser p = null;
+		try {
+			List<String> s = new ArrayList<String>();
+			s.add(ccgTerms);
+			p = new NodeParser(s, true);
+		}
+		catch (ParseException pe) {
+			System.err.println(pe.getMessage());
+			return false;
+		}
+		return !p.checkForUnsupportedTypeRaise();
+	}
+	public boolean checkForUnsupportedTypeRaise() {
+		for (ParseNode n : this.getTops()) {
+			Stack<ParseNode> s = new Stack<ParseNode>();
+			s.push(n);
+			while (!s.empty()) {
+				ParseNode cur = s.pop();
+				if (checkUnsupportedTypeRaise(cur)) {
+					return true;
+				}
+				if (cur instanceof RuleNode) {
+					RuleNode rcur = (RuleNode) cur;
+					s.push(rcur.getLeftChild());
+					s.push(rcur.getRightChild());				
+				}
+			}
+		}
+		return false;
+	}
+	private static boolean checkUnsupportedTypeRaise(ParseNode pn) {
+		if (!(pn instanceof RuleNode)) {
+			return false;
+		}
+		RuleNode rn = (RuleNode) pn;
+		if (rn.getPhrase().equals("TOP")) {
+			return false;
+		}
+		if (rn.getRule() == SyntaxRuleType.TypeRaise || rn.getRule() == SyntaxRuleType.TCR || rn.getRule() == SyntaxRuleType.TPC) {
+			if (rn.getLeftChild() instanceof RuleNode) {
+				return doubleCheck(rn);
+			}
+		}
+		return false;
+	}
+	private static boolean doubleCheck(RuleNode cur) {
+		boolean allTypeRaise = true;
+		while (cur != null) {
+			allTypeRaise = allTypeRaise && (cur.getRule() == SyntaxRuleType.TypeRaise || cur.getRule() == SyntaxRuleType.TCR || cur.getRule() == SyntaxRuleType.TPC);
+			if (cur.getLeftChild() instanceof RuleNode) {
+				cur = (RuleNode) cur.getLeftChild();
+			}
+			else {
+				cur = null;
+			}
+		}
+		return allTypeRaise;
+	}
+	public NodeParser(List<String> ccgTerms, boolean originalFiles) throws ParseException {
+		this.alternateSeperators = !originalFiles;
+		for (String s : ccgTerms) {
+			List<String> lines = Arrays.asList(s.split(System.getProperty("line.separator")));
+			popTops(lines);
+		}
+	}
+	public NodeParser(String file, boolean originalFiles) throws ParseException {
 		this(Paths.get(file), originalFiles);
 	}
-	private ParseNode getNode(String node) {
+	private ParseNode getNode(String node) throws ParseException {
 		node = node.trim();
 		if (node.charAt(0) != '{' && node.charAt(node.length()-1) != '}') {
 			System.err.println("Error, there is a bug that allows for formatting exceptions! All nodes must be enclosed with brackets!");
 			System.err.println(node);
-			System.exit(1);
+			throw new ParseException();
 		}
 		String noBNode = node.substring(1, node.length()-1); //remove front and end brackets
 		noBNode = noBNode.trim(); //whitepsace is fairly unpredictable...
@@ -99,10 +171,11 @@ public class NodeParser {
 			//no brackets??? must be a base case.
 			String[] things = noBNode.split("\\s+"); 
 			if (things.length != 2) { //error checking
-				for (String thing : things) {
+				System.err.println("Printing Node... it seems to have an odd number of elements");
+				for (String thing : things) {					
 					System.err.println(thing);
 				}
-				System.exit(1);
+				throw new ParseException();
 			}
 			return new LexNode(things[1], CCGCompoundType.makeCCGType(things[0], alternateSeperators));
 		}
@@ -112,10 +185,11 @@ public class NodeParser {
 		leftPart = leftPart.trim();
 		String[] parts = leftPart.split("\\s+");
 		if (parts.length != 2) { //error checking
+			System.err.println("Printing Node... it seems to have an odd number of elements");
 			for (String thing : parts) {
 				System.err.println(thing);
 			}
-			System.exit(1);
+			throw new ParseException();
 		}
 		CCGType resultType = CCGCompoundType.makeCCGType(parts[0], alternateSeperators);
 		SyntaxRuleType rule = SyntaxRuleType.parseSyntaxRule(parts[1]);
@@ -125,7 +199,7 @@ public class NodeParser {
 		if (rightPart.charAt(0) != '{') {
 			System.err.println("Error, our trimmer for complex nodes produced something that doesn't start with a bracket!");
 			System.err.println(rightPart);
-			System.exit(1);
+			throw new ParseException();
 		}
 		int i = 0;
 		int counter = 0;
@@ -151,14 +225,14 @@ public class NodeParser {
 		if (enclosures.size() == 0) {
 			System.err.println("No enclosures found. What?");
 			System.err.println(rightPart);
-			System.exit(1);
+			throw new ParseException();
 		}
 		else if (enclosures.size() > 2) {
 			System.err.println("An unusual amount of enclosures found, possible error in the code");
 			for (String enclosure : enclosures) {
 				System.err.println(enclosure+"\n");
 			}
-			System.exit(1);
+			throw new ParseException();
 		}
 		else if (enclosures.size() == 1) {
 			//we check in the rulenode constructor to make sure that it's actually typeraising.

@@ -1,5 +1,6 @@
-package edu.psu.acs.lang;
+package edu.psu.acs.lang.util;
 
+import edu.psu.acs.lang.Equivocable;
 import edu.psu.acs.lang.declarative.CCGType;
 
 public interface ParseNode extends Equivocable {

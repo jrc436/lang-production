@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.Set;
 
 import edu.psu.acs.lang.IDependencyGraph.IDependencyNode;
+import edu.psu.acs.lang.util.DependencyGraph;
+import edu.psu.acs.lang.util.NodeParser;
+import edu.psu.acs.lang.util.ParseNode;
 
 public class GraphMaker {
 	//now that we've theoretically got everything sorted nice and neatly into RuleNodes and LexNodes via NodeParser, 

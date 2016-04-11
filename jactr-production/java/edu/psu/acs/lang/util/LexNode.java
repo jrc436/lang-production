@@ -1,4 +1,4 @@
-package edu.psu.acs.lang;
+package edu.psu.acs.lang.util;
 
 import edu.psu.acs.lang.declarative.CCGType;
 
@@ -6,7 +6,7 @@ public class LexNode implements ParseNode {
 	private String word;
 	private CCGType type;
 	public LexNode(String word, CCGType type) {
-		this.word = word;
+		this.word = word.toLowerCase();
 		this.type = type;
 	}
 	public boolean equals(Object o) {

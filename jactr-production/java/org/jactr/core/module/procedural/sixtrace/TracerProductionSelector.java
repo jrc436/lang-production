@@ -20,17 +20,18 @@ import org.jactr.core.production.six.ISubsymbolicProduction6;
 import edu.psu.acs.lang.GraphMaker;
 import edu.psu.acs.lang.IDependencyGraph;
 import edu.psu.acs.lang.IDependencyGraph.IDependencyNode;
-import edu.psu.acs.lang.NodeParser;
-import edu.psu.acs.lang.PathConsts;
 import edu.psu.acs.lang.RuleNode;
 import edu.psu.acs.lang.declarative.CCGOperator;
 import edu.psu.acs.lang.declarative.CCGOperatorEnum;
 import edu.psu.acs.lang.production.SyntaxRuleType;
+import edu.psu.acs.lang.util.NodeParser;
+import edu.psu.acs.lang.util.ParseException;
+import edu.psu.acs.lang.util.PathConsts;
 
 public class TracerProductionSelector implements IProductionSelector {
 	private List<IDependencyGraph<RuleNode>> fireChecker;
 	private FileWriter log;
-	public TracerProductionSelector() {
+	public TracerProductionSelector() throws ParseException {
 		Path workingDir = Paths.get(PathConsts.workingDir);
 		Path dataDir = workingDir.resolve(PathConsts.dataDirName);
 		Path expDir = dataDir.resolve(PathConsts.expName);

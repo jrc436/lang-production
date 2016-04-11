@@ -7,6 +7,8 @@ public enum SyntaxRuleType {
 	TypeRaise, //just for parsing:
 	PCT, //just for parsing
 	TCR, //just for parsing
+	TPC, //just for parsing
+	UNK, //just for parsing
 	CONJ, //this is the parsing conj
 	CONJR, //this is the rule for conj right
 	CONJL, //this is the rule for conj left
@@ -35,11 +37,17 @@ public enum SyntaxRuleType {
 		else if (s.contains("TCR")) {
 			return SyntaxRuleType.TCR;
 		}
+		else if (s.contains("TPC")) {
+			return SyntaxRuleType.TPC;
+		}
 		else if (s.contains("PCT")) {
 			return SyntaxRuleType.PCT;
 		}
 		else if (s.contains("CONJ")) {
 			return SyntaxRuleType.CONJ;
+		}
+		else if (s.contains("UNK")) {
+			return SyntaxRuleType.UNK;
 		}
 		throw new IllegalArgumentException("String s should contain a combinatory rule. It contained: "+s);
 	}

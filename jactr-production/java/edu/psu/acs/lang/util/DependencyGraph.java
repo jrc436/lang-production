@@ -1,7 +1,10 @@
-package edu.psu.acs.lang;
+package edu.psu.acs.lang.util;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import edu.psu.acs.lang.Equivocable;
+import edu.psu.acs.lang.IDependencyGraph;
 
 /**
  * @author jrc

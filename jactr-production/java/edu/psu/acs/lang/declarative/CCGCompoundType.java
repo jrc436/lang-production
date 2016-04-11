@@ -53,10 +53,14 @@ public class CCGCompoundType extends CCGType {
 		}
 		return toRet;
 	}
-	public static CCGCompoundType makeType(CCGType left, CCGType right, CCGOperator connector) {
-		CCGCompoundType cg = new CCGCompoundType(left, right, connector);
+	private static CCGCompoundType makeTypeConj(CCGType left, CCGType right, CCGOperator connect, ConjEnum ce) {
+		CCGCompoundType cg = new CCGCompoundType(left, right, connect);
 		cg.addSlot(CCGTypeSlot.FullType, cg);
+		cg.conjable = ce;
 		return cg;
+	}
+	public static CCGCompoundType makeType(CCGType left, CCGType right, CCGOperator connector) {
+		return makeTypeConj(left, right, connector, ConjEnum.Nonconjable);
 	}
 	private CCGCompoundType(CCGType left, CCGType right, CCGOperator connector) {
 		super(left, right, connector);
@@ -75,28 +79,40 @@ public class CCGCompoundType extends CCGType {
 	}
 	
 	public static CCGType makeCCGType(String s, boolean alternateSeperators) {
+		if (s.isEmpty()) {
+			System.err.println("Something is passing an empty String to makeCCGType!!");
+		}
 		//System.out.println("Starting on string:"+s);
-		CCGType parent = alternateSeperators ? recCreateTypes(s, new CCGOperator(CCGOperatorEnum.Slash).toString().charAt(0), new CCGOperator(CCGOperatorEnum.Backslash).toString().charAt(0))
-											 : recCreateTypes(s, '/', '\\');
-		 //right now we know the conjable is null, and we know that only its right most type could possibly have conj set to true
-		 if (parent.isConjable()) {
-			 parent.purifyConj();
-			 parent.makeConjable();
-		 }
-		 else {
-			 parent.makeUnconjable();
-		 }
+		CCGType parent = alternateSeperators ? recCreateTypes(s, new CCGOperator(CCGOperatorEnum.Slash).toString().charAt(0), new CCGOperator(CCGOperatorEnum.Backslash).toString().charAt(0), checkConjable(s))
+											 : recCreateTypes(s, '/', '\\', checkConjable(s));
+//		 //right now we know the conjable is null, and we know that only its right most type could possibly have conj set to true
+//		 if (parent.isConjable()) {
+//			 parent.purifyConj();
+//			 parent.makeConjable();
+//		 }
+//		 else {
+//			 parent.makeUnconjable();
+//		 }
 		 return parent;
 	}
-	private static CCGType recCreateTypes(String s, char fappSep, char bappSep) {
+	private static CCGType recCreateTypes(String s, char fappSep, char bappSep, ConjEnum conjable) {
 		int parenStack = 0;
 		int paren = s.indexOf('(');
 		int slash = s.indexOf(fappSep);
 		int bslash = s.indexOf(bappSep);
+		
+		if (s.isEmpty()) {
+			System.err.println("Empty string passed into rec");
+		}
+		
 		//this means we're in a base type. This is the base case.
 		if (slash == -1 && bslash == -1) {
 			CCGTypeModifier modi = null;
-			if (s.contains("[")) {
+			if (conjable == ConjEnum.Conjable) {
+				modi = CCGTypeModifier.conj;
+			}
+			if (s.contains("[")) { //should only happen that it's not elif in the case where the first type is a base type
+				
 				int openb = s.indexOf("[");
 				int closeb = s.indexOf("]");
 				if (closeb == -1) {
@@ -112,6 +128,7 @@ public class CCGCompoundType extends CCGType {
 			//System.out.println("basetype:"+s);
 			return CCGBaseType.makeType(CCGBaseTypeEnum.value(s), modi);
 		}
+		
 		//this means we have an exposed dependency with a backslash!
 		if (bslash != -1 && (bslash < slash || slash == -1) && (bslash < paren || paren == -1)) {
 			slash = -1;
@@ -196,17 +213,56 @@ public class CCGCompoundType extends CCGType {
 			System.err.println(right);
 			System.err.println(s);
 		}
-		left = stripParens(left);
-		right = stripParens(right);
-		return makeType(recCreateTypes(left, fappSep, bappSep), recCreateTypes(right, fappSep, bappSep), new CCGOperator(c));
+		if (left.isEmpty() || right.isEmpty()) {
+			System.err.println("Normal processing produced an empty String");
+			System.err.println("Left: "+left);
+			System.err.println("Right: "+right);
+			System.err.println("Full: "+s);
+		}	
+		ConjEnum lce = checkConjable(left);
+		left = stripParens(left, lce);
+		ConjEnum rce = checkConjable(right);	
+		right = stripParens(right, rce);
+		if (right.isEmpty()) {
+			return recCreateTypes(left, fappSep, bappSep, lce);
+		}
+		if (left.isEmpty()) {
+			return recCreateTypes(right, fappSep, bappSep, rce);
+		}
+		return makeTypeConj(recCreateTypes(left, fappSep, bappSep, lce), recCreateTypes(right, fappSep, bappSep, rce), new CCGOperator(c), conjable);
 	}
-	private static String stripParens(String s) {
+	private static ConjEnum checkConjable(String type) {
+		//if it's a simple type, gr8, then it just ending in conj might be enough.
+		//If it's a complex type, then we also need to make sure the type is fully enclosed
+		ConjEnum ce = ConjEnum.Nonconjable;
+		if (!type.isEmpty() && type.charAt(type.length()-1) == ']') {
+			String modi = type.substring(type.lastIndexOf('[')+1, type.length()-1);
+			CCGTypeModifier ctm = CCGTypeModifier.value(modi);
+			ce = ctm == CCGTypeModifier.conj ? ConjEnum.Conjable : ce;
+			if (type.contains("(") && (type.charAt(0) != '(' || type.charAt(type.length()-conjLength - 1) != ')')) {
+				ce = ConjEnum.Nonconjable;
+			}
+			if (ctm != CCGTypeModifier.conj && type.charAt(0) == '(' && type.charAt(type.length()-2) == ')') {
+				System.err.println("Unexpected complex type modifier: "+modi+" Type: "+type);
+			}
+		}
+		return ce;
+	}
+	private static final int conjLength = 6; //[conj] is 6 characters
+	private static String stripParens(String s, ConjEnum ce) {
+		if (s.isEmpty()) {
+			return s;
+		}
+		if (ce == ConjEnum.Conjable) {
+			s = s.substring(0, s.length()-conjLength); //[conj] is 6 characters
+		}
 		if (s.charAt(0) == '(') {
 			//ok, it is a complex type still, so we will have to strip it.
 			if (s.charAt(s.length()-1) != ')') {
-				System.err.println("Mismatched parentheses. Most likely did something wrong.");
+				checkConjable(s);
+				System.err.println("Mismatched parentheses in creating a type. Most likely did something wrong.");
 				System.err.println(s);
-				System.err.println(s);
+				System.err.println(ce);
 				System.exit(1);
 			}
 			s = s.substring(1, s.length()-1);
@@ -218,23 +274,24 @@ public class CCGCompoundType extends CCGType {
 	//the initial setting, where isConjable refers to whether it is or will eventually be conjable. 
 	@Override
 	public boolean isConjable() {
-		//return leftCCGType.isConjable() || rightCCGType.isConjable();
-		return conjable == null ? checkConjability() : conjable == ConjEnum.Conjable;
+//		//return leftCCGType.isConjable() || rightCCGType.isConjable();
+//		return conjable == null ? checkConjability() : conjable == ConjEnum.Conjable;
+		return conjable == ConjEnum.Conjable;
 	}
-	//initially, the most right type will be the determiner for whether or not its conjable
-	private boolean checkConjability() {
-		return rightCCGType.isConjable();
-	}
-	@Override
-	protected void purifyConj() {
-		rightCCGType.purifyConj();
-	}
-	@Override
-	protected void makeConjable() {
-		conjable = ConjEnum.Conjable;	
-	}
-	@Override
-	protected void makeUnconjable() {
-		conjable = ConjEnum.Nonconjable;
-	}
+//	//initially, the most right type will be the determiner for whether or not its conjable
+//	private boolean checkConjability() {
+//		return this.isConjable();
+//	}
+//	@Override
+//	protected void purifyConj() {
+//		rightCCGType.purifyConj();
+//	}
+//	@Override
+//	protected void makeConjable() {
+//		conjable = ConjEnum.Conjable;	
+//	}
+//	@Override
+//	protected void makeUnconjable() {
+//		conjable = ConjEnum.Nonconjable;
+//	}
 }

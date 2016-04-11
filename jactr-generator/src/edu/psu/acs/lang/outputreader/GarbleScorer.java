@@ -5,8 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import edu.psu.acs.lang.PathConsts;
 import edu.psu.acs.lang.production.RetrieveHome;
+import edu.psu.acs.lang.util.PathConsts;
 import ngrams.StandardNgramModel;
 
 public class GarbleScorer {
@@ -14,7 +14,8 @@ public class GarbleScorer {
 		List<String> output = null;
 		StandardNgramModel sng = null;
 		try {
-			output = Files.readAllLines(Paths.get(PathConsts.outputPath));
+			String path = PathConsts.outputPath;
+			output = Files.readAllLines(Paths.get(path));
 			sng = new StandardNgramModel(2, PathConsts.lmPath);
 			
 		} catch (IOException e) {

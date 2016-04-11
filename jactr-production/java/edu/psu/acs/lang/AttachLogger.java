@@ -7,8 +7,11 @@ import java.util.concurrent.ExecutionException;
 import org.jactr.core.logging.Logger;
 import org.jactr.core.logging.impl.DefaultModelLogger;
 import org.jactr.core.model.IModel;
+import org.jactr.core.model.six.update.UpdateCycleProcessor6;
 import org.jactr.core.production.IProduction;
 import org.jactr.core.runtime.ACTRRuntime;
+
+import edu.psu.acs.lang.util.PathConsts;
 
 public class AttachLogger implements Runnable
 {
@@ -74,14 +77,20 @@ public class AttachLogger implements Runnable
 		e.printStackTrace();
 	}
   }
+  protected void setCycler(IModel model) {
+	  model.setCycleProcessor(new UpdateCycleProcessor6());
+  }
   protected void installLogger(IModel model)
   {
+	setCycler(model);
 	//initializeEarlyUtility(model);
     DefaultModelLogger dml = new DefaultModelLogger();
-//    //dml.setParameter("OUTPUT", "../../../../"+PathConsts.dataDirName+"/"+PathConsts.outputName);
+    dml.setParameter("OUTPUT", "../../../../"+PathConsts.dataDirName+"/"+PathConsts.expName+"/"+PathConsts.outputName);
+    DefaultModelLogger other = new DefaultModelLogger();
     for (String s : dml.getSetableParameters()) {
-    	dml.setParameter(s, s.toLowerCase()+".txt");
+    	other.setParameter(s, s.toLowerCase()+".txt");
     }
     Logger.addLogger(model, dml);
+    Logger.addLogger(model,  other);
   }
 }

@@ -10,13 +10,12 @@ import java.util.List;
 import java.util.Random;
 
 import edu.psu.acs.lang.IModelElement;
-import edu.psu.acs.lang.PathConsts;
-import edu.psu.acs.lang.declarative.Sentence;
-import edu.psu.acs.lang.declarative.SentenceManager;
+import edu.psu.acs.lang.util.ParseException;
+import edu.psu.acs.lang.util.PathConsts;
 
 public class ModelWriter {
-	private static final int numDivisionsToUse = 1;
-	private static final int numDivisions = 30000;
+	private static final int numberSentencesDesired = 100;
+	private static final int maxLength = 10;
 	private final FileWriter fw;
 	public ModelWriter(Path path) throws IOException {
 		fw = new FileWriter(path.toFile());
@@ -31,14 +30,14 @@ public class ModelWriter {
 		fw.flush();
 		elements.clear();
 	}
-	public static void main(String[] args) throws IOException, URISyntaxException {
-		int divisions = numDivisions;
-		int divisionsUse = numDivisionsToUse;
+	public static void main(String[] args) throws IOException, URISyntaxException, ParseException {
+		int numSentences = numberSentencesDesired;
 		String exp = PathConsts.expName;
 		String swbdName = PathConsts.swbdBaseName;
 		String dataDirStr = PathConsts.dataDirName;
 		String projectName = PathConsts.projectName;
 		String modelsName = PathConsts.models;
+		int maxl = maxLength;
 		
 		Random r = new Random();
 		File workingDir = new File(ModelCreator.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
@@ -46,13 +45,10 @@ public class ModelWriter {
 		Path dataDir = basePath.resolve(dataDirStr);
 		Path expDir = dataDir.resolve(exp);
 		SWBDSplitter swsp = new SWBDSplitter(dataDir, swbdName);
-		divisions = swsp.split(divisions, expDir);
-		int[] divisionsToUse = new int[divisionsUse];
-		for (int i = 0; i < divisionsUse; i++) {
-			divisionsToUse[i] = r.nextInt(divisions);
-		}
-		ModelPreparer prep = new ModelPreparer(expDir, divisionsToUse);
-		ModelCreator mc = new ModelCreator(prep, expDir, prep.getNumSentences());
+		int numDivisions = swsp.split(numSentences, expDir, maxl);
+		int divisionToUse = r.nextInt(numDivisions);
+		ModelPreparer prep = new ModelPreparer(expDir, divisionToUse);
+		ModelCreator mc = new ModelCreator(prep, expDir);
 		Path modelDir = basePath.resolve(projectName).resolve(modelsName);
 		ModelWriter mw = new ModelWriter(modelDir.resolve("lp-"+exp+".jactr"));
 				
@@ -68,13 +64,10 @@ public class ModelWriter {
 		mw.writeOut("Finished making type chunks", writer);
 		writer.addAll(mc.makeLexSynAndWordChunks());
 		mw.writeOut("Finished making lex syns", writer);
-		List<Sentence> allSentences = new ArrayList<Sentence>();
-		for (int division : divisionsToUse) {
-			allSentences.addAll(mc.makeSentences(division));
-			mw.writeOut("Finished making sentences in file: "+division, writer);
-		}
-		writer.addAll(mc.makeSentenceManagers(allSentences));
-		writer.addAll(allSentences);
+		
+	//	writer.addAll(mc.makeSentenceManagers(allSentences));
+		writer.addAll(mc.makeSentences(divisionToUse));
+		mw.writeOut("Finished making sentences in file: "+divisionToUse, writer);
 		
 		writer.add(new SimpleElement("</declarative-memory>"));
 		writer.add(new SimpleElement("<procedural-memory>"));
@@ -90,6 +83,7 @@ public class ModelWriter {
 		intro.add(new SimpleElement("<model name=\""+exp+"\">"));
 		intro.add(new SimpleElement("<modules>"));
 		intro.add(new SimpleElement("<module class=\"org.jactr.core.module.declarative.six.DefaultDeclarativeModule6\"/>"));
+		
 		if (tracer) {
 			intro.add(new SimpleElement("<module class=\"org.jactr.core.module.procedural.sixtrace.TracerProceduralModule6\"/>"));
 		}
@@ -101,6 +95,8 @@ public class ModelWriter {
 		intro.add(new SimpleElement("<module class=\"org.jactr.core.module.retrieval.six.DefaultRetrievalModule6\">"));
 		intro.add(new SimpleElement("<parameters>"));
 		intro.add(new SimpleElement("<parameter name=\"LatencyFactor\" value=\"0.00\"/>"));
+		intro.add(new SimpleElement("<parameter name=\"FINSTDurationTime\" value=\"30000.0\"/>"));
+	    intro.add(new SimpleElement("<parameter name=\"NumberOfFINSTs\" value=\"1000\"/>"));
 		intro.add(new SimpleElement("</parameters>"));
 		intro.add(new SimpleElement("</module>"));
 		intro.add(new SimpleElement("</modules>"));
@@ -108,7 +104,7 @@ public class ModelWriter {
 	}
 	private static List<SimpleElement> getOutro() {
 		List<SimpleElement> intro = new ArrayList<SimpleElement>();
-		intro.add(new SimpleElement("<buffer name=\"goal\" chunk=\""+SentenceManager.getFirst()+"\"/>"));
+		intro.add(new SimpleElement("<buffer name=\"goal\"/>"));// chunk=\""+Sentence.getNameConst(1)+"\"/>"));
 		intro.add(new SimpleElement("<buffer name=\"retrieval\">"));
 		intro.add(new SimpleElement("<parameters>"));
 		intro.add(new SimpleElement("<parameter name=\"StrictHarvestingEnabled\" value=\"true\"/>"));

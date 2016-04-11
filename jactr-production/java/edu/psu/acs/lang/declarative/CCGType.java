@@ -18,9 +18,9 @@ public abstract class CCGType extends ChunkStore implements SlotValue {
 				new Slot(CCGTypeSlot.Combinator, new EmptyChunk(EmptyEnum.NA)),
 		})));
 	}
-	protected abstract void makeConjable();
-	protected abstract void makeUnconjable();
-	protected abstract void purifyConj(); //this will remove conjable from any non parent types (which should theoretically just be its right-most leaf)
+//	protected abstract void makeConjable();
+//	protected abstract void makeUnconjable();
+//	protected abstract void purifyConj(); //this will remove conjable from any non parent types (which should theoretically just be its right-most leaf)
 	public abstract boolean isConjable();
 	public boolean isPCT() {
 		if (!(this instanceof CCGBaseType)) {

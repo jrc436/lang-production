@@ -13,6 +13,14 @@ public class Slot implements ISlot {
 		this.value = value;
 	}
 	public String toXML() {
-		return "<slot name=\""+name+"\" equals=\""+value.toString()+"\"/>";
+		String firstPart = "<slot name=\""+name+"\"";
+		String secondPart;
+		if (value instanceof NotValue) {
+			secondPart = "not=\""+value.toString()+"\"/>";
+		}
+		else {
+			secondPart = "equals=\""+value.toString()+"\"/>";
+		}
+		return firstPart + secondPart;
 	}
 }

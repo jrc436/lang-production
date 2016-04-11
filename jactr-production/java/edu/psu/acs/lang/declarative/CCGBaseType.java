@@ -46,17 +46,17 @@ public class CCGBaseType extends CCGType {
 	public boolean isConjable() {
 		return modifier == CCGTypeModifier.conj;
 	}
-	protected void purifyConj() {
-		makeUnconjable();
-	}
-	@Override
-	protected void makeConjable() {
-		modifier = CCGTypeModifier.conj;
-	}
-	@Override
-	protected void makeUnconjable() {
-		if (modifier == CCGTypeModifier.conj) {
-			modifier = null;
-		}
-	}
+//	protected void purifyConj() {
+//		makeUnconjable();
+//	}
+//	@Override
+//	protected void makeConjable() {
+//		modifier = CCGTypeModifier.conj;
+//	}
+//	@Override
+//	protected void makeUnconjable() {
+//		if (modifier == CCGTypeModifier.conj) {
+//			modifier = null;
+//		}
+//	}
 }

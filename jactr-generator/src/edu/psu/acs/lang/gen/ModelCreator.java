@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.psu.acs.lang.IModelElement;
+import edu.psu.acs.lang.RunConsts;
 import edu.psu.acs.lang.declarative.CCGCompoundType;
 import edu.psu.acs.lang.declarative.CCGOperator;
 import edu.psu.acs.lang.declarative.CCGOperatorEnum;
@@ -50,7 +51,6 @@ import edu.psu.acs.lang.production.ResolveForwardApplication;
 import edu.psu.acs.lang.production.ResolveForwardComposition;
 import edu.psu.acs.lang.production.RetrieveHome;
 import edu.psu.acs.lang.production.SyntaxRule;
-import edu.psu.acs.lang.util.PathConsts;
 
 public class ModelCreator {
 	private final int largestSentenceK; //93 is overall on swbd; //i
@@ -64,9 +64,9 @@ public class ModelCreator {
 		prep.createWords(delimiter);
 		largestSentenceK = prep.maxWordsPerSentence();
 		mostTypesN = prep.createTypes();
-		typesPath = expDir.resolve(PathConsts.typesFName);
-		wordsPath = expDir.resolve(PathConsts.wordsFName);
-		sentPath = expDir.resolve(PathConsts.wordCat);
+		typesPath = expDir.resolve(RunConsts.typesFName);
+		wordsPath = expDir.resolve(RunConsts.wordsFName);
+		sentPath = expDir.resolve(RunConsts.wordCat);
 	}
 	public List<IModelElement> makeChunkTypes() {
 		List<IModelElement> toret = new ArrayList<IModelElement>();

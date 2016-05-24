@@ -12,7 +12,7 @@ public class SetGoalBuffer extends ChangeGoalBuffer {
 	@Override
 	public List<String> toXML() {
 		List<String> lines = new ArrayList<String>();
-		lines.add("<add buffer=\""+buffer.toString()+"\" chunk=\""+nameOfNewGoalChunk+"\"/>");
+		lines.add("<set buffer=\""+buffer.toString()+"\" chunk=\""+nameOfNewGoalChunk+"\"/>");
 		return lines;
 	}
 }

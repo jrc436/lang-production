@@ -17,25 +17,25 @@ import org.jactr.core.production.IInstantiation;
 import org.jactr.core.production.VariableBindings;
 import org.jactr.core.production.six.ISubsymbolicProduction6;
 
-import edu.psu.acs.lang.GraphMaker;
-import edu.psu.acs.lang.IDependencyGraph;
-import edu.psu.acs.lang.IDependencyGraph.IDependencyNode;
-import edu.psu.acs.lang.RuleNode;
+import edu.psu.acs.lang.RunConsts;
 import edu.psu.acs.lang.declarative.CCGOperator;
 import edu.psu.acs.lang.declarative.CCGOperatorEnum;
 import edu.psu.acs.lang.production.SyntaxRuleType;
+import edu.psu.acs.lang.tracing.GraphMaker;
+import edu.psu.acs.lang.tracing.IDependencyGraph;
+import edu.psu.acs.lang.tracing.IDependencyGraph.IDependencyNode;
 import edu.psu.acs.lang.util.NodeParser;
 import edu.psu.acs.lang.util.ParseException;
-import edu.psu.acs.lang.util.PathConsts;
+import edu.psu.acs.lang.util.RuleNode;
 
 public class TracerProductionSelector implements IProductionSelector {
 	private List<IDependencyGraph<RuleNode>> fireChecker;
 	private FileWriter log;
 	public TracerProductionSelector() throws ParseException {
-		Path workingDir = Paths.get(PathConsts.workingDir);
-		Path dataDir = workingDir.resolve(PathConsts.dataDirName);
-		Path expDir = dataDir.resolve(PathConsts.expName);
-		Path ccgPath = expDir.resolve(PathConsts.typeCat);
+		Path workingDir = Paths.get(RunConsts.workingDir);
+		Path dataDir = workingDir.resolve(RunConsts.dataDirName);
+		Path expDir = dataDir.resolve(RunConsts.expName);
+		Path ccgPath = expDir.resolve(RunConsts.typeCat);
 		NodeParser n = new NodeParser(ccgPath, false);
 		fireChecker = GraphMaker.make(n);
 		try {

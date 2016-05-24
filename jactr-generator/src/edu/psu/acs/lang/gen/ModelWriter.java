@@ -6,16 +6,16 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import edu.psu.acs.lang.IModelElement;
+import edu.psu.acs.lang.RunConsts;
 import edu.psu.acs.lang.util.ParseException;
-import edu.psu.acs.lang.util.PathConsts;
 
 public class ModelWriter {
-	private static final int numberSentencesDesired = 100;
-	private static final int maxLength = 10;
 	private final FileWriter fw;
 	public ModelWriter(Path path) throws IOException {
 		fw = new FileWriter(path.toFile());
@@ -31,51 +31,61 @@ public class ModelWriter {
 		elements.clear();
 	}
 	public static void main(String[] args) throws IOException, URISyntaxException, ParseException {
-		int numSentences = numberSentencesDesired;
-		String exp = PathConsts.expName;
-		String swbdName = PathConsts.swbdBaseName;
-		String dataDirStr = PathConsts.dataDirName;
-		String projectName = PathConsts.projectName;
-		String modelsName = PathConsts.models;
-		int maxl = maxLength;
+		int numSentences = RunConsts.numberSentencesDesired;
+		String exp = RunConsts.expName;
+		String swbdName = RunConsts.swbdBaseName;
+		String dataDirStr = RunConsts.dataDirName;
+		String projectName = RunConsts.projectName;
+		String modelsName = RunConsts.models;
+		int maxl = RunConsts.maxLength;
 		
 		Random r = new Random();
-		File workingDir = new File(ModelCreator.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
-		Path basePath = workingDir.getParentFile().getParentFile().toPath();
-		Path dataDir = basePath.resolve(dataDirStr);
-		Path expDir = dataDir.resolve(exp);
-		SWBDSplitter swsp = new SWBDSplitter(dataDir, swbdName);
-		int numDivisions = swsp.split(numSentences, expDir, maxl);
-		int divisionToUse = r.nextInt(numDivisions);
-		ModelPreparer prep = new ModelPreparer(expDir, divisionToUse);
-		ModelCreator mc = new ModelCreator(prep, expDir);
-		Path modelDir = basePath.resolve(projectName).resolve(modelsName);
-		ModelWriter mw = new ModelWriter(modelDir.resolve("lp-"+exp+".jactr"));
-				
-		List<IModelElement> writer = new ArrayList<IModelElement>();
-		writer.addAll(getIntro(exp, false));
-		writer.add(new SimpleElement("<declarative-memory>"));
-		writer.addAll(mc.makeChunkTypes());
-		mw.writeOut("Finished making chunk types", writer);
-		writer.addAll(mc.makeConjChunks());
-		writer.addAll(mc.makeOperatorChunks());
-		writer.addAll(mc.makeTypeChunks());
-		writer.addAll(mc.makeEmptyChunk());
-		mw.writeOut("Finished making type chunks", writer);
-		writer.addAll(mc.makeLexSynAndWordChunks());
-		mw.writeOut("Finished making lex syns", writer);
-		
-	//	writer.addAll(mc.makeSentenceManagers(allSentences));
-		writer.addAll(mc.makeSentences(divisionToUse));
-		mw.writeOut("Finished making sentences in file: "+divisionToUse, writer);
-		
-		writer.add(new SimpleElement("</declarative-memory>"));
-		writer.add(new SimpleElement("<procedural-memory>"));
-		writer.addAll(mc.makeRules());
-		writer.add(new SimpleElement("</procedural-memory>")); 
-		mw.writeOut("Finished making rules", writer);	
-		writer.addAll(getOutro());
-		mw.writeOut("Finished!", writer);
+		Set<Integer> experimentDivisions = new HashSet<Integer>();
+		while (experimentDivisions.size() < 50) {
+			experimentDivisions.add(r.nextInt(2736));
+		}
+		int i = 0;
+		for (Integer divisionToUse : experimentDivisions) {
+			exp += i;
+			File workingDir = new File(ModelCreator.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+			Path basePath = workingDir.getParentFile().getParentFile().toPath();
+			Path dataDir = basePath.resolve(dataDirStr);
+			
+			SWBDSplitter swsp = new SWBDSplitter(dataDir, swbdName);
+			
+			Path expDir = dataDir.resolve(exp);
+			int numDivisions = swsp.split(numSentences, expDir, maxl);
+			ModelPreparer prep = new ModelPreparer(expDir, divisionToUse);
+			ModelCreator mc = new ModelCreator(prep, expDir);
+			Path modelDir = basePath.resolve(projectName).resolve(modelsName);
+			ModelWriter mw = new ModelWriter(modelDir.resolve("lp-"+exp+".jactr"));
+					
+			List<IModelElement> writer = new ArrayList<IModelElement>();
+			writer.addAll(getIntro(exp, false));
+			writer.add(new SimpleElement("<declarative-memory>"));
+			writer.addAll(mc.makeChunkTypes());
+			mw.writeOut("Finished making chunk types", writer);
+			writer.addAll(mc.makeConjChunks());
+			writer.addAll(mc.makeOperatorChunks());
+			writer.addAll(mc.makeTypeChunks());
+			writer.addAll(mc.makeEmptyChunk());
+			mw.writeOut("Finished making type chunks", writer);
+			writer.addAll(mc.makeLexSynAndWordChunks());
+			mw.writeOut("Finished making lex syns", writer);
+			
+		//	writer.addAll(mc.makeSentenceManagers(allSentences));
+			writer.addAll(mc.makeSentences(divisionToUse));
+			mw.writeOut("Finished making sentences in file: "+divisionToUse, writer);
+			
+			writer.add(new SimpleElement("</declarative-memory>"));
+			writer.add(new SimpleElement("<procedural-memory>"));
+			writer.addAll(mc.makeRules());
+			writer.add(new SimpleElement("</procedural-memory>")); 
+			mw.writeOut("Finished making rules", writer);	
+			writer.addAll(getOutro());
+			mw.writeOut("Finished!"+i, writer);
+			i++;
+		}
 	}
 	private static List<SimpleElement> getIntro(String exp, boolean tracer) {
 		List<SimpleElement> intro = new ArrayList<SimpleElement>();

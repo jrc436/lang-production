@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
-import edu.psu.acs.lang.RuleNode;
 import edu.psu.acs.lang.declarative.CCGCompoundType;
 import edu.psu.acs.lang.declarative.CCGType;
 import edu.psu.acs.lang.production.SyntaxRuleType;

@@ -16,14 +16,14 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 
-import edu.psu.acs.lang.RuleNode;
+import edu.psu.acs.lang.RunConsts;
 import edu.psu.acs.lang.declarative.CCGType;
 import edu.psu.acs.lang.production.SyntaxRuleType;
 import edu.psu.acs.lang.util.LexNode;
 import edu.psu.acs.lang.util.NodeParser;
 import edu.psu.acs.lang.util.ParseException;
 import edu.psu.acs.lang.util.ParseNode;
-import edu.psu.acs.lang.util.PathConsts;
+import edu.psu.acs.lang.util.RuleNode;
 
 public class ModelPreparer {
 	
@@ -83,8 +83,8 @@ public class ModelPreparer {
 		tlines.addAll(Files.readAllLines(tfiles[divisionToUse].toPath()));
 		
 		
-		wordCat = expDir.resolve(PathConsts.wordCat).toFile();
-		typeCat = expDir.resolve(PathConsts.typeCat).toFile();
+		wordCat = expDir.resolve(RunConsts.wordCat).toFile();
+		typeCat = expDir.resolve(RunConsts.typeCat).toFile();
 		
 		FileWriter fwword = new FileWriter(wordCat);
 		for (String line : lines) {
@@ -167,8 +167,8 @@ public class ModelPreparer {
 		return rn;
 	}
 	public int createTypes() throws IOException {
-		List<String> lines = Files.readAllLines(this.expDir.resolve(PathConsts.wordsFName));
-		FileWriter write = new FileWriter(this.expDir.resolve(PathConsts.typesFName).toFile());
+		List<String> lines = Files.readAllLines(this.expDir.resolve(RunConsts.wordsFName));
+		FileWriter write = new FileWriter(this.expDir.resolve(RunConsts.typesFName).toFile());
 		Set<String> types = new HashSet<String>();
 		int maxtypes = 0;
 		for (String line : lines) {
@@ -209,7 +209,7 @@ public class ModelPreparer {
 	 */
 	public void createWords(String delimiter) throws IOException {
 		//first, we'll just grab the word and make a list of all of their types so that we have a clear idea
-		Path writePath = this.expDir.resolve(PathConsts.wordsFName);
+		Path writePath = this.expDir.resolve(RunConsts.wordsFName);
 		FileWriter write = new FileWriter(writePath.toFile());
 		HashMap<String, Set<String>> map = new HashMap<String, Set<String>>();
 		

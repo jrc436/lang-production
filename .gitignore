@@ -1,3 +1,6 @@
+experiment-models/
+test/
+srilm/lm-corpus
 david/
 data/
 runs/

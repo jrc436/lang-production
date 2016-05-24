@@ -65,7 +65,7 @@ public class StandardNgramModel extends AbstractStandardNgramModel
     }
     public double easyScore(String fragment) {
     	List<String> words = Arrays.asList(fragment.trim().split(" "));
-    	return convertToProb(super.logProbFromNgram(words, 0, this.order));
+    	return super.logProbFromNgram(words, 0, this.order);
     }
 	
 	// reads in model
@@ -84,6 +84,11 @@ public class StandardNgramModel extends AbstractStandardNgramModel
             readLine(tokenizer, tokens);
             // check for blank line
             if (tokens[0] == null) continue;
+            for (int k = 0; k < tokens.length; k++) {
+            	if (tokens[k] != null) {
+            		tokens[k] = tokens[k].toLowerCase();
+            	}
+            }
             // check for initial delimiter
             if (tokens[0].equals("\\data\\")) { foundData = true; continue; }
             if (!foundData) continue;
@@ -144,6 +149,9 @@ public class StandardNgramModel extends AbstractStandardNgramModel
                 for (int i = 1; i < currentOrder; i++) {
                     currentPrefix.add(tokens[i]);
                 }
+            }
+            if (currentOrder == 2) {
+            	System.out.println("poop");
             }
             String key = tokens[currentOrder];
             currentKeys.add(key);

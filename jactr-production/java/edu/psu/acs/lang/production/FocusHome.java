@@ -3,16 +3,13 @@ package edu.psu.acs.lang.production;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.psu.acs.lang.RunConsts;
 import edu.psu.acs.lang.declarative.ChunkTypeEnum;
 import edu.psu.acs.lang.declarative.ISlot;
-import edu.psu.acs.lang.declarative.NotNullValue;
-import edu.psu.acs.lang.declarative.SingletonSlotName;
-import edu.psu.acs.lang.declarative.SingletonSlotNameEnum;
-import edu.psu.acs.lang.declarative.Slot;
 import edu.psu.acs.lang.declarative.SlotVar;
 
 public class FocusHome extends ProductionRule {
-
+	
 	public FocusHome() {
 		super("FocusHome");
 		this.makeQuery(BufferQueries.checkGoalEmpty());
@@ -22,7 +19,6 @@ public class FocusHome extends ProductionRule {
 		this.requireRetrieval(slots, ChunkTypeEnum.sentence); //will only focus a goal with its goal not dead
 		SlotVar sv = new SlotVar("retrieval");
 		changeGoal(sv.toString(), new ArrayList<ISlot>(), true);
-		this.addOutput("NEW GOAL: "+sv.toString());
+		this.addOutput(RunConsts.newGoal+": "+sv.toString());
 	}
-
 }

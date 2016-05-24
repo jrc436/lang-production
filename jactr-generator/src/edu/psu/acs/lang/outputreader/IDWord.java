@@ -22,4 +22,8 @@ public class IDWord {
 	public int hashCode() {
 		return string.hashCode() + 19 * id;
 	}
+	@Override
+	public String toString() {
+		return string+"."+id;
+	}
 }

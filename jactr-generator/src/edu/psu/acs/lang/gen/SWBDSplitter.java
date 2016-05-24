@@ -8,15 +8,15 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.psu.acs.lang.RunConsts;
 import edu.psu.acs.lang.util.NodeParser;
-import edu.psu.acs.lang.util.PathConsts;
 
 public class SWBDSplitter {
 	private final Path swbdTextPath;
 	private final Path swbdCCGPath;
 	public SWBDSplitter(Path dataDir, String swbdBaseName) {		
-		this.swbdTextPath = dataDir.resolve(swbdBaseName+PathConsts.sentExt);
-		this.swbdCCGPath = dataDir.resolve(swbdBaseName+PathConsts.sentAnnoExt);
+		this.swbdTextPath = dataDir.resolve(swbdBaseName+RunConsts.sentExt);
+		this.swbdCCGPath = dataDir.resolve(swbdBaseName+RunConsts.sentAnnoExt);
 	}
 	private void preFilter(int maxLength, List<String> sent, List<String> ccgTerms) {
 		for (int i = 0; i < sent.size(); i++) {
@@ -92,11 +92,11 @@ public class SWBDSplitter {
 	}
 	private File getTextFilePath(Path expDir, int divisionNumber, int numDivisions) {
 		String formatter = "%0"+String.valueOf(numDivisions).length()+"d";
-		return expDir.resolve(PathConsts.swbdBaseName+String.format(formatter, divisionNumber)+PathConsts.sentExt).toFile();
+		return expDir.resolve(RunConsts.swbdBaseName+String.format(formatter, divisionNumber)+RunConsts.sentExt).toFile();
 	}
 	private File getCCGFilePath(Path expDir, int divisionNumber, int numDivisions) {
 		String formatter = "%0"+String.valueOf(numDivisions).length()+"d";
-		return expDir.resolve(PathConsts.swbdBaseName+String.format(formatter, divisionNumber)+PathConsts.sentAnnoExt).toFile();
+		return expDir.resolve(RunConsts.swbdBaseName+String.format(formatter, divisionNumber)+RunConsts.sentAnnoExt).toFile();
 	}
 	private String destroyPunctuation(String str) {
 		return str.replace(" .", "").replace(" ?", "").replace(" :", "").replace(" ,", "").replace(". ", "").replace(", ", "").replace("? ", "");

@@ -249,8 +249,12 @@ public abstract class NgramScorer implements SignScorer
 	 */
     protected float logProb(List<String> keysList, int pos, int len) {
         TrieMap<String,NgramFloats> node = getNode(keysList, pos, len);
-        if (node != null && node.data != null) return node.data.logprob;
-        if (len == 1) return -99;
+        if (node != null && node.data != null) {
+        	return node.data.logprob;
+        }
+        if (len == 1) {
+        	return -99;
+        }
         float retval = logProb(keysList, pos+1, len-1);
       //  if (debugScore) System.out.print("(" + (len-1) + "-gram: " + retval + ") ");
         if (retval > -99) retval += backoffWeight(keysList, pos, len-1);

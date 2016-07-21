@@ -1,0 +1,148 @@
+This is BibTeX, Version 0.99d (TeX Live 2013)
+Capacity: max_strings=35307, hash_size=35307, hash_prime=30011
+The top-level auxiliary file: master.aux
+The style file: apacite.bst
+Reallocated glb_str_ptr (elt_size=4) to 20 items from 10.
+Reallocated global_strs (elt_size=20001) to 20 items from 10.
+Reallocated glb_str_end (elt_size=4) to 20 items from 10.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 6000 items from 3000.
+Reallocated singl_function (elt_size=4) to 100 items from 50.
+Reallocated wiz_functions (elt_size=4) to 9000 items from 6000.
+Database file #1: lang.bib
+I was expecting a `,' or a `}'---line 58 of file lang.bib
+ :  
+ :  pages = {1240}
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 75 of file lang.bib
+ :  
+ :  language = {en},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+Database file #2: gen.bib
+Repeated entry---line 1 of file gen.bib
+ : @article{convergence
+ :                     ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 63 of file gen.bib
+ : @inproceedings{actup
+ :                     ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 97 of file gen.bib
+ : @inproceedings{tag1
+ :                    ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 105 of file gen.bib
+ : @article{actr
+ :              ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 118 of file gen.bib
+ : @article{ccg
+ :             ,
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 127 of file gen.bib
+ :  
+ :  booktitle = {Proceedings of the 40th {Annual} {Meeting} on {Association} for {Computational} {Linguistics}},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 136 of file gen.bib
+ :  
+ :  booktitle = {Proceedings of the {Workshop} on {Monolingual} {Text}-{To}-{Text} {Generation}},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 160 of file gen.bib
+ :  
+ :  language = {en},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 174 of file gen.bib
+ :  
+ :  language = {en},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+Repeated entry---line 184 of file gen.bib
+ : @article{incremental
+ :                     ,
+I'm skipping whatever remains of this entry
+I was expecting a `,' or a `}'---line 202 of file gen.bib
+ :  
+ :  language = {en},
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+You're missing a field name---line 282 of file gen.bib
+ :  pages = {277--286},
+ :                     ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 314 of file gen.bib
+ : @article{radical
+ :                 ,
+I'm skipping whatever remains of this entry
+Repeated entry---line 322 of file gen.bib
+ : @inproceedings{srilm
+ :                     ,
+I'm skipping whatever remains of this entry
+Database file #3: models.bib
+I was expecting an "="---line 10 of file models.bib
+ : 
+ : }
+(Error may have been on previous line)
+I'm skipping whatever remains of this entry
+apacite.bst [2009/03/01 v4.05 APA bibliography style]
+Warning--No address in big-comprehension
+Warning--No publisher in tag1
+Warning--No address in tag1
+Warning--No journal in chart
+Warning--No publisher in references
+Warning--No address in references
+Warning--No journal in chinese
+Warning--No address in tag
+Warning--No journal in convergence
+Warning--No publisher in anaphoric
+Warning--No address in anaphoric
+Warning--No address in actup
+Warning--No publisher in decision
+Warning--No address in decision
+Warning--No publisher in srilm
+You've used 18 entries,
+            6361 wiz_defined-function locations,
+            1271 strings with 12545 characters,
+and the built_in function-call counts, 32611 in all, are:
+= -- 4213
+> -- 248
+< -- 1450
++ -- 1435
+- -- 32
+* -- 2023
+:= -- 5729
+add.period$ -- 86
+call.type$ -- 18
+change.case$ -- 97
+chr.to.int$ -- 0
+cite$ -- 51
+duplicate$ -- 766
+empty$ -- 1321
+format.name$ -- 366
+if$ -- 6369
+int.to.chr$ -- 0
+int.to.str$ -- 36
+missing$ -- 0
+newline$ -- 412
+num.names$ -- 128
+pop$ -- 714
+preamble$ -- 1
+purify$ -- 72
+quote$ -- 0
+skip$ -- 2238
+stack$ -- 0
+substring$ -- 1616
+swap$ -- 477
+text.length$ -- 68
+text.prefix$ -- 0
+top$ -- 1
+type$ -- 1988
+warning$ -- 15
+while$ -- 134
+width$ -- 0
+write$ -- 507
+(There were 17 error messages)

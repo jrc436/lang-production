@@ -1,0 +1,57 @@
+\begin{thebibliography}{10}
+\expandafter\ifx\csname url\endcsname\relax
+  \def\url#1{\texttt{#1}}\fi
+\expandafter\ifx\csname urlprefix\endcsname\relax\def\urlprefix{URL }\fi
+\expandafter\ifx\csname href\endcsname\relax
+  \def\href#1#2{#2} \def\path#1{#1}\fi
+
+\bibitem{incremental}
+F.~Ferreira, B.~Swets, How {Incremental} {Is} {Language} {Production}?
+  {Evidence} from the {Production} of {Utterances} {Requiring} the
+  {Computation} of {Arithmetic} {Sums}, Journal of Memory and Language 46~(1)
+  (2002) 57--84.
+\newblock \href {http://dx.doi.org/10.1006/jmla.2001.2797}
+  {\path{doi:10.1006/jmla.2001.2797}}.
+
+\bibitem{chinese}
+It is there whether you hear it or not: {Syntactic} representation of missing
+  arguments 136.
+
+\bibitem{tag1}
+V.~Demberg, F.~Keller, A psycholinguistically motivated version of {TAG}, in:
+  Proceedings of the 9th {International} {Workshop} on {Tree} {Adjoining}
+  {Grammars} and {Related} {Formalisms}. {Tübingen}, 2008, pp. 25--32.
+
+\bibitem{radical}
+W.~Menzel, Towards radically incremental parsing of natural language, Recent
+  Advances in Natural Language Processing V: Selected Papers from Ranlp 2007
+  (2009) 41.
+
+\bibitem{model}
+D.~Reitter, F.~Keller, J.~D. Moore, A {Computational} {Cognitive} {Model} of
+  {Syntactic} {Priming}, Cognitive Science 35~(4) (2011) 587--637.
+
+\bibitem{ccg}
+M.~Steedman, J.~Baldridge, Combinatory categorial grammar, Non-Transformational
+  Syntax: Formal and Explicit Models of Grammar. Wiley-Blackwell.
+
+\bibitem{convergence}
+A.~K. Joshi, K.~V. Shanker, D.~Weir, The convergence of mildly
+  context-sensitive grammar formalisms.
+
+\bibitem{actr}
+J.~Anderson, A {Spreading} {Activation} {Theory} of {Memory}, Journal of Verbal
+  Learning and Verbal Behavior.
+
+\bibitem{actup}
+D.~Reitter, C.~Lebiere, Accountable modeling in {ACT}-{UP}, a scalable,
+  rapid-prototyping {ACT}-{R} implementation, in: Proceedings of the 10th
+  international conference on cognitive modeling, {Philadelphia}, {PA},
+  Citeseer, 2010.
+
+\bibitem{srilm}
+A.~Stolcke, {SRILM}-an extensible language modeling toolkit., in: Proceedings
+  of the {International} {Conference} on {Spoken} {Language} {Processing},
+  Vol.~2, Denver, 2002, pp. 901--904.
+
+\end{thebibliography}

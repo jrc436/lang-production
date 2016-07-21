@@ -1,0 +1,12 @@
+\BOOKMARK [1][-]{section.1}{Introduction}{}% 1
+\BOOKMARK [1][-]{section.2}{Previous Work}{}% 2
+\BOOKMARK [1][-]{section.3}{Background}{}% 3
+\BOOKMARK [1][-]{section.4}{Model}{}% 4
+\BOOKMARK [2][-]{subsection.4.1}{Rules and Chunks}{section.4}% 5
+\BOOKMARK [3][-]{subsubsection.4.1.1}{Production Rules}{subsection.4.1}% 6
+\BOOKMARK [3][-]{subsubsection.4.1.2}{Declarative Memory}{subsection.4.1}% 7
+\BOOKMARK [2][-]{subsection.4.2}{Input}{section.4}% 8
+\BOOKMARK [2][-]{subsection.4.3}{Output}{section.4}% 9
+\BOOKMARK [2][-]{subsection.4.4}{Evaluation}{section.4}% 10
+\BOOKMARK [1][-]{section.5}{Methods}{}% 11
+\BOOKMARK [1][-]{section.6}{Results}{}% 12

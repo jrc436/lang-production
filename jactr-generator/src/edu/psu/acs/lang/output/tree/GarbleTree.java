@@ -25,6 +25,13 @@ public class GarbleTree {
 			addLine(iwp);
 		}
 	}
+	public List<String> getFragments() {
+		List<String> frags = new ArrayList<String>();
+		for (TreeNode tn : roots) {
+			frags.add(tn.nodeString().trim());
+		}
+		return frags;
+	}
 	public double getMemRatio() {
 		return ((double) size()) / ((double) getMaxMem());
 	} 
@@ -35,27 +42,32 @@ public class GarbleTree {
 		}
 		return sum;
 	}
-	public int computeCurMem() {
+	public int computeCurMem(int offset) {
 		//we have to add 2 because we removed from roots if we're going to recreate
 		//if we aren't going to recreate, then we have to add two for the new node that's being added
-		return this.roots.size() + 2;
+		return this.roots.size() + offset; //not sure if htis is right yet...
 	}
-	public void addLine(IDWordPair iwp) {
+	private void addLine(IDWordPair iwp) {
 		TreeNode leftSub = findSubTree(iwp.getLeft());
 		TreeNode rightSub = findSubTree(iwp.getRight());
+		int offset = 0;
 		if (leftSub != null) {
-			roots.remove(leftSub);
+			roots.remove(leftSub); //remove 1 from mem
+			offset--;
 		}
 		else {
-			leftSub = new GarbleNode(iwp.getLeft());
+			leftSub = new GarbleNode(iwp.getLeft()); //add 1 to mem
+			offset++;
 		}
 		if (rightSub != null) {
-			roots.remove(rightSub);
+			roots.remove(rightSub); //remove 1 from mem
+			offset--;
 		}
 		else {
-			rightSub = new GarbleNode(iwp.getRight());
+			rightSub = new GarbleNode(iwp.getRight()); //add 1 to mem
+			offset++;
 		}
-		this.maxMem = Math.max(maxMem, computeCurMem());
+		this.maxMem = Math.max(maxMem, computeCurMem(offset));
 		roots.add(new DummyNode(leftSub, rightSub));
 	}
 	private TreeNode findSubTree(IDWord idw) {
@@ -66,13 +78,14 @@ public class GarbleTree {
 		}
 		return null;
 	}
-	public double getAverageBranchFactor() {
-		//double sum = 0.0;
-		int totalLeft = 0;
+	public double computeUnweightedBranchFactor() {
+		//it is a left-branch if right is bigger, a right-branch if left is bigger, and neutral if they are the same size
 		int totalRight = 0;
+		int totalLeft = 0;
+		int totalBranches = 0;
 		for (TreeNode root : roots) {
-			int leftTotal = 0;
-			int rightTotal = 0;
+//			int rootLeftBranches = 0;
+//			int rootRightBranches = 0;
 			Queue<TreeNode> subtrees = new LinkedList<TreeNode>();
 			subtrees.offer(root);
 			while (!subtrees.isEmpty()) {
@@ -82,14 +95,44 @@ public class GarbleTree {
 				}
 				subtrees.offer(cur.getLeft());
 				subtrees.offer(cur.getRight());
-				leftTotal += cur.countLeftLeaves();
-				rightTotal += cur.countRightLeaves();
+				int left = cur.countLeftLeaves();
+				int right = cur.countRightLeaves();
+				if (left > right) {
+					//leftTotal
+					totalRight++;
+				}
+				else if (right > left) {
+					totalLeft++;
+				}
+				totalBranches++;
+				//int leftSize = cur.countLeftLeaves();
+				//int rightSize = cur.countRightLeaves();
 			}
 			//sum += ((double) leftTotal) / ((double) rightTotal);
-			totalLeft += leftTotal;
-			totalRight += rightTotal;
+			//totalLeft += leftTotal;
+			//allRightBranches += rootRightBranches;
+		}
+		return ((double) totalRight) / ((double) totalBranches);
+	}
+	//the weighted branch factor has to do with the nodes in the tree. A higher score represents something that is more
+	//right-branching
+	public double computeWeightedBranchFactor() {
+		int totalLeft = 0;
+		int totalRight = 0;
+		for (TreeNode root : roots) {
+			Queue<TreeNode> subtrees = new LinkedList<TreeNode>();
+			subtrees.offer(root);
+			while (!subtrees.isEmpty()) {
+				TreeNode cur = subtrees.poll();
+				if (cur instanceof GarbleNode) {
+					continue;
+				}
+				subtrees.offer(cur.getLeft());
+				subtrees.offer(cur.getRight());
+				totalLeft += cur.countLeftLeaves();
+				totalRight += cur.countRightLeaves();
+			}
 		}
 		return ((double) totalLeft) / ((double) totalRight);
-		//return sum / roots.size();
 	}
 }

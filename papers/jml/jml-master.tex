@@ -1,0 +1,100 @@
+\documentclass[review]{elsarticle}
+
+\usepackage{lineno,hyperref}
+\modulolinenumbers[5]
+
+\journal{Journal of \LaTeX\ Templates}
+
+%%%%%%%%%%%%%%%%%%%%%%%
+%% Elsevier bibliography styles
+%%%%%%%%%%%%%%%%%%%%%%%
+%% To change the style, put a % in front of the second line of the current style and
+%% remove the % from the second line of the style you would like to use.
+%%%%%%%%%%%%%%%%%%%%%%%
+
+%% Numbered
+%\bibliographystyle{model1-num-names}
+
+%% Numbered without titles
+%\bibliographystyle{model1a-num-names}
+
+%% Harvard
+%\bibliographystyle{model2-names.bst}\biboptions{authoryear}
+
+%% Vancouver numbered
+%\usepackage{numcompress}\bibliographystyle{model3-num-names}
+
+%% Vancouver name/year
+%\usepackage{numcompress}\bibliographystyle{model4-names}\biboptions{authoryear}
+
+%% APA style
+%\bibliographystyle{model5-names}\biboptions{authoryear}
+
+%% AMA style
+%\usepackage{numcompress}\bibliographystyle{model6-num-names}
+
+%% `Elsevier LaTeX' style
+\bibliographystyle{elsarticle-num}
+%%%%%%%%%%%%%%%%%%%%%%%
+\renewcommand{\citep}[1]{\cite{#1}}
+\renewcommand{\citet}[1]{\cite{#1}}
+
+
+\begin{document}
+
+\begin{frontmatter}
+
+\title{Examining Sentence Construction With An ACT-R Model of Language Production}
+%\tnotetext[mytitlenote]{Fully documented templates are available in the elsarticle package on \href{http://www.ctan.org/tex-archive/macros/latex/contrib/elsarticle}{CTAN}.}
+
+%% Group authors per affiliation:
+\author{Jeremy Cole and David Reitter} %\fnref{myfootnote}}
+%\address{Radarweg 29, Amsterdam}
+%\fntext[myfootnote]{Since 1880.}
+\address{College of Information Science and Technology}
+\address{The Pennsylvania State University}
+%% or include affiliations in footnotes:
+%\author[mymainaddress,mysecondaryaddress]{Elsevier Inc}
+%\ead[url]{www.elsevier.com}
+
+%\author[mysecondaryaddress]{Global Customer Service\corref{mycorrespondingauthor}}
+%\cortext[mycorrespondingauthor]{Corresponding author}
+%\ead{support@elsevier.com}
+
+\address{University Park, Pennsylvania}
+%\address[mysecondaryaddress]{360 Park Avenue South, New York}
+
+\begin{abstract}
+Our goal was to compare among different starting points in the process of language production. We accomplished this by building a model of language production that takes as input a set of words and attempts to construct a grammatical sentence from them. We pre-biased the model's initial utilities to start realization in the middle, beginning, and end of the sentence in order to add evidence to the debate of how incremental language production is. By comparing the probability distributions, we discovered that while the early and middle cases were the closest, no conditions are currently indistinguishable from natural language. Nonetheless, we present our modeling framework as a way forward to solve difficult problems in language production.
+\end{abstract}
+
+\begin{keyword}
+language production\sep cognitive modelling
+%\MSC[2010] 00-01\sep  99-00
+\end{keyword}
+
+\end{frontmatter}
+
+\linenumbers
+
+\input{tex/introduction}
+\input{tex/literature}
+\input{tex/model}
+\input{tex/methods}
+%\input{hypotheses}
+%\input{detail}
+%\input{actr}
+%\input{extra}
+\input{tex/experiment}
+\input{tex/results}
+\input{tex/discussion}
+\input{tex/conclusions}
+%\input{chunks}
+%\input{rules}
+%\input{rq}
+%\input{conclusion}
+
+\section*{References}
+\bibliography{bib/misctheory,bib/incremental,bib/grammar,bib/tech,bib/cogmodels,bib/semantics,bib/gen}
+
+\end{document}

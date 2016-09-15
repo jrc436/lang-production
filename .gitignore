@@ -9,6 +9,8 @@ old-models/
 srilm/lib/
 jactr-production-old/
 
+*.bash
+
 *.local
 *.cached
 *.lisp~

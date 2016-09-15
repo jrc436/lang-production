@@ -14,17 +14,18 @@ public class RunConsts {
 	public static final int numberSentencesDesired = 20;
 	public static final int maxLength = 15;
 	public static final UtilityInitialization UI = UtilityInitialization.LATE;
+	public static final String expName = "experiment49";
 	
 	public static final String sentenceDelimiter = "SENTENCE-END";
 	public static final String newGoal = "NEW GOAL";
 	public static final String fragDelim = "<%%>";
 	
-	public static final String expName = "experiment49";
 	public static final String swbdBaseName = "swbd";
 	public static final String dataDirName = "data/";
 	public static final String workingDir = "/work/research/lang-production/";
 	public static final String projectName = "jactr-production";
 	public static final String models = "models";
+	public static final String rougePath = workingDir+"rouge/rouge.pl";
 	
 	public static final String sentExt = ".txt";
 	public static final String sentAnnoExt = ".ccg";
@@ -40,8 +41,16 @@ public class RunConsts {
 	public static final String outputFolder = "experiment-output/";
 	public static final String distFolder = "experiment-distribution/";
 	public static final String expInput = "experiment-data/";
+	public static final String expSentences = "experiment-sentences/";
 	public static final String getOutputPath(UtilityInitialization ui) {
 		return workingDir + getPathFromData(ui);
+	}
+	public static final File[] getFixedInputFiles() {
+		File dir = Paths.get(workingDir + dataDirName + expSentences).toFile();
+		return dir.listFiles();
+	}
+	public static final File getFixedInputFile(int num) {
+		return Paths.get(workingDir + dataDirName + expSentences).resolve("swbdcat"+String.format("%02d", num)+".input").toFile();
 	}
 	public static final File[] getInputFilesList() {
 		File dir = Paths.get(workingDir+dataDirName+expInput).toFile();
@@ -68,6 +77,24 @@ public class RunConsts {
 		}
 		fw.close();
 	}
+	public static final File[] getAllOutputFiles(int expNum, UtilityInitialization ui) {
+		File outputDir = Paths.get(workingDir + dataDirName + outputFolder).toFile();
+		FileFilter filter = new FileFilter() { 
+			public boolean accept(File f) {
+				return f.getName().contains(ui.toString().toLowerCase()) && f.getName().contains(String.format("%02d", expNum)) && f.getName().endsWith("output");
+			}
+		};
+		return outputDir.listFiles(filter);
+	}
+	public static final File[] getAllOutputFiles(int expNum) {
+		File outputDir = Paths.get(workingDir + dataDirName + outputFolder).toFile();
+		FileFilter filter = new FileFilter() { 
+			public boolean accept(File f) {
+				return f.getName().contains(String.format("%02d", expNum)) && f.getName().endsWith("output");
+			}
+		};
+		return outputDir.listFiles(filter);
+	}
 	public static final File[] getAllOutputFiles(UtilityInitialization ui) {
 		File outputDir = Paths.get(workingDir + dataDirName + outputFolder).toFile();
 		FileFilter filter = new FileFilter() { 
@@ -80,11 +107,11 @@ public class RunConsts {
 	public static final Path getOutSentencesFilePath(UtilityInitialization ui) {
 		return Paths.get(workingDir + dataDirName + outputSentences + ui.toString().toLowerCase() + ".txt"); 
 	}
-	public static final Path getDistributionFilePath(String ui) {
-		return Paths.get(workingDir + dataDirName + distFolder + ui.toLowerCase() + ".dist"); 
+	public static final Path getDistributionFilePath(UtilityInitialization ui) {
+		return Paths.get(workingDir + dataDirName + distFolder + ui.toString().toLowerCase() + ".dist"); 
 	}
-	public static final Path getTableFilePath(String ui) {
-		return Paths.get(workingDir + dataDirName + distFolder + ui.toLowerCase() + ".table"); 
+	public static final Path getTableFilePath(UtilityInitialization ui) {
+		return Paths.get(workingDir + dataDirName + distFolder + ui.toString().toLowerCase() + ".table"); 
 	}
 	private static final String getPathFromData(UtilityInitialization ui) {
 		return dataDirName + outputFolder + expName + "-" + ui.toString().toLowerCase()+RunConsts.outputName;

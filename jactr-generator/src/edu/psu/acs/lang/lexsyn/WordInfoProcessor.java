@@ -8,9 +8,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
-import java.util.Map.Entry;
 
 import edu.psu.acs.lang.declarative.CCGType;
 import edu.psu.acs.lang.production.SyntaxRuleType;
@@ -23,6 +23,12 @@ import util.wordmap.CombineException;
 import util.wordmap.WordMap;
 
 public class WordInfoProcessor extends FileProcessor<CCGParseList, WordMap> {
+	public WordInfoProcessor(String inpDir, String outDir, String[] bool) {
+		super(inpDir, outDir, new WordMap(bool));
+	}
+	public WordInfoProcessor() {
+		super();
+	}
 	
 	@Override
 	public int getNumFixedArgs() {

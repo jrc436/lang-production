@@ -1,14 +1,12 @@
 package edu.psu.acs.lang.lexsyn;
 
-import java.util.List;
-import java.util.Stack;
-
-import edu.psu.acs.lang.util.ParseNode;
-import edu.psu.acs.lang.util.RuleNode;
 import util.sys.FileProcessor;
 
 public class TypesListProcessor extends FileProcessor<CCGParseList, TypesList> {
 
+	public TypesListProcessor() {
+		super();
+	}
 	@Override
 	public int getNumFixedArgs() {
 		return 0;

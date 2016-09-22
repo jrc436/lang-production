@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import edu.psu.acs.lang.IModelElement;
+import edu.psu.acs.lang.core.IModelElement;
 
 public class ParameterSet implements IModelElement {
 	private Set<IParameter> params;

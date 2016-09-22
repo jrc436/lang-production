@@ -8,10 +8,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import edu.psu.acs.lang.RunConsts;
 import edu.psu.acs.lang.hook.UtilityInitialization;
 import edu.psu.acs.lang.output.OutputReader;
 import edu.psu.acs.lang.output.OutputSentence;
+import edu.psu.acs.lang.settings.EvaluationConsts;
 
 public class Comparer {
 	public static Map<UtilityInitialization, List<Double>> evaluateAll(IGoalComparer scorer) throws IOException {
@@ -21,13 +21,13 @@ public class Comparer {
 		}
 		
 		for (int i = 0; i < 50; i++) {
-			File target = RunConsts.getFixedInputFile(i);
+			File target = EvaluationConsts.getFixedGoldFile(i);
 			if (!target.exists())	 {
 				continue;
 			}
 			List<String> targetSents = Files.readAllLines(target.toPath());
 			for (UtilityInitialization ui : UtilityInitialization.values()) {
-				List<OutputSentence> os = OutputReader.getAllSentences(RunConsts.getAllOutputFiles(i, ui));
+				List<OutputSentence> os = OutputReader.getAllSentences(EvaluationConsts.getAllOutputFiles(i, ui));
 				if (os.isEmpty()) {
 					continue;
 				}

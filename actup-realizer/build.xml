@@ -5,6 +5,7 @@
               directory with the processing instruction <?eclipse.ant.import?>
               as the first entry and export the buildfile again. --><project basedir="." default="build" name="actup-realizer">
     <property environment="env"/>
+    <property name="jactr-generator.location" value="../jactr-generator"/>
     <property name="ECLIPSE_HOME" value="../../../../opt/eclipse/"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.8"/>
@@ -49,7 +50,14 @@
             <classpath refid="actup-realizer.classpath"/>
         </javac>
     </target>
-    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects">
+        <ant antfile="build.xml" dir="${jactr-generator.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${jactr-generator.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
     <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
         <copy todir="${ant.library.dir}">
             <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
@@ -62,11 +70,5 @@
     <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
         <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
         <antcall target="build"/>
-    </target>
-    <target name="Client">
-        <java classname="runconfig.Client" failonerror="true" fork="yes">
-            <jvmarg line="-Xmx3g"/>
-            <classpath refid="actup-realizer.classpath"/>
-        </java>
     </target>
 </project>

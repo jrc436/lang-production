@@ -6,13 +6,45 @@
               as the first entry and export the buildfile again. --><project basedir="." default="build" name="jactr-generator">
     <property environment="env"/>
     <property name="ECLIPSE_HOME" value="../../../../opt/eclipse/"/>
-    <property name="edu.psu.acs.lang.location" value="../edu.psu.acs.lang"/>
+    <property name="evaluators.location" value="../evaluators"/>
+    <property name="Sociolinguistics.location" value="../Sociolinguistics"/>
+    <property name="actup-realizer.location" value="../actup-realizer"/>
+    <property name="jactr-production.location" value="../jactr-production"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.8"/>
     <property name="source" value="1.8"/>
+    <path id="Persisted container [/work/research/lang-production/jactr-generator/bin for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/opt/eclipse/plugins/org.jactr_2.0.0.201510231004.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/opt/eclipse/plugins/org.jactr.support_1.2.2.201507141147.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/org/jactr/commons-primitives-1.0.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/org/commons-logging-1.1.1.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/javolution.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/jscience.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/org/jactr/commons-lang-2.5.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/org/jactr/commons-cli-1.2.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/org/jactr/commons-collections-3.2.1.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/jmock/jmock-2.6.0.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/jmock/jmock-junit4-2.6.0.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/jmock/jmock-legacy-2.6.0.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/jmock/jmock-script-2.6.0.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/opt/eclipse/plugins/org.junit_4.11.0.v201303080030/junit.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/opt/eclipse/plugins/org.jactr.io_2.0.0.201507141147 for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/opt/eclipse/plugins/org.jactr.io_2.0.0.201507141147/lib/antlr-3.1.1.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/opt/eclipse/plugins/org.jactr.tools_2.0.0.201509281524/tools.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/opt/eclipse/plugins/org.jactr.tools_2.0.0.201509281524/lib/commons-math-2.1.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/opt/eclipse/plugins/org.commonreality.api_2.0.0.201509251143.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/opt/eclipse/plugins/org.commonreality.core_2.0.0.201509251143.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/opt/eclipse/plugins/org.commonreality.time_2.0.0.201509251143.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/opt/eclipse/plugins/org.commonreality.sensors_2.0.0.201507141147.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/opt/eclipse/plugins/org.commonreality.modalities_1.0.0.201509251143.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/opt/eclipse/plugins/org.jactr.modules.temporal_1.0.0.201507131128.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/opt/eclipse/plugins/org.commonreality.support_1.0.0.201508181348.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.commonreality.support_1.0.0.201508181348/lib/commons-logging-1.1.1.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.commonreality.support_1.0.0.201508181348/lib/javolution.jar for project [jactr-generator]].libraryclasspath"/>
+    <path id="Persisted container [/work/research/lang-production/edu.psu.acs.lang/bin for project [jactr-generator]].libraryclasspath"/>
     <path id="Plug-in Dependencies.libraryclasspath">
-        <pathelement location="${ECLIPSE_HOME}plugins/org.jactr_2.0.0.201510231004.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.jactr.support_1.2.2.201507141147.jar"/>
+        <pathelement location="../../../../home/jrc436/.eclipse/org.eclipse.platform_4.5.1_1473617060_linux_gtk_x86_64/plugins/org.jactr_2.1.0.201603301245.jar"/>
+        <pathelement location="../../../../home/jrc436/.eclipse/org.eclipse.platform_4.5.1_1473617060_linux_gtk_x86_64/plugins/org.jactr.support_1.2.2.201507141147.jar"/>
         <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/org/jactr/commons-primitives-1.0.jar"/>
         <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/org/commons-logging-1.1.1.jar"/>
         <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/javolution.jar"/>
@@ -25,29 +57,100 @@
         <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/jmock/jmock-legacy-2.6.0.jar"/>
         <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/jmock/jmock-script-2.6.0.jar"/>
         <pathelement location="${ECLIPSE_HOME}plugins/org.apache.log4j_1.2.15.v201012070815.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.junit_4.11.0.v201303080030/junit.jar"/>
+        <pathelement location="${ECLIPSE_HOME}plugins/org.junit_4.12.0.v201504281640/junit.jar"/>
         <pathelement location="${ECLIPSE_HOME}plugins/org.hamcrest.core_1.3.0.v201303031735.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.jactr.io_2.0.0.201507141147"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.jactr.io_2.0.0.201507141147/lib/antlr-3.1.1.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.jactr.tools_2.0.0.201509281524/tools.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.jactr.tools_2.0.0.201509281524/lib/commons-math-2.1.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.commonreality.api_2.0.0.201509251143.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.commonreality.core_2.0.0.201509251143.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.commonreality.time_2.0.0.201509251143.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.commonreality.sensors_2.0.0.201507141147.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.commonreality.modalities_1.0.0.201509251143.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.jactr.modules.temporal_1.0.0.201507131128.jar"/>
-        <pathelement location="${ECLIPSE_HOME}plugins/org.commonreality.support_1.0.0.201508181348.jar"/>
-        <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.commonreality.support_1.0.0.201508181348/lib/commons-logging-1.1.1.jar"/>
-        <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.commonreality.support_1.0.0.201508181348/lib/javolution.jar"/>
+        <pathelement location="../../../../home/jrc436/.eclipse/org.eclipse.platform_4.5.1_1473617060_linux_gtk_x86_64/plugins/org.jactr.io_2.0.0.201507141147"/>
+        <pathelement location="../../../../home/jrc436/.eclipse/org.eclipse.platform_4.5.1_1473617060_linux_gtk_x86_64/plugins/org.jactr.io_2.0.0.201507141147/lib/antlr-3.1.1.jar"/>
+        <pathelement location="../../../../home/jrc436/.eclipse/org.eclipse.platform_4.5.1_1473617060_linux_gtk_x86_64/plugins/org.jactr.tools_2.0.0.201603082109/tools.jar"/>
+        <pathelement location="../../../../home/jrc436/.eclipse/org.eclipse.platform_4.5.1_1473617060_linux_gtk_x86_64/plugins/org.jactr.tools_2.0.0.201603082109/lib/commons-math-2.1.jar"/>
+        <pathelement location="../../../../home/jrc436/.eclipse/org.eclipse.platform_4.5.1_1473617060_linux_gtk_x86_64/plugins/org.commonreality.api_1.0.0.201507101408.jar"/>
+        <pathelement location="../../../../home/jrc436/.eclipse/org.eclipse.platform_4.5.1_1473617060_linux_gtk_x86_64/plugins/org.commonreality.core_1.2.8.201507072003.jar"/>
+        <pathelement location="../../../../home/jrc436/.eclipse/org.eclipse.platform_4.5.1_1473617060_linux_gtk_x86_64/plugins/org.commonreality.time_1.0.0.201507101408.jar"/>
+        <pathelement location="../../../../home/jrc436/.eclipse/org.eclipse.platform_4.5.1_1473617060_linux_gtk_x86_64/plugins/org.commonreality.sensors_1.0.0.201507101340.jar"/>
+        <pathelement location="../../../../home/jrc436/.eclipse/org.eclipse.platform_4.5.1_1473617060_linux_gtk_x86_64/plugins/org.commonreality.modalities_1.0.0.201507072003.jar"/>
+        <pathelement location="../../../../home/jrc436/.eclipse/org.eclipse.platform_4.5.1_1473617060_linux_gtk_x86_64/plugins/org.commonreality.support_1.0.0.201507131128.jar"/>
+        <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.commonreality.support_1.0.0.201507131128/lib/commons-logging-1.1.1.jar"/>
+        <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.commonreality.support_1.0.0.201507131128/lib/javolution.jar"/>
     </path>
-    <path id="edu.psu.acs.lang.classpath">
+    <path id="jactr-production.classpath">
+        <pathelement location="${jactr-production.location}/bin"/>
         <path refid="Plug-in Dependencies.libraryclasspath"/>
-        <pathelement location="${edu.psu.acs.lang.location}/bin"/>
+    </path>
+    <path id="actup-realizer.classpath">
+        <pathelement location="${actup-realizer.location}/bin"/>
+        <pathelement location="${actup-realizer.location}/lib/ant-contrib.jar"/>
+        <pathelement location="${actup-realizer.location}/lib/ant-junit.jar"/>
+        <pathelement location="${actup-realizer.location}/lib/ant-junit4.jar"/>
+        <pathelement location="${actup-realizer.location}/lib/ant-launcher.jar"/>
+        <pathelement location="${actup-realizer.location}/lib/ant.jar"/>
+        <pathelement location="${actup-realizer.location}/lib/javacc.jar"/>
+        <pathelement location="${actup-realizer.location}/lib/jdom.jar"/>
+        <pathelement location="${actup-realizer.location}/lib/jgrapht-jdk1.6.jar"/>
+        <pathelement location="${actup-realizer.location}/lib/jopt-simple.jar"/>
+        <pathelement location="${actup-realizer.location}/lib/junit-4.10.jar"/>
+        <pathelement location="${actup-realizer.location}/lib/serializer.jar"/>
+        <pathelement location="${actup-realizer.location}/lib/trove.jar"/>
+        <pathelement location="${actup-realizer.location}/lib/xalan.jar"/>
+        <pathelement location="${actup-realizer.location}/lib/xercesImpl.jar"/>
+        <pathelement location="${actup-realizer.location}/lib/xml-apis.jar"/>
+        <pathelement location="${actup-realizer.location}/lib/xsltc.jar"/>
+    </path>
+    <path id="Sociolinguistics.classpath">
+        <pathelement location="${Sociolinguistics.location}/bin"/>
+        <pathelement location="${Sociolinguistics.location}/lib/ejml.jar"/>
+        <pathelement location="${Sociolinguistics.location}/lib/ejml.src.zip"/>
+        <pathelement location="${Sociolinguistics.location}/lib/javax.json.jar"/>
+        <pathelement location="${Sociolinguistics.location}/lib/javax.json.src.jar"/>
+        <pathelement location="${Sociolinguistics.location}/lib/joda-time.jar"/>
+        <pathelement location="${Sociolinguistics.location}/lib/joda-time.src.jar"/>
+        <pathelement location="${Sociolinguistics.location}/lib/jollyday.jar"/>
+        <pathelement location="${Sociolinguistics.location}/lib/jollyday.src.jar"/>
+        <pathelement location="${Sociolinguistics.location}/lib/protobuf.jar"/>
+        <pathelement location="${Sociolinguistics.location}/lib/slf4j-api.jar"/>
+        <pathelement location="${Sociolinguistics.location}/lib/slf4j-simple.jar"/>
+        <pathelement location="${Sociolinguistics.location}/lib/stanford.corenlp.jar"/>
+        <pathelement location="${Sociolinguistics.location}/lib/stanford.corenlp.javadoc.jar"/>
+        <pathelement location="${Sociolinguistics.location}/lib/stanford.corenlp.models.jar"/>
+        <pathelement location="${Sociolinguistics.location}/lib/stanford.corenlp.src.jar"/>
+        <pathelement location="${Sociolinguistics.location}/lib/xom.jar"/>
+        <pathelement location="${Sociolinguistics.location}/lib/xom.src.jar"/>
     </path>
     <path id="jactr-generator.classpath">
         <pathelement location="bin"/>
-        <path refid="edu.psu.acs.lang.classpath"/>
+        <path refid="Persisted container [/work/research/lang-production/jactr-generator/bin for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/opt/eclipse/plugins/org.jactr_2.0.0.201510231004.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/opt/eclipse/plugins/org.jactr.support_1.2.2.201507141147.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/org/jactr/commons-primitives-1.0.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/org/commons-logging-1.1.1.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/javolution.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/jscience.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/org/jactr/commons-lang-2.5.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/org/jactr/commons-cli-1.2.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/org/jactr/commons-collections-3.2.1.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/jmock/jmock-2.6.0.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/jmock/jmock-junit4-2.6.0.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/jmock/jmock-legacy-2.6.0.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.jactr.support_1.2.2.201507141147/lib/jmock/jmock-script-2.6.0.jar for project [jactr-generator]].libraryclasspath"/>
+        <pathelement location="../../../../opt/eclipse/plugins/org.apache.log4j_1.2.15.v201012070815.jar"/>
+        <path refid="Persisted container [/opt/eclipse/plugins/org.junit_4.11.0.v201303080030/junit.jar for project [jactr-generator]].libraryclasspath"/>
+        <pathelement location="../../../../opt/eclipse/plugins/org.hamcrest.core_1.3.0.v201303031735.jar"/>
+        <path refid="Persisted container [/opt/eclipse/plugins/org.jactr.io_2.0.0.201507141147 for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/opt/eclipse/plugins/org.jactr.io_2.0.0.201507141147/lib/antlr-3.1.1.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/opt/eclipse/plugins/org.jactr.tools_2.0.0.201509281524/tools.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/opt/eclipse/plugins/org.jactr.tools_2.0.0.201509281524/lib/commons-math-2.1.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/opt/eclipse/plugins/org.commonreality.api_2.0.0.201509251143.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/opt/eclipse/plugins/org.commonreality.core_2.0.0.201509251143.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/opt/eclipse/plugins/org.commonreality.time_2.0.0.201509251143.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/opt/eclipse/plugins/org.commonreality.sensors_2.0.0.201507141147.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/opt/eclipse/plugins/org.commonreality.modalities_1.0.0.201509251143.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/opt/eclipse/plugins/org.jactr.modules.temporal_1.0.0.201507131128.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/opt/eclipse/plugins/org.commonreality.support_1.0.0.201508181348.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.commonreality.support_1.0.0.201508181348/lib/commons-logging-1.1.1.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.commonreality.support_1.0.0.201508181348/lib/javolution.jar for project [jactr-generator]].libraryclasspath"/>
+        <path refid="Persisted container [/work/research/lang-production/edu.psu.acs.lang/bin for project [jactr-generator]].libraryclasspath"/>
+        <path refid="jactr-production.classpath"/>
+        <path refid="actup-realizer.classpath"/>
+        <path refid="Sociolinguistics.classpath"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -61,11 +164,23 @@
         <delete dir="bin"/>
     </target>
     <target depends="clean" name="cleanall">
-        <ant antfile="build.xml" dir="${edu.psu.acs.lang.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${Sociolinguistics.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${actup-realizer.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${jactr-production.location}" inheritAll="false" target="clean"/>
     </target>
     <target depends="build-subprojects,build-project" name="build"/>
     <target name="build-subprojects">
-        <ant antfile="build.xml" dir="${edu.psu.acs.lang.location}" inheritAll="false" target="build-project">
+        <ant antfile="build.xml" dir="${Sociolinguistics.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${actup-realizer.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${jactr-production.location}" inheritAll="false" target="build-project">
             <propertyset>
                 <propertyref name="build.compiler"/>
             </propertyset>
@@ -78,7 +193,14 @@
             <classpath refid="jactr-generator.classpath"/>
         </javac>
     </target>
-    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects">
+        <ant antfile="build.xml" dir="${evaluators.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${evaluators.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
     <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
         <copy todir="${ant.library.dir}">
             <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
@@ -92,15 +214,34 @@
         <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
         <antcall target="build"/>
     </target>
-    <target name="ModelCreator">
-        <java classname="edu.psu.acs.lang.gen.ModelCreator" failonerror="true" fork="yes">
-            <jvmarg line="-Xmx3g"/>
+    <target name="ModelWriter">
+        <java classname="edu.psu.acs.lang.gen.ModelWriter" failonerror="true" fork="yes">
             <classpath refid="jactr-generator.classpath"/>
         </java>
     </target>
-    <target name="ModelWriter">
-        <java classname="edu.psu.acs.lang.gen.ModelWriter" failonerror="true" fork="yes">
-            <jvmarg line="-Xmx3g"/>
+    <target name="GarbleScorer">
+        <java classname="edu.psu.acs.lang.output.GarbleScorer" failonerror="true" fork="yes">
+            <jvmarg line="-Xmx8g"/>
+            <classpath refid="jactr-generator.classpath"/>
+        </java>
+    </target>
+    <target name="CalculateBranching">
+        <java classname="edu.psu.acs.lang.output.tree.CalculateBranching" failonerror="true" fork="yes">
+            <classpath refid="jactr-generator.classpath"/>
+        </java>
+    </target>
+    <target name="MemoryEvaluation">
+        <java classname="edu.psu.acs.lang.output.mem.MemoryEvaluation" failonerror="true" fork="yes">
+            <classpath refid="jactr-generator.classpath"/>
+        </java>
+    </target>
+    <target name="ExperimentPreprocessor">
+        <java classname="edu.psu.acs.lang.gen.ExperimentPreprocessor" failonerror="true" fork="yes">
+            <classpath refid="jactr-generator.classpath"/>
+        </java>
+    </target>
+    <target name="ExperimentProcessor">
+        <java classname="edu.psu.acs.lang.gen.ExperimentProcessor" failonerror="true" fork="yes">
             <classpath refid="jactr-generator.classpath"/>
         </java>
     </target>

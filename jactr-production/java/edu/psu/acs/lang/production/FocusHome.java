@@ -3,10 +3,10 @@ package edu.psu.acs.lang.production;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.psu.acs.lang.RunConsts;
 import edu.psu.acs.lang.declarative.ChunkTypeEnum;
 import edu.psu.acs.lang.declarative.ISlot;
 import edu.psu.acs.lang.declarative.SlotVar;
+import edu.psu.acs.lang.settings.EvaluationConsts;
 
 public class FocusHome extends ProductionRule {
 	
@@ -19,6 +19,6 @@ public class FocusHome extends ProductionRule {
 		this.requireRetrieval(slots, ChunkTypeEnum.sentence); //will only focus a goal with its goal not dead
 		SlotVar sv = new SlotVar("retrieval");
 		changeGoal(sv.toString(), new ArrayList<ISlot>(), true);
-		this.addOutput(RunConsts.newGoal+": "+sv.toString());
+		this.addOutput(EvaluationConsts.newGoal+": "+sv.toString());
 	}
 }

@@ -8,11 +8,13 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import edu.psu.acs.lang.RunConsts;
 import edu.psu.acs.lang.hook.UtilityInitialization;
 import edu.psu.acs.lang.output.tree.GarbleTree;
+import edu.psu.acs.lang.settings.EvaluationConsts;
 
 public class OutputReader {
+
+	
 //	public static void translateToText(UtilityInitialization ui) throws IOException {
 //		FileWriter fw = new FileWriter(RunConsts.getOutSentencesFilePath(ui).toFile());
 //		List<OutputSentence> all = OutputReader.getAllSentences(ui);
@@ -37,7 +39,7 @@ public class OutputReader {
 	public static boolean doubleCheck() {
 		boolean check = false;
 		for (UtilityInitialization ui : UtilityInitialization.values()) {
-			List<OutputSentence> os = OutputReader.getAllSentences(RunConsts.getAllOutputFiles(ui));
+			List<OutputSentence> os = OutputReader.getAllSentences(EvaluationConsts.getAllOutputFiles(ui));
 			List<String> fragSentences = fragSentences(os);
 			List<String> treeSentences = treeSentences(os);
 			if (fragSentences.size() != treeSentences.size()) {
@@ -78,13 +80,13 @@ public class OutputReader {
 			List<String> fragments = gf.getFragments();
 			String outline = "";
 			for (String f : fragments) {
-				outline += f + RunConsts.fragDelim;
+				outline += f + EvaluationConsts.fragDelim;
 			}
 			if (outline.isEmpty()) {
 				System.err.println("No Fragments found");
 			}
 			else {
-				outline = outline.substring(0, outline.length()-RunConsts.fragDelim.length());
+				outline = outline.substring(0, outline.length()-EvaluationConsts.fragDelim.length());
 			}
 			lines.add(outline);
 		}
@@ -97,20 +99,20 @@ public class OutputReader {
 			List<String> fragments = gf.getFragments();
 			String outline = "";
 			for (String f : fragments) {
-				outline += f + RunConsts.fragDelim;
+				outline += f + EvaluationConsts.fragDelim;
 			}
 			if (outline.isEmpty()) {
 				System.err.println("No Fragments found");
 			}
 			else {
-				outline = outline.substring(0, outline.length()-RunConsts.fragDelim.length());
+				outline = outline.substring(0, outline.length()-EvaluationConsts.fragDelim.length());
 			}
 			lines.add(outline);
 		}
 		return lines;
 	}
 	public static List<String> getFragments(String garbSentence) {
-		return Arrays.asList(garbSentence.split(RunConsts.fragDelim));
+		return Arrays.asList(garbSentence.split(EvaluationConsts.fragDelim));
 	}
 //	public static List<OutputSentence> getAllSentences(UtilityInitialization ui) {
 //		List<OutputSentence> output = new ArrayList<OutputSentence>();
@@ -148,15 +150,15 @@ public class OutputReader {
 		while (index < output.size()) {
 			//hack but should work
 			String outLine = output.get(index).substring(output.get(index).lastIndexOf(')')+2); 
-			if (outLine.equals(RunConsts.sentenceDelimiter)) {
+			if (outLine.equals(EvaluationConsts.sentenceDelimiter)) {
 				//System.out.println("Starting new File");
 				index++;
 				continue;
 			}
-			if (RunConsts.goalLine(outLine)) {
+			if (EvaluationConsts.goalLine(outLine)) {
 				// great!
 				bastardGoal = false;
-				if (RunConsts.bastardGoal(outLine)) {
+				if (EvaluationConsts.bastardGoal(outLine)) {
 					bastardGoal = true;
 				}
 				index++;
@@ -173,7 +175,7 @@ public class OutputReader {
 				break;
 			}
 			String newOutLine = output.get(index).substring(output.get(index).lastIndexOf(')')+2);
-			if (newOutLine.equals(RunConsts.sentenceDelimiter)) {			
+			if (newOutLine.equals(EvaluationConsts.sentenceDelimiter)) {			
 				toReturn.add(os);
 				os = new OutputSentence();
 				index++;

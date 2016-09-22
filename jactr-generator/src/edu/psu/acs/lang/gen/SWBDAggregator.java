@@ -1,13 +1,10 @@
 package edu.psu.acs.lang.gen;
 
-import java.io.File;
-import java.io.FileFilter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,7 +13,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.Stack;
 
-import edu.psu.acs.lang.RunConsts;
 import edu.psu.acs.lang.declarative.CCGType;
 import edu.psu.acs.lang.production.SyntaxRuleType;
 import edu.psu.acs.lang.util.LexNode;
@@ -25,81 +21,105 @@ import edu.psu.acs.lang.util.ParseException;
 import edu.psu.acs.lang.util.ParseNode;
 import edu.psu.acs.lang.util.RuleNode;
 
-public class ModelPreparer {
+public class SWBDAggregator {
 	
 	//private static final Pattern ccgRegex = Pattern.compile("swbd[0-9]+\\.ccg");
 	//private static final Pattern txtRegex = Pattern.compile("swbd[0-9]+\\.txt");
 	
-	private final Path expDir;
-	private final int divisionToUse;
-	private File wordCat;
-	private File typeCat;
-	private final NodeParser p;
+	//private final Path expDir;
+	//private final int divisionToUse;
+	//private File wordCat;
+	//private File typeCat;
+//	private final NodeParser p;
+//	private final Path typesList;
+//	private final Path wordsInfo;
 	private Map<CCGType, Set<CCGType>> equivalences;
-	public ModelPreparer(Path expDir, int divisionToUse) throws IOException, ParseException {
-		this.divisionToUse = divisionToUse;
-		this.expDir = expDir;
-		FileFilter ccgFilter = new FileFilter() { 
-			public boolean accept(File f) {
-				return f.getName().endsWith(".ccg");
-			}
-		};
-		FileFilter txtFilter = new FileFilter() {
-			public boolean accept(File f) {
-				return f.getName().endsWith(".txt");
-			}
-		};
-		catFiles(ccgFilter, txtFilter);
-		p = new NodeParser(typeCat.toPath(), true);
+	private int maxTypes;
+	private int maxWords;
+	public SWBDAggregator() {
+		//this.divisionToUse = divisionToUse;
+		//this.expDir = expDir;
+//		FileFilter ccgFilter = new FileFilter() { 
+//			public boolean accept(File f) {
+//				return f.getName().endsWith(".ccg");
+//			}
+//		};
+//		FileFilter txtFilter = new FileFilter() {
+//			public boolean accept(File f) {
+//				return f.getName().endsWith(".txt");
+//			}
+//		};
+//		catFiles(ccgFilter, txtFilter, swordCat, stypeCat);
+//		this.sentFile = sentFile;
+//		this.annoFile = annoFile;
+//		this.typesList = typesList;
+//		this.wordsInfo = wordsInfo;
+//		p = new NodeParser(annoFile, true);
 		equivalences = new HashMap<CCGType, Set<CCGType>>();
-		recreateTypeFile();
+//		recreateTypeFile();
 	}
-	private int catFiles(FileFilter ccgFilter, FileFilter txtFilter) throws IOException {
-		List<String> lines = new ArrayList<String>();
-		List<String> tlines = new ArrayList<String>();
-		File[] files = expDir.toFile().listFiles(txtFilter);
-		Arrays.sort(files);
-		File[] tfiles = expDir.toFile().listFiles(ccgFilter);
-		Arrays.sort(tfiles);
-		if (files.length != tfiles.length) {
-			System.err.println("Files: "+files.length+"; tfiles: "+tfiles.length);
-			for (int j = 0; j < Math.max(files.length, tfiles.length); j++) {
-				if (j < files.length && j >= tfiles.length) {
-					System.err.println("Files"+j+": "+files[j]+"Tfiles"+j+": "+"None");
-					break;
-				}
-				else if (j < tfiles.length && j >= files.length) {
-					System.err.println("Files"+j+": "+"None"+"Tfiles"+j+": "+tfiles[j]);
-					break;
-				}
-				else if (files[j] != tfiles[j]) {
-					System.err.println("Files"+j+": "+files[j]+"Tfiles"+j+": "+tfiles[j]);
-					break;
-				}
-			}
+	public int getMaxTypes() {
+		return maxTypes;
+	}
+	public int getMaxWords() {
+		return maxWords;
+	}
+//	private int catFiles(FileFilter ccgFilter, FileFilter txtFilter, String swordCat, String stypeCat) throws IOException {
+//		List<String> lines = new ArrayList<String>();
+//		List<String> tlines = new ArrayList<String>();
+//		File[] files = expDir.toFile().listFiles(txtFilter);
+//		Arrays.sort(files);
+//		File[] tfiles = expDir.toFile().listFiles(ccgFilter);
+//		Arrays.sort(tfiles);
+//		if (files.length != tfiles.length) {
+//			System.err.println("Files: "+files.length+"; tfiles: "+tfiles.length);
+//			for (int j = 0; j < Math.max(files.length, tfiles.length); j++) {
+//				if (j < files.length && j >= tfiles.length) {
+//					System.err.println("Files"+j+": "+files[j]+"Tfiles"+j+": "+"None");
+//					break;
+//				}
+//				else if (j < tfiles.length && j >= files.length) {
+//					System.err.println("Files"+j+": "+"None"+"Tfiles"+j+": "+tfiles[j]);
+//					break;
+//				}
+//				else if (files[j] != tfiles[j]) {
+//					System.err.println("Files"+j+": "+files[j]+"Tfiles"+j+": "+tfiles[j]);
+//					break;
+//				}
+//			}
+//			System.exit(1);
+//		}
+//		lines.addAll(Files.readAllLines(files[divisionToUse].toPath()));
+//		tlines.addAll(Files.readAllLines(tfiles[divisionToUse].toPath()));
+//		
+//		
+//		wordCat = expDir.resolve(swordCat).toFile();
+//		typeCat = expDir.resolve(stypeCat).toFile();
+//		
+//		FileWriter fwword = new FileWriter(wordCat);
+//		for (String line : lines) {
+//			fwword.write(line+System.getProperty("line.separator"));
+//		}
+//		fwword.close();
+//		
+//		FileWriter fwtype = new FileWriter(typeCat);
+//		for (String line : tlines) {
+//			fwtype.write(line+System.getProperty("line.separator"));
+//		}
+//		fwtype.close();
+//		return lines.size();
+//	}
+	public NodeParser getNodeParser(Path baseAnnoFile) {
+		try {
+			return new NodeParser(baseAnnoFile, true);
+		} catch (ParseException e) {
+			System.err.println("Error parsing");
+			e.printStackTrace();
 			System.exit(1);
 		}
-		lines.addAll(Files.readAllLines(files[divisionToUse].toPath()));
-		tlines.addAll(Files.readAllLines(tfiles[divisionToUse].toPath()));
-		
-		
-		wordCat = expDir.resolve(RunConsts.wordCat).toFile();
-		typeCat = expDir.resolve(RunConsts.typeCat).toFile();
-		
-		FileWriter fwword = new FileWriter(wordCat);
-		for (String line : lines) {
-			fwword.write(line+System.getProperty("line.separator"));
-		}
-		fwword.close();
-		
-		FileWriter fwtype = new FileWriter(typeCat);
-		for (String line : tlines) {
-			fwtype.write(line+System.getProperty("line.separator"));
-		}
-		fwtype.close();
-		return lines.size();
+		return null;
 	}
-	private void recreateTypeFile() throws IOException {
+	public void recreateTypeFile(NodeParser p, Path runAnnoPath) throws IOException {
 		List<ParseNode> parse = p.getTops();
 		for (ParseNode n : parse) {
 			Stack<ParseNode> s = new Stack<ParseNode>();
@@ -114,7 +134,7 @@ public class ModelPreparer {
 					s.push(rcur.getRightChild());				
 				}
 			}
-			FileWriter fwtype = new FileWriter(typeCat);
+			FileWriter fwtype = new FileWriter(runAnnoPath.toFile());
 			fwtype.write(p.toString());
 			fwtype.close();
 		}
@@ -166,9 +186,9 @@ public class ModelPreparer {
 		}
 		return rn;
 	}
-	public int createTypes() throws IOException {
-		List<String> lines = Files.readAllLines(this.expDir.resolve(RunConsts.wordsFName));
-		FileWriter write = new FileWriter(this.expDir.resolve(RunConsts.typesFName).toFile());
+	public int createTypesList(Path wordsInfo, Path typesList) throws IOException {
+		List<String> lines = Files.readAllLines(wordsInfo);
+		FileWriter write = new FileWriter(typesList.toFile());
 		Set<String> types = new HashSet<String>();
 		int maxtypes = 0;
 		for (String line : lines) {
@@ -183,11 +203,12 @@ public class ModelPreparer {
 		for (String type : types) {
 			write.write(type+"\n");
 		}
-		write.close();	
+		write.close();
+		this.maxTypes = maxtypes;
 		return maxtypes;
 	}
-	public int maxWordsPerSentence() throws IOException {
-		List<String> lines = Files.readAllLines(wordCat.toPath());
+	private int maxWordsPerSentence(Path sentFile) throws IOException {
+		List<String> lines = Files.readAllLines(sentFile);
 		
 		int toReturn = 0;
 		for (String line : lines) {
@@ -207,9 +228,9 @@ public class ModelPreparer {
 	 * @return returns the maximum number of words in a sentence
 	 * @throws IOException if any of the files given in CCGPaths aren't valid
 	 */
-	public void createWords(String delimiter) throws IOException {
+	public int createWords(NodeParser p, String delimiter, Path wordsInfo, Path sentFile) throws IOException {
 		//first, we'll just grab the word and make a list of all of their types so that we have a clear idea
-		Path writePath = this.expDir.resolve(RunConsts.wordsFName);
+		Path writePath = wordsInfo;
 		FileWriter write = new FileWriter(writePath.toFile());
 		HashMap<String, Set<String>> map = new HashMap<String, Set<String>>();
 		
@@ -267,6 +288,9 @@ public class ModelPreparer {
 			write.write(toWrite);
 		}
 		write.close();
+		int maxwords = this.maxWordsPerSentence(sentFile);
+		this.maxWords = maxwords;
+		return maxwords;
 	}
 	private void addEquivalences(Set<String> types) {
 		for (CCGType s : equivalences.keySet()) {
@@ -289,72 +313,3 @@ public class ModelPreparer {
 	//or false. The CONJ rule's result if it's with two of the same types is to set that flag to false. If it's with some type and the CONJ type
 	//it's to set that flag to true.
 }
-//for (String line : lines) {
-//int start = line.indexOf('{');
-//int end = line.indexOf('}');
-//if (start == -1 || end == -1) {
-//	continue;
-//}
-//String fragment = line.substring(start, end);
-//String[] wordParts = fragment.split(" ");
-//
-////we have some kind of embedded bullshit. Most likely just have to move the starter pointer up
-//while (wordParts.length > 4) {
-//	fragment = fragment.substring(1);
-//	int newStart = fragment.indexOf('{');
-//	fragment = fragment.substring(newStart);
-//	wordParts = fragment.split(" ");
-//}
-//List<String> parts = new ArrayList<String>(Arrays.asList(wordParts));
-//parts.remove("");
-//if (parts.contains(" ")) {
-//	parts.remove(" ");
-//	
-//}
-//
-////ok, now we most likely either have a type raise operation or we have a just a word with its type.
-//
-////a "just in case" measure, if I forgot something
-//if (parts.size() == 1) {
-//	System.err.println("No spaces in fragment, printing and exiting:");
-//	System.err.println(wordParts[0]);
-//	System.exit(1);
-//}
-//else if (parts.size() == 3 || (parts.size() == 4 && !parts.get(1).contains("T"))) {
-//	parts = new ArrayList<String>(Arrays.asList(new String[] { parts.get(1), parts.get(2) }));
-//}
-//
-//String secondType = "";
-//String type = "";
-//String word = "";
-//try {
-//	secondType = parts.size() == 4 ? parts.get(2).substring(1) : "";
-//	type = parts.get(0).substring(1);
-//	int wordIndex = parts.size() == 4 ? 3 : 1;
-//	word = parts.get(wordIndex);
-//}
-//catch (Exception e) {
-//	e.printStackTrace();
-//	System.err.println(parts.size());
-//	for (String part : parts) {
-//		System.err.println(part);
-//	}
-//	System.err.println(fragment);
-//	System.exit(1);
-//}
-//word = word.toLowerCase();
-//
-////create or update the typeset
-//Set<String> typeset;
-//if (map.containsKey(word)) {
-//	typeset = map.get(word);
-//}
-//else {
-//	typeset = new HashSet<String>();
-//	map.put(word, typeset);
-//}
-//typeset.add(type);
-//if (secondType != "") {
-//	typeset.add(secondType);
-//}
-//}

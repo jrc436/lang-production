@@ -13,16 +13,15 @@ public class Sentence extends ChunkStore implements SlotValue {
 	 * @param sentence
 	 * @return
 	 */
+	public static int getWorkingMemorySize() {
+		return 5;
+	}
 	public static String getNameConst(int num) {
 		return "sentence"+num;
 	}
 	private final String name;
 	public static Sentence makeSentence(int num, List<String> wordBag, int maxtypes, int maxNumWords) {
 		List<Slot> slots = new ArrayList<Slot>();
-//		slots.add(new Slot(new SSlotName(SSlotNameEnum.FullType), new NullValue()));
-//		slots.add(new Slot(new SSlotName(SSlotNameEnum.LeftFullType), new NullValue()));
-//		slots.add(new Slot(new SSlotName(SSlotNameEnum.RightFullType), new NullValue()));
-//		slots.add(new Slot(new SSlotName(SSlotNameEnum.Combinator), new NullValue()));
 		for (int i = 1; i <= maxNumWords; i++) {
 			int k = i-1;
 			if (k < wordBag.size()) {
@@ -31,7 +30,9 @@ public class Sentence extends ChunkStore implements SlotValue {
 			else {
 				//blank out all the ones it doesn't have a word for.
 				slots.add(new Slot(new SSlotName(SSlotNameEnum.WordSem, i, maxNumWords), new NullValue()));
-			}
+			}			
+		}
+		for (int i = 1; i <= getWorkingMemorySize(); i++) {
 			slots.add(new Slot(new SSlotName(SSlotNameEnum.LexsynString, i, maxNumWords), new NullValue()));
 			for (int j = 1; j <= maxtypes; j++) {
 				slots.add(new Slot(new SSlotName(SSlotNameEnum.LexsynFullType, i, maxNumWords, j, maxtypes), new NullValue()));

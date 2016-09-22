@@ -1,4 +1,4 @@
-package edu.psu.acs.lang;
+package edu.psu.acs.lang.core;
 
 import java.util.List;
 

@@ -3,7 +3,7 @@ package edu.psu.acs.lang.declarative;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.psu.acs.lang.IModelElement;
+import edu.psu.acs.lang.core.IModelElement;
 
 public class ChunkStore implements IModelElement, SlotValue {
 	/**

@@ -6,7 +6,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Stack;
 
 import edu.psu.acs.lang.declarative.CCGCompoundType;
@@ -35,7 +39,7 @@ import edu.psu.acs.lang.production.SyntaxRuleType;
 		
 		//We can then feed the system back in and inverse it so it makes more sense.
 public class NodeParser {
-	private List<ParseNode> topNodes;
+	private final List<ParseNode> topNodes;
 	private final boolean alternateSeperators;
 	public List<ParseNode> getTops() {
 		return new ArrayList<ParseNode>(topNodes);
@@ -46,6 +50,21 @@ public class NodeParser {
 			retval += pn.toString() + System.lineSeparator();
 		}
 		return retval;
+	}
+	public NodeParser(List<String> ccgTerms, boolean originalFiles) throws ParseException {
+		this.alternateSeperators = !originalFiles;
+		this.topNodes = new ArrayList<ParseNode>();
+		for (String s : ccgTerms) {
+			List<String> lines = Arrays.asList(s.split(System.getProperty("line.separator")));
+			this.topNodes.addAll(popTops(lines));
+		}
+	}
+	public NodeParser(String file, boolean originalFiles) throws ParseException {
+		this(Paths.get(file), originalFiles);
+	}
+	public NodeParser(NodeParser np) {
+		this.topNodes = new ArrayList<ParseNode>(np.topNodes);
+		this.alternateSeperators = np.alternateSeperators;
 	}
 	public NodeParser(Path path, boolean originalFiles) throws ParseException {
 		this.alternateSeperators = !originalFiles;		
@@ -58,10 +77,10 @@ public class NodeParser {
 			System.err.println("Closing...");
 			System.exit(1);
 		}
-		popTops(lines);
+		topNodes = popTops(lines);
 	}
-	private void popTops(List<String> lines) throws ParseException {
-		topNodes = new ArrayList<ParseNode>();
+	private List<ParseNode> popTops(List<String> lines) throws ParseException {
+		List<ParseNode> topNodes = new ArrayList<ParseNode>();
 		boolean skipNext = false;
 		for (int i = 0; i < lines.size(); i++) {
 			String line = lines.get(i);
@@ -87,6 +106,7 @@ public class NodeParser {
 				}
 			}
 		}
+		return topNodes;
 	}
 	public static boolean testPurity(String ccgTerms) {
 		NodeParser p = null;
@@ -119,6 +139,52 @@ public class NodeParser {
 		}
 		return false;
 	}
+	public static Map<String, Set<CCGType>> wordTypes(String ccgTerms) {
+		NodeParser p = null;
+		try {
+			List<String> s = new ArrayList<String>();
+			s.add(ccgTerms);
+			p = new NodeParser(s, true);
+		}
+		catch (ParseException pe) {
+			System.err.println(pe.getMessage());
+			return null;
+		}
+		return p.wordTypes();
+	}
+	public Map<String, Set<CCGType>> wordTypes() {
+		Map<String, Set<CCGType>> wordtypes = new HashMap<String, Set<CCGType>>();
+		for (ParseNode n : this.getTops()) {
+			Stack<ParseNode> s = new Stack<ParseNode>();
+			s.push(n);
+			while (!s.empty()) {
+				ParseNode cur = s.pop();
+				String key = null;
+				CCGType val = null;
+				if (cur instanceof RuleNode) {
+					RuleNode rcur = (RuleNode) cur;
+					if (!checkUnsupportedTypeRaise(cur) && (rcur.getRule() == SyntaxRuleType.TCR || rcur.getRule() == SyntaxRuleType.TypeRaise || rcur.getRule() == SyntaxRuleType.TPC)) {
+						key = rcur.getPhrase();
+						val = rcur.getType();
+					}
+					s.push(rcur.getLeftChild());
+					s.push(rcur.getRightChild());
+				}
+				else if (cur instanceof LexNode) {
+					LexNode lcur = (LexNode) cur;
+					key = lcur.getPhrase();
+					val = lcur.getType();
+				}
+				if (key != null) {
+					if (!wordtypes.containsKey(key)) {
+						wordtypes.put(key, new HashSet<CCGType>());
+					}
+					wordtypes.get(key).add(val);
+				}
+			}
+		}
+		return wordtypes;
+	}
 	private static boolean checkUnsupportedTypeRaise(ParseNode pn) {
 		if (!(pn instanceof RuleNode)) {
 			return false;
@@ -128,6 +194,9 @@ public class NodeParser {
 			return false;
 		}
 		if (rn.getRule() == SyntaxRuleType.TypeRaise || rn.getRule() == SyntaxRuleType.TCR || rn.getRule() == SyntaxRuleType.TPC) {
+			if (rn.getPhrase().contains(" ") && (rn.getLeftChild() == null || rn.getLeftChild() instanceof LexNode) && (rn.getRightChild() == null || rn.getRightChild() instanceof LexNode)) {
+				return true;
+			}
 			if (rn.getLeftChild() instanceof RuleNode) {
 				return doubleCheck(rn);
 			}
@@ -147,16 +216,7 @@ public class NodeParser {
 		}
 		return allTypeRaise;
 	}
-	public NodeParser(List<String> ccgTerms, boolean originalFiles) throws ParseException {
-		this.alternateSeperators = !originalFiles;
-		for (String s : ccgTerms) {
-			List<String> lines = Arrays.asList(s.split(System.getProperty("line.separator")));
-			popTops(lines);
-		}
-	}
-	public NodeParser(String file, boolean originalFiles) throws ParseException {
-		this(Paths.get(file), originalFiles);
-	}
+	
 	private ParseNode getNode(String node) throws ParseException {
 		node = node.trim();
 		if (node.charAt(0) != '{' && node.charAt(node.length()-1) != '}') {

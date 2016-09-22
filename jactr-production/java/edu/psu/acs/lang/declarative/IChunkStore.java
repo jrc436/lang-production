@@ -2,7 +2,7 @@ package edu.psu.acs.lang.declarative;
 
 import java.util.List;
 
-import edu.psu.acs.lang.IModelElement;
+import edu.psu.acs.lang.core.IModelElement;
 
 /**
  * This is a system for generating chunks for a model. They are stored as java first, which then generates the XML for the model.

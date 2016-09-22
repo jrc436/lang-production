@@ -17,8 +17,8 @@ public abstract class SyntaxRule extends ProductionRule {
 		return rightJustAdded ? rightString + " " + rightOf + " " + leftString : leftString + " " + leftOf + " " + rightString;
 	}
 	
-	public SyntaxRule(SyntaxRuleType typ, int leftNum, int leftTypeNum, int rightNum, int rightTypeNum, int maxwords, int maxtypes) {
-		super(typ.getName()+String.format("%0"+String.valueOf(maxwords).length()+"d", leftNum)+"-"+String.format("%0"+String.valueOf(maxtypes).length()+"d", leftTypeNum)+"--"+String.format("%0"+String.valueOf(maxwords).length()+"d", rightNum)+"-"+String.format("%0"+String.valueOf(maxtypes).length()+"d", rightTypeNum));
+	public SyntaxRule(SyntaxRuleType typ, int leftNum, int leftTypeNum, int rightNum, int rightTypeNum, int wmsize, int maxtypes) {
+		super(typ.getName()+String.format("%0"+String.valueOf(wmsize).length()+"d", leftNum)+"-"+String.format("%0"+String.valueOf(maxtypes).length()+"d", leftTypeNum)+"--"+String.format("%0"+String.valueOf(wmsize).length()+"d", rightNum)+"-"+String.format("%0"+String.valueOf(maxtypes).length()+"d", rightTypeNum));
 	}
 	public static CCGType BApp(CCGType left, CCGType right) {
 		if (!(left instanceof CCGCompoundType)) {

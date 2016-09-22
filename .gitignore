@@ -8,6 +8,8 @@ models/
 old-models/
 srilm/lib/
 jactr-production-old/
+rawdata/
+experiments/
 
 *.bash
 

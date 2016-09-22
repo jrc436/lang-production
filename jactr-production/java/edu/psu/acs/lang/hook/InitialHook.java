@@ -11,7 +11,8 @@ import org.jactr.core.model.six.update.UpdateCycleProcessor6;
 import org.jactr.core.production.IProduction;
 import org.jactr.core.runtime.ACTRRuntime;
 
-import edu.psu.acs.lang.RunConsts;
+import edu.psu.acs.lang.settings.ExperimentSettings;
+import edu.psu.acs.lang.settings.ModelRunConsts;
 
 public class InitialHook implements Runnable {
 
@@ -20,10 +21,10 @@ public class InitialHook implements Runnable {
 	 * the models.
 	 */
 	public void run() {
-		UtilityInitialization ui = RunConsts.UI;
+		UtilityInitialization ui = ExperimentSettings.UI;
 		for (IModel m : ACTRRuntime.getRuntime().getModels()) {
 			setCycler(m);
-			initializeUtility(m, ui);
+			//initializeUtility(m, ui);
 			installLogger(m, ui);
 		}
 	}
@@ -77,7 +78,7 @@ public class InitialHook implements Runnable {
 	}
 
 	protected void initializeUtility(IModel model, UtilityInitialization ui) {
-		Map<Integer, Integer> map = getUtilityMap(RunConsts.maxLength, ui);
+		Map<Integer, Integer> map = getUtilityMap(ExperimentSettings.maxLength, ui);
 		try {
 			for (IProduction p : model.getProceduralModule().getProductions().get()) {
 				int index = -1;
@@ -110,7 +111,7 @@ public class InitialHook implements Runnable {
 	protected void installLogger(IModel model, UtilityInitialization ui) {
 		// initializeEarlyUtility(model);
 		DefaultModelLogger dml = new DefaultModelLogger();
-		dml.setParameter("OUTPUT", RunConsts.getOutputFromRuns(ui));
+		dml.setParameter("OUTPUT", ModelRunConsts.getOutputPath(ui));
 		DefaultModelLogger other = new DefaultModelLogger();
 		for (String s : dml.getSetableParameters()) {
 			other.setParameter(s, s.toLowerCase() + ".txt");

@@ -22,6 +22,7 @@ Eclipse-RegisterBuddy: org.apache.commons.logging,
  org.jactr.io,
  org.jactr.support,
  org.jactr.tools
-Export-Package: edu.psu.acs.lang,
+Export-Package: edu.psu.acs.lang.core,
  edu.psu.acs.lang.declarative,
- edu.psu.acs.lang.production
+ edu.psu.acs.lang.production,
+ edu.psu.acs.lang.settings

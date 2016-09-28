@@ -240,4 +240,9 @@
             <classpath refid="jactr-generator.classpath"/>
         </java>
     </target>
+    <target name="GrokExecutor">
+        <java classname="edu.psu.acs.lang.ccg.GrokExecutor" failonerror="true" fork="yes">
+            <classpath refid="jactr-generator.classpath"/>
+        </java>
+    </target>
 </project>

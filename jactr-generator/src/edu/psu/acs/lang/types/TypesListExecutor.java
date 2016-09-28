@@ -6,7 +6,7 @@ import util.sys.Executor;
 public class TypesListExecutor extends Executor<TypesListProcessor, LexsynOrderedList, TypesList> {
 
 	public TypesListExecutor() {
-		super("typeslist", 5, TypesListProcessor.class, LexsynOrderedList.class, TypesList.class);
+		super("typeslist", 12, TypesListProcessor.class, LexsynOrderedList.class, TypesList.class);
 	}
 	public static void main(String[] args) {
 		TypesListExecutor tle = new TypesListExecutor();

@@ -1,15 +1,12 @@
 experiment-models/
-test/
 srilm/lm-corpus
-david/
-data/
-runs/
-models/
 old-models/
 srilm/lib/
 jactr-production-old/
-rawdata/
+jactr-production/models/
+jactr-production/runs/
 experiments/
+rawdata/
 
 *.bash
 

@@ -11,7 +11,12 @@ import edu.psu.acs.lang.production.SyntaxRuleType;
 import util.sys.FileProcessor;
 
 public class CCGParseListGrokker extends FileProcessor<CCGParseList, CCGParseList> {
-
+	public CCGParseListGrokker() {
+		super();
+	}
+	public CCGParseListGrokker(String inpDir, String outDir) {
+		super(inpDir, outDir, new CCGParseList());
+	}
 	@Override
 	public int getNumFixedArgs() {
 		return 0;

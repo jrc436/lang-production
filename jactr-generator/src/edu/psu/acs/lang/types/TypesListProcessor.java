@@ -8,7 +8,9 @@ import edu.psu.acs.lang.lexsyn.LexsynOrderedList;
 import util.sys.FileProcessor;
 
 public class TypesListProcessor extends FileProcessor<LexsynOrderedList, TypesList> {
-
+	public TypesListProcessor(String inpDir, String outDir) {
+		super(inpDir, outDir, new TypesList());
+	}
 	public TypesListProcessor() {
 		super();
 	}

@@ -3,7 +3,7 @@ package edu.psu.acs.lang.lexsyn;
 import java.io.File;
 
 import edu.psu.acs.lang.ccg.CCGParseList;
-import edu.psu.acs.lang.util.ParseException;
+import edu.psu.acs.lang.parsing.ParseException;
 import util.sys.FileProcessor;
 
 public class WordInfoProcessor extends FileProcessor<CCGParseList, LexsynOrderedList> {

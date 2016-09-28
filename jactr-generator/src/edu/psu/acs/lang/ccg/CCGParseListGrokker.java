@@ -3,11 +3,11 @@ package edu.psu.acs.lang.ccg;
 import java.io.File;
 import java.util.Stack;
 
+import edu.psu.acs.lang.parsing.LexNode;
+import edu.psu.acs.lang.parsing.ParseException;
+import edu.psu.acs.lang.parsing.ParseNode;
+import edu.psu.acs.lang.parsing.RuleNode;
 import edu.psu.acs.lang.production.SyntaxRuleType;
-import edu.psu.acs.lang.util.LexNode;
-import edu.psu.acs.lang.util.ParseException;
-import edu.psu.acs.lang.util.ParseNode;
-import edu.psu.acs.lang.util.RuleNode;
 import util.sys.FileProcessor;
 
 public class CCGParseListGrokker extends FileProcessor<CCGParseList, CCGParseList> {

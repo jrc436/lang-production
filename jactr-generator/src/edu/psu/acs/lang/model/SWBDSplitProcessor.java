@@ -3,7 +3,7 @@ package edu.psu.acs.lang.model;
 import java.io.File;
 
 import edu.psu.acs.lang.ccg.CCGParseList;
-import edu.psu.acs.lang.util.ParseException;
+import edu.psu.acs.lang.parsing.ParseException;
 import util.data.BigDataSplitter;
 
 public class SWBDSplitProcessor extends BigDataSplitter<CCGParseList> {

@@ -8,6 +8,7 @@
     <property name="ECLIPSE_HOME" value="../../../../opt/eclipse/"/>
     <property name="evaluators.location" value="../evaluators"/>
     <property name="jactr-generator.location" value="../jactr-generator"/>
+    <property name="Executors.location" value="../Executors"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.8"/>
     <property name="source" value="1.8"/>
@@ -41,25 +42,49 @@
         <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.commonreality.support_1.0.0.201507131128/lib/commons-logging-1.1.1.jar"/>
         <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.commonreality.support_1.0.0.201507131128/lib/javolution.jar"/>
     </path>
+    <path id="Executors.classpath">
+        <pathelement location="${Executors.location}/bin"/>
+        <pathelement location="${Executors.location}/lib/ejml.jar"/>
+        <pathelement location="${Executors.location}/lib/ejml.src.zip"/>
+        <pathelement location="${Executors.location}/lib/javax.json.jar"/>
+        <pathelement location="${Executors.location}/lib/javax.json.src.jar"/>
+        <pathelement location="${Executors.location}/lib/joda-time.jar"/>
+        <pathelement location="${Executors.location}/lib/joda-time.src.jar"/>
+        <pathelement location="${Executors.location}/lib/jollyday.jar"/>
+        <pathelement location="${Executors.location}/lib/jollyday.src.jar"/>
+        <pathelement location="${Executors.location}/lib/protobuf.jar"/>
+        <pathelement location="${Executors.location}/lib/slf4j-api.jar"/>
+        <pathelement location="${Executors.location}/lib/slf4j-simple.jar"/>
+        <pathelement location="${Executors.location}/lib/stanford.corenlp.jar"/>
+        <pathelement location="${Executors.location}/lib/stanford.corenlp.javadoc.jar"/>
+        <pathelement location="${Executors.location}/lib/stanford.corenlp.models.jar"/>
+        <pathelement location="${Executors.location}/lib/stanford.corenlp.src.jar"/>
+        <pathelement location="${Executors.location}/lib/xom.jar"/>
+        <pathelement location="${Executors.location}/lib/xom.src.jar"/>
+    </path>
     <path id="jactr-production.classpath">
         <pathelement location="bin"/>
         <path refid="Plug-in Dependencies.libraryclasspath"/>
+        <path refid="Executors.classpath"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
         <copy includeemptydirs="false" todir="bin">
             <fileset dir="models">
+                <exclude name="**/*.launch"/>
                 <exclude name="**/*.java"/>
             </fileset>
         </copy>
         <copy includeemptydirs="false" todir="bin">
             <fileset dir="java">
+                <exclude name="**/*.launch"/>
                 <exclude name="**/*.java"/>
                 <exclude name="edu/psu/acs/lang/declarative/SentenceManager.java"/>
             </fileset>
         </copy>
         <copy includeemptydirs="false" todir="bin">
             <fileset dir="configuration">
+                <exclude name="**/*.launch"/>
                 <exclude name="**/*.java"/>
             </fileset>
         </copy>
@@ -67,9 +92,17 @@
     <target name="clean">
         <delete dir="bin"/>
     </target>
-    <target depends="clean" name="cleanall"/>
+    <target depends="clean" name="cleanall">
+        <ant antfile="build.xml" dir="${Executors.location}" inheritAll="false" target="clean"/>
+    </target>
     <target depends="build-subprojects,build-project" name="build"/>
-    <target name="build-subprojects"/>
+    <target name="build-subprojects">
+        <ant antfile="build.xml" dir="${Executors.location}" inheritAll="false" target="build-project">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+    </target>
     <target depends="init" name="build-project">
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">

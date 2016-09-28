@@ -3,14 +3,15 @@
               Any modifications will be overwritten.
               To include a user specific buildfile here, simply create one in the same
               directory with the processing instruction <?eclipse.ant.import?>
-              as the first entry and export the buildfile again. --><project basedir="." default="build" name="Sociolinguistics">
+              as the first entry and export the buildfile again. --><project basedir="." default="build" name="Executors">
     <property environment="env"/>
     <property name="jactr-generator.location" value="../jactr-generator"/>
+    <property name="jactr-production.location" value="../jactr-production"/>
     <property name="ECLIPSE_HOME" value="../../../../opt/eclipse/"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.8"/>
     <property name="source" value="1.8"/>
-    <path id="Sociolinguistics.classpath">
+    <path id="Executors.classpath">
         <pathelement location="bin"/>
         <pathelement location="lib/ejml.jar"/>
         <pathelement location="lib/ejml.src.zip"/>
@@ -34,6 +35,7 @@
         <mkdir dir="bin"/>
         <copy includeemptydirs="false" todir="bin">
             <fileset dir="src">
+                <exclude name="**/*.launch"/>
                 <exclude name="**/*.java"/>
             </fileset>
         </copy>
@@ -48,12 +50,18 @@
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
             <src path="src"/>
-            <classpath refid="Sociolinguistics.classpath"/>
+            <classpath refid="Executors.classpath"/>
         </javac>
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects">
         <ant antfile="build.xml" dir="${jactr-generator.location}" inheritAll="false" target="clean"/>
         <ant antfile="build.xml" dir="${jactr-generator.location}" inheritAll="false" target="build">
+            <propertyset>
+                <propertyref name="build.compiler"/>
+            </propertyset>
+        </ant>
+        <ant antfile="build.xml" dir="${jactr-production.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${jactr-production.location}" inheritAll="false" target="build">
             <propertyset>
                 <propertyref name="build.compiler"/>
             </propertyset>

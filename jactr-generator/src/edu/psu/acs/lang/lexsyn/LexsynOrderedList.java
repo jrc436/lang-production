@@ -12,8 +12,8 @@ import java.util.Set;
 
 import edu.psu.acs.lang.declarative.CCGCompoundType;
 import edu.psu.acs.lang.declarative.CCGType;
-import edu.psu.acs.lang.util.DoubleKeyMap;
-import edu.psu.acs.lang.util.Pair;
+import util.collections.DoubleKeyMap;
+import util.collections.Pair;
 import util.sys.DataType;
 import util.sys.FileWritable;
 

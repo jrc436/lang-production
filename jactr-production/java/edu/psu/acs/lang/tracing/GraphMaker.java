@@ -5,11 +5,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import edu.psu.acs.lang.parsing.DependencyGraph;
+import edu.psu.acs.lang.parsing.NodeParser;
+import edu.psu.acs.lang.parsing.ParseNode;
+import edu.psu.acs.lang.parsing.RuleNode;
 import edu.psu.acs.lang.tracing.IDependencyGraph.IDependencyNode;
-import edu.psu.acs.lang.util.DependencyGraph;
-import edu.psu.acs.lang.util.NodeParser;
-import edu.psu.acs.lang.util.ParseNode;
-import edu.psu.acs.lang.util.RuleNode;
 
 public class GraphMaker {
 	//now that we've theoretically got everything sorted nice and neatly into RuleNodes and LexNodes via NodeParser, 

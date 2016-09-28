@@ -8,10 +8,10 @@ import java.util.Set;
 
 import edu.psu.acs.lang.declarative.CCGType;
 import edu.psu.acs.lang.lexsyn.LexsynOrderedList;
-import edu.psu.acs.lang.util.DoubleKeyMap;
-import edu.psu.acs.lang.util.NodeParser;
-import edu.psu.acs.lang.util.ParseException;
-import edu.psu.acs.lang.util.ParseNode;
+import edu.psu.acs.lang.parsing.NodeParser;
+import edu.psu.acs.lang.parsing.ParseException;
+import edu.psu.acs.lang.parsing.ParseNode;
+import util.collections.DoubleKeyMap;
 import util.sys.FileProcessor;
 
 public class CCGParseListFilter extends FileProcessor<CCGParseList, CCGParseList> {

@@ -7,8 +7,7 @@
     <property environment="env"/>
     <property name="ECLIPSE_HOME" value="../../../../opt/eclipse/"/>
     <property name="evaluators.location" value="../evaluators"/>
-    <property name="Sociolinguistics.location" value="../Sociolinguistics"/>
-    <property name="actup-realizer.location" value="../actup-realizer"/>
+    <property name="Executors.location" value="../Executors"/>
     <property name="jactr-production.location" value="../jactr-production"/>
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.8"/>
@@ -72,48 +71,30 @@
         <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.commonreality.support_1.0.0.201507131128/lib/commons-logging-1.1.1.jar"/>
         <pathelement location="../.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.commonreality.support_1.0.0.201507131128/lib/javolution.jar"/>
     </path>
+    <path id="Executors.classpath">
+        <pathelement location="${Executors.location}/bin"/>
+        <pathelement location="${Executors.location}/lib/ejml.jar"/>
+        <pathelement location="${Executors.location}/lib/ejml.src.zip"/>
+        <pathelement location="${Executors.location}/lib/javax.json.jar"/>
+        <pathelement location="${Executors.location}/lib/javax.json.src.jar"/>
+        <pathelement location="${Executors.location}/lib/joda-time.jar"/>
+        <pathelement location="${Executors.location}/lib/joda-time.src.jar"/>
+        <pathelement location="${Executors.location}/lib/jollyday.jar"/>
+        <pathelement location="${Executors.location}/lib/jollyday.src.jar"/>
+        <pathelement location="${Executors.location}/lib/protobuf.jar"/>
+        <pathelement location="${Executors.location}/lib/slf4j-api.jar"/>
+        <pathelement location="${Executors.location}/lib/slf4j-simple.jar"/>
+        <pathelement location="${Executors.location}/lib/stanford.corenlp.jar"/>
+        <pathelement location="${Executors.location}/lib/stanford.corenlp.javadoc.jar"/>
+        <pathelement location="${Executors.location}/lib/stanford.corenlp.models.jar"/>
+        <pathelement location="${Executors.location}/lib/stanford.corenlp.src.jar"/>
+        <pathelement location="${Executors.location}/lib/xom.jar"/>
+        <pathelement location="${Executors.location}/lib/xom.src.jar"/>
+    </path>
     <path id="jactr-production.classpath">
         <pathelement location="${jactr-production.location}/bin"/>
         <path refid="Plug-in Dependencies.libraryclasspath"/>
-    </path>
-    <path id="actup-realizer.classpath">
-        <pathelement location="${actup-realizer.location}/bin"/>
-        <pathelement location="${actup-realizer.location}/lib/ant-contrib.jar"/>
-        <pathelement location="${actup-realizer.location}/lib/ant-junit.jar"/>
-        <pathelement location="${actup-realizer.location}/lib/ant-junit4.jar"/>
-        <pathelement location="${actup-realizer.location}/lib/ant-launcher.jar"/>
-        <pathelement location="${actup-realizer.location}/lib/ant.jar"/>
-        <pathelement location="${actup-realizer.location}/lib/javacc.jar"/>
-        <pathelement location="${actup-realizer.location}/lib/jdom.jar"/>
-        <pathelement location="${actup-realizer.location}/lib/jgrapht-jdk1.6.jar"/>
-        <pathelement location="${actup-realizer.location}/lib/jopt-simple.jar"/>
-        <pathelement location="${actup-realizer.location}/lib/junit-4.10.jar"/>
-        <pathelement location="${actup-realizer.location}/lib/serializer.jar"/>
-        <pathelement location="${actup-realizer.location}/lib/trove.jar"/>
-        <pathelement location="${actup-realizer.location}/lib/xalan.jar"/>
-        <pathelement location="${actup-realizer.location}/lib/xercesImpl.jar"/>
-        <pathelement location="${actup-realizer.location}/lib/xml-apis.jar"/>
-        <pathelement location="${actup-realizer.location}/lib/xsltc.jar"/>
-    </path>
-    <path id="Sociolinguistics.classpath">
-        <pathelement location="${Sociolinguistics.location}/bin"/>
-        <pathelement location="${Sociolinguistics.location}/lib/ejml.jar"/>
-        <pathelement location="${Sociolinguistics.location}/lib/ejml.src.zip"/>
-        <pathelement location="${Sociolinguistics.location}/lib/javax.json.jar"/>
-        <pathelement location="${Sociolinguistics.location}/lib/javax.json.src.jar"/>
-        <pathelement location="${Sociolinguistics.location}/lib/joda-time.jar"/>
-        <pathelement location="${Sociolinguistics.location}/lib/joda-time.src.jar"/>
-        <pathelement location="${Sociolinguistics.location}/lib/jollyday.jar"/>
-        <pathelement location="${Sociolinguistics.location}/lib/jollyday.src.jar"/>
-        <pathelement location="${Sociolinguistics.location}/lib/protobuf.jar"/>
-        <pathelement location="${Sociolinguistics.location}/lib/slf4j-api.jar"/>
-        <pathelement location="${Sociolinguistics.location}/lib/slf4j-simple.jar"/>
-        <pathelement location="${Sociolinguistics.location}/lib/stanford.corenlp.jar"/>
-        <pathelement location="${Sociolinguistics.location}/lib/stanford.corenlp.javadoc.jar"/>
-        <pathelement location="${Sociolinguistics.location}/lib/stanford.corenlp.models.jar"/>
-        <pathelement location="${Sociolinguistics.location}/lib/stanford.corenlp.src.jar"/>
-        <pathelement location="${Sociolinguistics.location}/lib/xom.jar"/>
-        <pathelement location="${Sociolinguistics.location}/lib/xom.src.jar"/>
+        <path refid="Executors.classpath"/>
     </path>
     <path id="jactr-generator.classpath">
         <pathelement location="bin"/>
@@ -149,13 +130,13 @@
         <path refid="Persisted container [/work/research/lang-production/.metadata/.plugins/org.eclipse.pde.core/.external_libraries/org.commonreality.support_1.0.0.201508181348/lib/javolution.jar for project [jactr-generator]].libraryclasspath"/>
         <path refid="Persisted container [/work/research/lang-production/edu.psu.acs.lang/bin for project [jactr-generator]].libraryclasspath"/>
         <path refid="jactr-production.classpath"/>
-        <path refid="actup-realizer.classpath"/>
-        <path refid="Sociolinguistics.classpath"/>
+        <path refid="Executors.classpath"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
         <copy includeemptydirs="false" todir="bin">
             <fileset dir="src">
+                <exclude name="**/*.launch"/>
                 <exclude name="**/*.java"/>
             </fileset>
         </copy>
@@ -164,18 +145,12 @@
         <delete dir="bin"/>
     </target>
     <target depends="clean" name="cleanall">
-        <ant antfile="build.xml" dir="${Sociolinguistics.location}" inheritAll="false" target="clean"/>
-        <ant antfile="build.xml" dir="${actup-realizer.location}" inheritAll="false" target="clean"/>
+        <ant antfile="build.xml" dir="${Executors.location}" inheritAll="false" target="clean"/>
         <ant antfile="build.xml" dir="${jactr-production.location}" inheritAll="false" target="clean"/>
     </target>
     <target depends="build-subprojects,build-project" name="build"/>
     <target name="build-subprojects">
-        <ant antfile="build.xml" dir="${Sociolinguistics.location}" inheritAll="false" target="build-project">
-            <propertyset>
-                <propertyref name="build.compiler"/>
-            </propertyset>
-        </ant>
-        <ant antfile="build.xml" dir="${actup-realizer.location}" inheritAll="false" target="build-project">
+        <ant antfile="build.xml" dir="${Executors.location}" inheritAll="false" target="build-project">
             <propertyset>
                 <propertyref name="build.compiler"/>
             </propertyset>
@@ -215,7 +190,7 @@
         <antcall target="build"/>
     </target>
     <target name="ModelWriter">
-        <java classname="edu.psu.acs.lang.gen.ModelWriter" failonerror="true" fork="yes">
+        <java classname="edu.psu.acs.lang.model.ModelWriter" failonerror="true" fork="yes">
             <classpath refid="jactr-generator.classpath"/>
         </java>
     </target>
@@ -236,12 +211,32 @@
         </java>
     </target>
     <target name="ExperimentPreprocessor">
-        <java classname="edu.psu.acs.lang.gen.ExperimentPreprocessor" failonerror="true" fork="yes">
+        <java classname="edu.psu.acs.lang.model.ExperimentPreprocessor" failonerror="true" fork="yes">
             <classpath refid="jactr-generator.classpath"/>
         </java>
     </target>
     <target name="ExperimentProcessor">
-        <java classname="edu.psu.acs.lang.gen.ExperimentProcessor" failonerror="true" fork="yes">
+        <java classname="edu.psu.acs.lang.model.ExperimentProcessor" failonerror="true" fork="yes">
+            <classpath refid="jactr-generator.classpath"/>
+        </java>
+    </target>
+    <target name="SwbdSplitExecutor">
+        <java classname="edu.psu.acs.lang.model.SWBDSplitExecutor" failonerror="true" fork="yes">
+            <jvmarg line="-Xmx12g"/>
+            <arg line="/work/research/lang-production/experiments/v1.5/testraw/ /work/research/lang-production/experiments/v1.5/testsplit/"/>
+            <classpath refid="jactr-generator.classpath"/>
+        </java>
+    </target>
+    <target name="WordInfoExecutor">
+        <java classname="edu.psu.acs.lang.lexsyn.WordInfoExecutor" failonerror="true" fork="yes">
+            <jvmarg line="-Xmx15g"/>
+            <arg line="/work/research/lang-production/experiments/v1.5/testout/ /work/research/lang-production/experiments/v1.5/wordsout/ edu.psu.acs.lang.lexsyn.TypeCombine END"/>
+            <classpath refid="jactr-generator.classpath"/>
+        </java>
+    </target>
+    <target name="FilterExecutor">
+        <java classname="edu.psu.acs.lang.ccg.FilterExecutor" failonerror="true" fork="yes">
+            <arg line="/work/research/lang-production/experiments/v1.5/testsplit/ /work/research/lang-production/experiments/v1.5/testfilter/"/>
             <classpath refid="jactr-generator.classpath"/>
         </java>
     </target>

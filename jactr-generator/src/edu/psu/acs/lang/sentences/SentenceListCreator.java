@@ -3,8 +3,8 @@ package edu.psu.acs.lang.sentences;
 import java.io.File;
 
 import edu.psu.acs.lang.ccg.CCGParseList;
-import edu.psu.acs.lang.util.ParseException;
-import edu.psu.acs.lang.util.ParseNode;
+import edu.psu.acs.lang.parsing.ParseException;
+import edu.psu.acs.lang.parsing.ParseNode;
 import util.sys.FileProcessor;
 
 public class SentenceListCreator extends FileProcessor<CCGParseList, SentenceList> {

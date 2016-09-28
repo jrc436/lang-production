@@ -1,5 +1,6 @@
 package edu.psu.acs.lang.util;
 
+import edu.psu.acs.lang.declarative.CCGCompoundType;
 import edu.psu.acs.lang.declarative.CCGType;
 import edu.psu.acs.lang.production.SyntaxRuleType;
 
@@ -16,17 +17,53 @@ public class RuleNode implements ParseNode {
 			System.err.println(result);
 			throw new ParseException("Null values for result, left, and rule are never allowed");
 		}
-		
-		//typeraise should only have one node
-		if ((rule == SyntaxRuleType.TypeRaise || rule == SyntaxRuleType.TCR || rule == SyntaxRuleType.TPC) && right != null) {
-			System.err.println(left);
-		    System.err.println(right);
-			System.err.println(rule);
-			System.err.println(result);
-			throw new ParseException("TypeRaise should only have one node!");
+		if (rule.isTypeRaise() && right != null) {
+			if (left.getType().isPCT()) {
+				left = right;
+				right = null;
+			}
+			else if (right.getType().isPCT()) {
+				right = null;
+			}
+			//it could also be a conj, in which case we have to do some bullshit fk magic because they are likely cheating.
+			else if (left.getType().isConjugation()) {
+				//so... it's a typeraise and they're combining it with a conjugation because who cares, right?
+				//so we need to return a rulenode that has an embedded rulenode, gross.
+//				if (right instanceof RuleNode) {
+//					//so do the conj, then the TCR..? but add the conj to the TCR typ
+//					//so the result of the conj doesn't technically matter...
+					CCGCompoundType.reverseConjability(right.getType());
+					left = new RuleNode(right.getType(), left, right, SyntaxRuleType.CONJ);
+					right = null;
+				//}
+			}
+			else if (right.getType().isConjugation()) {
+				CCGCompoundType.reverseConjability(left.getType());
+				right = new RuleNode(left.getType(), left, right, SyntaxRuleType.CONJ);
+				left = null;
+			}
+			else {
+				System.err.println(left);
+			    System.err.println(right);
+				System.err.println(rule);
+				System.err.println(result);
+				throw new ParseException("TypeRaise should only have one node!");
+			}	
 		}
+//		
+//		//typeraise should only have one node
+//		if ((rule == SyntaxRuleType.TypeRaise || rule == SyntaxRuleType.TPC) && right != null) {
+//		
+//		}
+//		if (rule == SyntaxRuleType.TCR && right != null && !left.getType().isPCT() && !right.getType().isPCT() && !left.getType().isConjugation() && !right.getType().isConjugation()) {
+//			System.err.println(left);
+//		    System.err.println(right);
+//			System.err.println(rule);
+//			System.err.println(result);
+//			throw new ParseException("I'm not really sure wtf TCR is, but it might be wrong?");
+//		}
 		//not typeraise should have exactly two nodes
-		if (!(rule == SyntaxRuleType.TypeRaise || rule == SyntaxRuleType.TCR) && right == null) {
+		if (!(rule == SyntaxRuleType.TypeRaise || rule == SyntaxRuleType.TCR || rule == SyntaxRuleType.TPC) && right == null) {
 			System.err.println(left);
 		    System.err.println(right);
 			System.err.println(rule);
@@ -38,6 +75,7 @@ public class RuleNode implements ParseNode {
 		this.rule = rule;
 		this.result = result;
 	}
+	
 	public SyntaxRuleType getRule() {
 		return rule;
 	}

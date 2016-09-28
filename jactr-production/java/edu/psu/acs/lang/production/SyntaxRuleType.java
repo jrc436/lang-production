@@ -25,7 +25,7 @@ public enum SyntaxRuleType {
 		else if (s.contains("B<")) {
 			return SyntaxRuleType.BackwardComposition;
 		}
-		else if (s.contains("T>")) {
+		else if (s.contains("T>") || (s.contains("T<"))) {
 			return SyntaxRuleType.TypeRaise;
 		}
 		else if (s.contains(">")) {
@@ -53,6 +53,18 @@ public enum SyntaxRuleType {
 	}
 	public String getName() {
 		return super.toString();
+	}
+	public boolean isTypeRaise() {
+		switch (this) {	
+			case TCR:
+				return true;
+			case TPC:
+				return true;
+			case TypeRaise:
+				return true;
+			default:
+				return false;
+		}
 	}
 	public String toString() {
 		switch (this) {

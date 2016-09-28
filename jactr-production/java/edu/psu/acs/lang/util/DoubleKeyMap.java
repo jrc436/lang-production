@@ -13,6 +13,12 @@ public class DoubleKeyMap<E, V, K> extends HashMap<Pair<E, V>, K> {
 		super();
 		symmetric = false;
 	}
+	public DoubleKeyMap(DoubleKeyMap<E, V, K> dkm) {
+		for (Pair<E, V> keys : dkm.keySet()) {
+			this.put(keys, dkm.get(keys));
+		}
+		this.symmetric = dkm.symmetric;
+	}
 	public DoubleKeyMap(boolean symmetric) {
 		this.symmetric = symmetric;
 	}

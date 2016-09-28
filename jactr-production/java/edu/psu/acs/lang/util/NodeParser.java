@@ -6,11 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.Stack;
 
 import edu.psu.acs.lang.declarative.CCGCompoundType;
@@ -66,6 +62,10 @@ public class NodeParser {
 		this.topNodes = new ArrayList<ParseNode>(np.topNodes);
 		this.alternateSeperators = np.alternateSeperators;
 	}
+	public NodeParser() {
+		this.topNodes = new ArrayList<ParseNode>();
+		this.alternateSeperators = true;
+	}
 	public NodeParser(Path path, boolean originalFiles) throws ParseException {
 		this.alternateSeperators = !originalFiles;		
 		List<String> lines = null;
@@ -83,6 +83,7 @@ public class NodeParser {
 		List<ParseNode> topNodes = new ArrayList<ParseNode>();
 		boolean skipNext = false;
 		for (int i = 0; i < lines.size(); i++) {
+			//System.out.println(i);
 			String line = lines.get(i);
 			if (line.charAt(0) == '#' && line.contains("Incremental")) {
 				//skipNext = true;
@@ -102,11 +103,17 @@ public class NodeParser {
 					skipNext = false;
 				}
 				else {
-					topNodes.add(getNode(top));
+					ParseNode t = getNode(top);
+					if (t != null) {
+						topNodes.add(t);
+					}
 				}
 			}
 		}
 		return topNodes;
+	}
+	public void addTop(ParseNode pn) {
+		this.getTops().add(pn);
 	}
 	public static boolean testPurity(String ccgTerms) {
 		NodeParser p = null;
@@ -139,7 +146,7 @@ public class NodeParser {
 		}
 		return false;
 	}
-	public static Map<String, Set<CCGType>> wordTypes(String ccgTerms) {
+	public static DoubleKeyMap<String, CCGType, Integer> wordTypes(String ccgTerms) {
 		NodeParser p = null;
 		try {
 			List<String> s = new ArrayList<String>();
@@ -152,38 +159,48 @@ public class NodeParser {
 		}
 		return p.wordTypes();
 	}
-	public Map<String, Set<CCGType>> wordTypes() {
-		Map<String, Set<CCGType>> wordtypes = new HashMap<String, Set<CCGType>>();
-		for (ParseNode n : this.getTops()) {
-			Stack<ParseNode> s = new Stack<ParseNode>();
-			s.push(n);
-			while (!s.empty()) {
-				ParseNode cur = s.pop();
-				String key = null;
-				CCGType val = null;
-				if (cur instanceof RuleNode) {
-					RuleNode rcur = (RuleNode) cur;
-					if (!checkUnsupportedTypeRaise(cur) && (rcur.getRule() == SyntaxRuleType.TCR || rcur.getRule() == SyntaxRuleType.TypeRaise || rcur.getRule() == SyntaxRuleType.TPC)) {
-						key = rcur.getPhrase();
-						val = rcur.getType();
-					}
-					s.push(rcur.getLeftChild());
-					s.push(rcur.getRightChild());
+	public static DoubleKeyMap<String, CCGType, Integer> wordTypes(ParseNode n) {
+		DoubleKeyMap<String, CCGType, Integer> wordtypes = new DoubleKeyMap<String, CCGType, Integer>();
+		Stack<ParseNode> s = new Stack<ParseNode>();
+		s.push(n);
+		while (!s.empty()) {
+			ParseNode cur = s.pop();
+			String key = null;
+			CCGType val = null;
+			if (cur instanceof RuleNode) {
+				RuleNode rcur = (RuleNode) cur;
+				if (!checkUnsupportedTypeRaise(cur) && (rcur.getRule() == SyntaxRuleType.TCR || rcur.getRule() == SyntaxRuleType.TypeRaise || rcur.getRule() == SyntaxRuleType.TPC)) {
+					key = rcur.getPhrase();
+					val = rcur.getType();
 				}
-				else if (cur instanceof LexNode) {
-					LexNode lcur = (LexNode) cur;
-					key = lcur.getPhrase();
-					val = lcur.getType();
-				}
-				if (key != null) {
-					if (!wordtypes.containsKey(key)) {
-						wordtypes.put(key, new HashSet<CCGType>());
-					}
-					wordtypes.get(key).add(val);
-				}
+				s.push(rcur.getLeftChild());
+				s.push(rcur.getRightChild());
+			}
+			else if (cur instanceof LexNode) {
+				LexNode lcur = (LexNode) cur;
+				key = lcur.getPhrase();
+				val = lcur.getType();
+			}
+			if (key != null) {
+				int addend = wordtypes.containsKey(key, val) ? wordtypes.get(key, val) : 0;
+				wordtypes.put(key, val, addend + 1);
 			}
 		}
 		return wordtypes;
+	}
+	public DoubleKeyMap<String, CCGType, Integer> wordTypes() {
+		DoubleKeyMap<String, CCGType, Integer> wordtypes = new DoubleKeyMap<String, CCGType, Integer>();
+		for (ParseNode n : this.getTops()) {
+			DoubleKeyMap<String, CCGType, Integer> ind = wordTypes(n);
+			combine(wordtypes, ind);
+		}
+		return wordtypes;
+	}
+	private static void combine(DoubleKeyMap<String, CCGType, Integer> first, DoubleKeyMap<String, CCGType, Integer> second) {
+		for (Pair<String, CCGType> keys : second.keySet()) {
+			int addend = first.containsKey(keys) ? first.get(keys) : 0;
+			first.put(keys, addend + second.get(keys));
+		}
 	}
 	private static boolean checkUnsupportedTypeRaise(ParseNode pn) {
 		if (!(pn instanceof RuleNode)) {
@@ -236,21 +253,37 @@ public class NodeParser {
 				}
 				throw new ParseException();
 			}
-			return new LexNode(things[1], CCGCompoundType.makeCCGType(things[0], alternateSeperators));
+			CCGType t = CCGCompoundType.makeCCGType(things[0], alternateSeperators);
+			if (t == null) {
+				return null;
+			}
+			return new LexNode(things[1], t);
 		}
 		//okay, otherwise we expect a resulting type and a combinatory rule before our first set of brackets. Let's peel off those two parts.
 		int firstLeftBracket = noBNode.indexOf('{');
 		String leftPart = noBNode.substring(0, firstLeftBracket);
 		leftPart = leftPart.trim();
 		String[] parts = leftPart.split("\\s+");
-		if (parts.length != 2) { //error checking
-			System.err.println("Printing Node... it seems to have an odd number of elements");
-			for (String thing : parts) {
-				System.err.println(thing);
+		if (parts.length != 2) { //error checking		
+			if (parts.length == 1) {
+				//System.err.println("Guessing it's from a malformed PCT.");
+				String firstPart = parts[0];
+				parts = new String[2];
+				parts[0] = firstPart;
+				parts[1] = "(comb:PCT)";
 			}
-			throw new ParseException();
+			else {
+				System.err.println("Printing Node... it seems to have an odd number of elements");
+				for (String thing : parts) {
+					System.err.println(thing);
+				}
+				throw new ParseException();
+			}
 		}
 		CCGType resultType = CCGCompoundType.makeCCGType(parts[0], alternateSeperators);
+		if (resultType == null) {
+			return null;
+		}
 		SyntaxRuleType rule = SyntaxRuleType.parseSyntaxRule(parts[1]);
 		//this is one or two nodes... it shouldn't be more, but we can make it fairly easy for it to not matter.
 		String rightPart = noBNode.substring(firstLeftBracket, noBNode.length());
@@ -295,9 +328,12 @@ public class NodeParser {
 		}
 		else if (enclosures.size() == 1) {
 			//we check in the rulenode constructor to make sure that it's actually typeraising.
-			return new RuleNode(resultType, getNode(enclosures.get(0)), null, rule);
+			ParseNode n = getNode(enclosures.get(0));
+			return n == null ? null : new RuleNode(resultType, n, null, rule);
 		}
-		return new RuleNode(resultType, getNode(enclosures.get(0)), getNode(enclosures.get(1)), rule);
+		ParseNode n = getNode(enclosures.get(0));
+		ParseNode m = getNode(enclosures.get(1));
+		return n == null || m == null ? null : new RuleNode(resultType, n, m, rule);
 	}
 	
 }

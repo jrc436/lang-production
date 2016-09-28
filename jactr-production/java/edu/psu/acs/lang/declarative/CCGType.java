@@ -37,7 +37,18 @@ public abstract class CCGType extends ChunkStore implements SlotValue {
 		default:
 			return false;		
 		}
-		
+	}
+	public boolean isConjugation() {
+		if (!(this instanceof CCGBaseType)) {
+			return false;
+		}
+		CCGBaseType cbt = (CCGBaseType) this;
+		switch (cbt.getTypeEnum()) {
+			case conj:
+				return true;
+			default:
+				return false;		
+			}
 	}
 	@Override
 	public boolean equals(Object other) {

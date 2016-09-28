@@ -77,10 +77,33 @@ public class CCGCompoundType extends CCGType {
 	public CCGType getRight() {
 		return rightCCGType;
 	}
+	public static void reverseConjability(CCGType ct) {
+		if (ct instanceof CCGCompoundType) {		
+			CCGCompoundType c = (CCGCompoundType) ct;
+			if (c.conjable == ConjEnum.Conjable) {
+				c.conjable = ConjEnum.Nonconjable;
+			}
+			else {
+				c.conjable = ConjEnum.Conjable;
+			}
+		}
+		else if (ct instanceof CCGBaseType) {
+			CCGBaseType c = (CCGBaseType) ct;
+			if (c.isConjable()) {
+				c.eraseModifier();
+			}
+			else {
+				c.setModifier(CCGTypeModifier.conj);
+			}
+		}
+	}
 	
 	public static CCGType makeCCGType(String s, boolean alternateSeperators) {
 		if (s.isEmpty()) {
 			System.err.println("Something is passing an empty String to makeCCGType!!");
+		}
+		if (s.equals("CODE")) {
+			return null;
 		}
 		//System.out.println("Starting on string:"+s);
 		CCGType parent = alternateSeperators ? recCreateTypes(s, new CCGOperator(CCGOperatorEnum.Slash).toString().charAt(0), new CCGOperator(CCGOperatorEnum.Backslash).toString().charAt(0), checkConjable(s))

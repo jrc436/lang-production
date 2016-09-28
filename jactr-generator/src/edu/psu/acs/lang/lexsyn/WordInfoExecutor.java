@@ -1,12 +1,12 @@
 package edu.psu.acs.lang.lexsyn;
 
+import edu.psu.acs.lang.ccg.CCGParseList;
 import util.sys.Executor;
-import util.wordmap.WordMap;
 
-public class WordInfoExecutor extends Executor<WordInfoProcessor, CCGParseList, WordMap> {
+public class WordInfoExecutor extends Executor<WordInfoProcessor, CCGParseList, LexsynOrderedList> {
 
 	public WordInfoExecutor() {
-		super("words", 20, WordInfoProcessor.class, CCGParseList.class, WordMap.class);
+		super("words", 5, WordInfoProcessor.class, CCGParseList.class, LexsynOrderedList.class);
 	}
 	public static void main(String[] args) {
 		WordInfoExecutor wie = new WordInfoExecutor();

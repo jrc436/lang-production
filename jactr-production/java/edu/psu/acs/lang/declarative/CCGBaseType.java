@@ -19,9 +19,9 @@ public class CCGBaseType extends CCGType {
 	}
 	public String toString() {
 		String modAdd = "";
-//		if (modifier != null) {
-//			modAdd = "["+modifier.toString()+"]";
-//		}
+		if (modifier == CCGTypeModifier.conj) {
+			modAdd = "["+modifier.toString()+"]";
+		}
 		return type.toString()+modAdd;
 	}
 //	public CCGTypeModifier getModifier() {
@@ -45,6 +45,12 @@ public class CCGBaseType extends CCGType {
 	@Override
 	public boolean isConjable() {
 		return modifier == CCGTypeModifier.conj;
+	}
+	protected void eraseModifier() {
+		modifier = null;
+	}
+	protected void setModifier(CCGTypeModifier e) {
+		modifier = e;
 	}
 //	protected void purifyConj() {
 //		makeUnconjable();

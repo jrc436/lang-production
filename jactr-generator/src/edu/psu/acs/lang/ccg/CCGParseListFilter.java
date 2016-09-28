@@ -27,7 +27,7 @@ public class CCGParseListFilter extends FileProcessor<CCGParseList, CCGParseList
 		int maxTypesPerWord = Integer.parseInt(args[1]);
 		LexsynOrderedList toadd = null;
 		try {
-			toadd = LexsynOrderedList.createFromFile(Paths.get(args[2]));
+			toadd = LexsynOrderedList.createFromDir(Paths.get(args[2]));
 		}
 		catch (IOException ie) {
 			ie.printStackTrace();

@@ -1,5 +1,6 @@
 package edu.psu.acs.lang.lexsyn;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,12 +29,24 @@ public class LexsynOrderedList extends DoubleKeyMap<String, CCGType, Integer> im
 	public LexsynOrderedList(DoubleKeyMap<String, CCGType, Integer> dkm) {
 		super(dkm);
 	}
+	public static LexsynOrderedList createFromDir(Path p) throws IOException {
+		if (!p.toFile().isDirectory()) {
+			System.err.println(p);
+			throw new IllegalArgumentException("This doesn't point to a valid directory");
+		}
+		LexsynOrderedList base = new LexsynOrderedList();
+		for (File f : p.toFile().listFiles()) {
+			base.absorb(createFromFile(f.toPath()));
+		}
+		return base;
+	}
 	public static LexsynOrderedList createFromFile(Path p) throws IOException {
 		List<String> lines = Files.readAllLines(p);
 		LexsynOrderedList toReturn = new LexsynOrderedList();
 		for (String line : lines) {
 			String[] parts = line.split(betweenTypes);
 			if (parts.length == 0) {
+				System.err.println(p);
 				throw new IllegalArgumentException("This doesn't point to a valid dsv file");
 			}
 			String word = parts[0];

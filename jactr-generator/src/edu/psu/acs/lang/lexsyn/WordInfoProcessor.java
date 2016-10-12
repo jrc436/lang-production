@@ -32,25 +32,22 @@ public class WordInfoProcessor extends FileProcessor<CCGParseList, LexsynOrdered
 	@Override
 	public CCGParseList getNextData() {
 		File f = super.getNextFile();	
-		System.out.println(f);
+		//System.out.println(f);
 		if ( f == null) {
 			return null;
+		}		
+		try {
+			return new CCGParseList(f.toPath(), false);
+		} catch (ParseException e) {
+			e.printStackTrace();
+			System.exit(1);
 		}
-		while (true) {
-			try {
-				return new CCGParseList(f.toPath(), false);
-			} catch (ParseException e) {
-				e.printStackTrace();
-				f = super.getNextFile();
-				//System.exit(1);
-			}
-		}
+		return null;
 	}
 	
 
 	@Override
 	public void map(CCGParseList newData, LexsynOrderedList threadAggregate) {
-		//System.out.println("hi");
 		threadAggregate.absorb(new LexsynOrderedList(newData.getParser().wordTypes()));
 	}
 

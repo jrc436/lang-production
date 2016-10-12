@@ -3,16 +3,16 @@ package edu.psu.acs.lang.production;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.psu.acs.lang.declarative.CCGOperator;
-import edu.psu.acs.lang.declarative.CCGOperatorEnum;
-import edu.psu.acs.lang.declarative.CCGTypeSlot;
-import edu.psu.acs.lang.declarative.ChunkTypeEnum;
-import edu.psu.acs.lang.declarative.ISlot;
-import edu.psu.acs.lang.declarative.NullValue;
-import edu.psu.acs.lang.declarative.SSlotName;
-import edu.psu.acs.lang.declarative.SSlotNameEnum;
-import edu.psu.acs.lang.declarative.Slot;
-import edu.psu.acs.lang.declarative.SlotVar;
+import edu.psu.acs.lang.declarative.chunk.ChunkTypeEnum;
+import edu.psu.acs.lang.declarative.sentence.SSlotName;
+import edu.psu.acs.lang.declarative.sentence.SSlotNameEnum;
+import edu.psu.acs.lang.declarative.slot.ISlot;
+import edu.psu.acs.lang.declarative.slot.NullValue;
+import edu.psu.acs.lang.declarative.slot.Slot;
+import edu.psu.acs.lang.declarative.slot.SlotVar;
+import edu.psu.acs.lang.declarative.type.CCGOperator;
+import edu.psu.acs.lang.declarative.type.CCGOperatorEnum;
+import edu.psu.acs.lang.declarative.type.CCGTypeSlot;
 
 public class ResolveForwardComposition extends SyntaxRuleResolution {
 	public ResolveForwardComposition(int lexsynNum, int lexsynTypeNum, int maxwords, int maxTypes) {

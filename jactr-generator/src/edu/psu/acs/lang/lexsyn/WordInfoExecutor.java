@@ -6,7 +6,7 @@ import util.sys.Executor;
 public class WordInfoExecutor extends Executor<WordInfoProcessor, CCGParseList, LexsynOrderedList> {
 
 	public WordInfoExecutor() {
-		super("words", 12, WordInfoProcessor.class, CCGParseList.class, LexsynOrderedList.class);
+		super("words", 4, WordInfoProcessor.class, CCGParseList.class, LexsynOrderedList.class);
 	}
 	public static void main(String[] args) {
 		WordInfoExecutor wie = new WordInfoExecutor();

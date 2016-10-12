@@ -43,7 +43,7 @@ public class JsonReadable extends HashMap<String, String> {
 				System.err.println("Formatting problem with colons:");
 				System.err.println(fromString);
 				System.err.println(s);
-				System.exit(1);
+				throw new IllegalArgumentException();
 			}
 			toReturn.put(keyval[0], keyval[1]);
 		}

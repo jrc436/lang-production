@@ -11,4 +11,18 @@ public interface TreeNode {
 	public boolean contains(IDWord word);
 	public String nodeString();
 	public int getSubtreeSize();
+	public String uglyPrint();
+	
+	public static TreeNode fromString(String s) {
+		if (s.isEmpty() || !s.contains("[") || !s.contains("]")) {
+			System.err.println(s);
+			throw new IllegalArgumentException("A node must have brackets");
+		}
+		if (s.indexOf('[') != s.lastIndexOf('[')) {
+			return DummyNode.fromString(s);
+		}
+		else {
+			return GarbleNode.fromString(s);
+		}
+	}
 }

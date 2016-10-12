@@ -26,3 +26,4 @@ Export-Package: edu.psu.acs.lang.core,
  edu.psu.acs.lang.declarative,
  edu.psu.acs.lang.production,
  edu.psu.acs.lang.settings
+Bundle-RequiredExecutionEnvironment: JavaSE-1.8

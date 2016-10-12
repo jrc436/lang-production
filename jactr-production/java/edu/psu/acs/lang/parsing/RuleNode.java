@@ -1,7 +1,7 @@
 package edu.psu.acs.lang.parsing;
 
-import edu.psu.acs.lang.declarative.CCGCompoundType;
-import edu.psu.acs.lang.declarative.CCGType;
+import edu.psu.acs.lang.declarative.type.CCGCompoundType;
+import edu.psu.acs.lang.declarative.type.CCGType;
 import edu.psu.acs.lang.production.SyntaxRuleType;
 
 public class RuleNode implements ParseNode {

@@ -1,8 +1,6 @@
 package edu.psu.acs.lang.model;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -10,25 +8,19 @@ import java.util.List;
 import java.util.Set;
 
 import edu.psu.acs.lang.core.IModelElement;
-import edu.psu.acs.lang.declarative.CCGCompoundType;
-import edu.psu.acs.lang.declarative.CCGOperator;
-import edu.psu.acs.lang.declarative.CCGOperatorEnum;
-import edu.psu.acs.lang.declarative.CCGType;
-import edu.psu.acs.lang.declarative.CCGTypeSlot;
-import edu.psu.acs.lang.declarative.ChunkType;
-import edu.psu.acs.lang.declarative.ChunkTypeEnum;
-import edu.psu.acs.lang.declarative.ConjEnum;
-import edu.psu.acs.lang.declarative.Conjable;
-import edu.psu.acs.lang.declarative.EmptyChunk;
-import edu.psu.acs.lang.declarative.EmptyEnum;
-import edu.psu.acs.lang.declarative.LSSlotName;
-import edu.psu.acs.lang.declarative.LSSlotNameEnum;
-import edu.psu.acs.lang.declarative.LexSyn;
-import edu.psu.acs.lang.declarative.SSlotName;
-import edu.psu.acs.lang.declarative.SSlotNameEnum;
-import edu.psu.acs.lang.declarative.Sentence;
-import edu.psu.acs.lang.declarative.SlotName;
 import edu.psu.acs.lang.declarative.Word;
+import edu.psu.acs.lang.declarative.chunk.ChunkTypeEnum;
+import edu.psu.acs.lang.declarative.chunk.EmptyChunk;
+import edu.psu.acs.lang.declarative.chunk.EmptyEnum;
+import edu.psu.acs.lang.declarative.lexsyn.LexSyn;
+import edu.psu.acs.lang.declarative.sentence.Sentence;
+import edu.psu.acs.lang.declarative.type.CCGCompoundType;
+import edu.psu.acs.lang.declarative.type.CCGOperator;
+import edu.psu.acs.lang.declarative.type.CCGOperatorEnum;
+import edu.psu.acs.lang.declarative.type.CCGType;
+import edu.psu.acs.lang.declarative.type.ConjEnum;
+import edu.psu.acs.lang.declarative.type.Conjable;
+import edu.psu.acs.lang.parsing.ParseException;
 import edu.psu.acs.lang.production.AddLexSyn;
 import edu.psu.acs.lang.production.BackwardApplication;
 import edu.psu.acs.lang.production.BackwardComposition;
@@ -69,47 +61,54 @@ public class ModelCreator {
 		this.mostTypesN = mostTypes;
 	}
 	public List<IModelElement> makeChunkTypes() {
+		ChunkTypeEnum.initializeAsElements(mostTypesN, largestSentenceK);
 		List<IModelElement> toret = new ArrayList<IModelElement>();
-		toret.add(new ChunkType(ChunkTypeEnum.CCGType, new ArrayList<SlotName>(Arrays.asList(CCGTypeSlot.values()))));
-		
-		//lexssyns
-		List<SlotName> lsslots = new ArrayList<SlotName>();
-		lsslots.add(new LSSlotName(LSSlotNameEnum.Word));
-		for (int j = 1; j <= mostTypesN; j++) {
-			lsslots.add(new LSSlotName(LSSlotNameEnum.Combinator, j, mostTypesN));
-			lsslots.add(new LSSlotName(LSSlotNameEnum.LeftType, j, mostTypesN));
-			lsslots.add(new LSSlotName(LSSlotNameEnum.RightType, j, mostTypesN));
-			lsslots.add(new LSSlotName(LSSlotNameEnum.Type, j, mostTypesN));
-			lsslots.add(new LSSlotName(LSSlotNameEnum.Conj, j, mostTypesN));
+		for (ChunkTypeEnum cte : ChunkTypeEnum.values()) {
+			toret.add(cte);
 		}
-		toret.add(new ChunkType(ChunkTypeEnum.lexsyn, lsslots));
-		toret.add(new ChunkType(ChunkTypeEnum.word, new ArrayList<SlotName>()));
-		toret.add(new ChunkType(ChunkTypeEnum.operator, new ArrayList<SlotName>()));
-		toret.add(new ChunkType(ChunkTypeEnum.conj, new ArrayList<SlotName>()));
-		toret.add(new ChunkType(ChunkTypeEnum.empty, new ArrayList<SlotName>()));
-		
-		//sentences 
-		List<SlotName> sslots = new ArrayList<SlotName>();
-		for (int i = 1; i <= largestSentenceK; i++) {
-			sslots.add(new SSlotName(SSlotNameEnum.WordSem, i, Sentence.getWorkingMemorySize()));
-			sslots.add(new SSlotName(SSlotNameEnum.LexsynString, i, Sentence.getWorkingMemorySize()));
-			for (int j = 1; j <= mostTypesN; j++) {
-				sslots.add(new SSlotName(SSlotNameEnum.LexsynCombo, i, Sentence.getWorkingMemorySize(), j, mostTypesN));
-				sslots.add(new SSlotName(SSlotNameEnum.LexsynLeftType, i, Sentence.getWorkingMemorySize(), j, mostTypesN));
-				sslots.add(new SSlotName(SSlotNameEnum.LexsynRightType, i, Sentence.getWorkingMemorySize(), j, mostTypesN));
-				sslots.add(new SSlotName(SSlotNameEnum.LexsynFullType, i, Sentence.getWorkingMemorySize(), j, mostTypesN));
-				sslots.add(new SSlotName(SSlotNameEnum.LexsynConj, i, Sentence.getWorkingMemorySize(), j, mostTypesN));
-			}
-		}
-		toret.add(new ChunkType(ChunkTypeEnum.sentence, sslots));
-		
-		//sentence manager
-	//	List<SlotName> smSlots = new ArrayList<SlotName>();
-	//	smSlots.add(new SingletonSlotName(SingletonSlotNameEnum.goal));
-	//	toret.add(new ChunkType(ChunkTypeEnum.sentenceManager, smSlots));
-		
-		
 		return toret;
+//		toret.add(new ChunkType(ChunkTypeEnum.CCGType, new ArrayList<SlotName>(Arrays.asList(CCGTypeSlot.values()))));
+//		
+//		//lexssyns
+//		List<SlotName> lsslots = new ArrayList<SlotName>();
+//		lsslots.add(new LSSlotName(LSSlotNameEnum.Word));
+//		for (int j = 1; j <= mostTypesN; j++) {
+//			lsslots.add(new LSSlotName(LSSlotNameEnum.Combinator, j, mostTypesN));
+//			lsslots.add(new LSSlotName(LSSlotNameEnum.LeftType, j, mostTypesN));
+//			lsslots.add(new LSSlotName(LSSlotNameEnum.RightType, j, mostTypesN));
+//			lsslots.add(new LSSlotName(LSSlotNameEnum.Type, j, mostTypesN));
+//			lsslots.add(new LSSlotName(LSSlotNameEnum.Conj, j, mostTypesN));
+//		}
+//		toret.add(new ChunkType(ChunkTypeEnum.lexsyn, lsslots));
+//		toret.add(new ChunkType(ChunkTypeEnum.word, new ArrayList<SlotName>()));
+//		toret.add(new ChunkType(ChunkTypeEnum.operator, new ArrayList<SlotName>()));
+//		toret.add(new ChunkType(ChunkTypeEnum.conj, new ArrayList<SlotName>()));
+//		toret.add(new ChunkType(ChunkTypeEnum.empty, new ArrayList<SlotName>()));
+//		
+//		//sentences 
+//		List<SlotName> sslots = new ArrayList<SlotName>();
+//		for (int i = 1; i <= largestSentenceK; i++) {
+//			sslots.add(new SSlotName(SSlotNameEnum.WordSem, i, Sentence.getWorkingMemorySize()));
+//		}
+//		for (int i = 1; i <= Sentence.getWorkingMemorySize(); i++) {
+//			sslots.add(new SSlotName(SSlotNameEnum.LexsynString, i, Sentence.getWorkingMemorySize()));
+//			for (int j = 1; j <= mostTypesN; j++) {
+//				sslots.add(new SSlotName(SSlotNameEnum.LexsynCombo, i, Sentence.getWorkingMemorySize(), j, mostTypesN));
+//				sslots.add(new SSlotName(SSlotNameEnum.LexsynLeftType, i, Sentence.getWorkingMemorySize(), j, mostTypesN));
+//				sslots.add(new SSlotName(SSlotNameEnum.LexsynRightType, i, Sentence.getWorkingMemorySize(), j, mostTypesN));
+//				sslots.add(new SSlotName(SSlotNameEnum.LexsynFullType, i, Sentence.getWorkingMemorySize(), j, mostTypesN));
+//				sslots.add(new SSlotName(SSlotNameEnum.LexsynConj, i, Sentence.getWorkingMemorySize(), j, mostTypesN));
+//			}
+//		}
+//		toret.add(new ChunkType(ChunkTypeEnum.sentence, sslots));
+//		
+//		//sentence manager
+//	//	List<SlotName> smSlots = new ArrayList<SlotName>();
+//	//	smSlots.add(new SingletonSlotName(SingletonSlotNameEnum.goal));
+//	//	toret.add(new ChunkType(ChunkTypeEnum.sentenceManager, smSlots));
+//		
+		
+		//return toret;
 	}
 	public List<IModelElement> makeEmptyChunk() {
 		List<IModelElement> ele = new ArrayList<IModelElement>();
@@ -129,10 +128,9 @@ public class ModelCreator {
 		el.add(new Conjable(ConjEnum.Nonconjable));
 		return el;
 	}
-	public List<IModelElement> makeTypeChunks(Path typesList) throws IOException {
+	public List<IModelElement> makeTypeChunks(List<String> typelines) throws ParseException {
 		List<IModelElement> ele = new ArrayList<IModelElement>();
 		Set<CCGType> types = new HashSet<CCGType>();
-		List<String> typelines = Files.readAllLines(typesList);
 		for (String line : typelines) {
 			CCGType cg = CCGCompoundType.makeCCGType(line, true);
 			if (cg instanceof CCGCompoundType) {
@@ -184,17 +182,16 @@ public class ModelCreator {
 		ele.addAll(types);
 		return ele;
 	}
-	public List<IModelElement> makeLexSynAndWordChunks(Path wordInfo, String delimiter) throws IOException {
+	public List<IModelElement> makeLexSynAndWordChunks(List<String> wordlines, String delimiter) throws IOException, ParseException {
 		List<IModelElement> ele = new ArrayList<IModelElement>();
 		List<LexSyn> lexsyns = new ArrayList<LexSyn>();
 		Set<Word> words = new HashSet<Word>();
-		List<String> wordlines = Files.readAllLines(wordInfo);
 		for (String line : wordlines) {
 			String[] l = line.split(delimiter);
 			if (l.length < 2) {
 				System.err.println("Line does not contain bare minimum of type and word");
 				System.err.println(l);
-				System.exit(1);
+				throw new IllegalArgumentException();
 			}
 			//System.out.println("Word:"+l[0]);
 			List<String> typerz = new ArrayList<String>(Arrays.asList(l));
@@ -209,10 +206,9 @@ public class ModelCreator {
 		ele.addAll(lexsyns);
 		return ele;
 	}
-	public List<Sentence> makeSentences(Path sentPath) throws IOException {
+	public List<Sentence> makeSentences(List<String> sentlines)  {
 		List<Sentence> ele = new ArrayList<Sentence>();
 		List<Sentence> goals = new ArrayList<Sentence>();
-		List<String> sentlines = Files.readAllLines(sentPath);
 		int k = 1;
 		for (String line : sentlines) {
 			List<String> wordBag = new ArrayList<String>(Arrays.asList(line.split(" ")));
@@ -243,8 +239,10 @@ public class ModelCreator {
 //		for (int j = 1; j <= numSentences; j++) {
 //			rules.add(new RetrieveHome(j));
 //		}
-		for (int j = 1; j <= largestSentenceK; j++) {		
-			rules.add(new GrabWord(j, largestSentenceK));
+		for (int j = 1; j <= largestSentenceK; j++) {	
+			for (int i = 1; i <= Sentence.getWorkingMemorySize(); i++) {
+				rules.add(new GrabWord(j, largestSentenceK, i, Sentence.getWorkingMemorySize()));
+			}
 		}
 		for (int j = 1; j <= Sentence.getWorkingMemorySize(); j++) {
 			rules.add(new AddLexSyn(j, mostTypesN, Sentence.getWorkingMemorySize()));

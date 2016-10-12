@@ -1,5 +1,8 @@
 package edu.psu.acs.lang.output;
 
+import edu.psu.acs.lang.declarative.Word;
+import edu.psu.acs.lang.production.SyntaxRule;
+
 public class IDWord {
 	private final int id;
 	private final String string;
@@ -8,7 +11,7 @@ public class IDWord {
 			throw new IllegalArgumentException("String cannot be null");
 		}
 		this.id = id;
-		this.string = string;
+		this.string = Word.reverseNameConst(string);
 	}
 	@Override
 	public boolean equals(Object other) {
@@ -27,6 +30,14 @@ public class IDWord {
 	}
 	@Override
 	public String toString() {
-		return string+"."+id;
+		return Word.getNameConst(string)+SyntaxRule.wordSep+id;
+	}
+	public static IDWord fromString(String s) {
+		String[] parts = s.split(SyntaxRule.wordSep);
+		if (parts.length != 2) {
+			System.err.println(s);
+			throw new IllegalArgumentException("This isn't an IDWord");
+		}
+		return new IDWord(parts[0], Integer.parseInt(parts[1]));
 	}
 }

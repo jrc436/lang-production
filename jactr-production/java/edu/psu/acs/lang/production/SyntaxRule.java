@@ -1,11 +1,11 @@
 package edu.psu.acs.lang.production;
 
-import edu.psu.acs.lang.declarative.CCGBaseType;
-import edu.psu.acs.lang.declarative.CCGCompoundType;
-import edu.psu.acs.lang.declarative.CCGOperator;
-import edu.psu.acs.lang.declarative.CCGOperatorEnum;
-import edu.psu.acs.lang.declarative.CCGType;
-import edu.psu.acs.lang.declarative.SlotVar;
+import edu.psu.acs.lang.declarative.slot.SlotVar;
+import edu.psu.acs.lang.declarative.type.CCGBaseType;
+import edu.psu.acs.lang.declarative.type.CCGCompoundType;
+import edu.psu.acs.lang.declarative.type.CCGOperator;
+import edu.psu.acs.lang.declarative.type.CCGOperatorEnum;
+import edu.psu.acs.lang.declarative.type.CCGType;
 
 public abstract class SyntaxRule extends ProductionRule {
 	public static final String leftOf = ">>>";

@@ -10,6 +10,7 @@ import java.util.List;
 
 import edu.psu.acs.lang.core.IModelElement;
 import edu.psu.acs.lang.lexsyn.LexsynOrderedList;
+import edu.psu.acs.lang.parsing.ParseException;
 import edu.psu.acs.lang.settings.ExperimentSettings;
 
 public class ModelWriter {
@@ -36,7 +37,7 @@ public class ModelWriter {
 		fw.flush();
 		elements.clear();
 	}
-	public static void main(String[] args) throws IOException {
+	public static void main(String[] args) throws IOException, ParseException {
 		if (args.length != 3) {
 			System.out.println("The ModelWriter needs Paths to the words.dsv file, the types.list file, and the sentences.list file");
 			System.exit(1);
@@ -46,13 +47,14 @@ public class ModelWriter {
 		Path typesList = Paths.get(args[1]); 
 		Path wordsList = Paths.get(args[0]);
 		Path sentenceList = Paths.get(args[2]);
-		List<String> lines = Files.readAllLines(typesList);
+		List<String> types = Files.readAllLines(typesList);
 		List<String> sents = Files.readAllLines(sentenceList);
+		List<String> words = Files.readAllLines(wordsList);
 		String modelName = ExperimentSettings.getModelName(ExperimentSettings.expVersion, ExperimentSettings.expName);
 		Path modelPath = Paths.get(ExperimentSettings.getModelRunPath(ExperimentSettings.workingDir, ExperimentSettings.expVersion, ExperimentSettings.expName));
-		ModelCreator mc = new ModelCreator(getMaxSentenceLength(sents), getMaxTypes(lines, delim));
+		ModelCreator mc = new ModelCreator(getMaxSentenceLength(sents), getMaxTypes(words, delim));
 		ModelWriter mw = new ModelWriter(modelPath, modelName, mc);
-		mw.writeAll(typesList, wordsList, delim, sentenceList);
+		mw.writeAll(types, words, sents, delim);
 		
 	}
 	public static int getMaxSentenceLength(List<String> lines) {
@@ -65,11 +67,11 @@ public class ModelWriter {
 	public static int getMaxTypes(List<String> lines, String delimiter) {
 		int maxTypes = 0;
 		for (String line : lines) {
-			maxTypes = Math.max(maxTypes, line.split(delimiter).length);
+			maxTypes = Math.max(maxTypes, line.split(delimiter).length-1);
 		}
 		return maxTypes;
 	}
-	public void writeAll(Path typesList, Path wordInfo, String delimiter, Path sentFile) throws IOException {
+	public void writeAll(List<String> typesList, List<String> wordsList, List<String> sentList, String delimiter) throws IOException, ParseException {
 		if (mc == null) {
 			throw new IllegalArgumentException("need a modelcreator, this modelwriter has to manually write!");
 		}
@@ -83,11 +85,11 @@ public class ModelWriter {
 		writer.addAll(mc.makeTypeChunks(typesList));
 		writer.addAll(mc.makeEmptyChunk());
 		writeOut("Finished making type chunks", writer);
-		writer.addAll(mc.makeLexSynAndWordChunks(wordInfo, delimiter));
+		writer.addAll(mc.makeLexSynAndWordChunks(wordsList, delimiter));
 		writeOut("Finished making lex syns", writer);
 		
 	//	writer.addAll(mc.makeSentenceManagers(allSentences));
-		writer.addAll(mc.makeSentences(sentFile));
+		writer.addAll(mc.makeSentences(sentList));
 		writeOut("Finished making sentences", writer);
 		
 		writer.add(new SimpleElement("</declarative-memory>"));
@@ -144,19 +146,19 @@ public class ModelWriter {
 		intro.add(new SimpleElement("<modules>"));
 		intro.add(new SimpleElement("<module class=\"org.jactr.core.module.declarative.six.DefaultDeclarativeModule6\"/>"));
 		
-		if (tracer) {
-			intro.add(new SimpleElement("<module class=\"org.jactr.core.module.procedural.sixtrace.TracerProceduralModule6\"/>"));
-		}
-		else {
-			intro.add(new SimpleElement("<module class=\"org.jactr.core.module.procedural.six.DefaultProceduralModule6\"/>"));
-		}
+//		if (tracer) {
+//			intro.add(new SimpleElement("<module class=\"org.jactr.core.module.procedural.sixtrace.TracerProceduralModule6\"/>"));
+//		}
+//		else {
+		intro.add(new SimpleElement("<module class=\"org.jactr.core.module.procedural.sixfix.FixedCompareProModule6\"/>"));
+		//}
 		intro.add(new SimpleElement("<module class=\"org.jactr.core.module.goal.six.DefaultGoalModule6\"/>"));
 		intro.add(new SimpleElement("<module class=\"org.jactr.core.module.procedural.six.learning.DefaultProceduralLearningModule6\"/>"));
 		intro.add(new SimpleElement("<module class=\"org.jactr.core.module.retrieval.six.DefaultRetrievalModule6\">"));
 		intro.add(new SimpleElement("<parameters>"));
 		intro.add(new SimpleElement("<parameter name=\"LatencyFactor\" value=\"0.00\"/>"));
-		intro.add(new SimpleElement("<parameter name=\"FINSTDurationTime\" value=\"30000.0\"/>"));
-	    intro.add(new SimpleElement("<parameter name=\"NumberOfFINSTs\" value=\"1000\"/>"));
+		intro.add(new SimpleElement("<parameter name=\"FINSTDurationTime\" value=\"100000000000000000.0\"/>"));
+	    intro.add(new SimpleElement("<parameter name=\"NumberOfFINSTs\" value=\"10000\"/>"));
 		intro.add(new SimpleElement("</parameters>"));
 		intro.add(new SimpleElement("</module>"));
 		intro.add(new SimpleElement("</modules>"));

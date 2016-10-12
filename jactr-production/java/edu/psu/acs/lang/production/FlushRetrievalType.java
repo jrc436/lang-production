@@ -2,8 +2,8 @@ package edu.psu.acs.lang.production;
 
 import java.util.ArrayList;
 
-import edu.psu.acs.lang.declarative.ChunkTypeEnum;
-import edu.psu.acs.lang.declarative.ISlot;
+import edu.psu.acs.lang.declarative.chunk.ChunkTypeEnum;
+import edu.psu.acs.lang.declarative.slot.ISlot;
 
 public class FlushRetrievalType extends ProductionRule {
 	public FlushRetrievalType() {

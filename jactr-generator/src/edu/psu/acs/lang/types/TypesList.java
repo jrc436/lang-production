@@ -2,13 +2,14 @@ package edu.psu.acs.lang.types;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 
-import edu.psu.acs.lang.declarative.CCGType;
+import edu.psu.acs.lang.declarative.type.CCGType;
 import util.sys.DataType;
 import util.sys.FileWritable;
 
-public class TypesList extends ArrayList<CCGType> implements DataType {
+public class TypesList extends HashSet<CCGType> implements DataType {
 	public TypesList() {
 		super();
 	}

@@ -6,7 +6,6 @@ public class FilterExecutor extends Executor<CCGParseListFilter, CCGParseList, C
 
 	public FilterExecutor() {
 		super("filterccg", 12, CCGParseListFilter.class, CCGParseList.class, CCGParseList.class);
-		// TODO Auto-generated constructor stub
 	}
 	public static void main(String[] args) {
 		FilterExecutor fe = new FilterExecutor();

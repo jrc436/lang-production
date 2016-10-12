@@ -3,15 +3,15 @@ package edu.psu.acs.lang.production;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.psu.acs.lang.declarative.CCGBaseType;
-import edu.psu.acs.lang.declarative.CCGBaseTypeEnum;
-import edu.psu.acs.lang.declarative.ConjEnum;
-import edu.psu.acs.lang.declarative.Conjable;
-import edu.psu.acs.lang.declarative.ISlot;
-import edu.psu.acs.lang.declarative.SSlotName;
-import edu.psu.acs.lang.declarative.SSlotNameEnum;
-import edu.psu.acs.lang.declarative.Slot;
-import edu.psu.acs.lang.declarative.SlotVar;
+import edu.psu.acs.lang.declarative.sentence.SSlotName;
+import edu.psu.acs.lang.declarative.sentence.SSlotNameEnum;
+import edu.psu.acs.lang.declarative.slot.ISlot;
+import edu.psu.acs.lang.declarative.slot.Slot;
+import edu.psu.acs.lang.declarative.slot.SlotVar;
+import edu.psu.acs.lang.declarative.type.CCGBaseType;
+import edu.psu.acs.lang.declarative.type.CCGBaseTypeEnum;
+import edu.psu.acs.lang.declarative.type.ConjEnum;
+import edu.psu.acs.lang.declarative.type.Conjable;
 
 //consider that the combinatory rule that combines 'poop' to the left of 'and' is different than the combinatory rule that combines 'poop' to the
 //right of 'and', what's not entirely clear is if both of these combinatory rules exist

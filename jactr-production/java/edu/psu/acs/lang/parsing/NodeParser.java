@@ -9,8 +9,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Stack;
 
-import edu.psu.acs.lang.declarative.CCGCompoundType;
-import edu.psu.acs.lang.declarative.CCGType;
+import edu.psu.acs.lang.declarative.type.CCGBaseType;
+import edu.psu.acs.lang.declarative.type.CCGBaseTypeEnum;
+import edu.psu.acs.lang.declarative.type.CCGCompoundType;
+import edu.psu.acs.lang.declarative.type.CCGType;
 import edu.psu.acs.lang.production.SyntaxRuleType;
 import util.collections.DoubleKeyMap;
 import util.collections.Pair;
@@ -54,7 +56,7 @@ public class NodeParser {
 		this.topNodes = new ArrayList<ParseNode>();
 		for (String s : ccgTerms) {
 			List<String> lines = Arrays.asList(s.split(System.getProperty("line.separator")));
-			this.topNodes.addAll(popTops(lines));
+			this.topNodes.addAll(popTops(lines, "unknown"));
 		}
 	}
 	public NodeParser(String file, boolean originalFiles) throws ParseException {
@@ -79,43 +81,56 @@ public class NodeParser {
 			System.err.println("Closing...");
 			System.exit(1);
 		}
-		topNodes = popTops(lines);
+		topNodes = popTops(lines, path.toString());
 	}
-	private List<ParseNode> popTops(List<String> lines) throws ParseException {
+	private List<ParseNode> popTops(List<String> lines, String fileName) throws ParseException {
+		System.out.println("Starting parse of: "+fileName);
 		List<ParseNode> topNodes = new ArrayList<ParseNode>();
-		boolean skipNext = false;
+		//boolean skipNext = false;
 		for (int i = 0; i < lines.size(); i++) {
-			//System.out.println(i);
 			String line = lines.get(i);
-			if (line.charAt(0) == '#' && line.contains("Incremental")) {
-				//skipNext = true;
-				continue;
-			}
-			if (line.charAt(0) == '#') {
+			if (line.charAt(0) == '#') { //these are comment lines, though it doesn't matter in the rewrite
 				continue;
 			}
 			if (line.contains("TOP")) {
+				if (line.indexOf("{") != 0) {
+					System.err.println("TOP line does not start with an open bracket. The current idea is that it should.");
+					throw new IllegalArgumentException();
+				}
+				int openbrackets = 0;
 				String top = "";
-				while (i < lines.size() && !lines.get(i).contains("#")) {
-					top += lines.get(i);
-					i++;
-				}
-				i--; //the last line was the one that failed, so we might want to double check it again.
-				if (skipNext) {
-					skipNext = false;
-				}
-				else {
-					ParseNode t = getNode(top);
-					if (t != null) {
-						topNodes.add(t);
+				String cline = line;
+				while (i < lines.size()) {
+					for (int j = 0; j < cline.length(); j++) {
+						if (cline.charAt(j) == '{') {
+							openbrackets++;
+						}
+						else if (cline.charAt(j) == '}') {
+							openbrackets--;
+						}
+						top += cline.charAt(j);
+						if (openbrackets == 0) {
+							break;
+						}
 					}
+					if (openbrackets == 0) {
+						break;
+					}
+					i++;
+					cline = lines.get(i);
 				}
+				//i--; //this should no longer be necessary - we'll break as soon as we're done.
+				ParseNode t = getNode(top, fileName, i);
+				if (t != null) {
+					//System.out.println("Top successfully added");
+					topNodes.add(t);
+				}		
 			}
 		}
 		return topNodes;
 	}
 	public void addTop(ParseNode pn) {
-		this.getTops().add(pn);
+		this.topNodes.add(pn);
 	}
 	public static boolean testPurity(String ccgTerms) {
 		NodeParser p = null;
@@ -183,7 +198,7 @@ public class NodeParser {
 				key = lcur.getPhrase();
 				val = lcur.getType();
 			}
-			if (key != null) {
+			if (key != null && !val.equals(CCGBaseType.makeType(CCGBaseTypeEnum.TOP, null))) {
 				int addend = wordtypes.containsKey(key, val) ? wordtypes.get(key, val) : 0;
 				wordtypes.put(key, val, addend + 1);
 			}
@@ -236,11 +251,12 @@ public class NodeParser {
 		return allTypeRaise;
 	}
 	
-	private ParseNode getNode(String node) throws ParseException {
+	private ParseNode getNode(String node, String fileName, int lineNum) throws ParseException {
 		node = node.trim();
 		if (node.charAt(0) != '{' && node.charAt(node.length()-1) != '}') {
 			System.err.println("Error, there is a bug that allows for formatting exceptions! All nodes must be enclosed with brackets!");
 			System.err.println(node);
+			System.err.println(fileName +":"+ lineNum);
 			throw new ParseException();
 		}
 		String noBNode = node.substring(1, node.length()-1); //remove front and end brackets
@@ -253,6 +269,7 @@ public class NodeParser {
 				for (String thing : things) {					
 					System.err.println(thing);
 				}
+				System.err.println(fileName +":"+ lineNum);
 				throw new ParseException();
 			}
 			CCGType t = CCGCompoundType.makeCCGType(things[0], alternateSeperators);
@@ -279,10 +296,20 @@ public class NodeParser {
 				for (String thing : parts) {
 					System.err.println(thing);
 				}
+				System.err.println(fileName +":"+ lineNum);
 				throw new ParseException();
 			}
 		}
-		CCGType resultType = CCGCompoundType.makeCCGType(parts[0], alternateSeperators);
+		CCGType resultType = null;
+		try {
+			resultType = CCGCompoundType.makeCCGType(parts[0], alternateSeperators);
+		}
+		catch (ParseException pe) {
+			System.err.println("Encountered an error while parsing types.");
+			System.err.println(fileName + ":" + lineNum);
+			pe.printStackTrace();
+			System.exit(1);
+		}
 		if (resultType == null) {
 			return null;
 		}
@@ -293,6 +320,7 @@ public class NodeParser {
 		if (rightPart.charAt(0) != '{') {
 			System.err.println("Error, our trimmer for complex nodes produced something that doesn't start with a bracket!");
 			System.err.println(rightPart);
+			System.err.println(fileName +":"+ lineNum);
 			throw new ParseException();
 		}
 		int i = 0;
@@ -319,22 +347,27 @@ public class NodeParser {
 		if (enclosures.size() == 0) {
 			System.err.println("No enclosures found. What?");
 			System.err.println(rightPart);
+			System.err.println(fileName +":"+ lineNum);
 			throw new ParseException();
 		}
 		else if (enclosures.size() > 2) {
 			System.err.println("An unusual amount of enclosures found, possible error in the code");
-			for (String enclosure : enclosures) {
-				System.err.println(enclosure+"\n");
-			}
+			System.err.println("Enclosure number: "+enclosures.size());
+			System.err.println(enclosures.get(0));
+			System.err.println(enclosures.get(enclosures.size()-1));
+//			for (String enclosure : enclosures) {
+//				System.err.println(enclosure+"\n");
+//			}
+			System.err.println(fileName +":"+ lineNum);
 			throw new ParseException();
 		}
 		else if (enclosures.size() == 1) {
 			//we check in the rulenode constructor to make sure that it's actually typeraising.
-			ParseNode n = getNode(enclosures.get(0));
+			ParseNode n = getNode(enclosures.get(0), fileName, lineNum);
 			return n == null ? null : new RuleNode(resultType, n, null, rule);
 		}
-		ParseNode n = getNode(enclosures.get(0));
-		ParseNode m = getNode(enclosures.get(1));
+		ParseNode n = getNode(enclosures.get(0), fileName, lineNum);
+		ParseNode m = getNode(enclosures.get(1), fileName, lineNum);
 		return n == null || m == null ? null : new RuleNode(resultType, n, m, rule);
 	}
 	

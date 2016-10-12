@@ -6,7 +6,7 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Set;
 
-import edu.psu.acs.lang.declarative.CCGType;
+import edu.psu.acs.lang.declarative.type.CCGType;
 import edu.psu.acs.lang.lexsyn.LexsynOrderedList;
 import edu.psu.acs.lang.parsing.NodeParser;
 import edu.psu.acs.lang.parsing.ParseException;
@@ -23,16 +23,16 @@ public class CCGParseListFilter extends FileProcessor<CCGParseList, CCGParseList
 	}
 	public CCGParseListFilter(String inpDir, String outDir, String[] args) {
 		super(inpDir, outDir, new CCGParseList());
-		maxSentenceLength = Integer.parseInt(args[0]);
-		int maxTypesPerWord = Integer.parseInt(args[1]);
+		maxSentenceLength = Integer.parseInt(args[1]);
+		int maxTypesPerWord = Integer.parseInt(args[2]);
 		LexsynOrderedList toadd = null;
 		try {
-			toadd = LexsynOrderedList.createFromDir(Paths.get(args[2]));
+			toadd = LexsynOrderedList.createFromDir(Paths.get(args[0]));
 		}
-		catch (IOException ie) {
+		catch (IOException |ParseException ie) {
 			ie.printStackTrace();
 			System.exit(1);
-		}
+		} 
 		lol = toadd.getFirst(maxTypesPerWord);
 	}
 	
@@ -48,7 +48,7 @@ public class CCGParseListFilter extends FileProcessor<CCGParseList, CCGParseList
 
 	@Override
 	public String getConstructionErrorMsg() {
-		return "After the input and outputdirectory, the CCGParseListFilter should first take the maximum number of words in a sentence, and then the maximum number of types per word. Lastly, it needs to take a dsv filepath with the wordinfo/lexsyns";
+		return "After the input and outputdirectory, the CCGParseListFilter should first take the filepath to the lexsyns/wordsinfo, then the maximum number of words in a sentence, and then the maximum number of types per word.";
 	}
 
 	@Override
@@ -58,7 +58,7 @@ public class CCGParseListFilter extends FileProcessor<CCGParseList, CCGParseList
 			return null;
 		}
 		try {
-			return new CCGParseList(f.toPath(), true);
+			return new CCGParseList(f.toPath(), false);
 		} catch (ParseException e) {
 			e.printStackTrace();
 			System.exit(1);

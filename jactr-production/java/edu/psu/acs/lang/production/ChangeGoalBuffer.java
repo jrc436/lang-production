@@ -3,7 +3,7 @@ package edu.psu.acs.lang.production;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.psu.acs.lang.declarative.ISlot;
+import edu.psu.acs.lang.declarative.slot.ISlot;
 
 public class ChangeGoalBuffer extends BufferEffects {
 	protected String nameOfNewGoalChunk;

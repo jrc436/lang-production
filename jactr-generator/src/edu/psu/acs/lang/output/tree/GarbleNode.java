@@ -44,4 +44,25 @@ public class GarbleNode implements TreeNode {
 	public int getSubtreeSize() {
 		return 1;
 	}
+	public String uglyPrint() {
+		return nodeString();
+	}
+	@Override
+	public int hashCode() {
+		return data.hashCode();
+	}
+	@Override
+	public boolean equals(Object other) {
+		if (!(other instanceof GarbleNode)) {
+			return false;
+		}
+		GarbleNode gn = (GarbleNode) other;
+		return this.data.equals(gn.data);
+	}
+	public static GarbleNode fromString(String s) {
+		return new GarbleNode(IDWord.fromString(DummyNode.stripBrackets(s)));
+	}
+	public String toString() {
+		return "["+data.toString()+"]";
+	}
 }

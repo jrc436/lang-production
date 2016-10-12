@@ -115,6 +115,7 @@ public class Executor<J extends FileProcessor<K, V>, K extends DataType, V exten
             log.start();
 		} catch (IOException e) {
             System.err.println("Error initializing output. Check your output paths");
+            e.printStackTrace();
             System.exit(1);
 		}
 	    int numThr = ResourceAllocator.getSuggestedNumThreads(gbPerThread);

@@ -40,7 +40,7 @@ public class UserList extends DataCollection<String> {
 		String thisCreateLine = lines.get(0);
 		if (!isKeyLine(thisCreateLine)) {
 			System.err.println("These lists have still not been 'fixed', please run ReorderListProcessor");
-			System.exit(1);
+			throw new IllegalArgumentException();
 		}
 		return new UserList(lines);
 	}

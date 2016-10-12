@@ -9,7 +9,7 @@ public class ExperimentSettings {
 //	public static final int fileNum = 0;
 	public static final UtilityInitialization UI = UtilityInitialization.DEFAULT;
 	public static final String expVersion = "v1.5";
-	public static final String expName = "trial1";
+	public static final String expName = "smaller-finsts";
 	public static final String workingDir = "/work/research/lang-production/";
 	
 	public static final String sentenceDelimiter = "SENTENCE-END";

@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.psu.acs.lang.core.IModelElement;
-import edu.psu.acs.lang.declarative.ChunkTypeEnum;
-import edu.psu.acs.lang.declarative.ISlot;
+import edu.psu.acs.lang.declarative.chunk.ChunkTypeEnum;
+import edu.psu.acs.lang.declarative.slot.ISlot;
 
 public class BufferEffects implements IModelElement {
 	protected Buffer buffer;

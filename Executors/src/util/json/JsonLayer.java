@@ -71,6 +71,7 @@ public abstract class JsonLayer<K extends DataType> extends FileProcessor<JsonLi
 				catch (Exception e) {
 					System.err.println(e);
 					System.err.println(jv.getClass());
+					e.printStackTrace();
 					System.exit(1);
 				}
 			}
@@ -78,6 +79,7 @@ public abstract class JsonLayer<K extends DataType> extends FileProcessor<JsonLi
 		catch (javax.json.stream.JsonParsingException jpe) {
 			System.err.println(f.toPath());
 			System.err.println(jpe.getMessage());
+			jpe.printStackTrace();
 			System.exit(1);
 		}
 	//	System.out.println("Transformed into Map finished");

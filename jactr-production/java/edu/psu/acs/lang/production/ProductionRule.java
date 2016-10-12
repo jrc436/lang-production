@@ -3,12 +3,12 @@ package edu.psu.acs.lang.production;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.psu.acs.lang.declarative.ChunkTypeEnum;
-import edu.psu.acs.lang.declarative.ISlot;
-import edu.psu.acs.lang.declarative.NullValue;
-import edu.psu.acs.lang.declarative.SSlotName;
-import edu.psu.acs.lang.declarative.SSlotNameEnum;
-import edu.psu.acs.lang.declarative.Slot;
+import edu.psu.acs.lang.declarative.chunk.ChunkTypeEnum;
+import edu.psu.acs.lang.declarative.sentence.SSlotName;
+import edu.psu.acs.lang.declarative.sentence.SSlotNameEnum;
+import edu.psu.acs.lang.declarative.slot.ISlot;
+import edu.psu.acs.lang.declarative.slot.NullValue;
+import edu.psu.acs.lang.declarative.slot.Slot;
 
 public class ProductionRule implements IProductionRule {
 	public static final String RetrievalBufferVar = "retrieval";
@@ -20,9 +20,9 @@ public class ProductionRule implements IProductionRule {
 	protected void addOutput(String s) {
 		outputs.add(s);
 	}
-	protected void ensureSentenceManager(List<ISlot> slots) {
-		conditions.add(new BufferConditions(Buffer.goal, ChunkTypeEnum.sentenceManager, slots));
-	}
+//	protected void ensureSentenceManager(List<ISlot> slots) {
+//		conditions.add(new BufferConditions(Buffer.goal, ChunkTypeEnum.sentenceManager, slots));
+//	}
 	protected void requireSentence(List<ISlot> slots) {
 		conditions.add(new BufferConditions(Buffer.goal, ChunkTypeEnum.sentence, slots));
 	}

@@ -1,19 +1,16 @@
 package edu.psu.acs.lang.output.mem;
 
-import edu.psu.acs.lang.hook.UtilityInitialization;
+import edu.psu.acs.lang.eval.data.garblegold.GarbleGold;
+import edu.psu.acs.lang.output.Evaluator;
 
-public class MemoryEvaluation {
-	public static void main(String[] args) {
-		for (UtilityInitialization ui : UtilityInitialization.values()) {
-			System.out.println(ui.toString()+":");
-			double avgMemRatio = 0.0;
-//			List<OutputSentence> sent = OutputReader.getAllSentences(EvaluationConsts.getAllOutputFiles(ui));
-//			for (OutputSentence s : sent) {
-//				GarbleTree gt = new GarbleTree(s);
-//				avgMemRatio += gt.getMaxMem();
-//			}
-//			avgMemRatio /= sent.size();
-//			System.out.println(avgMemRatio);
-		}
+public class MemoryEvaluation implements Evaluator<GarbleGold> {
+	@Override
+	public String evalName() {
+		return "MemoryRatio,MaxMemory";
+	}
+
+	@Override
+	public String evaluate(GarbleGold data) {
+		return ""+data.getGarble().getMemRatio()+","+data.getGarble().getMaxMem();
 	}
 }

@@ -3,13 +3,13 @@ package edu.psu.acs.lang.production;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.psu.acs.lang.declarative.ConjEnum;
-import edu.psu.acs.lang.declarative.Conjable;
-import edu.psu.acs.lang.declarative.ISlot;
-import edu.psu.acs.lang.declarative.SSlotName;
-import edu.psu.acs.lang.declarative.SSlotNameEnum;
-import edu.psu.acs.lang.declarative.Slot;
-import edu.psu.acs.lang.declarative.SlotVar;
+import edu.psu.acs.lang.declarative.sentence.SSlotName;
+import edu.psu.acs.lang.declarative.sentence.SSlotNameEnum;
+import edu.psu.acs.lang.declarative.slot.ISlot;
+import edu.psu.acs.lang.declarative.slot.Slot;
+import edu.psu.acs.lang.declarative.slot.SlotVar;
+import edu.psu.acs.lang.declarative.type.ConjEnum;
+import edu.psu.acs.lang.declarative.type.Conjable;
 
 public class FinishConjunctionRight extends SyntaxRule {
 	//not called "resolve" because it is a bona fide rule. It represents merging something with 'poop and', for instance, 'butts'

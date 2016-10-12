@@ -3,20 +3,20 @@ package edu.psu.acs.lang.production;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.psu.acs.lang.declarative.ChunkTypeEnum;
-import edu.psu.acs.lang.declarative.ISlot;
-import edu.psu.acs.lang.declarative.LSSlotName;
-import edu.psu.acs.lang.declarative.LSSlotNameEnum;
-import edu.psu.acs.lang.declarative.NullValue;
-import edu.psu.acs.lang.declarative.SSlotName;
-import edu.psu.acs.lang.declarative.SSlotNameEnum;
-import edu.psu.acs.lang.declarative.Slot;
-import edu.psu.acs.lang.declarative.SlotVar;
+import edu.psu.acs.lang.declarative.chunk.ChunkTypeEnum;
+import edu.psu.acs.lang.declarative.lexsyn.LSSlotName;
+import edu.psu.acs.lang.declarative.lexsyn.LSSlotNameEnum;
+import edu.psu.acs.lang.declarative.sentence.SSlotName;
+import edu.psu.acs.lang.declarative.sentence.SSlotNameEnum;
+import edu.psu.acs.lang.declarative.slot.ISlot;
+import edu.psu.acs.lang.declarative.slot.NullValue;
+import edu.psu.acs.lang.declarative.slot.Slot;
+import edu.psu.acs.lang.declarative.slot.SlotVar;
 
 public class AddLexSyn extends ProductionRule {
 
-	public AddLexSyn(int wordNum, int maxNumTypes, int maxNumWords) {
-		super("addlexsyn"+wordNum);
+	public AddLexSyn(int memNum, int maxNumTypes, int wmSize) {
+		super("addlexsyn"+memNum);
 		
 		String wordVar = "word";
 		
@@ -35,8 +35,8 @@ public class AddLexSyn extends ProductionRule {
 		}
 		
 		List<ISlot> goalprecond = new ArrayList<ISlot>();
-		goalprecond.add(new Slot(new SSlotName(SSlotNameEnum.LexsynString, wordNum, maxNumWords), new SlotVar(wordVar)));
-		goalprecond.add(new Slot(new SSlotName(SSlotNameEnum.LexsynFullType, wordNum, maxNumWords, 1, maxNumTypes), new NullValue())); //check if any types are populated
+		goalprecond.add(new Slot(new SSlotName(SSlotNameEnum.LexsynString, memNum, wmSize), new SlotVar(wordVar)));
+		goalprecond.add(new Slot(new SSlotName(SSlotNameEnum.LexsynFullType, memNum, wmSize, 1, maxNumTypes), new NullValue())); //check if any types are populated
 		//goalprecond.add(new Slot(new SSlotName(SSlotNameEnum.State), new GoalState(GoalStateEnum.RetrievedLexSyn)));
 		requireSentence(goalprecond);
 		
@@ -55,11 +55,11 @@ public class AddLexSyn extends ProductionRule {
 		
 		List<ISlot> cueAdds = new ArrayList<ISlot>();
 		for (int i = 1; i <= maxNumTypes; i++) {
-			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.LexsynFullType, wordNum, maxNumWords, i, maxNumTypes), new SlotVar(typeVar[i-1])));
-			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.LexsynLeftType, wordNum, maxNumWords, i, maxNumTypes), new SlotVar(leftTypeVar[i-1])));
-			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.LexsynRightType, wordNum, maxNumWords, i, maxNumTypes), new SlotVar(rightTypeVar[i-1])));
-			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.LexsynCombo, wordNum, maxNumWords, i, maxNumTypes), new SlotVar(combos[i-1])));
-			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.LexsynConj, wordNum, maxNumWords, i, maxNumTypes), new SlotVar(conjs[i-1])));
+			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.LexsynFullType, memNum, wmSize, i, maxNumTypes), new SlotVar(typeVar[i-1])));
+			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.LexsynLeftType, memNum, wmSize, i, maxNumTypes), new SlotVar(leftTypeVar[i-1])));
+			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.LexsynRightType, memNum, wmSize, i, maxNumTypes), new SlotVar(rightTypeVar[i-1])));
+			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.LexsynCombo, memNum, wmSize, i, maxNumTypes), new SlotVar(combos[i-1])));
+			cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.LexsynConj, memNum, wmSize, i, maxNumTypes), new SlotVar(conjs[i-1])));
 		}
 		//cueAdds.add(new Slot(new SSlotName(SSlotNameEnum.State), new GoalState(GoalStateEnum.Free)));
 		modifyGoal(cueAdds);

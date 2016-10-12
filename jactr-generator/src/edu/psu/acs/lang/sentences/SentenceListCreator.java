@@ -1,6 +1,9 @@
 package edu.psu.acs.lang.sentences;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map.Entry;
 
 import edu.psu.acs.lang.ccg.CCGParseList;
 import edu.psu.acs.lang.parsing.ParseException;
@@ -37,26 +40,46 @@ public class SentenceListCreator extends FileProcessor<CCGParseList, SentenceLis
 			return null;
 		}
 		try {
-			return new CCGParseList(f.toPath(), true);
+			return new CCGParseList(f.toPath(), false);
 		} catch (ParseException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}
 		return null;
 	}
-
+	private static Integer key = 1;
+	private static final List<String> tailPastPhrases = new ArrayList<String>();
 	@Override
 	public void map(CCGParseList newData, SentenceList threadAggregate) {
+		String pastPhrase = "";
 		for (ParseNode pn : newData.getParser().getTops()) {
-			threadAggregate.add(pn.getPhrase());
+			String phrase = pn.getPhrase();
+			if (phrase.equals(pastPhrase)) {
+				continue;
+			}
+			else if (phrase.contains(",") || phrase.contains("?") || phrase.contains(".") || phrase.contains(":") || phrase.contains("!")) {
+				continue;
+			}
+			else if (tailPastPhrases.contains(phrase)) {
+				continue; //this isn't *horribly* unlikely
+			}
+			synchronized(key) {
+				threadAggregate.put(key, phrase);
+				key++;
+			}
+			pastPhrase = phrase;
 		}
-		
+		synchronized(tailPastPhrases) {
+			tailPastPhrases.add(pastPhrase);
+		}
 	}
 
 	@Override
 	public void reduce(SentenceList threadAggregate) {
 		synchronized(processAggregate) {
-			processAggregate.addAll(threadAggregate);
+			for (Entry<Integer, String> en : threadAggregate.entrySet()) {
+				processAggregate.put(en.getKey(), en.getValue());
+			}
 		}
 	}
 

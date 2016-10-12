@@ -2,7 +2,7 @@ package util.csv;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
+import java.util.Set;
 
 import util.collections.DoubleKeyMap;
 import util.collections.Pair;
@@ -63,7 +63,7 @@ public class ConfusionCSV<K> extends DoubleKeyMap<K, K, Integer> implements Data
 		ArrayList<String> lines = new ArrayList<String>();
 		for (K key2 : super.getKeysetTwo()) {
 			String line = key2.toString()+",";
-			for (K key1 : super.getKeysetOne()) {
+			for (K key1 : super.getPairedKeys2(key2)) {
 				line += super.get(key1, key2)+",";
 			}
 			line = line.substring(0, line.length()-1);
@@ -80,7 +80,7 @@ public class ConfusionCSV<K> extends DoubleKeyMap<K, K, Integer> implements Data
 //		}
 //		return line.substring(0, line.length()-1);
 		String line = "";
-		List<K> keyset = super.getKeysetOne();
+		Set<K> keyset = super.getKeysetOne();
 		for (K key : keyset) {
 			line += key.toString() + ",";
 		}
@@ -101,14 +101,14 @@ public class ConfusionCSV<K> extends DoubleKeyMap<K, K, Integer> implements Data
 		final ConfusionCSV<K> outer = this;
 		Iterator<String> iter = new Iterator<String>() {
 			Iterator<K> vertLabels = outer.getKeysetTwo().iterator();
-			List<K> keysetOne = outer.getKeysetOne();
+			//Set<K> keysetOne = outer.getKeysetOne();
 			public boolean hasNext() {
 				return vertLabels.hasNext();
 			}
 			public String next() {
 				K key2 = vertLabels.next();
 				String line = key2.toString()+",";
-				for (K key1 : keysetOne) {
+				for (K key1 : outer.getPairedKeys2(key2)) {
 					int shared = outer.containsKey(key1,key2) ? outer.get(key1, key2) : 0;
 					line += shared + ",";
 				}

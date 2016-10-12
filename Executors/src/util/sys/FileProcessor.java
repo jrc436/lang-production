@@ -94,7 +94,7 @@ public abstract class FileProcessor<E extends DataType, V extends DataType> impl
 	private static final int maxCharPerFile = 1000000;
 	
 	protected String getFileExt() {
-		return ".txt";
+		return processAggregate.getFileExt();
 	}
 	
 	/**

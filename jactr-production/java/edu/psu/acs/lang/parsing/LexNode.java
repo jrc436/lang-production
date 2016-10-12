@@ -1,6 +1,6 @@
 package edu.psu.acs.lang.parsing;
 
-import edu.psu.acs.lang.declarative.CCGType;
+import edu.psu.acs.lang.declarative.type.CCGType;
 
 public class LexNode implements ParseNode {
 	private String word;

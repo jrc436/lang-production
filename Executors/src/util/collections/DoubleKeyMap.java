@@ -1,9 +1,7 @@
 package util.collections;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class DoubleKeyMap<E, V, K> extends HashMap<Pair<E, V>, K> {
@@ -41,34 +39,42 @@ public class DoubleKeyMap<E, V, K> extends HashMap<Pair<E, V>, K> {
 		return super.get(new OrderedPair<E, V>(key1, key2));
 	}
 	
-	public List<E> getKeysetOne() {
-		List<E> one = new ArrayList<E>();
+	public Set<E> getKeysetOne() {
+		Set<E> one = new HashSet<E>();
 		for (Pair<E, V> p : super.keySet()) {
 			one.add(p.typeOne);
 		}
 		return one;
 	}
-	public List<V> getKeysetTwo() {
-		List<V> two = new ArrayList<V>();
+	public Set<V> getKeysetTwo() {
+		Set<V> two = new HashSet<V>();
 		for (Pair<E, V> p : super.keySet()) {
 			two.add(p.typeTwo);
 		}
 		return two;
 	}
-	public Set<V> getFirstPairedKeys(E key1) {
+	@SuppressWarnings("unchecked")
+	public Set<V> getPairedKeys(E key1) {
 		Set<V> pairedKeys = new HashSet<V>();
 		for (Pair<E, V> p : super.keySet()) {
 			if (p.typeOne.equals(key1)) {
 				pairedKeys.add(p.typeTwo);
 			}
+			if (symmetric && p.typeTwo.equals(key1)) {
+				pairedKeys.add((V) p.typeOne);
+			}
 		}
 		return pairedKeys;
 	}
-	public Set<E> getSecondPairedKeys(V key2) {
+	@SuppressWarnings("unchecked")
+	public Set<E> getPairedKeys2(V key2) {
 		Set<E> pairedKeys = new HashSet<E>();
 		for (Pair<E, V> p : super.keySet()) {
 			if (p.typeTwo.equals(key2)) {
 				pairedKeys.add(p.typeOne);
+			}
+			if (symmetric && p.typeOne.equals(key2)) {
+				pairedKeys.add((E) p.typeTwo);
 			}
 		}
 		return pairedKeys;

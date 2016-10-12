@@ -5,7 +5,7 @@ import util.sys.Executor;
 
 public class SentenceListExecutor extends Executor<SentenceListCreator, CCGParseList, SentenceList> {
 	public SentenceListExecutor() {
-		super("slist", 12, SentenceListCreator.class, CCGParseList.class, SentenceList.class);
+		super("sentences", 4, SentenceListCreator.class, CCGParseList.class, SentenceList.class);
 	}
 	public static void main(String[] args) {
 		SentenceListExecutor tle = new SentenceListExecutor();

@@ -8,4 +8,7 @@ public class OutputSentence extends ArrayList<IDWordPair> {
 	public boolean add(String garble) {
 		return super.add(new IDWordPair(garble));
 	}
+	public boolean contains(String garble) {
+		return super.contains(new IDWordPair(garble));
+	}
 }

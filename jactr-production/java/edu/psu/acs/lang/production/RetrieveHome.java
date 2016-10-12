@@ -3,11 +3,11 @@ package edu.psu.acs.lang.production;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.psu.acs.lang.declarative.BooleanSlotVal;
-import edu.psu.acs.lang.declarative.ChunkTypeEnum;
-import edu.psu.acs.lang.declarative.ISlot;
-import edu.psu.acs.lang.declarative.MetaSlot;
-import edu.psu.acs.lang.declarative.MetaSlotEnum;
+import edu.psu.acs.lang.declarative.chunk.ChunkTypeEnum;
+import edu.psu.acs.lang.declarative.slot.BooleanSlotVal;
+import edu.psu.acs.lang.declarative.slot.ISlot;
+import edu.psu.acs.lang.declarative.slot.MetaSlot;
+import edu.psu.acs.lang.declarative.slot.MetaSlotEnum;
 import edu.psu.acs.lang.settings.ExperimentSettings;
 
 public class RetrieveHome extends ProductionRule {

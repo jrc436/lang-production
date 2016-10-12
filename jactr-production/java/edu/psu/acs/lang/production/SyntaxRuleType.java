@@ -72,8 +72,8 @@ public enum SyntaxRuleType {
 				return "<";
 			case BackwardComposition:
 				return "B<";
-			case CONJ:
-				return "CONJ";
+//			case CONJ:
+//				return "CONJ";
 			case CONJDL:
 				return "CONJ";
 			case CONJDR:
@@ -86,15 +86,16 @@ public enum SyntaxRuleType {
 				return ">";
 			case ForwardComposition:
 				return "B>";
-			case PCT:
-				return "PCT";
-			case TCR:
-				return "TCR";
+//			case PCT:
+//				return "PCT";
+//			case TCR:
+//				return "TCR";
 			case TypeRaise:
 				return "T>";
 			default:
 				break;		
 		}
-		return "";
+		//System.out.println("Giving toString to type:"+super.toString());
+		return super.toString();
 	}
 }

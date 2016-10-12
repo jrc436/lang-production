@@ -1,164 +1,132 @@
-//package edu.psu.acs.lang.output;
-//
-//import java.io.File;
-//import java.io.IOException;
-//import java.nio.file.Files;
-//import java.util.ArrayList;
-//import java.util.Arrays;
-//import java.util.Collections;
-//import java.util.List;
-//
-//import edu.psu.acs.lang.hook.UtilityInitialization;
-//import edu.psu.acs.lang.output.tree.GarbleTree;
-//import edu.psu.acs.lang.settings.EvaluationConsts;
-//
-//public class OutputReader {
-//
-//	
-////	public static void translateToText(UtilityInitialization ui) throws IOException {
-////		FileWriter fw = new FileWriter(RunConsts.getOutSentencesFilePath(ui).toFile());
-////		List<OutputSentence> all = OutputReader.getAllSentences(ui);
-////		for (OutputSentence os : all) {
-////			GarbleFragments gf = new GarbleFragments(os);
-////			List<String> fragments = gf.getFragments();
-////			String outline = "";
-////			for (String f : fragments) {
-////				outline += f + RunConsts.fragDelim;
-////			}
-////			if (outline.isEmpty()) {
-////				System.err.println("No Fragments found");
-////			}
-////			else {
-////				outline = outline.substring(0, outline.length()-RunConsts.fragDelim.length()) + System.getProperty("line.separator");
-////			}
-////			fw.write(outline);
-////			fw.flush();
-////		}
-////		fw.close();
-////	}
-//	public static boolean doubleCheck() {
-//		boolean check = false;
-//		for (UtilityInitialization ui : UtilityInitialization.values()) {
-//			List<OutputSentence> os = OutputReader.getAllSentences(EvaluationConsts.getAllOutputFiles(ui));
-//			List<String> fragSentences = fragSentences(os);
-//			List<String> treeSentences = treeSentences(os);
-//			if (fragSentences.size() != treeSentences.size()) {
-//				System.err.println("Size error on ui: "+ui.toString());
-//				check = true;
-//				continue;
-//			}
-//			for (int i = 0; i < fragSentences.size(); i++) {
-//				List<String> treeFrags = OutputReader.getFragments(treeSentences.get(i));
-//				Collections.sort(treeFrags);
-//				List<String> fragFrags = OutputReader.getFragments(fragSentences.get(i));
-//				Collections.sort(fragFrags);
-//				if (treeFrags.size() != fragFrags.size()) {
-//					System.err.println("Size error on sentence: "+i);
-//					check = true;
-//					System.err.println("Frag: "+fragSentences.get(i));
-//					System.err.println("Tree: "+treeSentences.get(i));
-//				}
-//				for (int j = 0; j < treeFrags.size(); j++) {
-//					if (!fragFrags.get(j).equals(treeFrags.get(j))) {
-//						System.err.println("Error on sentence: "+i);
-//						System.err.println("Frag: "+fragSentences.get(i));
-//						System.err.println("Tree: "+treeSentences.get(i));
-//						System.err.println("TreeFrag: "+treeFrags.get(j));
-//						System.err.println("Fragfrag: "+fragFrags.get(j));
-//						System.err.println();
-//						check = true;
-//					}
-//				}			
-//			}
-//		}
-//		return check;
-//	}
-//	public static List<String> fragSentences(List<OutputSentence> all) {
-//		List<String> lines = new ArrayList<String>();
-//		for (OutputSentence os : all) {
-//			GarbleFragments gf = new GarbleFragments(os);
-//			List<String> fragments = gf.getFragments();
-//			String outline = "";
-//			for (String f : fragments) {
-//				outline += f + EvaluationConsts.fragDelim;
-//			}
-//			if (outline.isEmpty()) {
-//				System.err.println("No Fragments found");
-//			}
-//			else {
-//				outline = outline.substring(0, outline.length()-EvaluationConsts.fragDelim.length());
-//			}
-//			lines.add(outline);
-//		}
-//		return lines;
-//	}
-//	public static List<String> treeSentences(List<OutputSentence> all) {
-//		List<String> lines = new ArrayList<String>();
-//		for (OutputSentence os : all) {
-//			GarbleTree gf = new GarbleTree(os);
-//			List<String> fragments = gf.getFragments();
-//			String outline = "";
-//			for (String f : fragments) {
-//				outline += f + EvaluationConsts.fragDelim;
-//			}
-//			if (outline.isEmpty()) {
-//				System.err.println("No Fragments found");
-//			}
-//			else {
-//				outline = outline.substring(0, outline.length()-EvaluationConsts.fragDelim.length());
-//			}
-//			lines.add(outline);
-//		}
-//		return lines;
-//	}
-//	public static List<String> getFragments(String garbSentence) {
-//		return Arrays.asList(garbSentence.split(EvaluationConsts.fragDelim));
-//	}
-////	public static List<OutputSentence> getAllSentences(UtilityInitialization ui) {
-////		List<OutputSentence> output = new ArrayList<OutputSentence>();
-////		File[] files = RunConsts.getAllOutputFiles(ui);
-////		try {
-////			for (File f : files) {
-////				output.addAll(readFile(f));
-////			}
-////		} catch (IOException e) {
-////			e.printStackTrace();
-////			System.err.println("A path is invalid");
-////			System.exit(1);
-////		}
-////		return output;
-////	}
-//	public static List<OutputSentence> getAllSentences(File[] files) {
-//		List<OutputSentence> output = new ArrayList<OutputSentence>();
-//		try {
-//			for (File f : files) {
-//				output.addAll(readFile(f));
-//			}
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			System.err.println("A path is invalid");
-//			System.exit(1);
-//		}
-//		return output;
-//	}
+package edu.psu.acs.lang.output;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import edu.psu.acs.lang.declarative.sentence.Sentence;
+import edu.psu.acs.lang.output.tree.GarbleTree;
+import edu.psu.acs.lang.settings.ExperimentSettings;
+
+public class OutputReader {
+	 private static boolean goalLine(String line) {
+         return line.contains(ExperimentSettings.newGoal);
+	 }
+	 private static boolean bastardGoal(String line) {
+	         return line.contains("-");
+	 }
+	 private static int getSentNumFromLine(String line) {
+		 String sentenceName = line.substring(line.lastIndexOf(Sentence.nameConst));
+		 return bastardGoal(line) ? Sentence.extractNumber(sentenceName.split("-")[0]) : Sentence.extractNumber(sentenceName);
+	 }
+
+	public static List<String> treeSentences(List<OutputSentence> all) {
+		List<String> lines = new ArrayList<String>();
+		for (OutputSentence os : all) {
+			GarbleTree gf = new GarbleTree(os);
+			lines.add(gf.getDelimitedFragLine());
+		}
+		return lines;
+	}
+	public static List<String> getFragments(String garbSentence) {
+		return Arrays.asList(garbSentence.split(ExperimentSettings.fragDelim));
+	}
+	public static List<OutputSentence> getAllSentences(File[] files) {
+		List<OutputSentence> output = new ArrayList<OutputSentence>();
+		try {
+			for (File f : files) {
+				output.addAll(readFile(f).values());
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.err.println("A path is invalid");
+			System.exit(1);
+		}
+		return output;
+	}
+	//hack but should work unless parens are in the output strings
+	private static String getLine(List<String> output, int index) {
+		return output.get(index).substring(output.get(index).lastIndexOf(')')+2); 
+	}
+	public static Map<Integer, OutputSentence> readFile(File f) throws IOException {
+		List<String> output = Files.readAllLines(f.toPath());
+		Map<Integer, OutputSentence> toReturn = new HashMap<Integer, OutputSentence>();
+		int index = 1; // first line is always sentence-end
+		boolean checkForRepeat = false;
+		while (index < output.size()) {	
+			String outLine = getLine(output, index);
+			if (goalLine(outLine)) {
+				int num = getSentNumFromLine(outLine);
+				if (toReturn.containsKey(num)) {
+					checkForRepeat = true;
+				}
+				else {
+					toReturn.put(num, new OutputSentence());
+				}
+				index++;
+				while (index < output.size()) {
+					outLine = getLine(output, index);
+					if (outLine.equals(ExperimentSettings.sentenceDelimiter)) {
+						checkForRepeat = false; //this could happen in an empty one.
+						index++;
+						break;
+					}
+					if (checkForRepeat) {
+						OutputSentence os = toReturn.get(num); 
+						if (os.contains(outLine)) {
+							System.err.println("Warning: repeat found.. skipping full realization...");
+							//need to do a skiparoo...
+							while (index < output.size() && !goalLine(getLine(output, index))) {
+								index++;
+							}
+							break; //we found a repeat, i guess!
+						}
+					}
+					checkForRepeat = false;
+					toReturn.get(num).add(outLine);
+					index++;
+				}
+			}
+			else {
+				System.err.println(index+":"+outLine);
+				throw new IOException("This should always result in a goalLine at this point.");
+			}
+		}
+		return toReturn;
+	}
 //	public static List<OutputSentence> readFile(File f) throws IOException {
 //		List<String> output = Files.readAllLines(f.toPath());
 //		List<OutputSentence> toReturn = new ArrayList<OutputSentence>();
 //		int index = 0; // first line is always sentence-end
 //		boolean bastardGoal = false;
-//		OutputSentence os = new OutputSentence();
-//		while (index < output.size()) {
-//			//hack but should work
+//		
+//		while (true) {
+//			//hack but should work unless parens are in the output strings
 //			String outLine = output.get(index).substring(output.get(index).lastIndexOf(')')+2); 
-//			if (outLine.equals(EvaluationConsts.sentenceDelimiter)) {
+//			
+//			if (goalLine(outLine)) {
+//				OutputSentence os = new OutputSentence();
+//				int num = 
+//				while (!outLine.equals(ExperimentSettings.sentenceDelimiter)) {
+//					outLine = output.get(index).substring(output.get(index).lastIndexOf(')')+2); 
+//					
+//				}
+//			}
+//			
+//			if (outLine.equals(ExperimentSettings.sentenceDelimiter)) {
 //				//System.out.println("Starting new File");
 //				index++;
 //				continue;
 //			}
-//			if (EvaluationConsts.goalLine(outLine)) {
+//			if (goalLine(outLine)) {
 //				// great!
 //				bastardGoal = false;
-//				if (EvaluationConsts.bastardGoal(outLine)) {
+//				if (bastardGoal(outLine)) {
 //					bastardGoal = true;
 //				}
 //				index++;
@@ -175,7 +143,7 @@
 //				break;
 //			}
 //			String newOutLine = output.get(index).substring(output.get(index).lastIndexOf(')')+2);
-//			if (newOutLine.equals(EvaluationConsts.sentenceDelimiter)) {			
+//			if (newOutLine.equals(ExperimentSettings.sentenceDelimiter)) {			
 //				toReturn.add(os);
 //				os = new OutputSentence();
 //				index++;
@@ -183,4 +151,4 @@
 //		}
 //		return toReturn;
 //	}
-//}
+}

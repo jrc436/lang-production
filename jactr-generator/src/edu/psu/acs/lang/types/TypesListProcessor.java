@@ -3,8 +3,9 @@ package edu.psu.acs.lang.types;
 import java.io.File;
 import java.io.IOException;
 
-import edu.psu.acs.lang.declarative.CCGType;
+import edu.psu.acs.lang.declarative.type.CCGType;
 import edu.psu.acs.lang.lexsyn.LexsynOrderedList;
+import edu.psu.acs.lang.parsing.ParseException;
 import util.sys.FileProcessor;
 
 public class TypesListProcessor extends FileProcessor<LexsynOrderedList, TypesList> {
@@ -39,7 +40,7 @@ public class TypesListProcessor extends FileProcessor<LexsynOrderedList, TypesLi
 		LexsynOrderedList dat = null;
 		try {
 			dat = LexsynOrderedList.createFromFile(f.toPath());
-		} catch (IOException e) {
+		} catch (IOException | ParseException e) {
 			e.printStackTrace();
 			System.exit(1);
 		}

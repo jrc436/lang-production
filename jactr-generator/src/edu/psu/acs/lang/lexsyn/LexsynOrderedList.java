@@ -99,7 +99,7 @@ public class LexsynOrderedList extends DoubleKeyMap<String, CCGType, Integer> im
 	}
 	
 	private List<CCGType> produceOrdering(String word) {
-		List<CCGType> ordered = new ArrayList<CCGType>(this.getFirstPairedKeys(word));
+		List<CCGType> ordered = new ArrayList<CCGType>(this.getPairedKeys(word));
 		LexsynOrderedList outer = this;
 		Comparator<CCGType> compare = new Comparator<CCGType>() {
 			@Override

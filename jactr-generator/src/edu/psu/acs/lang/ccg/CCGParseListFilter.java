@@ -77,7 +77,7 @@ public class CCGParseListFilter extends FileProcessor<CCGParseList, CCGParseList
 			}
 			DoubleKeyMap<String, CCGType, Integer> nodeTypes = NodeParser.wordTypes(pn);
 			for (String word : words) {
-				for (CCGType types : nodeTypes.getFirstPairedKeys(word)) {
+				for (CCGType types : nodeTypes.getPairedKeys(word)) {
 					if (!lol.get(word).contains(types)) {
 						add = false;
 						break;

@@ -1,13 +1,28 @@
-\section{Methods}
-While we use the bigram method previously described to evaluate the utterances described, we also need something to compare to. To do this, we put randomly sampled Switchboard sentences through the same evaluation scheme. We additionally compare variants of the model to this condition, to see which one best fits the data. As described earlier, our primary research question is to determine the degree that language production is incremental. We believe the effectiveness of each model in fitting the human data can provide evidence toward answering that question.
+\section{Experiment 1}
+After generating a model as described above (using 1200 sentences), we ran it using the provided jACT-R system with no other constraints. The model's output was parsed into both syntax trees and sentences. Then, the edit distance between the produced sentence and input sentence was computed and correlated with the branching factor and working memory usage in a linear model. These metrics are described in more detail in the following sections, and the results can be found in Table~\ref{exp1}.  
 
-\begin{itemize}
-\item The \textit{Incremental} model has an initial utility distribution that favors syntactic rules at the beginning of the sentence, decreasing for rules later in the sentence.
-\item The \textit{Centered} model has an initial distribution favoring rules in the center of the sentence, decreasing as they get closer to the end and the beginning.
-\item The \textit{Reverse} model has an initial distribution favoring rules at the end of the sentence, decreasing as they get closer to the beginning.
-\item The \textit{Default} model has no initial utility distribution, with every rule starting at zero utility.
-\end{itemize}
+\subsection{Branching Factor}
+The branching factor can be thought of as the degree to which the sentence was realized incrementally. The more right-branching a syntax tree is, the more incrementally it was realized. We defined two basic metrics for measuring this. The unweighted branching factor (ubf) is simply the number of right-branching decisions compared to the number of total decisions. The weighted branching factor (wbf) takes into account how far up the syntax tree the decision was made; it short, it sums all of the subtrees rather than simply comparing the decisions. An example tree can be found in Figure~\ref{tree}. 
 
-As a reminder, all of these utilities would change as the model progresses and makes sentences. However, the \textit{Default} model has certain disadvantages. As there is an initial sentence the model receives, having any imposed structure would make the model more likely to produce an utterance closer to that original sentence, which is presumably slightly more plausible than any given grammatical utterance. Nonetheless, we hypothesize due to a decreased cognitive load and an increased flexibility in the usage of syntactic rules that the \textit{Incremental} model will perform the best.
+\subsection{Working Memory Usage}
+The Working Memory Usage (WMU) was based on the maximum amount of slots the model used while realizing a sentence. We additionally computed the adjusted working memory usage (AWMU), which took into account the length of the sentence, as longer sentences could require additional working memory.
 
-Each of the four models and the control condition were fed ten groups of one hundred sentences. Each of them is plotted and compared by their standard deviation, mean, and median.
+\subsection{Edit Distance}
+The edit distance between the result and the input sentence was computed using Levenshtein distance. If the model produced multiple fragments rather than a single utterance, the two distances were averaged for that utterance.
+
+\subsection{Results}
+Both the unweighted and weighted branch factors were found to be highly significant with a negative effect on edit distance, implying more incremental constructions produce realizations more similar to the intial sentences. Conversely, more working memory usage was found to have a positive effect, implying increased working memory usage decreased performance. This was especially true with the adjusted working memory usage, implying no extra need for working memory for longer sentences. 
+
+\begin{table}
+\centering
+\begin{tabular}{l|cccc}
+        & WBF & UBF & WMU & AWMU \\ \hline
+p-value & $<0.0001$ & $<0.0001$ & $0.007$ & $<0.0001$ \\
+effect & $-0.221$ & $-0.168$ & $0.057$ & $0.074$ \\
+\end{tabular}
+\label{exp1}
+\caption{Correlations as individual linear models with edit distance}
+\end{table}
+
+\subsection{Discussion}
+Branching Factor and Working Memory usage were also significantly correlated ($p<0.001$). This could imply that one of the effects is a lurking variable. However, the effects themselves are also both significant given each other ($p<0.0001$). Increased working memory usage, rather than alleviating stress caused by low-resources, could cause the realizer to garden-path itself. By allowing itself to work breadth-first, it can potentially make syntactic choices that won't eventually lead to a good utterance. The branching factor could partially be a result of this: having a higher right-branching factor should lead to lower working memory use, as new elements are added to the current state, rather than built up in another way. However, it could also be a simple consequence of that since language is outputted in order, it's easier to combine it in order, thus allowing earlier outputs.

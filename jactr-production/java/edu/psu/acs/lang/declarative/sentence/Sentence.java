@@ -20,7 +20,7 @@ public class Sentence extends ChunkStore {
 	 * @return
 	 */
 	public static int getWorkingMemorySize() {
-		return 7;
+		return 6;
 	}
 	public static final String nameConst = "sentence";
 	public static String getNameConst(int num) {

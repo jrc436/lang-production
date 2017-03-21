@@ -44,7 +44,7 @@
 
 \begin{frontmatter}
 
-\title{Examining Sentence Construction With An ACT-R Model of Language Production}
+\title{Examining Sentence Construction With An ACT-R Model of Grammatical Encoding}
 %\tnotetext[mytitlenote]{Fully documented templates are available in the elsarticle package on \href{http://www.ctan.org/tex-archive/macros/latex/contrib/elsarticle}{CTAN}.}
 
 %% Group authors per affiliation:
@@ -65,7 +65,7 @@
 %\address[mysecondaryaddress]{360 Park Avenue South, New York}
 
 \begin{abstract}
-Our goal was to compare among different starting points in the process of language production. We accomplished this by building a model of language production that takes as input a set of words and attempts to construct a grammatical sentence from them. We pre-biased the model's initial utilities to start realization in the middle, beginning, and end of the sentence in order to add evidence to the debate of how incremental language production is. By comparing the probability distributions, we discovered that while the early and middle cases were the closest, no conditions are currently indistinguishable from natural language. Nonetheless, we present our modeling framework as a way forward to solve difficult problems in language production.
+We built a cognitive model of grammatical encoding that can be empirically validated on large data. We see this as a step toward a methodology that combines cognitive plausibility, linguistic theory, and computational modeling. In particular, we used ACT-R model, the Combinatory Categorial Grammar formalism, and the Switchboard corpus. To evaluate our methodology, we examined working memory usage and incrementality in the process of grammatical encoding. By comparing realized sentences to their targets, we were able to determine that sentences with low working memory usage and a high degree of incrementality are more easily able to be realized. By limiting working memory in the model, we showed that having more working memory available also improves performance. We claim that our methodology has the ability to disentangle complicated effects on psycholinguistic phenomena in general.
 \end{abstract}
 
 \begin{keyword}
@@ -85,6 +85,7 @@ language production\sep cognitive modelling
 %\input{detail}
 %\input{actr}
 %\input{extra}
+\input{tex/rq}
 \input{tex/experiment}
 \input{tex/results}
 \input{tex/discussion}

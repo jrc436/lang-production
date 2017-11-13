@@ -1,4 +1,0 @@
----------------------------------------------
-actr-swm1 ROUGE-L Average_R: 0.63685 (95%-conf.int. 0.63202 - 0.64159)
-actr-swm1 ROUGE-L Average_P: 0.97258 (95%-conf.int. 0.97161 - 0.97353)
-actr-swm1 ROUGE-L Average_F: 0.76795 (95%-conf.int. 0.76432 - 0.77143)

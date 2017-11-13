@@ -7,7 +7,7 @@ representations and make specific claims about memory.
 
 This project is not necessarily designed for public use, but to document the methods used in that research. To setup, please first have
 jACT-R running. Models are generated programmatically by learning the vocabulary and associated types from a corpus, so an annotated
-corpus (such as Switchboard) is needed. 
+corpus (such as Switchboard) is needed. This project is also dependent on the executors project (https://github.com/jrc436/executors). 
 
 Paper can be found below:
 https://psyarxiv.com/rxhnd/
